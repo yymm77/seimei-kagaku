@@ -1,1 +1,1 @@
-# seimei-kagaku
+# Index
