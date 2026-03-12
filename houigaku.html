@@ -1,0 +1,3118 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>方位学の殿堂 ｜ 九星気学方位判定システム</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;700;900&family=Noto+Serif+JP:wght@300;400;700&family=Shippori+Mincho:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:#0d0b08; --paper:#f7f2e8; --aged:#e8dfc8; --gold:#a07c20;
+  --gold-light:#c9a84c; --vermillion:#9b2335; --indigo:#1a2f5a;
+  --jade:#1e5c3a; --smoke:#6b6358; --kichi-bg:#e8f5ee; --hankichi-bg:#e8eef8;
+  --kyou-bg:#faeaea;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--paper);color:var(--ink);font-family:'Noto Serif JP',serif;overflow-x:hidden;}
+
+/* ======== ヘッダー ======== */
+header{background:var(--indigo);padding:0;overflow:hidden;position:relative;}
+.header-inner{display:flex;align-items:center;justify-content:center;padding:1.8rem 4rem;gap:1.5rem;position:relative;z-index:2;}
+.header-bg-compass{position:absolute;right:-60px;top:50%;transform:translateY(-50%);opacity:.07;animation:spin-slow 80s linear infinite;}
+@keyframes spin-slow{to{transform:translateY(-50%) rotate(360deg);}}
+.site-title h1{font-family:'Zen Old Mincho',serif;font-size:2rem;color:#f7f2e8;letter-spacing:.35em;text-shadow:0 0 30px rgba(201,168,76,.4);}
+.site-title .sub{font-size:.72rem;color:var(--gold-light);letter-spacing:.45em;margin-top:.3rem;text-align:center;}
+
+nav{background:rgba(8,12,28,.95);border-top:1px solid rgba(201,168,76,.25);border-bottom:1px solid rgba(201,168,76,.25);}
+nav ul{display:flex;justify-content:center;list-style:none;}
+nav ul li a{display:block;padding:.8rem 1.8rem;color:#c9c0aa;text-decoration:none;font-size:.78rem;letter-spacing:.15em;transition:.3s;border-right:1px solid rgba(201,168,76,.12);position:relative;}
+nav ul li:first-child a{border-left:1px solid rgba(201,168,76,.12);}
+nav ul li a:hover,nav ul li a.active{color:var(--gold-light);background:rgba(201,168,76,.1);}
+nav ul li a.active::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:20px;height:2px;background:var(--gold-light);}
+
+/* ======== ヒーロー ======== */
+.hero{background:linear-gradient(155deg,var(--indigo),#0d1530 50%,#1a0808);padding:4rem;text-align:center;position:relative;overflow:hidden;}
+.hero-compass-bg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);opacity:.05;animation:spin-slow 120s linear infinite;}
+.hero h2{font-family:'Zen Old Mincho',serif;font-size:1.4rem;color:var(--gold-light);letter-spacing:.5em;margin-bottom:.8rem;position:relative;z-index:2;}
+.hero p{color:#c9c0aa;font-size:.85rem;line-height:2.1;max-width:580px;margin:0 auto;position:relative;z-index:2;}
+.divider{display:flex;align-items:center;justify-content:center;gap:1rem;margin:1.5rem 0;position:relative;z-index:2;}
+.divider::before,.divider::after{content:'';width:60px;height:1px;}
+.divider::before{background:linear-gradient(90deg,transparent,var(--gold));}
+.divider::after{background:linear-gradient(90deg,var(--gold),transparent);}
+.divider span{color:var(--gold);}
+
+/* ======== ステップバー ======== */
+.steps-bar{background:var(--aged);padding:2.5rem 4rem;}
+.steps-inner{max-width:1000px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(160,124,32,.2);}
+.step-item{background:white;padding:1.5rem 1rem;text-align:center;}
+.step-no{font-family:'Shippori Mincho',serif;font-size:2.2rem;font-weight:800;color:var(--aged);display:block;line-height:1;}
+.step-item h4{font-family:'Zen Old Mincho',serif;font-size:.85rem;letter-spacing:.1em;color:var(--indigo);margin:.4rem 0 .3rem;}
+.step-item p{font-size:.7rem;color:var(--smoke);line-height:1.8;}
+
+/* ======== メイン ======== */
+main{max-width:1060px;margin:0 auto;padding:3rem 2rem;}
+.sec-head{display:flex;align-items:flex-start;gap:1.2rem;margin-bottom:2rem;}
+.sec-no{font-family:'Shippori Mincho',serif;font-size:2.8rem;font-weight:800;color:var(--aged);line-height:1;flex-shrink:0;}
+.sec-head h3{font-family:'Zen Old Mincho',serif;font-size:1.3rem;letter-spacing:.2em;color:var(--indigo);border-bottom:2px solid var(--gold);padding-bottom:.4rem;}
+.sec-head p{font-size:.75rem;color:var(--smoke);margin-top:.3rem;}
+
+/* ======== カード ======== */
+.card{background:white;border:1px solid rgba(160,124,32,.2);padding:2rem;box-shadow:0 3px 16px rgba(0,0,0,.05);position:relative;margin-bottom:2rem;}
+.card::after{content:'';position:absolute;top:6px;left:6px;right:-6px;bottom:-6px;border:1px solid rgba(160,124,32,.08);z-index:-1;}
+
+/* ======== フォーム ======== */
+.fg{display:flex;flex-direction:column;gap:.4rem;margin-bottom:1rem;}
+.fg label{font-size:.75rem;letter-spacing:.15em;color:var(--smoke);font-weight:600;}
+.fg label .req{color:var(--vermillion);margin-left:.2rem;}
+.fg input,.fg select{border:1px solid rgba(160,124,32,.3);padding:.65rem .9rem;font-family:'Noto Serif JP',serif;font-size:.88rem;background:var(--paper);color:var(--ink);outline:none;transition:.2s;}
+.fg input:focus,.fg select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(160,124,32,.1);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.form-row.three{grid-template-columns:1fr 1fr 1fr;}
+
+.loc-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem;}
+.loc-box{padding:1.2rem;background:var(--paper);border:1px solid rgba(160,124,32,.18);}
+.loc-box h5{font-family:'Zen Old Mincho',serif;font-size:.82rem;letter-spacing:.15em;color:var(--indigo);padding-bottom:.5rem;border-bottom:1px solid rgba(160,124,32,.2);margin-bottom:.8rem;}
+
+.sep{display:flex;align-items:center;gap:1rem;margin:1.5rem 0;}
+.sep::before,.sep::after{content:'';flex:1;height:1px;background:rgba(160,124,32,.2);}
+.sep span{color:var(--gold);font-size:.9rem;}
+
+.btn-calc{background:linear-gradient(135deg,var(--indigo),#0c1630);color:var(--gold-light);border:1px solid var(--gold);padding:.9rem 3rem;font-family:'Zen Old Mincho',serif;font-size:.95rem;letter-spacing:.4em;cursor:pointer;transition:.3s;display:block;margin:1.5rem auto 0;position:relative;overflow:hidden;}
+.btn-calc::before{content:'';position:absolute;inset:0;background:rgba(201,168,76,.12);opacity:0;transition:.3s;}
+.btn-calc:hover::before{opacity:1;}
+.btn-calc:hover{box-shadow:0 4px 18px rgba(160,124,32,.3);}
+
+/* ======== 結果エリア ======== */
+#result{display:none;}
+#result.show{display:block;animation:fadeUp .5s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+
+/* ======== 命星バッジ ======== */
+.badge-row{display:flex;align-items:center;gap:2rem;flex-wrap:wrap;padding:1.2rem 0;}
+.badge{width:82px;height:82px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Zen Old Mincho',serif;font-weight:900;flex-shrink:0;}
+.badge .bn{font-size:1.6rem;line-height:1;}
+.badge .bname{font-size:.62rem;letter-spacing:.05em;}
+.b1{background:radial-gradient(#2a1010,#120808);color:#f0c8b0;border:2px solid #7a2828;}
+.b2{background:radial-gradient(#231808,#120c04);color:#f0d890;border:2px solid #806020;}
+.b3{background:radial-gradient(#082818,#041408);color:#90f0b8;border:2px solid #186840;}
+.b4{background:radial-gradient(#082010,#040c04);color:#98e898;border:2px solid #286020;}
+.b5{background:radial-gradient(#281508,#140a04);color:#f0c870;border:2px solid #985818;}
+.b6{background:radial-gradient(#101220,#08080f);color:#b8cce8;border:2px solid #385888;}
+.b7{background:radial-gradient(#180820,#0c0410);color:#ddb0f0;border:2px solid #703888;}
+.b8{background:radial-gradient(#221508,#110a04);color:#f8d090;border:2px solid #b87020;}
+.b9{background:radial-gradient(#200808,#100404);color:#f8a090;border:2px solid #b83828;}
+
+.badge-info{flex:1;min-width:220px;font-size:.8rem;line-height:2;color:var(--smoke);padding-left:1.2rem;border-left:2px solid var(--gold);}
+.badge-label{font-size:.7rem;letter-spacing:.2em;color:var(--smoke);margin-bottom:.3rem;}
+
+/* ======== 方位グリッド ======== */
+.houi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:1.2rem;}
+.hc{padding:.9rem .5rem;text-align:center;border:1px solid rgba(0,0,0,.08);transition:.2s;cursor:default;}
+.hc:hover{transform:scale(1.03);z-index:2;box-shadow:0 4px 14px rgba(0,0,0,.12);}
+.hc .hdir{font-family:'Zen Old Mincho',serif;font-size:1rem;font-weight:700;display:block;margin-bottom:.2rem;}
+.hc .hscore{font-size:1.6rem;font-weight:800;font-family:'Shippori Mincho',serif;display:block;line-height:1.2;}
+.hc .hlabel{font-size:.65rem;letter-spacing:.05em;margin-top:.15rem;display:block;}
+.hc .hstar{font-size:.6rem;opacity:.6;display:block;margin-top:.1rem;}
+
+.hc.kichi{background:var(--kichi-bg);border-color:rgba(30,92,58,.25);}
+.hc.kichi .hdir,.hc.kichi .hscore{color:var(--jade);}
+.hc.hankichi{background:var(--hankichi-bg);border-color:rgba(26,47,90,.2);}
+.hc.hankichi .hdir,.hc.hankichi .hscore{color:var(--indigo);}
+.hc.kyou{background:var(--kyou-bg);border-color:rgba(155,35,53,.2);}
+.hc.kyou .hdir,.hc.kyou .hscore{color:var(--vermillion);}
+.hc.futsu{background:#f8f4ec;border-color:rgba(160,124,32,.15);}
+.hc.futsu .hdir,.hc.futsu .hscore{color:#6b5830;}
+.hc.center{background:linear-gradient(135deg,var(--indigo),#0c1428);color:var(--gold-light);}
+.hc.center .hdir,.hc.center .hscore,.hc.center .hlabel,.hc.center .hstar{color:var(--gold-light);}
+
+/* ======== スコアバー ======== */
+.bar-list{margin-top:1rem;}
+.bar-item{display:flex;align-items:center;gap:.8rem;margin-bottom:.6rem;}
+.bar-dir{width:2.8rem;font-family:'Zen Old Mincho',serif;font-size:.85rem;text-align:center;flex-shrink:0;}
+.bar-track{flex:1;height:22px;background:var(--aged);overflow:hidden;}
+.bar-fill{height:100%;display:flex;align-items:center;padding-left:.4rem;font-size:.65rem;color:white;letter-spacing:.05em;transition:width 1.2s ease;}
+.bar-fill.kichi{background:linear-gradient(90deg,var(--jade),#329a60);}
+.bar-fill.hankichi{background:linear-gradient(90deg,var(--indigo),#2a4a8a);}
+.bar-fill.kyou{background:linear-gradient(90deg,var(--vermillion),#c04050);}
+.bar-fill.futsu{background:linear-gradient(90deg,#8a7a50,#a89870);}
+.bar-val{width:2.2rem;font-size:.82rem;font-weight:700;text-align:right;flex-shrink:0;}
+
+/* ======== 詳細説明 ======== */
+.detail-list{margin-top:1rem;}
+.detail-item{display:flex;gap:1rem;align-items:flex-start;padding:1rem;margin-bottom:.6rem;border-left:3px solid transparent;}
+.detail-item.kichi{background:var(--kichi-bg);border-color:var(--jade);}
+.detail-item.hankichi{background:var(--hankichi-bg);border-color:var(--indigo);}
+.detail-item.kyou{background:var(--kyou-bg);border-color:var(--vermillion);}
+.detail-item.futsu{background:#f8f4ec;border-color:#c0a860;}
+.detail-dir{font-family:'Zen Old Mincho',serif;font-size:1.1rem;font-weight:700;flex-shrink:0;width:2rem;text-align:center;}
+.detail-body h5{font-size:.8rem;font-weight:700;margin-bottom:.3rem;letter-spacing:.08em;}
+.detail-body p{font-size:.75rem;color:var(--smoke);line-height:1.9;}
+
+/* ======== タブ ======== */
+.tabs{display:flex;border-bottom:2px solid rgba(160,124,32,.2);margin-bottom:1.2rem;}
+.tab{padding:.6rem 1.3rem;border:none;background:none;font-family:'Noto Serif JP',serif;font-size:.78rem;letter-spacing:.08em;color:var(--smoke);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:.2s;}
+.tab.on{color:var(--indigo);border-bottom-color:var(--gold);font-weight:700;}
+.tc{display:none;} .tc.on{display:block;animation:fadeUp .3s ease;}
+
+/* ======== カレンダー ======== */
+.cal-head-row{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-top:1rem;}
+.cal-hd{text-align:center;padding:.35rem;font-size:.68rem;letter-spacing:.08em;background:var(--indigo);color:var(--gold-light);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.cal-day{padding:.5rem .2rem;text-align:center;font-size:.72rem;border:1px solid rgba(160,124,32,.12);cursor:pointer;transition:.18s;background:white;position:relative;}
+.cal-day:hover{box-shadow:0 2px 10px rgba(0,0,0,.15);z-index:2;}
+.cal-day .dn{font-size:.88rem;font-weight:600;display:block;}
+.cal-day .ds{font-size:.58rem;margin-top:.08rem;display:block;}
+.cal-day .dc{font-size:.6rem;font-weight:700;display:block;}
+/* カレンダー7段階カラー */
+/* 吉 */
+.cal-day.c-kichi{background:#e8f7ee;border-color:rgba(16,163,104,.25);}
+.cal-day.c-kichi .dn{color:#0a6040;}
+.cal-day.c-kichi .dc{color:#10a368;font-weight:800;}
+/* 普通 */
+.cal-day.c-futsu{background:#f0f2f8;border-color:rgba(100,120,160,.2);}
+.cal-day.c-futsu .dc{color:#4a5880;}
+/* 小凶 */
+.cal-day.c-syokyo{background:#fdf6e0;border-color:rgba(220,160,30,.3);}
+.cal-day.c-syokyo .dc{color:#a07800;}
+/* 凶 */
+.cal-day.c-kyo{background:#fdecea;border-color:rgba(220,60,60,.3);}
+.cal-day.c-kyo .dc{color:#b02020;font-weight:800;}
+/* 大凶 — 黄色ベース、読みやすい茶文字 */
+.cal-day.c-daikyo{
+  background: repeating-linear-gradient(
+    135deg,
+    #fff9c4 0px, #fff9c4 6px,
+    #ffe082 6px, #ffe082 12px
+  );
+  border: 2px solid #f9a825;
+}
+.cal-day.c-daikyo .dn{color:#5d3a00;font-weight:800;}
+.cal-day.c-daikyo .dc{color:#7a4400;font-weight:800;font-size:.65rem;}
+/* 最大凶 — 赤ベース、白文字 */
+.cal-day.c-saidaikyo{
+  background: repeating-linear-gradient(
+    135deg,
+    #ffcdd2 0px, #ffcdd2 6px,
+    #ef9a9a 6px, #ef9a9a 12px
+  );
+  border: 2px solid #c62828;
+}
+.cal-day.c-saidaikyo .dn{color:#7f0000;font-weight:800;}
+.cal-day.c-saidaikyo .dc{color:#b71c1c;font-weight:800;font-size:.65rem;}
+/* 超最大凶 — 黒ベース、可読性確保のため薄いグレーストライプ */
+.cal-day.c-chosaikyo{
+  background: repeating-linear-gradient(
+    135deg,
+    #2a2a2a 0px, #2a2a2a 6px,
+    #1a1a1a 6px, #1a1a1a 12px
+  );
+  border: 2px solid #880e4f;
+}
+.cal-day.c-chosaikyo .dn{color:#ffe0e0;font-weight:800;text-shadow:0 0 4px rgba(255,100,100,.5);}
+.cal-day.c-chosaikyo .ds{color:#ccc;}
+.cal-day.c-chosaikyo .dc{color:#ff6090;font-weight:800;font-size:.65rem;text-shadow:0 0 3px rgba(255,0,80,.4);}
+/* 今日の枠 */
+.cal-day.today{outline:2px solid var(--gold);outline-offset:-2px;}
+.cal-day.empty{background:transparent;border-color:transparent;}
+.cal-legend{display:flex;gap:1.5rem;margin-top:.8rem;flex-wrap:wrap;}
+.cl-item{display:flex;align-items:center;gap:.4rem;font-size:.72rem;color:var(--smoke);}
+.cl-dot{width:10px;height:10px;border-radius:50%;}
+
+/* ======== フッター ======== */
+footer{background:var(--indigo);color:#c9c0aa;padding:3rem 4rem;margin-top:4rem;position:relative;}
+footer::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.footer-inner{display:grid;grid-template-columns:2fr 1fr 1fr;gap:3rem;max-width:1060px;margin:0 auto;}
+.footer-brand h3{font-family:'Zen Old Mincho',serif;font-size:1rem;color:var(--gold-light);letter-spacing:.3em;margin-bottom:.7rem;}
+.footer-brand p{font-size:.72rem;line-height:2;opacity:.65;}
+footer h4{font-family:'Zen Old Mincho',serif;font-size:.82rem;letter-spacing:.2em;color:var(--gold-light);margin-bottom:.8rem;}
+footer ul{list-style:none;}
+footer ul li{margin-bottom:.4rem;}
+footer ul li a{color:#c9c0aa;text-decoration:none;font-size:.75rem;opacity:.65;transition:.2s;}
+footer ul li a:hover{opacity:1;color:var(--gold-light);}
+.footer-bottom{text-align:center;margin-top:2rem;padding-top:1rem;border-top:1px solid rgba(201,168,76,.18);font-size:.68rem;opacity:.45;max-width:1060px;margin-left:auto;margin-right:auto;}
+
+@media(max-width:768px){
+  .header-inner{padding:1.2rem;}
+  .site-title h1{font-size:1.4rem;}
+  nav ul{flex-wrap:wrap;}
+  nav ul li a{padding:.6rem .9rem;font-size:.7rem;}
+  .hero{padding:2.5rem 1.5rem;}
+  .steps-bar{padding:2rem 1.5rem;}
+  .steps-inner{grid-template-columns:1fr 1fr;}
+  main{padding:2rem 1rem;}
+  .form-row,.form-row.three,.loc-grid{grid-template-columns:1fr;}
+  .footer-inner{grid-template-columns:1fr;}
+  footer{padding:2rem 1.5rem;}
+}
+</style>
+<style>
+
+/* ======== 日別方位モーダル ======== */
+#calModal {
+  display: none;
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(10,12,24,.55);
+  backdrop-filter: blur(3px);
+  align-items: center; justify-content: center;
+}
+#calModal.open { display: flex; }
+#calModalBox {
+  background: var(--paper);
+  border: 1px solid rgba(160,124,32,.35);
+  box-shadow: 0 12px 48px rgba(0,0,0,.35);
+  width: min(560px, 94vw);
+  max-height: 88vh;
+  overflow-y: auto;
+  position: relative;
+  animation: fadeUp .22s ease;
+}
+#calModalClose {
+  position: absolute; top: .8rem; right: 1rem;
+  background: none; border: none; font-size: 1.3rem;
+  color: var(--smoke); cursor: pointer; line-height: 1;
+}
+#calModalClose:hover { color: var(--ink); }
+#calModalHead {
+  background: var(--indigo);
+  padding: 1.1rem 1.5rem;
+  display: flex; align-items: baseline; gap: 1rem; flex-wrap: wrap;
+}
+#calModalHead .mh-date {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: 1.15rem; color: var(--gold-light); letter-spacing: .2em;
+}
+#calModalHead .mh-nissei {
+  font-size: .75rem; color: rgba(201,168,76,.7); letter-spacing: .1em;
+}
+#calModalBody { padding: 1.2rem 1.5rem 1.5rem; }
+.modal-dir-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-top: .8rem;
+}
+.modal-dir-cell {
+  padding: .65rem .4rem;
+  text-align: center;
+  border-radius: 3px;
+  border: 1px solid rgba(0,0,0,.08);
+}
+.modal-dir-cell.center-cell {
+  background: var(--indigo);
+  color: var(--gold-light);
+}
+.modal-dir-cell .mdc-dir {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: .82rem; font-weight: 700; display: block;
+}
+.modal-dir-cell .mdc-kichi {
+  font-size: .7rem; font-weight: 700; display: block; margin-top: .18rem;
+}
+.modal-dir-cell .mdc-score {
+  font-size: .6rem; color: rgba(0,0,0,.4); display: block; margin-top: .1rem;
+}
+/* 方位セルの吉凶色 */
+.mdc-c-kichi    { background:#e8f7ee; border-color:rgba(16,163,104,.3); }
+.mdc-c-kichi .mdc-kichi { color:#10a368; }
+.mdc-c-futsu    { background:#f0f2f8; border-color:rgba(100,120,160,.2); }
+.mdc-c-futsu .mdc-kichi { color:#4a5880; }
+.mdc-c-syokyo   { background:#fdf6e0; border-color:rgba(220,160,30,.3); }
+.mdc-c-syokyo .mdc-kichi { color:#a07800; }
+.mdc-c-kyo      { background:#fdecea; border-color:rgba(220,60,60,.3); }
+.mdc-c-kyo .mdc-kichi { color:#b02020; font-weight:800; }
+.mdc-c-daikyo   { background:repeating-linear-gradient(135deg,#fff9c4 0,#fff9c4 5px,#ffe082 5px,#ffe082 10px); border-color:#f9a825; }
+.mdc-c-daikyo .mdc-kichi { color:#7a4400; }
+.mdc-c-saidaikyo{ background:repeating-linear-gradient(135deg,#ffcdd2 0,#ffcdd2 5px,#ef9a9a 5px,#ef9a9a 10px); border-color:#c62828; }
+.mdc-c-saidaikyo .mdc-kichi { color:#b71c1c; }
+.mdc-c-chosaikyo{ background:repeating-linear-gradient(135deg,#2a2a2a 0,#2a2a2a 5px,#1a1a1a 5px,#1a1a1a 10px); border-color:#880e4f; }
+.mdc-c-chosaikyo .mdc-dir { color:#ffe0e0; }
+.mdc-c-chosaikyo .mdc-kichi { color:#ff6090; }
+.mdc-c-chosaikyo .mdc-score { color:rgba(255,255,255,.35); }
+/* 吉方まとめ */
+.modal-summary { margin-top: 1.2rem; padding: .9rem 1rem; background: #f7f3e9; border-left: 3px solid var(--gold); font-size: .78rem; line-height: 2; color: var(--smoke); }
+.modal-summary strong { color: var(--indigo); }
+
+
+
+/* ======== 月盤・年盤グリッド ======== */
+/* 月盤：12ヶ月 × 各月のブロック */
+.cal-month-block { margin-bottom: 1.2rem; }
+.cal-month-label {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: .8rem; letter-spacing: .15em;
+  color: var(--indigo); padding: .3rem .4rem;
+  border-left: 3px solid var(--gold);
+  background: rgba(160,124,32,.06);
+  margin-bottom: 4px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.cal-month-label .ml-star {
+  font-size: .7rem; color: var(--smoke);
+  background: white; border: 1px solid rgba(160,124,32,.25);
+  padding: .1rem .5rem; border-radius: 2px;
+}
+/* セツ入り区切りライン */
+.setsuiri-divider {
+  grid-column: 1 / -1;
+  border-top: 2px dashed rgba(160,124,32,.45);
+  margin: 2px 0;
+  position: relative;
+}
+.setsuiri-divider::after {
+  content: attr(data-label);
+  position: absolute; left: 4px; top: -9px;
+  font-size: .58rem; color: var(--gold);
+  background: var(--paper); padding: 0 4px;
+  white-space: nowrap;
+}
+/* 年盤タイムライン */
+.year-timeline { display: flex; flex-direction: column; gap: 3px; }
+.year-row {
+  display: flex; align-items: center; gap: 6px;
+  padding: .3rem .5rem; border-radius: 2px;
+  border-left: 4px solid transparent;
+  transition: .15s; cursor: pointer;
+}
+.year-row:hover { filter: brightness(.95); }
+.year-row .yr-num {
+  font-family: 'Shippori Mincho', serif;
+  font-size: .9rem; font-weight: 700;
+  min-width: 3.2rem; color: inherit;
+}
+.year-row .yr-era { font-size: .7rem; color: inherit; opacity: .7; min-width: 4rem; }
+.year-row .yr-star { font-size: .72rem; min-width: 5rem; }
+.year-row .yr-kichi {
+  font-size: .75rem; font-weight: 700; min-width: 4.5rem;
+}
+.year-row .yr-bar {
+  flex: 1; height: 8px; border-radius: 4px;
+  background: rgba(255,255,255,.35);
+  overflow: hidden;
+}
+.year-row .yr-bar-fill { height: 100%; border-radius: 4px; }
+.year-row.yr-current {
+  outline: 2px solid var(--gold); outline-offset: 1px;
+}
+/* 年盤：吉凶色 */
+.yr-c-kichi     { background:#d4f0e2; border-color:#10a368; }
+.yr-c-futsu     { background:#e8ecf4; border-color:#6478a0; }
+.yr-c-syokyo    { background:#fdf0d0; border-color:#e6a01e; }
+.yr-c-kyo       { background:#fce0de; border-color:#dc3c3c; }
+.yr-c-daikyo    {
+  background: repeating-linear-gradient(135deg,#fff9c4 0,#fff9c4 8px,#ffe082 8px,#ffe082 16px);
+  border-color:#f9a825;
+}
+.yr-c-saidaikyo {
+  background: repeating-linear-gradient(135deg,#ffcdd2 0,#ffcdd2 8px,#ef9a9a 8px,#ef9a9a 16px);
+  border-color:#c62828;
+}
+.yr-c-chosaikyo {
+  background: repeating-linear-gradient(135deg,#2a2a2a 0,#2a2a2a 8px,#1a1a1a 8px,#1a1a1a 16px);
+  border-color:#880e4f;
+}
+.yr-c-kichi     .yr-num, .yr-c-kichi     .yr-era { color:#0a5030; }
+.yr-c-futsu     .yr-num, .yr-c-futsu     .yr-era { color:#3a4870; }
+.yr-c-syokyo    .yr-num, .yr-c-syokyo    .yr-era { color:#705000; }
+.yr-c-kyo       .yr-num, .yr-c-kyo       .yr-era { color:#8a1010; }
+.yr-c-daikyo    .yr-num, .yr-c-daikyo    .yr-era { color:#5d3a00; }
+.yr-c-saidaikyo .yr-num, .yr-c-saidaikyo .yr-era { color:#7f0000; }
+.yr-c-chosaikyo .yr-num, .yr-c-chosaikyo .yr-era { color:#ffe0e0; }
+.yr-c-chosaikyo .yr-kichi { color:#ff6090; }
+
+/* ======== カレンダーナビ ======== */
+.cal-nav-btn{background:rgba(255,255,255,.1);border:1px solid rgba(201,168,76,.3);color:var(--gold-light);padding:.3rem .65rem;cursor:pointer;font-size:.8rem;border-radius:2px;transition:.2s;font-family:'Noto Serif JP',serif;}
+.cal-nav-btn:hover{background:rgba(201,168,76,.2);border-color:var(--gold-light);}
+.cal-today-btn{letter-spacing:.1em;font-size:.72rem;padding:.3rem .9rem;}
+.cal-radio{display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--smoke);cursor:pointer;}
+.cal-radio input{accent-color:var(--gold);}
+.cal-radio span{letter-spacing:.05em;}
+
+</style>
+<!-- Leaflet.js -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+// Leaflet RotatedMarker（軽量インライン実装）
+(function(){
+  var proto = L.Marker.prototype;
+  var _initIcon = proto._initIcon;
+  var _setPos   = proto._setPos;
+  proto._initIcon = function(){
+    _initIcon.call(this);
+    this._applyRotation();
+  };
+  proto._setPos = function(pos){
+    _setPos.call(this, pos);
+    this._applyRotation();
+  };
+  proto._applyRotation = function(){
+    if (this.options.rotationAngle) {
+      this._icon.style.transformOrigin = this.options.rotationOrigin || 'center bottom';
+      var t = this._icon.style.transform;
+      this._icon.style.transform = t + ' rotate(' + this.options.rotationAngle + 'deg)';
+    }
+  };
+})();
+</script>
+<style>
+
+/* ======== 今日のダッシュボード ======== */
+#todayDash {
+  background: linear-gradient(135deg, #0c1428 0%, #1a2f5a 60%, #0d1a3a 100%);
+  border: 1px solid rgba(201,168,76,.3);
+  padding: 1.4rem 1.6rem 1.2rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+#todayDash::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(201,168,76,.02) 40px, rgba(201,168,76,.02) 41px);
+}
+.dash-date {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: .8rem; letter-spacing: .3em; color: rgba(201,168,76,.6);
+  margin-bottom: .6rem;
+}
+.dash-row {
+  display: flex; gap: .8rem; flex-wrap: wrap; align-items: flex-start;
+  position: relative; z-index: 1;
+}
+.dash-ban-block {
+  flex: 1; min-width: 130px;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(201,168,76,.18);
+  border-radius: 3px;
+  padding: .7rem .9rem;
+}
+.dash-ban-block .dbb-title {
+  font-size: .62rem; letter-spacing: .18em; color: rgba(201,168,76,.6);
+  margin-bottom: .35rem;
+}
+.dash-ban-block .dbb-star {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: .95rem; color: var(--gold-light); font-weight: 700;
+}
+.dash-dir-pills {
+  display: flex; flex-wrap: wrap; gap: 4px; margin-top: .5rem;
+}
+.dash-pill {
+  font-size: .65rem; padding: .15rem .5rem;
+  border-radius: 20px; border: 1px solid transparent;
+  font-family: 'Noto Serif JP', serif; white-space: nowrap;
+}
+.dash-pill.kichi    { background:#d4f0e2; border-color:#10a368; color:#0a5030; }
+.dash-pill.futsu    { background:#e8ecf4; border-color:#6478a0; color:#3a4870; }
+.dash-pill.kyo      { background:#fce0de; border-color:#dc3c3c; color:#8a1010; }
+.dash-pill.daikyo   { background:#fff9c4; border-color:#f9a825; color:#5d3a00; }
+
+/* ======== 生活相談セクション ======== */
+#advice-sec { margin-top: 2.5rem; }
+.advice-tabs {
+  display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 1rem;
+}
+.adv-tab {
+  background: white; border: 1px solid rgba(160,124,32,.25);
+  padding: .45rem .9rem; font-family: 'Noto Serif JP', serif;
+  font-size: .75rem; letter-spacing: .05em; cursor: pointer;
+  transition: .2s; color: var(--smoke); border-radius: 2px;
+}
+.adv-tab:hover { background: rgba(160,124,32,.08); }
+.adv-tab.on {
+  background: var(--indigo); color: var(--gold-light);
+  border-color: var(--indigo);
+}
+.adv-panel { display: none; }
+.adv-panel.on { display: block; animation: fadeUp .25s ease; }
+.adv-form-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: .8rem;
+  margin-bottom: .8rem;
+}
+@media(max-width:600px){ .adv-form-row{ grid-template-columns:1fr; } }
+.adv-result {
+  display: none; margin-top: 1rem;
+  border: 1px solid rgba(160,124,32,.2);
+  background: white;
+}
+.adv-result.show { display: block; animation: fadeUp .3s ease; }
+.adv-result-head {
+  background: var(--indigo); padding: .65rem 1rem;
+  font-family: 'Zen Old Mincho', serif; font-size: .85rem;
+  color: var(--gold-light); letter-spacing: .15em;
+}
+.adv-result-body { padding: 1rem 1.2rem; }
+.adv-dir-row {
+  display: flex; align-items: center; gap: .8rem;
+  padding: .5rem .6rem; margin-bottom: 4px;
+  border-left: 3px solid transparent; font-size: .8rem;
+}
+.adv-dir-row.kichi  { background:#e8f7ee; border-color:#10a368; }
+.adv-dir-row.futsu  { background:#f0f2f8; border-color:#6478a0; }
+.adv-dir-row.kyo    { background:#fdecea; border-color:#dc3c3c; }
+.adv-dir-row.daikyo {
+  background: repeating-linear-gradient(135deg,#fff9c4 0,#fff9c4 6px,#ffe082 6px,#ffe082 12px);
+  border-color:#f9a825;
+}
+.adv-dir-name {
+  font-family: 'Zen Old Mincho', serif; font-weight: 700;
+  min-width: 2.8rem; font-size: .85rem;
+}
+.adv-dir-kichi { font-weight: 700; min-width: 5rem; }
+.adv-dir-kichi.k { color:#10a368; }
+.adv-dir-kichi.f { color:#4a5880; }
+.adv-dir-kichi.y { color:#b02020; }
+.adv-dir-kichi.d { color:#7a4400; }
+.adv-dir-note { font-size: .72rem; color: var(--smoke); flex: 1; line-height: 1.7; }
+.adv-summary-box {
+  margin-top: .8rem; padding: .8rem 1rem;
+  background: linear-gradient(135deg, #f7f3e9, #f0ece0);
+  border-left: 3px solid var(--gold);
+  font-size: .78rem; line-height: 2; color: var(--smoke);
+}
+
+/* ======== 地図セクション ======== */
+#map-sec { margin-top: 2.5rem; }
+#mapContainer {
+  width: 100%; height: 480px;
+  border: 1px solid rgba(160,124,32,.3);
+  box-shadow: 0 3px 16px rgba(0,0,0,.08);
+  position: relative;
+}
+#mapInstructions {
+  background: linear-gradient(135deg, var(--indigo), #0c1630);
+  color: var(--gold-light);
+  font-family: 'Noto Serif JP', serif;
+  font-size: .8rem;
+  letter-spacing: .1em;
+  padding: .7rem 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.map-step {
+  display: flex; align-items: center; gap: .4rem;
+  padding: .25rem .7rem;
+  border: 1px solid rgba(201,168,76,.35);
+  border-radius: 2px;
+}
+.map-step .sn {
+  background: var(--gold); color: var(--indigo);
+  width: 18px; height: 18px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .65rem; font-weight: 700; flex-shrink: 0;
+}
+#mapResult {
+  background: white;
+  border: 1px solid rgba(160,124,32,.2);
+  border-top: none;
+  padding: .8rem 1.2rem;
+  font-size: .78rem;
+  color: var(--smoke);
+  display: none;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+#mapResult.show { display: flex; }
+.map-result-item { display: flex; flex-direction: column; gap: .15rem; }
+.map-result-item .mri-label { font-size: .65rem; letter-spacing: .12em; color: #aaa; }
+.map-result-item .mri-val { font-family: 'Zen Old Mincho', serif; font-size: .92rem; color: var(--indigo); font-weight: 700; }
+.map-result-item .mri-kichi { font-size: .88rem; font-weight: 700; }
+.mri-kichi.kichi  { color: var(--jade); }
+.mri-kichi.futsu  { color: #8a7a50; }
+.mri-kichi.kyou   { color: var(--vermillion); }
+#mapResetBtn {
+  margin-left: auto;
+  background: none; border: 1px solid rgba(160,124,32,.4);
+  color: var(--smoke); font-size: .72rem; padding: .3rem .8rem;
+  cursor: pointer; font-family: 'Noto Serif JP', serif;
+}
+#mapResetBtn:hover { background: rgba(160,124,32,.08); }
+/* leafletのポップアップカスタム */
+.leaflet-popup-content-wrapper {
+  border-radius: 2px !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,.18) !important;
+}
+.popup-kichi   { color: #1e5c3a; font-weight: 700; }
+.popup-futsu   { color: #6b5830; }
+.popup-kyou    { color: #9b2335; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<header>
+  <svg class="header-bg-compass" width="280" height="280" viewBox="0 0 280 280" fill="none" stroke="white">
+    <circle cx="140" cy="140" r="130" stroke-width="1"/>
+    <circle cx="140" cy="140" r="100" stroke-width=".5"/>
+    <circle cx="140" cy="140" r="70" stroke-width=".5"/>
+    <line x1="140" y1="10" x2="140" y2="270" stroke-width=".5"/>
+    <line x1="10" y1="140" x2="270" y2="140" stroke-width=".5"/>
+    <line x1="48" y1="48" x2="232" y2="232" stroke-width=".3"/>
+    <line x1="232" y1="48" x2="48" y2="232" stroke-width=".3"/>
+    <polygon points="140,15 136,140 140,125 144,140" fill="white" opacity=".7"/>
+  </svg>
+  <div class="header-inner">
+    <svg width="52" height="52" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="44" fill="none" stroke="#c9a84c" stroke-width="1.5" opacity=".6"/>
+      <circle cx="50" cy="50" r="33" fill="none" stroke="#c9a84c" stroke-width=".5" opacity=".35"/>
+      <text x="50" y="13" text-anchor="middle" fill="#c9a84c" font-size="9" font-family="serif">北</text>
+      <text x="88" y="54" text-anchor="middle" fill="#c9a84c" font-size="9" font-family="serif">東</text>
+      <text x="50" y="94" text-anchor="middle" fill="#c9a84c" font-size="9" font-family="serif">南</text>
+      <text x="12" y="54" text-anchor="middle" fill="#c9a84c" font-size="9" font-family="serif">西</text>
+      <polygon points="50,18 47,50 50,44 53,50" fill="#b83020" opacity=".9"/>
+      <polygon points="50,82 47,50 50,56 53,50" fill="#c9a84c" opacity=".9"/>
+      <circle cx="50" cy="50" r="3.5" fill="#c9a84c"/>
+    </svg>
+    <div class="site-title">
+      <h1>方 位 学 の 殿 堂</h1>
+      <div class="sub">九 星 気 学 方 位 判 定 シ ス テ ム</div>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <ul>
+    <li><a href="#" class="active">▲ 方位判定</a></li>
+    <li><a href="#cal-sec">◆ 吉方カレンダー</a></li>
+    <li><a href="#kyusei-sec">◇ 九星の解説</a></li>
+    <li><a href="#about-sec">○ 方位学とは</a></li>
+  </ul>
+</nav>
+
+<div class="hero">
+  <svg class="hero-compass-bg" width="440" height="440" viewBox="0 0 440 440" fill="none" stroke="white">
+    <circle cx="220" cy="220" r="200" stroke-width="1"/>
+    <circle cx="220" cy="220" r="155" stroke-width=".5"/>
+    <circle cx="220" cy="220" r="110" stroke-width=".5"/>
+    <line x1="220" y1="18" x2="220" y2="422" stroke-width=".5"/>
+    <line x1="18" y1="220" x2="422" y2="220" stroke-width=".5"/>
+    <line x1="79" y1="79" x2="361" y2="361" stroke-width=".3"/>
+    <line x1="361" y1="79" x2="79" y2="361" stroke-width=".3"/>
+  </svg>
+  <h2>生 年 月 日 か ら 導 く 吉 方 位</h2>
+  <div class="divider"><span>✦</span></div>
+  <p>九星気学の原理に基づき、あなたの本命星・月命星と行動日の九星を照合。<br>
+  八方位それぞれの吉凶をスコア化してお伝えします。<br>
+  現在地と目的地を入力すれば、実際の方位角による精密判定も可能です。</p>
+</div>
+
+<div class="steps-bar">
+  <div class="steps-inner">
+    <div class="step-item"><span class="step-no">一</span><h4>生年月日を入力</h4><p>本命星・月命星を自動算出</p></div>
+    <div class="step-item"><span class="step-no">二</span><h4>行動日を選択</h4><p>移動・旅行・契約など判定したい日付を指定</p></div>
+    <div class="step-item"><span class="step-no">三</span><h4>住所を入力（任意）</h4><p>現在地と目的地で実方位を算出</p></div>
+    <div class="step-item"><span class="step-no">四</span><h4>吉方位を確認</h4><p>スコア付きで方位ごとの吉凶を表示</p></div>
+  </div>
+</div>
+
+<main>
+  <!-- ===== 生まれ星を知るパネル ===== -->
+  <div class="card" style="margin-bottom:1.5rem;border:1px solid rgba(184,150,12,.4);background:linear-gradient(135deg,#f9f5ea,#f0ebd8);">
+    <div style="text-align:center;margin-bottom:1.2rem;">
+      <div style="font-size:10px;letter-spacing:.7em;color:#8a7f6e;margin-bottom:.5rem;">方 位 学 の 第 一 歩</div>
+      <h3 style="font-family:'Zen Old Mincho',serif;font-size:1.2rem;color:var(--indigo);letter-spacing:.2em;margin:0;">あなたの生まれ星を調べる</h3>
+      <p style="font-size:.8rem;color:#6a6050;margin:.5rem 0 0;letter-spacing:.1em;">九星気学では、生まれた年から定まる「本命星」がすべての方位判定の基準になります</p>
+    </div>
+    <div style="display:flex;gap:8px;align-items:flex-end;justify-content:center;flex-wrap:wrap;">
+      <div>
+        <label style="font-size:.75rem;color:#8a7f6e;letter-spacing:.1em;display:block;margin-bottom:4px;">生まれた西暦年</label>
+        <div style="display:flex;align-items:center;gap:4px;">
+          <input type="number" id="qYear" placeholder="例：1953" min="1900" max="2099"
+            style="width:100px;text-align:center;padding:.5rem;border:1px solid rgba(184,150,12,.4);background:white;font-family:'Noto Serif JP',serif;font-size:1rem;"
+            oninput="quickStarCalc()">
+          <span style="color:#8a7f6e;font-size:.9rem;">年生まれ</span>
+        </div>
+      </div>
+      <div id="quickStarResult" style="display:none;text-align:center;padding:.6rem 1.4rem;background:var(--indigo);border:1px solid rgba(201,168,76,.4);">
+        <div style="font-size:.7rem;color:rgba(201,168,76,.7);letter-spacing:.3em;margin-bottom:2px;">あなたの本命星</div>
+        <div id="quickStarName" style="font-family:'Zen Old Mincho',serif;font-size:1.4rem;color:var(--gold);letter-spacing:.2em;"></div>
+      </div>
+    </div>
+    <div style="margin-top:1.2rem;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;" id="starGrid">
+    </div>
+    <p style="text-align:center;font-size:.75rem;color:#8a7f6e;margin:.8rem 0 0;letter-spacing:.1em;">
+      ※ 2月4日（節入り）以前生まれの方は前年の星になります
+    </p>
+  </div>
+  <!-- ===== 入力フォーム ===== -->
+  <div class="sec-head">
+    <div class="sec-no">壱</div>
+    <div><h3>基 本 情 報 の 入 力</h3><p>生年月日と判定したい日を入力してください</p></div>
+  </div>
+  <div class="card">
+    <div class="form-row">
+      <div class="fg"><label>お名前（任意）</label><input type="text" id="iName" placeholder="例：三原　嘉明"></div>
+      <div class="fg" style="flex:2;">
+  <label>生年月日 <span class="req">必須</span></label>
+  <div style="display:flex;gap:4px;align-items:center;">
+    <input type="number" id="iBirthY" placeholder="西暦" min="1900" max="2099"
+      style="width:80px;text-align:center;"
+      oninput="autoTabBirth(this,'iBirthM',4)"
+      onchange="onBirthChange()">
+    <span style="opacity:.5;font-size:.85rem;">年</span>
+    <input type="number" id="iBirthM" placeholder="月" min="1" max="12"
+      style="width:50px;text-align:center;"
+      oninput="autoTabBirth(this,'iBirthD',2)"
+      onchange="onBirthChange()">
+    <span style="opacity:.5;font-size:.85rem;">月</span>
+    <input type="number" id="iBirthD" placeholder="日" min="1" max="31"
+      style="width:50px;text-align:center;"
+      onchange="onBirthChange()">
+    <span style="opacity:.5;font-size:.85rem;">日</span>
+    <span id="birthStarBadge" style="margin-left:8px;padding:4px 10px;background:var(--indigo);color:var(--gold);font-family:'Zen Old Mincho',serif;font-size:.8rem;letter-spacing:.1em;border-radius:2px;display:none;"></span>
+  </div>
+</div>
+    </div>
+    <div class="form-row three">
+      <div class="fg">
+        <label>出生時刻（月命星算出に使用）</label>
+        <select id="iHour">
+          <option value="-1">不明</option>
+          <option value="23">子の刻（23〜01時）</option>
+          <option value="1">丑の刻（01〜03時）</option>
+          <option value="3">寅の刻（03〜05時）</option>
+          <option value="5">卯の刻（05〜07時）</option>
+          <option value="7">辰の刻（07〜09時）</option>
+          <option value="9">巳の刻（09〜11時）</option>
+          <option value="11">午の刻（11〜13時）</option>
+          <option value="13">未の刻（13〜15時）</option>
+          <option value="15">申の刻（15〜17時）</option>
+          <option value="17">酉の刻（17〜19時）</option>
+          <option value="19">戌の刻（19〜21時）</option>
+          <option value="21">亥の刻（21〜23時）</option>
+        </select>
+      </div>
+      <div class="fg"><label>判定対象日 <span class="req">必須</span></label><input type="date" id="iTarget"></div>
+      <div class="fg">
+        <label>判定の目的</label>
+        <select id="iPurpose">
+          <option value="travel">旅行・移動</option>
+          <option value="business">商談・仕事</option>
+          <option value="move">引越し・転居</option>
+          <option value="marriage">婚姻・契約</option>
+          <option value="health">療養・回復</option>
+          <option value="other">その他</option>
+        </select>
+      </div>
+    </div>
+    <div class="sep"><span>◆</span></div>
+    <div class="loc-grid">
+      <div class="loc-box">
+        <h5>📍 現在地（出発地）</h5>
+        <div class="fg"><label>住所（都道府県・市区町村）</label><input type="text" id="iFrom" placeholder="例：東京都府中市"></div>
+        <div class="fg"><label>緯度・経度（任意）</label><input type="text" id="iFromCoord" placeholder="例：35.6762, 139.6503"></div>
+      </div>
+      <div class="loc-box">
+        <h5>🎯 目的地（行き先）</h5>
+        <div class="fg"><label>住所（都道府県・市区町村）</label><input type="text" id="iTo" placeholder="例：京都府京都市"></div>
+        <div class="fg"><label>緯度・経度（任意）</label><input type="text" id="iToCoord" placeholder="例：35.0116, 135.7681"></div>
+      </div>
+    </div>
+    <button class="btn-calc" onclick="doCalc()">✦ 方 位 を 判 定 す る ✦</button>
+  </div>
+
+
+  <!-- ===== 今日のダッシュボード ===== -->
+  <div id="todayDash" style="display:none;">
+    <div class="dash-date" id="dashDate"></div>
+    <div class="dash-row">
+      <div class="dash-ban-block">
+        <div class="dbb-title">▪ 日　盤</div>
+        <div class="dbb-star" id="dashNissei"></div>
+        <div class="dash-dir-pills" id="dashNichiPills"></div>
+      </div>
+      <div class="dash-ban-block">
+        <div class="dbb-title">▪ 月　盤</div>
+        <div class="dbb-star" id="dashTsusei"></div>
+        <div class="dash-dir-pills" id="dashTsukiPills"></div>
+      </div>
+      <div class="dash-ban-block">
+        <div class="dbb-title">▪ 年　盤</div>
+        <div class="dbb-star" id="dashNensei"></div>
+        <div class="dash-dir-pills" id="dashNenPills"></div>
+      </div>
+    </div>
+    <div id="dashAdvice" style="margin-top:.9rem;font-size:.75rem;color:rgba(201,168,76,.75);line-height:2;position:relative;z-index:1;"></div>
+  </div>
+
+  <!-- ===== 生活相談セクション ===== -->
+  <div id="advice-sec" style="display:none;">
+    <div class="sec-head">
+      <div class="sec-no">参</div>
+      <div><h3>生 活 方 位 相 談</h3><p>場面別に吉方位・凶方位のアドバイスを表示します</p></div>
+    </div>
+    <div class="card">
+      <!-- 相談日入力 -->
+      <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1.2rem;">
+        <label style="font-size:.78rem;color:var(--smoke);">相談日：</label>
+        <input type="date" id="advDate" style="border:1px solid rgba(160,124,32,.3);background:white;padding:.35rem .6rem;font-family:'Noto Serif JP',serif;font-size:.8rem;">
+        <button class="btn-calc" style="padding:.4rem 1.2rem;font-size:.8rem;" onclick="advSetToday()">今日</button>
+      </div>
+
+      <!-- カテゴリタブ -->
+      <div class="advice-tabs">
+        <button class="adv-tab on" onclick="showAdvTab('person',this)">👤 人に会う</button>
+        <button class="adv-tab" onclick="showAdvTab('land',this)">🏡 土地・不動産</button>
+        <button class="adv-tab" onclick="showAdvTab('shop',this)">🛒 買い物・契約</button>
+        <button class="adv-tab" onclick="showAdvTab('letter',this)">✉ 手紙・通信</button>
+        <button class="adv-tab" onclick="showAdvTab('travel',this)">🚗 外出・旅行</button>
+        <button class="adv-tab" onclick="showAdvTab('decide',this)">⚖ 重大な決断</button>
+        <button class="adv-tab" onclick="showAdvTab('health',this)">🏥 健康・病院</button>
+        <button class="adv-tab" onclick="showAdvTab('money',this)">💴 金銭・投資</button>
+      </div>
+
+      <!-- 各パネル -->
+      <div id="advPanel-person" class="adv-panel on">
+        <div class="adv-form-row">
+          <div>
+            <label class="form-label">相手の方角（自宅から）</label>
+            <select id="adv-person-dir" class="form-select" style="width:100%">
+              <option value="">─ 方角を選ぶ ─</option>
+              <option value="N">北</option><option value="NE">北東</option>
+              <option value="E">東</option><option value="SE">南東</option>
+              <option value="S">南</option><option value="SW">南西</option>
+              <option value="W">西</option><option value="NW">北西</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">判定軸</label>
+            <select id="adv-person-ban" class="form-select" style="width:100%">
+              <option value="nichi">日盤（その日の出会い）</option>
+              <option value="tsuki">月盤（月単位の付き合い）</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn-calc" style="padding:.45rem 1.4rem;font-size:.82rem;" onclick="runAdvice('person')">✦ 判定する</button>
+        <div class="adv-result" id="advResult-person"></div>
+      </div>
+
+      <div id="advPanel-land" class="adv-panel">
+        <p style="font-size:.78rem;color:var(--smoke);margin-bottom:.8rem;line-height:1.9;">
+          土地・物件は現住所からの方角が重要です。年盤・月盤・日盤を総合して判定します。
+        </p>
+        <div class="adv-form-row">
+          <div>
+            <label class="form-label">物件の方角（現住所から）</label>
+            <select id="adv-land-dir" class="form-select" style="width:100%">
+              <option value="">─ 方角を選ぶ ─</option>
+              <option value="N">北</option><option value="NE">北東</option>
+              <option value="E">東</option><option value="SE">南東</option>
+              <option value="S">南</option><option value="SW">南西</option>
+              <option value="W">西</option><option value="NW">北西</option>
+              <option value="ALL">全方位を比較</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">購入・入居の時期</label>
+            <select id="adv-land-timing" class="form-select" style="width:100%">
+              <option value="today">今日</option>
+              <option value="month">今月中</option>
+              <option value="year">今年中</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn-calc" style="padding:.45rem 1.4rem;font-size:.82rem;" onclick="runAdvice('land')">✦ 判定する</button>
+        <div class="adv-result" id="advResult-land"></div>
+      </div>
+
+      <div id="advPanel-shop" class="adv-panel">
+        <div class="adv-form-row">
+          <div>
+            <label class="form-label">店・契約先の方角</label>
+            <select id="adv-shop-dir" class="form-select" style="width:100%">
+              <option value="">─ 方角を選ぶ ─</option>
+              <option value="N">北</option><option value="NE">北東</option>
+              <option value="E">東</option><option value="SE">南東</option>
+              <option value="S">南</option><option value="SW">南西</option>
+              <option value="W">西</option><option value="NW">北西</option>
+              <option value="ALL">全方位を比較</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">金額の規模</label>
+            <select id="adv-shop-scale" class="form-select" style="width:100%">
+              <option value="daily">日用品・食料（日盤）</option>
+              <option value="mid">家電・衣料（月盤）</option>
+              <option value="large">大型・不動産（年盤）</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn-calc" style="padding:.45rem 1.4rem;font-size:.82rem;" onclick="runAdvice('shop')">✦ 判定する</button>
+        <div class="adv-result" id="advResult-shop"></div>
+      </div>
+
+      <div id="advPanel-letter" class="adv-panel">
+        <p style="font-size:.78rem;color:var(--smoke);margin-bottom:.8rem;line-height:1.9;">
+          手紙・メール・電話の相手がいる方角を選んでください。日盤で判定します。
+        </p>
+        <div class="adv-form-row">
+          <div>
+            <label class="form-label">送り先の方角</label>
+            <select id="adv-letter-dir" class="form-select" style="width:100%">
+              <option value="">─ 方角を選ぶ ─</option>
+              <option value="N">北</option><option value="NE">北東</option>
+              <option value="E">東</option><option value="SE">南東</option>
+              <option value="S">南</option><option value="SW">南西</option>
+              <option value="W">西</option><option value="NW">北西</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">目的</label>
+            <select id="adv-letter-purpose" class="form-select" style="width:100%">
+              <option value="req">依頼・お願い</option>
+              <option value="greet">挨拶・近況</option>
+              <option value="biz">商談・契約</option>
+              <option value="apology">謝罪・詫び状</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn-calc" style="padding:.45rem 1.4rem;font-size:.82rem;" onclick="runAdvice('letter')">✦ 判定する</button>
+        <div class="adv-result" id="advResult-letter"></div>
+      </div>
+
+      <div id="advPanel-travel" class="adv-panel">
+        <div class="adv-form-row">
+          <div>
+            <label class="form-label">目的地の方角</label>
+            <select id="adv-travel-dir" class="form-select" style="width:100%">
+              <option value="">─ 方角を選ぶ ─</option>
+              <option value="N">北</option><option value="NE">北東</option>
+              <option value="E">東</option><option value="SE">南東</option>
+              <option value="S">南</option><option value="SW">南西</option>
+              <option value="W">西</option><option value="NW">北西</option>
+              <option value="ALL">全方位を比較（どこへ行くか迷っている）</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">旅の規模</label>
+            <select id="adv-travel-scale" class="form-select" style="width:100%">
+              <option value="day">日帰り（日盤）</option>
+              <option value="week">数日〜1週間（月盤）</option>
+              <option value="long">長期移住・赴任（年盤）</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn-calc" style="padding:.45rem 1.4rem;font-size:.82rem;" onclick="runAdvice('travel')">✦ 判定する</button>
+        <div class="adv-result" id="advResult-travel"></div>
+      </div>
+
+      <div id="advPanel-decide" class="adv-panel">
+        <p style="font-size:.78rem;color:var(--smoke);margin-bottom:.8rem;line-height:1.9;">
+          転職・結婚・独立・移住など人生の重大な決断は年盤・月盤・日盤を三層で確認します。
+        </p>
+        <div class="adv-form-row">
+          <div>
+            <label class="form-label">決断の内容</label>
+            <select id="adv-decide-type" class="form-select" style="width:100%">
+              <option value="job">転職・就職</option>
+              <option value="marry">結婚・婚約</option>
+              <option value="biz">独立・開業</option>
+              <option value="move">移住・転居</option>
+              <option value="invest">大型投資・購入</option>
+              <option value="other">その他の重大決断</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">関連する方角（相手・場所）</label>
+            <select id="adv-decide-dir" class="form-select" style="width:100%">
+              <option value="ALL">全方位を比較</option>
+              <option value="N">北</option><option value="NE">北東</option>
+              <option value="E">東</option><option value="SE">南東</option>
+              <option value="S">南</option><option value="SW">南西</option>
+              <option value="W">西</option><option value="NW">北西</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn-calc" style="padding:.45rem 1.4rem;font-size:.82rem;" onclick="runAdvice('decide')">✦ 三盤で判定する</button>
+        <div class="adv-result" id="advResult-decide"></div>
+      </div>
+
+      <div id="advPanel-health" class="adv-panel">
+        <p style="font-size:.78rem;color:var(--smoke);margin-bottom:.8rem;line-height:1.9;">
+          病院・医療機関の方角、または受診・手術日の吉凶を判定します。
+        </p>
+        <div class="adv-form-row">
+          <div>
+            <label class="form-label">病院の方角</label>
+            <select id="adv-health-dir" class="form-select" style="width:100%">
+              <option value="ALL">全方位を比較</option>
+              <option value="N">北</option><option value="NE">北東</option>
+              <option value="E">東</option><option value="SE">南東</option>
+              <option value="S">南</option><option value="SW">南西</option>
+              <option value="W">西</option><option value="NW">北西</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">受診の種別</label>
+            <select id="adv-health-type" class="form-select" style="width:100%">
+              <option value="checkup">定期検診・通院</option>
+              <option value="surgery">手術・入院</option>
+              <option value="emergency">緊急受診</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn-calc" style="padding:.45rem 1.4rem;font-size:.82rem;" onclick="runAdvice('health')">✦ 判定する</button>
+        <div class="adv-result" id="advResult-health"></div>
+      </div>
+
+      <div id="advPanel-money" class="adv-panel">
+        <div class="adv-form-row">
+          <div>
+            <label class="form-label">金融機関・取引先の方角</label>
+            <select id="adv-money-dir" class="form-select" style="width:100%">
+              <option value="ALL">全方位を比較</option>
+              <option value="N">北</option><option value="NE">北東</option>
+              <option value="E">東</option><option value="SE">南東</option>
+              <option value="S">南</option><option value="SW">南西</option>
+              <option value="W">西</option><option value="NW">北西</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">種別</label>
+            <select id="adv-money-type" class="form-select" style="width:100%">
+              <option value="save">預金・積立</option>
+              <option value="invest">投資・株</option>
+              <option value="borrow">借入・ローン</option>
+              <option value="receive">回収・受取</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn-calc" style="padding:.45rem 1.4rem;font-size:.82rem;" onclick="runAdvice('money')">✦ 判定する</button>
+        <div class="adv-result" id="advResult-money"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== 結果 ===== -->
+  <div id="result">
+    <div class="sec-head">
+      <div class="sec-no">弐</div>
+      <div><h3>判 定 結 果</h3><p id="rDateLabel"></p></div>
+    </div>
+
+    <!-- 命星表示 -->
+    <div class="card">
+      <div class="badge-row">
+        <div>
+          <div class="badge-label">本 命 星</div>
+          <div class="badge b3" id="honmeiBadge"><span class="bn">三</span><span class="bname">碧木星</span></div>
+        </div>
+        <div>
+          <div class="badge-label">月 命 星</div>
+          <div class="badge b7" id="getsumeBadge"><span class="bn">七</span><span class="bname">赤金星</span></div>
+        </div>
+        <div>
+          <div class="badge-label">日 盤 星</div>
+          <div class="badge b5" id="dailyBadge" style="width:68px;height:68px;"><span class="bn" style="font-size:1.3rem">五</span><span class="bname">黄土星</span></div>
+        </div>
+        <div class="badge-info" id="honmeiDesc"></div>
+      </div>
+    </div>
+
+    <!-- タブ結果 -->
+    <div class="card">
+      <div class="tabs">
+        <button class="tab on" onclick="showTab('grid',this)">方位盤</button>
+        <button class="tab" onclick="showTab('radar',this)">レーダーチャート</button>
+        <button class="tab" onclick="showTab('detail',this)">詳細説明</button>
+      </div>
+      <div id="tab-grid" class="tc on">
+        <div class="houi-grid" id="houiGrid"></div>
+        <div class="cal-legend" style="margin-top:1rem;">
+          <div class="cl-item"><div class="cl-dot" style="background:var(--jade)"></div>吉（80）</div>
+          <div class="cl-item"><div class="cl-dot" style="background:#8a7a50"></div>普通（50）</div>
+          <div class="cl-item"><div class="cl-dot" style="background:#b08030"></div>小凶（35）</div>
+          <div class="cl-item"><div class="cl-dot" style="background:var(--vermillion)"></div>凶〜超最大凶（20以下）</div>
+        </div>
+      </div>
+      <div id="tab-radar" class="tc">
+        <div style="display:flex;flex-direction:column;align-items:center;padding:1.5rem 0;gap:1rem;">
+          <canvas id="radarChart" width="520" height="520" style="max-width:100%;border-radius:4px;"></canvas>
+          <div id="radarLegend" style="display:flex;flex-wrap:wrap;gap:.8rem;justify-content:center;font-size:.72rem;font-family:'Noto Serif JP',serif;"></div>
+        </div>
+      </div>
+      <div id="tab-detail" class="tc">
+        <div class="detail-list" id="detailList"></div>
+      </div>
+    </div>
+
+
+  <!-- ===== 地図判定 ===== -->
+  <div id="map-sec">
+    <div class="sec-head">
+      <div class="sec-no">参</div>
+      <div><h3>地 図 で 方 位 を 判 定</h3><p>現在地をクリック → 目的地をクリック で吉凶を即時判定</p></div>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <div id="mapInstructions">
+        <div class="map-step"><div class="sn">1</div>現在地をクリック</div>
+        <div class="map-step"><div class="sn">2</div>目的地をクリック</div>
+        <div class="map-step"><div class="sn">3</div>方位・吉凶を自動表示</div>
+        <span style="font-size:.7rem;opacity:.5;margin-left:auto;">※判定には上の生年月日入力が必要です</span>
+      </div>
+      <div id="mapContainer"></div>
+      <div id="mapResult">
+        <div class="map-result-item">
+          <span class="mri-label">方 位 角</span>
+          <span class="mri-val" id="mrAngle">─</span>
+        </div>
+        <div class="map-result-item">
+          <span class="mri-label">方 位</span>
+          <span class="mri-val" id="mrDir">─</span>
+        </div>
+        <div class="map-result-item">
+          <span class="mri-label">距 離</span>
+          <span class="mri-val" id="mrDist">─</span>
+        </div>
+        <div class="map-result-item">
+          <span class="mri-label">吉 凶</span>
+          <span class="mri-kichi" id="mrKichi">─</span>
+        </div>
+        <div class="map-result-item">
+          <span class="mri-label">日 盤 星</span>
+          <span class="mri-val" id="mrNissei">─</span>
+        </div>
+        <button id="mapResetBtn" onclick="resetMap()">リセット</button>
+      </div>
+    </div>
+  </div>
+
+    <!-- カレンダー -->
+    <div id="cal-sec" class="sec-head" style="margin-top:2.5rem;">
+      <div class="sec-no">肆</div>
+      <div><h3>吉 方 カ レ ン ダ ー</h3><p style="font-size:.72rem;color:var(--smoke)">日付をクリックすると方位別の詳細が表示されます</p></div>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <!-- 年月ナビゲーション -->
+      <div id="calNavBar" style="background:var(--indigo);padding:.7rem 1rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;">
+        <div id="calNavLeft" style="display:flex;align-items:center;gap:.4rem;">
+          <button class="cal-nav-btn" id="btnPrevYear" onclick="calChangeYear(-1)">&#9664;&#9664;</button>
+          <button class="cal-nav-btn" id="btnPrevMonth" onclick="calChangeMonth(-1)">&#9664;</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:1rem;">
+          <span id="calYearMonthLabel" style="font-family:'Zen Old Mincho',serif;color:var(--gold-light);font-size:1.05rem;letter-spacing:.2em;"></span>
+          <button class="cal-nav-btn cal-today-btn" id="btnCalToday" onclick="calGoToday()">今月</button>
+        </div>
+        <div id="calNavRight" style="display:flex;align-items:center;gap:.4rem;">
+          <button class="cal-nav-btn" id="btnNextMonth" onclick="calChangeMonth(1)">&#9654;</button>
+          <button class="cal-nav-btn" id="btnNextYear" onclick="calChangeYear(1)">&#9654;&#9654;</button>
+        </div>
+      </div>
+      <!-- 三盤表示切替 -->
+      <div style="background:#f0ece0;padding:.5rem 1rem;display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;border-bottom:1px solid rgba(160,124,32,.15);">
+        <span style="font-size:.7rem;color:var(--smoke);letter-spacing:.1em;">判定軸：</span>
+        <label class="cal-radio"><input type="radio" name="calBan" value="nichi" checked onchange="calRedraw()"> <span>日盤</span></label>
+        <label class="cal-radio"><input type="radio" name="calBan" value="tsuki" onchange="calRedraw()"> <span>月盤</span></label>
+        <label class="cal-radio"><input type="radio" name="calBan" value="nen" onchange="calRedraw()"> <span>年盤</span></label>
+        <span id="calBanNote" style="font-size:.68rem;color:var(--smoke);margin-left:.5rem;"></span>
+      </div>
+      <div style="padding:.8rem 1rem 0;">
+        <div id="calDowHeader" class="cal-head-row">
+          <div class="cal-hd">日</div><div class="cal-hd">月</div><div class="cal-hd">火</div>
+          <div class="cal-hd">水</div><div class="cal-hd">木</div><div class="cal-hd">金</div><div class="cal-hd">土</div>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+      </div>
+      <div class="cal-legend" style="margin:.6rem 1rem .8rem;gap:.8rem;flex-wrap:wrap;">
+        <div class="cl-item"><div class="cl-dot" style="background:#10a368"></div>吉</div>
+        <div class="cl-item"><div class="cl-dot" style="background:#6478a0"></div>普通</div>
+        <div class="cl-item"><div class="cl-dot" style="background:#e6a01e"></div>小凶</div>
+        <div class="cl-item"><div class="cl-dot" style="background:#dc3c3c"></div>凶</div>
+        <div class="cl-item"><div style="width:13px;height:9px;background:repeating-linear-gradient(135deg,#fff9c4 0,#fff9c4 3px,#ffe082 3px,#ffe082 6px);border:1px solid #f9a825;border-radius:1px;"></div>⚠大凶</div>
+        <div class="cl-item"><div style="width:13px;height:9px;background:repeating-linear-gradient(135deg,#ffcdd2 0,#ffcdd2 3px,#ef9a9a 3px,#ef9a9a 6px);border:1px solid #c62828;border-radius:1px;"></div>❌最大凶</div>
+        <div class="cl-item"><div style="width:13px;height:9px;background:repeating-linear-gradient(135deg,#2a2a2a 0,#2a2a2a 3px,#1a1a1a 3px,#1a1a1a 6px);border:1px solid #880e4f;border-radius:1px;"></div>☠超最大凶</div>
+        <div class="cl-item"><span style="color:var(--gold);font-size:.85rem;line-height:1;">◻</span>今日</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 九星解説 ===== -->
+  <div id="kyusei-sec" style="margin-top:3rem;">
+    <div class="sec-head">
+      <div class="sec-no">伍</div>
+      <div><h3>九 星 の 解 説</h3><p>あなたの九星が持つ特性と方位との関係</p></div>
+    </div>
+    <div class="card" id="kyuseiCards">
+      <p style="font-size:.82rem;color:var(--smoke);line-height:2;">
+        生年月日を入力して判定を実行すると、あなたの本命星の詳細解説がここに表示されます。
+      </p>
+    </div>
+  </div>
+
+  <!-- ===== 方位学とは ===== -->
+  <div id="about-sec" style="margin-top:3rem;">
+    <div class="sec-head">
+      <div class="sec-no">陸</div>
+      <div><h3>方 位 学 と は 何 か</h3><p>九星気学の原理とその歴史的背景</p></div>
+    </div>
+    <div class="card">
+      <p style="font-size:.83rem;line-height:2.2;color:#3a3020;margin-bottom:1.2rem;">
+        方位学（九星気学方位術）は、古代中国の易学・陰陽五行思想を源流とし、日本で独自の発展を遂げた東洋占術の体系です。
+        宇宙の気の流れを「一白水星・二黒土星・三碧木星・四緑木星・五黄土星・六白金星・七赤金星・八白土星・九紫火星」の
+        九つの星（九星）で表し、それぞれの星が年・月・日ごとに特定の方位に配置されると考えます。
+      </p>
+      <p style="font-size:.83rem;line-height:2.2;color:#3a3020;margin-bottom:1.2rem;">
+        人は生まれた年・月によって一生変わらない「本命星」と「月命星」を持ち、この星の気質が行動する方位の吉凶を左右します。
+        たとえばある年・月・日において、自分の本命星が「吉」とされる方位に向かって移動・転居・旅行することで、
+        その星の気を取り込み、運気を高めることができるとされます。
+      </p>
+      <p style="font-size:.83rem;line-height:2.2;color:#3a3020;">
+        本システムは「高木穫光著 改訂版 方位学入門（光文社）」の理論体系を参照し、
+        年盤・月盤・日盤の三盤を統合して方位別のスコアを算出します。
+        住所入力により実際の方位角を算出することで、より精密な判定を行います。
+      </p>
+    </div>
+  </div>
+
+<!-- ===== 日別方位モーダル ===== -->
+<div id="calModal" onclick="if(event.target===this)closeCalModal()">
+  <div id="calModalBox">
+    <button id="calModalClose" onclick="closeCalModal()">✕</button>
+    <div id="calModalHead">
+      <span class="mh-date" id="mhDate"></span>
+      <span class="mh-nissei" id="mhNissei"></span>
+    </div>
+    <div id="calModalBody">
+      <div class="modal-dir-grid" id="modalDirGrid"></div>
+      <div class="modal-summary" id="modalSummary"></div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <h3>方 位 学 の 殿 堂</h3>
+      <p>九星気学の叡智を現代技術で再現。<br>
+      年盤・月盤・日盤の三盤統合による方位判定システム。<br>
+      高木穫光著「改訂版 方位学入門」の理論に基づく。</p>
+    </div>
+    <div>
+      <h4>主な機能</h4>
+      <ul>
+        <li><a href="#">方位判定</a></li>
+        <li><a href="#">吉方カレンダー</a></li>
+        <li><a href="#">九星解説</a></li>
+        <li><a href="#">方位盤の見方</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>関連ページ</h4>
+      <ul>
+        <li><a href="https://yymm77.github.io">サイトトップ</a></li>
+        <li><a href="https://yymm77.github.io/seimei-kagaku/">姓名科学の殿堂</a></li>
+        <li><a href="#">至誠の覚醒（連載）</a></li>
+        <li><a href="#">お問い合わせ</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    © 2026 方位学の殿堂 ｜ 高木穫光著「改訂版 方位学入門」理論参照 ｜ 判定結果はあくまで参考情報です
+  </div>
+</footer>
+
+<script>
+let _calYear = new Date().getFullYear();
+let _calMonth = new Date().getMonth() + 1;
+let _calHon = 0, _calGet = 0;
+
+// ========== 九星データ ==========
+const KYUSEI = [
+  {n:'一白水星',cls:'b1',num:'一',elem:'水',dir:'北（坎）',color:'白',nature:'知性・外交・流動性。北の方位と深い縁を持つ。水のように柔軟だが粘り強い。',
+   kichi:['北','南西','東北'],kyou:['南','東','西'],hankichi:['南東','北西','北東']},
+  {n:'二黒土星',cls:'b2',num:'二',elem:'土',dir:'南西（坤）',color:'黒',nature:'勤勉・忍耐・母性。南西の方位と縁深く、農耕・不動産・家庭に縁がある。',
+   kichi:['南西','東','北'],kyou:['北','東北','南'],hankichi:['北西','西','南東']},
+  {n:'三碧木星',cls:'b3',num:'三',elem:'木',dir:'東（震）',color:'碧',nature:'活発・創造・言語。東の方位の木の気を持つ。芸術・通信・新事業に縁がある。',
+   kichi:['東','南','北西'],kyou:['西','北東','南西'],hankichi:['北','南東','東北']},
+  {n:'四緑木星',cls:'b4',num:'四',elem:'木',dir:'南東（巽）',color:'緑',nature:'温和・信頼・旅行運。南東の風の気。縁結び・商業・旅に吉方が多い。',
+   kichi:['南東','北','東'],kyou:['北西','南西','東北'],hankichi:['南','西','北東']},
+  {n:'五黄土星',cls:'b5',num:'五',elem:'土',dir:'中央',color:'黄',nature:'強烈・帝王・波乱。中央の土の気で最も力が強い。成功も失敗も大きくなる傾向。',
+   kichi:['北','南','東'],kyou:['北東','南西','西'],hankichi:['南東','北西','東北']},
+  {n:'六白金星',cls:'b6',num:'六',elem:'金',dir:'北西（乾）',color:'白',nature:'権威・完璧・リーダー。北西の天の気。指導力・法律・政治に縁がある。',
+   kichi:['北西','東','南'],kyou:['東北','南東','北'],hankichi:['南西','西','北東']},
+  {n:'七赤金星',cls:'b7',num:'七',elem:'金',dir:'西（兌）',color:'赤',nature:'社交・芸術・弁舌。西の金の気。飲食・娯楽・金融に縁があり弁が立つ。',
+   kichi:['西','北','南東'],kyou:['東','北西','南西'],hankichi:['北東','南','東北']},
+  {n:'八白土星',cls:'b8',num:'八',elem:'土',dir:'東北（艮）',color:'白',nature:'堅実・変革・不動産。東北の山の気。地道な努力で大成功。変革期に強い。',
+   kichi:['東北','西','南'],kyou:['南東','北','東'],hankichi:['北西','北東','南西']},
+  {n:'九紫火星',cls:'b9',num:'九',elem:'火',dir:'南（離）',color:'紫',nature:'明朗・直観・名誉。南の火の気。学術・芸能・情報に縁があり直観力が鋭い。',
+   kichi:['南','東北','北西'],kyou:['北','西','南東'],hankichi:['東','南西','北東']}
+];
+
+// 方位データ
+const DIRS = [
+  {key:'SE', label:'南東', tri:['巽'],angle:135},
+  {key:'S',  label:'南',   tri:['離'],angle:180},
+  {key:'SW', label:'南西', tri:['坤'],angle:225},
+  {key:'E',  label:'東',   tri:['震'],angle:90},
+  {key:'C',  label:'中央', tri:['中'],angle:0},
+  {key:'W',  label:'西',   tri:['兌'],angle:270},
+  {key:'NE', label:'東北', tri:['艮'],angle:45},
+  {key:'N',  label:'北',   tri:['坎'],angle:0},
+  {key:'NW', label:'北西', tri:['乾'],angle:315},
+];
+
+// ========== 九星計算 ==========
+// 節入り（立春）簡易計算：2月4日を基準
+function adjustForSetsuiri(y, m, d) {
+  // 立春（節入り）前の1月・2月は前年扱い
+  const SETSU = {1:4,2:4,3:6,4:5,5:6,6:6,7:7,8:8,9:8,10:8,11:7,12:7}; // 概算
+  const nodeDay = SETSU[m] || 6;
+  if (m === 1 || (m === 2 && d < 4)) return y - 1;
+  return y;
+}
+
+function honmeisei(y, m, d) {
+  const yr = adjustForSetsuiri(y, m, d);
+  // 2024年=三碧(3)を基準に逆行計算
+  const diff = 2024 - yr;
+  const r = (3 + diff) % 9;
+  return r === 0 ? 9 : r;
+}
+
+function getsumeisei(y, m, d, hour) {
+  // 月命星：本命星と出生月から算出
+  const yr = adjustForSetsuiri(y, m, d);
+  const hon = honmeisei(y, m, d);
+  // 月命星の計算（九星術標準法）
+  // 年の九星グループによって月の起算点が異なる
+  let adjustedM = m;
+  // 節入り前は前月扱い（簡易）
+  if (d < 6) adjustedM = m - 1;
+  if (adjustedM <= 0) adjustedM += 12;
+  
+  // 年九星のグループ別月命星起算
+  const group = ((yr - 1) % 3 + 3) % 3; // 0,1,2
+  const startMonth = [8, 2, 5][group]; // 各グループの1月の月命星
+  const offset = (adjustedM - 1);
+  let msei = ((startMonth - offset - 1 + 99) % 9) + 1;
+  return msei;
+}
+
+function nisseiFor(y, m, d) {
+  // 日の九星計算
+  // 基準日 2000年1月1日 = 八白土星（逆行）
+  const base = new Date(2000, 0, 1);
+  const target = new Date(y, m - 1, d);
+  const diff = Math.round((target - base) / 86400000);
+  const n = (8 - diff) % 9;
+  return n === 0 ? 9 : (n < 0 ? n + 9 : n);
+}
+
+function nenseiFor(y) {
+  // 2024年=三碧(3)を基準に逆行計算
+  const diff = 2024 - y;
+  const r = (3 + diff) % 9;
+  return r === 0 ? 9 : r;
+}
+
+function getseiFor(y, m) {
+  // 月の九星（年盤からの月盤）
+  const nen = nenseiFor(y);
+  // 年九星グループ
+  const grp = ((nen - 1) % 3);
+  const starts = [[8,7,6,5,4,3,2,1,9,8,7,6],
+                  [2,1,9,8,7,6,5,4,3,2,1,9],
+                  [5,4,3,2,1,9,8,7,6,5,4,3]];
+  // 節入り月補正（簡易）
+  const mi = m - 1;
+  const v = starts[grp][mi];
+  return v;
+}
+
+
+
+// ===== 生まれ星クイック計算 =====
+function quickStarCalc() {
+  const y = parseInt(document.getElementById('qYear').value);
+  if (!y || y < 1900 || y > 2099) {
+    document.getElementById('quickStarResult').style.display = 'none';
+    return;
+  }
+  const hon = nenseiFor(y);
+  const star = KYUSEI[hon - 1];
+  document.getElementById('quickStarName').textContent = star.n;
+  document.getElementById('quickStarResult').style.display = 'block';
+
+  // 入力フォームの生年月日年欄にも反映
+  const birthY = document.getElementById('iBirthY');
+  if (birthY && !birthY.value) birthY.value = y;
+}
+
+function buildStarGrid() {
+  const grid = document.getElementById('starGrid');
+  if (!grid) return;
+  // 代表的な生まれ年を星ごとに表示
+  const currentYear = new Date().getFullYear();
+  let html = '';
+  // 直近9年分（各星の代表年）
+  for (let s = 1; s <= 9; s++) {
+    const star = KYUSEI[s - 1];
+    // この星になる最近の年を探す
+    let repYear = currentYear;
+    for (let y = currentYear; y >= currentYear - 8; y--) {
+      if (nenseiFor(y) === s) { repYear = y; break; }
+    }
+    html += `<span onclick="document.getElementById('qYear').value=${repYear};quickStarCalc();"
+      style="cursor:pointer;padding:4px 10px;background:${star.col||'#1a3a5c'};color:#f0e8c8;font-family:'Zen Old Mincho',serif;font-size:.78rem;letter-spacing:.1em;border-radius:2px;opacity:.85;transition:opacity .2s;"
+      onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.85"
+      title="${repYear}年生まれ">${star.n}</span>`;
+  }
+  grid.innerHTML = html;
+}
+
+// ===== 生年月日3分割入力ヘルパー =====
+function autoTabBirth(el, nextId, maxLen) {
+  if (el.value.length >= maxLen) {
+    document.getElementById(nextId).focus();
+    document.getElementById(nextId).select();
+  }
+}
+
+function getBirthVal() {
+  const y = document.getElementById('iBirthY').value;
+  const m = document.getElementById('iBirthM').value;
+  const d = document.getElementById('iBirthD').value;
+  if (!y || !m || !d) return '';
+  const mm = String(m).padStart(2,'0');
+  const dd = String(d).padStart(2,'0');
+  return `${y}-${mm}-${dd}`;
+}
+
+function onBirthChange() {
+  const val = getBirthVal();
+  if (!val) return;
+  const parts = val.split('-').map(Number);
+  const hon = honmeisei(parts[0], parts[1], parts[2]);
+  const badge = document.getElementById('birthStarBadge');
+  if (badge && hon) {
+    badge.textContent = KYUSEI[hon-1].n;
+    badge.style.display = 'inline-block';
+  }
+}
+
+// ========== 書籍原典データ（高木彬光「改訂版 方位学入門」） ==========
+// 方位順: 北,北東,東,南東,南,南西,西,北西
+// 吉凶: 吉=80, 普通=50, 小凶=35, 凶=20, 大凶=8, 最大凶=3, 超最大凶=1
+const KICHI_SCORE = {吉:80, 普通:50, 小凶:35, 凶:20, 大凶:8, 最大凶:3, 超最大凶:1};
+
+const HOUI_TABLES = {
+  // ===== 一白水星 =====
+  1:{
+    1:{北:'凶',北東:'吉',東:'吉',南東:'凶',南:'凶',南西:'吉',西:'吉',北西:'凶'},
+    2:{北:'凶',北東:'凶',東:'吉',南東:'吉',南:'大凶',南西:'吉',西:'吉',北西:'普通'},
+    3:{北:'吉',北東:'吉',東:'超最大凶',南東:'凶',南:'凶',南西:'吉',西:'最大凶',北西:'凶'},
+    4:{北:'吉',北東:'吉',東:'凶',南東:'吉',南:'吉',南西:'大凶',西:'吉',北西:'凶'},
+    5:{北:'凶',北東:'吉',東:'吉',南東:'吉',南:'吉',南西:'凶',西:'吉',北西:'吉'},
+    6:{北:'凶',北東:'吉',東:'吉',南東:'大凶',南:'凶',南西:'吉',西:'吉',北西:'小凶'},
+    7:{北:'吉',北東:'凶',東:'凶',南東:'凶',南:'吉',南西:'吉',西:'小凶',北西:'吉'},
+    8:{北:'吉',北東:'凶',東:'吉',南東:'吉',南:'吉',南西:'凶',西:'凶',北西:'吉'},
+    9:{北:'凶',北東:'吉',東:'吉',南東:'吉',南:'吉',南西:'吉',西:'凶',北西:'凶'},
+  },
+  // ===== 二黒土星 ===== （三原氏精査済み＋書籍確認）
+  2:{
+    1:{北:'小凶',北東:'普通',東:'吉',南東:'小凶',南:'凶',南西:'吉',西:'普通',北西:'凶'},
+    2:{北:'吉',北東:'凶',東:'吉',南東:'普通',南:'吉',南西:'小凶',西:'普通',北西:'普通'},
+    3:{北:'吉',北東:'吉',東:'大凶',南東:'凶',南:'吉',南西:'吉',西:'凶',北西:'凶'},
+    4:{北:'吉',北東:'吉',東:'凶',南東:'大凶',南:'吉',南西:'普通',西:'小凶',北西:'凶'},
+    5:{北:'普通',北東:'小凶',東:'普通',南東:'普通',南:'吉',南西:'凶',西:'吉',北西:'吉'},
+    6:{北:'凶',北東:'吉',東:'普通',南東:'凶',南:'凶',南西:'普通',西:'吉',北西:'小凶'},
+    7:{北:'凶',北東:'普通',東:'凶',南東:'吉',南:'凶',南西:'普通',西:'小凶',北西:'吉'},
+    8:{北:'普通',北東:'超最大凶',東:'吉',南東:'吉',南:'普通',南西:'最大凶',西:'普通',北西:'吉'},
+    9:{北:'凶',北東:'吉',東:'普通',南東:'吉',南:'大凶',南西:'吉',西:'凶',北西:'普通'},
+  },
+  // ===== 三碧木星 =====
+  3:{
+    1:{北:'大凶',北東:'吉',東:'凶',南東:'凶',南:'凶',南西:'吉',西:'凶',北西:'凶'},
+    2:{北:'凶',北東:'凶',東:'吉',南東:'吉',南:'吉',南西:'大凶',西:'吉',北西:'吉'},
+    3:{北:'吉',北東:'吉',東:'凶',南東:'小凶',南:'吉',南西:'吉',西:'凶',北西:'凶'},
+    4:{北:'吉',北東:'凶',東:'凶',南東:'超最大凶',南:'吉',南西:'吉',西:'吉',北西:'凶'},
+    5:{北:'吉',北東:'凶',東:'普通',南東:'吉',南:'吉',南西:'凶',西:'吉',北西:'吉'},
+    6:{北:'凶',北東:'吉',東:'吉',南東:'凶',南:'凶',南西:'凶',西:'凶',北西:'凶'},
+    7:{北:'凶',北東:'吉',東:'凶',南東:'吉',南:'凶',南西:'吉',西:'小凶',北西:'吉'},
+    8:{北:'吉',北東:'凶',東:'吉',南東:'大凶',南:'凶',南西:'凶',西:'吉',北西:'凶'},
+    9:{北:'凶',北東:'吉',東:'凶',南東:'凶',南:'凶',南西:'吉',西:'凶',北西:'吉'},
+  },
+  // ===== 四緑木星 =====
+  4:{
+    1:{北:'大凶',北東:'凶',東:'吉',南東:'凶',南:'凶',南西:'吉',西:'吉',北西:'凶'},
+    2:{北:'吉',北東:'凶',東:'吉',南東:'吉',南:'吉',南西:'大凶',西:'凶',北西:'吉'},
+    3:{北:'凶',北東:'吉',東:'凶',南東:'小凶',南:'凶',南西:'吉',西:'凶',北西:'凶'},
+    4:{北:'吉',北東:'凶',東:'凶',南東:'小凶',南:'吉',南西:'吉',西:'凶',北西:'凶'},
+    5:{北:'吉',北東:'吉',東:'凶',南東:'超最大凶',南:'吉',南西:'凶',西:'凶',北西:'小凶'},
+    6:{北:'凶',北東:'吉',東:'凶',南東:'凶',南:'吉',南西:'凶',西:'吉',北西:'凶'},
+    7:{北:'吉',北東:'凶',東:'凶',南東:'吉',南:'凶',南西:'凶',西:'凶',北西:'吉'},
+    8:{北:'吉',北東:'凶',東:'大凶',南東:'吉',南:'凶',南西:'最大凶',西:'凶',北西:'吉'},
+    9:{北:'最大凶',北東:'吉',東:'凶',南東:'凶',南:'超最大凶',南西:'吉',西:'凶',北西:'凶'},
+  },
+  // ===== 五黄土星 =====
+  5:{
+    1:{北:'大凶',北東:'吉',東:'吉',南東:'吉',南:'最大凶',南西:'吉',西:'吉',北西:'吉'},
+    2:{北:'最大凶',北東:'大凶',東:'吉',南東:'吉',南:'吉',南西:'吉',西:'吉',北西:'吉'},
+    3:{北:'吉',北東:'吉',東:'超最大凶',南東:'吉',南:'吉',南西:'吉',西:'最大凶',北西:'吉'},
+    4:{北:'吉',北東:'吉',東:'吉',南東:'吉',南:'吉',南西:'超最大凶',西:'吉',北西:'最大凶'},
+    5:{北:'吉',北東:'吉',東:'吉',南東:'吉',南:'吉',南西:'最大凶',西:'吉',北西:'吉'},
+    6:{北:'最大凶',北東:'吉',東:'吉',南東:'最大凶',南:'吉',南西:'吉',西:'吉',北西:'吉'},
+    7:{北:'吉',北東:'吉',東:'最大凶',南東:'吉',南:'最大凶',南西:'吉',西:'吉',北西:'吉'},
+    8:{北:'吉',北東:'最大凶',東:'吉',南東:'吉',南:'吉',南西:'最大凶',西:'吉',北西:'吉'},
+    9:{北:'最大凶',北東:'吉',東:'吉',南東:'吉',南:'超最大凶',南西:'吉',西:'最大凶',北西:'吉'},
+  },
+  // ===== 六白金星 =====
+  6:{
+    1:{北:'超最大凶',北東:'吉',東:'吉',南東:'小凶',南:'最大凶',南西:'吉',西:'吉',北西:'吉'},
+    2:{北:'凶',北東:'小凶',東:'吉',南東:'吉',南:'凶',南西:'凶',西:'吉',北西:'吉'},
+    3:{北:'吉',北東:'凶',東:'小凶',南東:'凶',南:'吉',南西:'吉',西:'凶',北西:'吉'},
+    4:{北:'凶',北東:'吉',東:'凶',南東:'凶',南:'凶',南西:'吉',西:'凶',北西:'凶'},
+    5:{北:'凶',北東:'吉',東:'凶',南東:'凶',南:'凶',南西:'凶',西:'凶',北西:'大凶'},
+    6:{北:'凶',北東:'吉',東:'凶',南東:'凶',南:'凶',南西:'凶',西:'吉',北西:'凶'},
+    7:{北:'吉',北東:'吉',東:'凶',南東:'超最大凶',南:'凶',南西:'吉',西:'凶',北西:'吉'},
+    8:{北:'吉',北東:'凶',東:'凶',南東:'吉',南:'凶',南西:'凶',西:'凶',北西:'吉'},
+    9:{北:'凶',北東:'吉',東:'吉',南東:'吉',南:'大凶',南西:'吉',西:'凶',北西:'吉'},
+  },
+  // ===== 七赤金星 =====
+  7:{
+    1:{北:'小凶',北東:'凶',東:'吉',南東:'小凶',南:'凶',南西:'凶',西:'吉',北西:'凶'},
+    2:{北:'小凶',北東:'小凶',東:'吉',南東:'吉',南:'凶',南西:'凶',西:'吉',北西:'吉'},
+    3:{北:'吉',北東:'凶',東:'小凶',南東:'凶',南:'吉',南西:'吉',西:'凶',北西:'吉'},
+    4:{北:'凶',北東:'吉',東:'凶',南東:'凶',南:'凶',南西:'吉',西:'吉',北西:'凶'},
+    5:{北:'吉',北東:'吉',東:'吉',南東:'凶',南:'吉',南西:'凶',西:'大凶',北西:'凶'},
+    6:{北:'超最大凶',北東:'吉',東:'吉',南東:'凶',南:'凶',南西:'凶',西:'凶',北西:'最大凶'},
+    7:{北:'凶',北東:'凶',東:'凶',南東:'凶',南:'凶',南西:'凶',西:'凶',北西:'大凶'},
+    8:{北:'吉',北東:'凶',東:'吉',南東:'小凶',南:'吉',南西:'凶',西:'凶',北西:'吉'},
+    9:{北:'凶',北東:'吉',東:'大凶',南東:'凶',南:'大凶',南西:'吉',西:'凶',北西:'吉'},
+  },
+  // ===== 八白土星 =====
+  8:{
+    1:{北:'小凶',北東:'凶',東:'凶',南東:'吉',南:'凶',南西:'吉',西:'凶',北西:'吉'},
+    2:{北:'吉',北東:'最大凶',東:'吉',南東:'吉',南:'吉',南西:'超最大凶',西:'吉',北西:'吉'},
+    3:{北:'大凶',北東:'吉',東:'大凶',南東:'吉',南:'吉',南西:'吉',西:'凶',北西:'吉'},
+    4:{北:'吉',北東:'吉',東:'吉',南東:'吉',南:'凶',南西:'吉',西:'吉',北西:'凶'},
+    5:{北:'吉',北東:'吉',東:'吉',南東:'吉',南:'凶',南西:'吉',西:'凶',北西:'凶'},
+    6:{北:'凶',北東:'吉',東:'吉',南東:'凶',南:'凶',南西:'吉',西:'吉',北西:'凶'},
+    7:{北:'凶',北東:'小凶',東:'凶',南東:'凶',南:'凶',南西:'吉',西:'小凶',北西:'大凶'},
+    8:{北:'吉',北東:'大凶',東:'吉',南東:'小凶',南:'吉',南西:'凶',西:'凶',北西:'吉'},
+    9:{北:'凶',北東:'吉',東:'凶',南東:'大凶',南:'大凶',南西:'吉',西:'凶',北西:'吉'},
+  },
+  // ===== 九紫火星 =====
+  9:{
+    1:{北:'大凶',北東:'吉',東:'吉',南東:'大凶',南:'凶',南西:'吉',西:'吉',北西:'吉'},
+    2:{北:'凶',北東:'小凶',東:'凶',南東:'吉',南:'凶',南西:'吉',西:'吉',北西:'吉'},
+    3:{北:'吉',北東:'大凶',東:'大凶',南東:'凶',南:'吉',南西:'吉',西:'凶',北西:'吉'},
+    4:{北:'凶',北東:'吉',東:'吉',南東:'凶',南:'吉',南西:'凶',西:'吉',北西:'凶'},
+    5:{北:'吉',北東:'吉',東:'吉',南東:'凶',南:'凶',南西:'吉',西:'吉',北西:'吉'},
+    6:{北:'凶',北東:'吉',東:'凶',南東:'凶',南:'凶',南西:'吉',西:'凶',北西:'凶'},
+    7:{北:'吉',北東:'吉',東:'凶',南東:'凶',南:'超最大凶',南西:'吉',西:'最大凶',北西:'吉'},
+    8:{北:'凶',北東:'凶',東:'吉',南東:'小凶',南:'凶',南西:'最大凶',西:'凶',北西:'吉'},
+    9:{北:'小凶',北東:'吉',東:'吉',南東:'吉',南:'凶',南西:'吉',西:'凶',北西:'凶'},
+  },
+};
+
+// 方位キーと方位名の対応
+const DIR_KEY_MAP = {N:'北',NE:'北東',E:'東',SE:'南東',S:'南',SW:'南西',W:'西',NW:'北西'};
+
+// ========== 方位スコア計算（書籍原典ベース） ==========
+function calcScore(honmei, getsu, nissei, dirKey) {
+  if (dirKey === 'C') return null;
+
+  const dirLabel = DIR_KEY_MAP[dirKey];
+  if (!dirLabel) return 50;
+
+  const table = HOUI_TABLES[honmei];
+  if (!table || !table[nissei]) return 50;
+
+  const kichiStr = table[nissei][dirLabel];
+  if (!kichiStr) return 50;
+
+  return KICHI_SCORE[kichiStr] || 50;
+}
+
+function getDirLabel(key) {
+  return DIR_KEY_MAP[key] || key;
+}
+
+function getKichiClass(score) {
+  if (score === null) return 'center';
+  if (score >= 70) return 'kichi';
+  if (score >= 40) return 'hankichi';
+  if (score >= 25) return 'futsu';
+  return 'kyou';
+}
+
+function getKichiLabel(score) {
+  if (score === null) return '';
+  if (score >= 80) return '吉';
+  if (score >= 50) return '普通';
+  if (score >= 35) return '小凶';
+  if (score >= 20) return '凶';
+  if (score >= 8)  return '大凶';
+  if (score >= 3)  return '最大凶';
+  return '超最大凶';
+}
+
+function getKichiLabelFull(honmei, nissei, dirKey) {
+  const dirLabel = DIR_KEY_MAP[dirKey];
+  if (!dirLabel || !HOUI_TABLES[honmei] || !HOUI_TABLES[honmei][nissei]) return '─';
+  return HOUI_TABLES[honmei][nissei][dirLabel] || '─';
+}
+
+// ========== チャート描画関数 ==========
+
+// 方位の順番（北から時計回り）と角度
+const CHART_DIRS = [
+  {key:'N',  label:'北',  angle: -90},
+  {key:'NE', label:'北東',angle: -45},
+  {key:'E',  label:'東',  angle:   0},
+  {key:'SE', label:'南東',angle:  45},
+  {key:'S',  label:'南',  angle:  90},
+  {key:'SW', label:'南西',angle: 135},
+  {key:'W',  label:'西',  angle: 180},
+  {key:'NW', label:'北西',angle: -135},
+];
+
+function scoreColor(sc) {
+  if (sc >= 80) return '#1e5c3a';  // 吉 jade
+  if (sc >= 50) return '#6b5830';  // 普通
+  if (sc >= 35) return '#b08030';  // 小凶
+  if (sc >= 20) return '#9b2335';  // 凶
+  if (sc >= 8)  return '#7a1025';  // 大凶
+  if (sc >= 3)  return '#550010';  // 最大凶
+  return '#2a000a';                // 超最大凶
+}
+
+function scoreColorAlpha(sc, alpha) {
+  if (sc >= 80) return `rgba(30,92,58,${alpha})`;
+  if (sc >= 50) return `rgba(107,88,48,${alpha})`;
+  if (sc >= 35) return `rgba(176,128,48,${alpha})`;
+  if (sc >= 20) return `rgba(155,35,53,${alpha})`;
+  if (sc >= 8)  return `rgba(122,16,37,${alpha})`;
+  if (sc >= 3)  return `rgba(85,0,16,${alpha})`;
+  return `rgba(42,0,10,${alpha})`;
+}
+
+// ===== レーダーチャート（モダン・クリーン） =====
+function drawRadarChart(scores) {
+  const canvas = document.getElementById('radarChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const size = 520;
+  canvas.width = size * dpr;
+  canvas.height = size * dpr;
+  canvas.style.width = size + 'px';
+  canvas.style.height = size + 'px';
+  ctx.scale(dpr, dpr);
+
+  const W = size, H = size;
+  const cx = W / 2, cy = H / 2;
+  const R = W * 0.33;
+  const N = 8;
+
+  // 背景
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, W, H);
+
+  // カラーパレット（モダン）
+  const COLOR = {
+    吉:        { fill: 'rgba(16,163,104,0.18)', stroke: '#10a368', dot: '#10a368', text: '#0a7a4e' },
+    普通:      { fill: 'rgba(100,120,160,0.15)', stroke: '#6478a0', dot: '#6478a0', text: '#4a5880' },
+    小凶:      { fill: 'rgba(230,160,30,0.18)', stroke: '#e6a01e', dot: '#e6a01e', text: '#b07800' },
+    凶:        { fill: 'rgba(220,60,60,0.18)', stroke: '#dc3c3c', dot: '#dc3c3c', text: '#b02020' },
+    大凶:      { fill: 'rgba(180,20,40,0.22)', stroke: '#b41428', dot: '#b41428', text: '#900010' },
+    最大凶:    { fill: 'rgba(120,0,30,0.28)', stroke: '#78001e', dot: '#78001e', text: '#600018' },
+    超最大凶:  { fill: 'rgba(60,0,20,0.35)', stroke: '#3c0014', dot: '#3c0014', text: '#3c0014' },
+  };
+
+  function getColor(sc) {
+    if (sc >= 80) return COLOR['吉'];
+    if (sc >= 50) return COLOR['普通'];
+    if (sc >= 35) return COLOR['小凶'];
+    if (sc >= 20) return COLOR['凶'];
+    if (sc >= 8)  return COLOR['大凶'];
+    if (sc >= 3)  return COLOR['最大凶'];
+    return COLOR['超最大凶'];
+  }
+
+  // 方位と角度（北=上、時計回り）
+  const dirs = [
+    {key:'N',  label:'北',  ang: -90},
+    {key:'NE', label:'北東', ang: -45},
+    {key:'E',  label:'東',  ang:   0},
+    {key:'SE', label:'南東', ang:  45},
+    {key:'S',  label:'南',  ang:  90},
+    {key:'SW', label:'南西', ang: 135},
+    {key:'W',  label:'西',  ang: 180},
+    {key:'NW', label:'北西', ang: -135},
+  ];
+
+  // グリッドレベル
+  const levels = [20, 35, 50, 80];
+  const levelColors = ['#fce8e8','#fdf4e0','#eef2f8','#e6f7ef'];
+
+  // 塗り分けゾーン（外から内へ）
+  levels.slice().reverse().forEach((lv, li) => {
+    const r = R * (lv / 80);
+    ctx.beginPath();
+    dirs.forEach((d, i) => {
+      const ang = d.ang * Math.PI / 180;
+      const x = cx + r * Math.cos(ang);
+      const y = cy + r * Math.sin(ang);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.closePath();
+    ctx.fillStyle = levelColors[levels.length - 1 - li];
+    ctx.fill();
+  });
+
+  // グリッド線（多角形）
+  levels.forEach((lv, li) => {
+    const r = R * (lv / 80);
+    ctx.beginPath();
+    dirs.forEach((d, i) => {
+      const ang = d.ang * Math.PI / 180;
+      const x = cx + r * Math.cos(ang);
+      const y = cy + r * Math.sin(ang);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.closePath();
+    const gridColors = ['#f5c0c0','#f0d890','#c8d8f0','#a0dfc0'];
+    ctx.strokeStyle = gridColors[li];
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // グリッドラベル（北軸右側）
+    const labelAng = -90 * Math.PI / 180;
+    ctx.font = `${W * 0.022}px -apple-system, sans-serif`;
+    ctx.fillStyle = '#999';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(lv, cx + r * Math.cos(labelAng) + 6, cy + r * Math.sin(labelAng));
+  });
+
+  // 軸線
+  dirs.forEach(d => {
+    const ang = d.ang * Math.PI / 180;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + R * Math.cos(ang), cy + R * Math.sin(ang));
+    ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  // スコアデータ点の計算
+  const pts = dirs.map(d => {
+    const sc = scores[d.key] || 1;
+    const r = R * Math.min(sc, 80) / 80;
+    const ang = d.ang * Math.PI / 180;
+    return { x: cx + r * Math.cos(ang), y: cy + r * Math.sin(ang), sc, color: getColor(sc) };
+  });
+
+  // データポリゴン：塗り（各セグメント個別色）
+  dirs.forEach((d, i) => {
+    const next = (i + 1) % N;
+    const p = pts[i], pn = pts[next];
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(p.x, p.y);
+    ctx.lineTo(pn.x, pn.y);
+    ctx.closePath();
+    ctx.fillStyle = p.color.fill;
+    ctx.fill();
+  });
+
+  // データポリゴン：輪郭
+  ctx.beginPath();
+  pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+  ctx.closePath();
+  ctx.strokeStyle = 'rgba(50,50,50,0.35)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // 各頂点ドット
+  pts.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, W * 0.016, 0, Math.PI * 2);
+    ctx.fillStyle = p.color.dot;
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  });
+
+  // 方位ラベル＋吉凶テキスト
+  dirs.forEach((d, i) => {
+    const ang = d.ang * Math.PI / 180;
+    const labelR = R * 1.2;
+    const lx = cx + labelR * Math.cos(ang);
+    const ly = cy + labelR * Math.sin(ang);
+    const sc = scores[d.key] || 1;
+    const c = getColor(sc);
+    const kichiStr = getKichiLabel(sc);
+
+    // 背景ピル
+    const pillW = W * 0.16, pillH = W * 0.11;
+    ctx.fillStyle = 'rgba(255,255,255,0.92)';
+    ctx.beginPath();
+    ctx.roundRect(lx - pillW/2, ly - pillH/2, pillW, pillH, 6);
+    ctx.fill();
+    ctx.strokeStyle = c.stroke;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // 方位名
+    ctx.font = `bold ${W * 0.032}px -apple-system, 'Helvetica Neue', sans-serif`;
+    ctx.fillStyle = '#222';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(d.label, lx, ly - pillH * 0.18);
+
+    // 吉凶ラベル
+    ctx.font = `${W * 0.024}px -apple-system, sans-serif`;
+    ctx.fillStyle = c.text;
+    ctx.fillText(kichiStr, lx, ly + pillH * 0.25);
+  });
+
+  // 中央ラベル
+  ctx.beginPath();
+  ctx.arc(cx, cy, W * 0.06, 0, Math.PI * 2);
+  ctx.fillStyle = '#1a2f5a';
+  ctx.fill();
+  ctx.font = `bold ${W * 0.032}px -apple-system, sans-serif`;
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('方位', cx, cy);
+
+  // レジェンド
+  const legend = document.getElementById('radarLegend');
+  if (legend) {
+    const entries = [
+      {label:'吉', color:'#10a368'},
+      {label:'普通', color:'#6478a0'},
+      {label:'小凶', color:'#e6a01e'},
+      {label:'凶', color:'#dc3c3c'},
+      {label:'大凶', color:'#b41428'},
+      {label:'最大凶', color:'#78001e'},
+      {label:'超最大凶', color:'#3c0014'},
+    ];
+    legend.innerHTML = entries.map(e =>
+      `<span style="display:flex;align-items:center;gap:4px;">
+        <span style="width:10px;height:10px;border-radius:50%;background:${e.color};display:inline-block;"></span>
+        <span style="color:#555;">${e.label}</span>
+      </span>`
+    ).join('');
+  }
+}
+
+
+// ========== 詳細テキスト ==========
+function getDetailText(honmei, dirKey, score) {
+  const PURPOSE_MAP = {travel:'旅行・移動',business:'商談・仕事',move:'引越し・転居',marriage:'婚姻・契約',health:'療養・回復',other:'各種行動'};
+  const purpose = PURPOSE_MAP[document.getElementById('iPurpose').value] || '行動';
+  const dir = getDirLabel(dirKey);
+  const cls = getKichiClass(score);
+  const label = getKichiLabel(score);
+
+  const texts = {
+    kichi: [`${dir}は本日の吉方です。${purpose}に向けてこの方位への移動は運気を高めます。活力・財運・人間関係において好影響が期待できます。積極的な行動が吉。`,
+            `${dir}からの気が本命星の気と共鳴する吉日です。この方位への移動・滞在・交渉は成果が出やすく、新しい縁や機会が訪れる可能性があります。`],
+    hankichi: [`${dir}は半吉方です。極端な行動は避けつつ、日常的な${purpose}であれば概ね問題ありません。慎重に進めれば良い結果が期待できます。`,
+               `${dir}の気は概ね穏やかです。${purpose}の場合は計画をしっかり立て、大きなリスクを取らない姿勢で臨むと良いでしょう。`],
+    futsu: [`${dir}は本日普通の方位です。吉でも凶でもなく、${purpose}の場合は可もなく不可もない結果となりそうです。通常通りの行動で問題ありません。`],
+    kyou: [`${dir}は本日の要注意方位です。${purpose}でのこの方位への移動は、予期せぬトラブルや障害が生じる可能性があります。できれば別の方位をご検討ください。`,
+           `${dir}は凶方となっています。急用でなければ${purpose}での移動・契約は延期が賢明です。どうしても必要な場合は、お清めや心の準備をしっかりと。`],
+  };
+
+  const arr = texts[cls] || texts.futsu;
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+// ========== UI更新 ==========
+function updateBadge(el, star) {
+  const s = KYUSEI[star - 1];
+  el.className = `badge ${s.cls}`;
+  el.innerHTML = `<span class="bn">${s.num}</span><span class="bname">${s.n}</span>`;
+}
+
+function showTab(id, btn) {
+  document.querySelectorAll('.tc').forEach(e => e.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(e => e.classList.remove('on'));
+  document.getElementById('tab-' + id).classList.add('on');
+  if (btn) btn.classList.add('on');
+}
+
+// ========== メイン計算 ========== 
+function doCalc() {
+  const birthVal = getBirthVal();
+  const targetVal = document.getElementById('iTarget').value;
+  if (!birthVal || !targetVal) { alert('生年月日と判定対象日を入力してください。'); return; }
+
+  const [by, bm, bd] = birthVal.split('-').map(Number);
+  const [ty, tm, td] = targetVal.split('-').map(Number);
+  const hour = parseInt(document.getElementById('iHour').value);
+
+  const hon = honmeisei(by, bm, bd);
+  const get = getsumeisei(by, bm, bd, hour);
+  const niss = nisseiFor(ty, tm, td);
+
+  // バッジ更新
+  updateBadge(document.getElementById('honmeiBadge'), hon);
+  updateBadge(document.getElementById('getsumeBadge'), get);
+  updateBadge(document.getElementById('dailyBadge'), niss);
+
+  // 本命星説明
+  const honData = KYUSEI[hon - 1];
+  document.getElementById('honmeiDesc').innerHTML =
+    `<strong style="color:var(--indigo);display:block;margin-bottom:.3rem">${honData.n}の方</strong>
+     ${honData.nature}<br>
+     <span style="font-size:.72rem;opacity:.8">五行：${honData.elem}　　象徴方位：${honData.dir}</span>`;
+
+  // ラベル更新
+  const dw = ['日','月','火','水','木','金','土'][new Date(ty,tm-1,td).getDay()];
+  document.getElementById('rDateLabel').textContent =
+    `${ty}年${tm}月${td}日（${dw}）の方位判定 ── 本命星：${honData.n}　日盤：${KYUSEI[niss-1].n}`;
+
+  // 方位スコア計算
+  const scores = {};
+  DIRS.forEach(d => {
+    scores[d.key] = calcScore(hon, get, niss, d.key);
+  });
+
+  // 方位グリッド
+  const grid = document.getElementById('houiGrid');
+  grid.innerHTML = '';
+  DIRS.forEach(d => {
+    const sc = scores[d.key];
+    const cls = getKichiClass(sc);
+    const label = d.key === 'C' ? '中宮' : getKichiLabelFull(hon, niss, d.key);
+    const div = document.createElement('div');
+    div.className = `hc ${cls}`;
+    // 凶レベルに応じた表示
+    const scoreDisp = sc !== null ? sc : '─';
+    div.innerHTML = `<span class="hdir">${d.label}</span>
+      <span class="hscore">${scoreDisp}</span>
+      <span class="hlabel">${label}</span>`;
+    grid.appendChild(div);
+  });
+
+  // チャート描画（レーダー＆放射棒グラフ）
+  const dirsSorted = DIRS.filter(d => d.key !== 'C').sort((a,b) => (scores[b.key]||0) - (scores[a.key]||0));
+  setTimeout(() => { drawRadarChart(scores); }, 80);
+
+  // 詳細説明
+  const detailList = document.getElementById('detailList');
+  detailList.innerHTML = '';
+  dirsSorted.forEach(d => {
+    const sc = scores[d.key];
+    const cls = getKichiClass(sc);
+    const kichiStr = getKichiLabelFull(hon, niss, d.key);
+    const item = document.createElement('div');
+    item.className = `detail-item ${cls}`;
+    item.innerHTML = `<div class="detail-dir">${d.label}</div>
+      <div class="detail-body">
+        <h5>${kichiStr}　スコア：${sc}</h5>
+        <p>${getDetailText(hon, d.key, sc)}</p>
+      </div>`;
+    detailList.appendChild(item);
+  });
+
+  // カレンダー生成（当月）
+  buildCalendar(ty, tm, hon, get);
+
+  // 九星解説
+  buildKyuseiCards(hon);
+
+  // ダッシュボード更新・表示
+  buildTodayDash(hon, get);
+  document.getElementById('todayDash').style.display = 'block';
+  document.getElementById('advice-sec').style.display = 'block';
+  // 相談日を判定日に合わせる
+  document.getElementById('advDate').value = targetVal;
+
+  // 結果表示
+  document.getElementById('result').classList.add('show');
+  document.getElementById('result').style.display = 'block';
+  setTimeout(() => document.getElementById('todayDash').scrollIntoView({behavior:'smooth', block:'start'}), 100);
+}
+
+
+// =====================================================
+// 今日のダッシュボード
+// =====================================================
+function buildTodayDash(hon, get) {
+  const t = new Date();
+  const y = t.getFullYear(), m = t.getMonth()+1, d = t.getDate();
+  const dw = ['日','月','火','水','木','金','土'][t.getDay()];
+  const niss = nisseiFor(y, m, d);
+  const tsei = getseiFor(y, m);
+  const ysei = nenseiFor(y);
+
+  document.getElementById('dashDate').textContent =
+    `${y}年${m}月${d}日（${dw}）　本命星：${KYUSEI[hon-1].n}　月命星：${KYUSEI[get-1].n}`;
+  document.getElementById('dashNissei').textContent = KYUSEI[niss-1].n;
+  document.getElementById('dashTsusei').textContent = KYUSEI[tsei-1].n;
+  document.getElementById('dashNensei').textContent = KYUSEI[ysei-1].n;
+
+  function makePills(banStar, containerId) {
+    const el = document.getElementById(containerId);
+    el.innerHTML = '';
+    const good=[], bad=[];
+    DIRS.forEach(dir => {
+      if (dir.key === 'C') return;
+      const sc = calcScore(hon, get, banStar, dir.key);
+      if (sc >= 80) good.push({label:dir.label, sc});
+      else if (sc <= 20) bad.push({label:dir.label, sc});
+    });
+    good.forEach(x => {
+      const p = document.createElement('span');
+      p.className = 'dash-pill kichi';
+      p.textContent = `✦${x.label}`;
+      el.appendChild(p);
+    });
+    bad.forEach(x => {
+      const p = document.createElement('span');
+      p.className = `dash-pill ${x.sc<=8?'daikyo':'kyo'}`;
+      p.textContent = `▼${x.label}`;
+      el.appendChild(p);
+    });
+    if (!good.length && !bad.length) {
+      const p = document.createElement('span');
+      p.className = 'dash-pill futsu';
+      p.textContent = '全方位 普通';
+      el.appendChild(p);
+    }
+  }
+  makePills(niss, 'dashNichiPills');
+  makePills(tsei, 'dashTsukiPills');
+  makePills(ysei, 'dashNenPills');
+
+  // 総合アドバイス文
+  let bestDirs=[], worstDirs=[];
+  DIRS.forEach(dir => {
+    if (dir.key==='C') return;
+    const sc = calcScore(hon, get, niss, dir.key);
+    if (sc>=80) bestDirs.push(dir.label);
+    else if (sc<=8) worstDirs.push(dir.label);
+  });
+  let adv = '';
+  if (bestDirs.length) adv += `✦ 今日の吉方位：<strong style="color:#c9a84c">${bestDirs.join('・')}</strong>　外出・商談・人と会う際はこの方角を意識してください。`;
+  if (worstDirs.length) adv += (adv?'　　':'')+`⚠ 要注意：<strong style="color:#ff6060">${worstDirs.join('・')}</strong>　この方角への行動は今日は控えてください。`;
+  if (!adv) adv = '今日はすべての方位が概ね穏やかです。通常通り行動して問題ありません。';
+  document.getElementById('dashAdvice').innerHTML = adv;
+}
+
+// =====================================================
+// 生活相談タブ切替
+// =====================================================
+function showAdvTab(id, btn) {
+  document.querySelectorAll('.adv-panel').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.adv-tab').forEach(b => b.classList.remove('on'));
+  document.getElementById('advPanel-'+id).classList.add('on');
+  btn.classList.add('on');
+}
+function advSetToday() {
+  const t = new Date();
+  const s = `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+  document.getElementById('advDate').value = s;
+}
+
+// 方位ラベル変換
+const DIR_LABEL = {N:'北',NE:'北東',E:'東',SE:'南東',S:'南',SW:'南西',W:'西',NW:'北西'};
+
+// アドバイスの盤選択
+function getBanStar(mode, y, m, d) {
+  if (mode==='nen')   return nenseiFor(y);
+  if (mode==='tsuki') return getseiFor(y, m);
+  return nisseiFor(y, m, d);
+}
+
+// 単一方位の判定結果HTML
+// 超最大凶・最大凶の緊急警告バナー
+function makeAlertBanner(dangerRows, category) {
+  if (!dangerRows.length) return '';
+  const isCho = dangerRows.some(r => r.sc <= 1);
+  const isSai = dangerRows.some(r => r.sc <= 3 && r.sc > 1);
+  const level = isCho ? '超最大凶' : '最大凶';
+  const dirs  = dangerRows.map(r => r.label).join('・');
+
+  const WARN = {
+    person: `この方角の人物との接触・取引は絶対に避けてください。`,
+    land:   `この方位への移転・購入は人生を左右する深刻な打撃をもたらす恐れがあります。`,
+    shop:   `この方角での契約・大型購入は財産・健康に取り返しのつかない損害をもたらす恐れがあります。`,
+    letter: `この方角への重要な連絡は全く逆効果になります。今すぐ送るのを止めてください。`,
+    travel: `この方角への移動は事故・病気など深刻な事態を招く恐れがあります。絶対に避けてください。`,
+    decide: `この方位・この時期での決断は厳禁です。必ず時期・方位を変えてください。`,
+    health: `緊急でない限りこの方角の医療機関への入院・手術は日程変更を強くお勧めします。担当医に相談を。`,
+    money:  `この方角での大型資金移動・投資は重大な損失を招く恐れがあります。今すぐ保留にしてください。`,
+  };
+
+  const bg   = isCho
+    ? 'repeating-linear-gradient(135deg,#1a1a1a 0,#1a1a1a 8px,#2a2a2a 8px,#2a2a2a 16px)'
+    : 'repeating-linear-gradient(135deg,#c62828 0,#c62828 8px,#b71c1c 8px,#b71c1c 16px)';
+  const col  = isCho ? '#ff6090' : '#fff';
+  const icon = isCho ? '☠' : '❌';
+
+  return `<div style="
+    background:${bg}; color:${col}; border:2px solid ${isCho?'#880e4f':'#c62828'};
+    padding:.9rem 1.1rem; margin-bottom:.9rem; border-radius:2px;
+    font-family:'Noto Serif JP',serif;
+  ">
+    <div style="font-size:.95rem;font-weight:700;letter-spacing:.1em;margin-bottom:.4rem;">
+      ${icon} 【${level}警告】${dirs} 方位
+    </div>
+    <div style="font-size:.78rem;line-height:1.9;opacity:.9;">
+      ${WARN[category] || WARN['travel']}
+    </div>
+  </div>`;
+}
+
+function makeSingleDirResult(sc, dirLabel, category) {
+  const cls  = sc>=80?'kichi':sc>=50?'futsu':sc>=20?'kyo':'daikyo';
+  const lbl  = sc>=80?'吉':sc>=50?'普通':sc>=35?'小凶':sc>=20?'凶':sc>=8?'大凶':sc>=3?'最大凶':'超最大凶';
+  const klcl = sc>=80?'k':sc>=50?'f':sc>=20?'y':'d';
+  // 超最大凶・最大凶は行自体にも追加の強調スタイル
+  const extraStyle = sc<=3
+    ? 'border-left:4px solid #880e4f;background:repeating-linear-gradient(135deg,#2a2a2a 0,#2a2a2a 6px,#1a1a1a 6px,#1a1a1a 12px);'
+    : sc<=8
+    ? 'border-left:4px solid #c62828;background:repeating-linear-gradient(135deg,#ffcdd2 0,#ffcdd2 6px,#ef9a9a 6px,#ef9a9a 12px);'
+    : '';
+  const nameColor = sc<=3 ? 'color:#ff6090;' : sc<=8 ? 'color:#7f0000;' : '';
+  const advice = getCategoryAdvice(category, dirLabel, sc);
+  return `<div class="adv-dir-row ${cls}" style="${extraStyle}">
+    <span class="adv-dir-name" style="${nameColor}">${dirLabel}</span>
+    <span class="adv-dir-kichi ${klcl}" style="${nameColor}">${lbl}（${sc}）</span>
+    <span class="adv-dir-note" style="${sc<=3?'color:#ffb0c8;':sc<=8?'color:#5a0000;':''}">${advice}</span>
+  </div>`;
+}
+
+// 全方位比較HTML：超最大凶・最大凶を冒頭に警告バナーで出す
+function makeAllDirResult(hon, get, banStar, category) {
+  const rows = DIRS.filter(d=>d.key!=='C')
+    .map(d => ({key:d.key, label:d.label, sc:calcScore(hon,get,banStar,d.key)||50}))
+    .sort((a,b)=>b.sc-a.sc);
+
+  // 危険方位を抽出してバナーを先頭に
+  const dangerRows = rows.filter(r => r.sc <= 3);
+  const banner = makeAlertBanner(dangerRows, category);
+
+  return banner + rows.map(r => makeSingleDirResult(r.sc, r.label, category)).join('');
+}
+
+// カテゴリ別アドバイス文生成
+function getCategoryAdvice(cat, dirLabel, sc) {
+  const good = sc >= 80;
+  const bad  = sc <= 20;
+  const vbad = sc <= 8;
+
+  const TABLE = {
+    person: {
+      good: `${dirLabel}方面の方との出会い・商談は好結果が期待できます。積極的に会いましょう。`,
+      bad:  `${dirLabel}方面の方との接触は今日は慎重に。誤解・トラブルが起きやすい傾向があります。`,
+      vbad: `${dirLabel}方面の方との重要な取引・約束は今日は避けてください。`,
+    },
+    land: {
+      good: `${dirLabel}方位の土地・物件は今が吉。積極的に検討できます。`,
+      bad:  `${dirLabel}方位の物件は慎重に。後から問題が出やすい傾向があります。`,
+      vbad: `${dirLabel}方位への引越・購入は強く避けてください。長期間にわたる影響が出る恐れがあります。`,
+    },
+    shop: {
+      good: `${dirLabel}方面の店での購入・契約は吉。満足のいく結果が得られやすいです。`,
+      bad:  `${dirLabel}方面での買い物は後悔しやすい日です。急がず後日に。`,
+      vbad: `${dirLabel}方面での大きな買い物・契約は今日は避けてください。`,
+    },
+    letter: {
+      good: `${dirLabel}方面への手紙・連絡は今日は好印象で受け取られます。送るなら今日が最適です。`,
+      bad:  `${dirLabel}方面への依頼・交渉は断られやすい日です。タイミングをずらすと良いでしょう。`,
+      vbad: `${dirLabel}方面への重要な連絡は今日は控えてください。逆効果になる恐れがあります。`,
+    },
+    travel: {
+      good: `${dirLabel}方面への外出・旅行は吉。良い出会いや発見が期待できます。`,
+      bad:  `${dirLabel}方面への外出は今日はトラブルが起きやすいです。必要な場合は十分注意して。`,
+      vbad: `${dirLabel}方面への移動は今日は避けてください。事故・体調不良のリスクがあります。`,
+    },
+    decide: {
+      good: `${dirLabel}方面に関する決断は今が好機です。自信を持って進んでください。`,
+      bad:  `${dirLabel}方面に関する決断は今は不利。可能なら時期を改めてください。`,
+      vbad: `${dirLabel}方面に関する重大な決断は今は厳禁です。必ず時期を変えてください。`,
+    },
+    health: {
+      good: `${dirLabel}方面の医療機関は今は吉。受診・手術のタイミングとして問題ありません。`,
+      bad:  `${dirLabel}方面の医療機関への受診は慎重に。緊急でない限り日程の変更を検討してください。`,
+      vbad: `${dirLabel}方面の病院への入院・手術は今の時期は避けた方が安全です。担当医とよく相談を。`,
+    },
+    money: {
+      good: `${dirLabel}方面との金銭取引は今は吉。タイミングとして問題ありません。`,
+      bad:  `${dirLabel}方面との資金移動は今は慎重に。損失リスクが高まっています。`,
+      vbad: `${dirLabel}方面への大きな資金移動・投資は今は避けてください。`,
+    },
+  };
+
+  const t = TABLE[cat] || TABLE['person'];
+  if (vbad) return t.vbad;
+  if (bad)  return t.bad;
+  if (good) return t.good;
+  return `${dirLabel}方面は普通〜小凶の範囲です。大きな問題はありませんが過信は禁物です。`;
+}
+
+// 相談実行
+function runAdvice(cat) {
+  if (!_calHon) { alert('先に生年月日と判定対象日を入力して「方位を判定する」ボタンを押してください。'); return; }
+  const hon = _calHon, get = _calGet;
+  const dateVal = document.getElementById('advDate').value;
+  if (!dateVal) { alert('相談日を入力してください。'); return; }
+  const [y,m,d] = dateVal.split('-').map(Number);
+
+  const resultEl = document.getElementById('advResult-'+cat);
+  resultEl.innerHTML = '';
+
+  let html = '';
+  let banMode = 'nichi';
+  let dirKey  = 'ALL';
+  let extraInfo = '';
+
+  // カテゴリ別の盤・方位を決定
+  if (cat==='person') {
+    dirKey  = document.getElementById('adv-person-dir').value || 'ALL';
+    banMode = document.getElementById('adv-person-ban').value;
+  } else if (cat==='land') {
+    dirKey  = document.getElementById('adv-land-dir').value || 'ALL';
+    const timing = document.getElementById('adv-land-timing').value;
+    banMode = timing==='year'?'nen':timing==='month'?'tsuki':'nichi';
+    extraInfo = `<div style="font-size:.72rem;color:var(--smoke);padding:.4rem .6rem;background:#f7f3e9;margin-bottom:.6rem;">
+      ※ 土地・不動産は日盤・月盤・年盤すべての吉が揃う方位が最善です。
+      判定軸：${banMode==='nen'?'年盤（今年中）':banMode==='tsuki'?'月盤（今月中）':'日盤（今日）'}
+    </div>`;
+  } else if (cat==='shop') {
+    dirKey  = document.getElementById('adv-shop-dir').value || 'ALL';
+    const sc = document.getElementById('adv-shop-scale').value;
+    banMode = sc==='large'?'nen':sc==='mid'?'tsuki':'nichi';
+  } else if (cat==='letter') {
+    dirKey  = document.getElementById('adv-letter-dir').value || 'ALL';
+    banMode = 'nichi';
+  } else if (cat==='travel') {
+    dirKey  = document.getElementById('adv-travel-dir').value || 'ALL';
+    const sc = document.getElementById('adv-travel-scale').value;
+    banMode = sc==='long'?'nen':sc==='week'?'tsuki':'nichi';
+  } else if (cat==='decide') {
+    dirKey  = document.getElementById('adv-decide-dir').value;
+    banMode = 'nen'; // 重大決断は年盤優先
+    const dtype = document.getElementById('adv-decide-type').value;
+    const DECIDE_LABEL = {job:'転職・就職',marry:'結婚・婚約',biz:'独立・開業',move:'移住・転居',invest:'大型投資',other:'重大決断'};
+    extraInfo = `<div style="font-size:.72rem;color:var(--smoke);padding:.4rem .6rem;background:#f7f3e9;margin-bottom:.6rem;">
+      ✦ ${DECIDE_LABEL[dtype]}は年盤・月盤・日盤の三層で確認することが重要です。
+      三盤すべてで吉が揃う方位・時期を選んでください。
+    </div>`;
+    // 決断は三盤すべて表示
+    html += extraInfo;
+    ['nen','tsuki','nichi'].forEach(bm => {
+      const bs = getBanStar(bm, y, m, d);
+      const bmLabel = bm==='nen'?'年盤':bm==='tsuki'?'月盤':'日盤';
+      html += `<div style="font-size:.75rem;font-weight:700;color:var(--indigo);padding:.35rem .6rem;background:rgba(26,47,90,.06);margin:4px 0 2px;letter-spacing:.1em;">── ${bmLabel}（${KYUSEI[bs-1].n}）</div>`;
+      if (dirKey==='ALL') {
+        html += makeAllDirResult(hon, get, bs, cat);
+      } else {
+        const sc = calcScore(hon, get, bs, dirKey);
+        if (sc <= 3) html += makeAlertBanner([{label: DIR_LABEL[dirKey]||dirKey, sc}], cat);
+        html += makeSingleDirResult(sc, DIR_LABEL[dirKey]||dirKey, cat);
+      }
+    });
+    resultEl.innerHTML = `<div class="adv-result-head">⚖ ${DECIDE_LABEL[dtype]}の方位判定</div><div class="adv-result-body">${html}</div>`;
+    resultEl.classList.add('show');
+    return;
+  } else if (cat==='health') {
+    dirKey  = document.getElementById('adv-health-dir').value || 'ALL';
+    const ht = document.getElementById('adv-health-type').value;
+    banMode = ht==='surgery'?'tsuki':'nichi';
+    extraInfo = `<div style="font-size:.72rem;color:var(--smoke);padding:.4rem .6rem;background:#fff8f0;border-left:3px solid #dc3c3c;margin-bottom:.6rem;">
+      ⚠ 健康・医療は吉凶よりも医師の判断を最優先にしてください。方位はあくまで参考情報です。
+    </div>`;
+  } else if (cat==='money') {
+    dirKey  = document.getElementById('adv-money-dir').value || 'ALL';
+    const mt = document.getElementById('adv-money-type').value;
+    banMode = mt==='invest'||mt==='borrow'?'tsuki':'nichi';
+  }
+
+  const banStar = getBanStar(banMode, y, m, d);
+  const banLabel = banMode==='nen'?'年盤':banMode==='tsuki'?'月盤':'日盤';
+  const CAT_TITLES = {
+    person:'👤 人に会う', land:'🏡 土地・不動産', shop:'🛒 買い物・契約',
+    letter:'✉ 手紙・通信', travel:'🚗 外出・旅行', health:'🏥 健康・病院', money:'💴 金銭・投資',
+  };
+
+  html += extraInfo;
+  if (dirKey==='ALL') {
+    html += makeAllDirResult(hon, get, banStar, cat);
+  } else {
+    const sc = calcScore(hon, get, banStar, dirKey);
+    // 単一方位でも超最大凶・最大凶は先頭に警告バナーを出す
+    if (sc <= 3) {
+      html += makeAlertBanner([{label: DIR_LABEL[dirKey]||dirKey, sc}], cat);
+    }
+    html += makeSingleDirResult(sc, DIR_LABEL[dirKey]||dirKey, cat);
+  }
+
+  resultEl.innerHTML = `<div class="adv-result-head">${CAT_TITLES[cat]}　（${y}/${m}/${d}・${banLabel}：${KYUSEI[banStar-1].n}）</div><div class="adv-result-body">${html}</div>`;
+  resultEl.classList.add('show');
+}
+
+function buildCalendar(y, m, hon, get) {
+  _calYear  = y;
+  _calMonth = m;
+  _calHon   = hon;
+  _calGet   = get;
+  calRedraw();
+}
+
+// 三盤説明
+const BAN_NOTES = {
+  nichi: '日盤：日々の吉凶。外出・商談・日常行動の判断に',
+  tsuki: '月盤：月単位の吉凶。転職・引越・契約など月をまたぐ決断に',
+  nen:   '年盤：年単位の吉凶。結婚・独立・大きな転機など人生の節目に',
+};
+
+// スコア→CSSクラス
+function calClass(sc) {
+  if (sc >= 80) return 'c-kichi';
+  if (sc >= 50) return 'c-futsu';
+  if (sc >= 35) return 'c-syokyo';
+  if (sc >= 20) return 'c-kyo';
+  if (sc >= 8)  return 'c-daikyo';
+  if (sc >= 3)  return 'c-saidaikyo';
+  return 'c-chosaikyo';
+}
+function calLbl(sc) {
+  if (sc >= 80) return '吉';
+  if (sc >= 50) return '普通';
+  if (sc >= 35) return '小凶';
+  if (sc >= 20) return '凶';
+  if (sc >= 8)  return '⚠大凶';
+  if (sc >= 3)  return '❌最大凶';
+  return '☠超最大凶';
+}
+
+// 和暦変換（簡易）
+function toJapaneseEra(y) {
+  if (y >= 2019) return `令和${y - 2018}年`;
+  if (y >= 1989) return `平成${y - 1988}年`;
+  if (y >= 1926) return `昭和${y - 1925}年`;
+  if (y >= 1912) return `大正${y - 1911}年`;
+  if (y >= 1868) return `明治${y - 1867}年`;
+  return '';
+}
+
+// 節入り日（その月の気が変わる日）の簡易テーブル（月→概算日）
+const SETSU_DAY = [6,4,6,5,6,6,7,8,8,8,7,7]; // 1月〜12月の節入り概算日
+
+function calRedraw() {
+  if (!_calHon) return;
+  const hon     = _calHon;
+  const get     = _calGet;
+  const banMode = document.querySelector('input[name="calBan"]:checked')?.value || 'nichi';
+  const noteEl  = document.getElementById('calBanNote');
+  if (noteEl) noteEl.textContent = BAN_NOTES[banMode] || '';
+
+  // モードに応じてUI切替
+  const dowHeader = document.getElementById('calDowHeader');
+  const btnPrevM  = document.getElementById('btnPrevMonth');
+  const btnNextM  = document.getElementById('btnNextMonth');
+  const btnToday  = document.getElementById('btnCalToday');
+  const grid      = document.getElementById('calGrid');
+  grid.innerHTML  = '';
+
+  // ========== 日盤モード（従来通り：1ヶ月表示） ==========
+  if (banMode === 'nichi') {
+    if (dowHeader) dowHeader.style.display = '';
+    if (btnPrevM)  btnPrevM.style.display  = '';
+    if (btnNextM)  btnNextM.style.display  = '';
+    if (btnToday)  btnToday.style.display  = '';
+    document.getElementById('calYearMonthLabel').textContent = `${_calYear}年 ${_calMonth}月`;
+    grid.style.display = '';
+
+    const today    = new Date();
+    const firstDay = new Date(_calYear, _calMonth - 1, 1).getDay();
+    const lastDay  = new Date(_calYear, _calMonth, 0).getDate();
+
+    for (let i = 0; i < firstDay; i++) {
+      const e = document.createElement('div'); e.className = 'cal-day empty'; grid.appendChild(e);
+    }
+    for (let d = 1; d <= lastDay; d++) {
+      const niss = nisseiFor(_calYear, _calMonth, d);
+      const tsei = getseiFor(_calYear, _calMonth);
+      const ysei = nenseiFor(_calYear);
+      const banStar = niss;
+      let total = 0, cnt = 0, minSc = 999;
+      const dirScores = {};
+      DIRS.forEach(dir => {
+        if (dir.key === 'C') return;
+        const sc = calcScore(hon, get, banStar, dir.key);
+        if (sc !== null) { dirScores[dir.key] = sc; total += sc; cnt++; if (sc < minSc) minSc = sc; }
+      });
+      const avg    = cnt > 0 ? Math.round(total / cnt) : 50;
+      const dispSc = minSc <= 8 ? minSc : avg;
+      const cls    = calClass(dispSc);
+      const lbl    = calLbl(dispSc);
+      const isToday = (d === today.getDate() && _calMonth === today.getMonth()+1 && _calYear === today.getFullYear());
+      const el = document.createElement('div');
+      el.className = `cal-day ${cls}${isToday ? ' today' : ''}`;
+      el.innerHTML = `<span class="dn">${d}</span><span class="ds">${KYUSEI[banStar-1].num}星</span><span class="dc">${lbl}</span>`;
+      el.style.cursor = 'pointer';
+      el.title = 'クリックで方位詳細';
+      (function(dd, bs, ts, ys, sc) {
+        el.addEventListener('click', () => openCalModal(_calYear, _calMonth, dd, bs, hon, get, bs, ts, ys, sc.scores, sc.avg, sc.min, 'nichi'));
+      })(d, banStar, tsei, ysei, {scores: dirScores, avg, min: minSc});
+      grid.appendChild(el);
+    }
+    return;
+  }
+
+  // ========== 月盤モード（1年分 × 12ヶ月） ==========
+  if (banMode === 'tsuki') {
+    if (dowHeader) dowHeader.style.display = 'none';
+    if (btnPrevM)  btnPrevM.style.display  = 'none';
+    if (btnNextM)  btnNextM.style.display  = 'none';
+    if (btnToday)  btnToday.style.display  = 'none';
+    document.getElementById('calYearMonthLabel').textContent = `${_calYear}年　月盤一覧`;
+    grid.style.display = 'block';
+    grid.style.gridTemplateColumns = '';
+
+    const ysei = nenseiFor(_calYear);
+
+    for (let m = 1; m <= 12; m++) {
+      const tsei      = getseiFor(_calYear, m);
+      const setsuDay  = SETSU_DAY[m - 1];  // その月の節入り日（概算）
+      const lastDay   = new Date(_calYear, m, 0).getDate();
+      const today     = new Date();
+
+      // 月ブロック
+      const block = document.createElement('div');
+      block.className = 'cal-month-block';
+
+      // 月ラベル
+      const mlabel = document.createElement('div');
+      mlabel.className = 'cal-month-label';
+      mlabel.innerHTML = `<span>${m}月</span><span class="ml-star">${KYUSEI[tsei-1].n}（月盤）</span>`;
+      block.appendChild(mlabel);
+
+      // 日グリッド（この月の日々）
+      const dayGrid = document.createElement('div');
+      dayGrid.className = 'cal-head-row';
+      dayGrid.style.cssText = 'display:grid;grid-template-columns:repeat(7,1fr);gap:2px;';
+
+      // 曜日ヘッダー
+      ['日','月','火','水','木','金','土'].forEach(d => {
+        const h = document.createElement('div');
+        h.className = 'cal-hd';
+        h.style.fontSize = '.6rem';
+        h.textContent = d;
+        dayGrid.appendChild(h);
+      });
+
+      // 月初の空セル
+      const firstDow = new Date(_calYear, m - 1, 1).getDay();
+      for (let i = 0; i < firstDow; i++) {
+        const e = document.createElement('div'); e.className = 'cal-day empty'; dayGrid.appendChild(e);
+      }
+
+      // 各日
+      for (let d = 1; d <= lastDay; d++) {
+        // 節入り前は前月の月盤を使う
+        const actualTsei = (d < setsuDay) ? getseiFor(_calYear, m - 1 <= 0 ? 12 : m - 1) : tsei;
+
+        let total = 0, cnt = 0, minSc = 999;
+        const dirScores = {};
+        DIRS.forEach(dir => {
+          if (dir.key === 'C') return;
+          const sc = calcScore(hon, get, actualTsei, dir.key);
+          if (sc !== null) { dirScores[dir.key] = sc; total += sc; cnt++; if (sc < minSc) minSc = sc; }
+        });
+        const avg    = cnt > 0 ? Math.round(total / cnt) : 50;
+        const dispSc = minSc <= 8 ? minSc : avg;
+        const cls    = calClass(dispSc);
+        const lbl    = calLbl(dispSc);
+        const isToday = (d === today.getDate() && m === today.getMonth()+1 && _calYear === today.getFullYear());
+
+        const el = document.createElement('div');
+        el.className = `cal-day ${cls}${isToday ? ' today' : ''}`;
+        // 節入り日に区切り表示
+        const setsuMark = (d === setsuDay) ? '<span style="position:absolute;top:0;left:0;width:100%;height:2px;background:rgba(160,124,32,.5);"></span>' : '';
+        el.style.position = 'relative';
+        el.innerHTML = `${setsuMark}<span class="dn">${d}</span><span class="ds">${KYUSEI[actualTsei-1].num}月</span><span class="dc">${lbl}</span>`;
+        el.style.cursor = 'pointer';
+        el.title = `${_calYear}/${m}/${d}　月盤：${KYUSEI[actualTsei-1].n}`;
+        const niss = nisseiFor(_calYear, m, d);
+        (function(dd, mm, bs, ts, sc) {
+          el.addEventListener('click', () => openCalModal(_calYear, mm, dd, bs, hon, get, niss, ts, ysei, sc.scores, sc.avg, sc.min, 'tsuki'));
+        })(d, m, actualTsei, tsei, {scores: dirScores, avg, min: minSc});
+        dayGrid.appendChild(el);
+      }
+      block.appendChild(dayGrid);
+      grid.appendChild(block);
+    }
+    return;
+  }
+
+  // ========== 年盤モード（生年〜現在+100年のタイムライン） ==========
+  if (banMode === 'nen') {
+    if (dowHeader) dowHeader.style.display = 'none';
+    if (btnPrevM)  btnPrevM.style.display  = 'none';
+    if (btnNextM)  btnNextM.style.display  = 'none';
+    if (btnToday)  btnToday.style.display  = 'none';
+    document.getElementById('calYearMonthLabel').textContent = `年盤タイムライン`;
+    grid.style.display = 'block';
+    grid.style.gridTemplateColumns = '';
+
+    // 本命星算出に使った生年を_calHon から推算するのではなく
+    // iBirth の値から生年を取得
+    const birthVal = getBirthVal();
+    const birthYear = birthVal ? parseInt(birthVal.split('-')[0]) : 1950;
+    const thisYear  = new Date().getFullYear();
+    const endYear   = birthYear + 130;
+
+    const timeline = document.createElement('div');
+    timeline.className = 'year-timeline';
+
+    for (let y = birthYear; y <= endYear; y++) {
+      const ysei = nenseiFor(y);
+      let total = 0, cnt = 0, minSc = 999, maxSc = 0;
+      let bestDir = '', worstDir = '';
+      const dirScores = {};
+      DIRS.forEach(dir => {
+        if (dir.key === 'C') return;
+        const sc = calcScore(hon, get, ysei, dir.key);
+        if (sc !== null) {
+          dirScores[dir.key] = sc;
+          total += sc; cnt++;
+          if (sc < minSc) { minSc = sc; worstDir = dir.label; }
+          if (sc > maxSc) { maxSc = sc; bestDir  = dir.label; }
+        }
+      });
+      const avg = cnt > 0 ? Math.round(total / cnt) : 50;
+      const era = toJapaneseEra(y);
+      const age = y - birthYear;
+      const isCurrent = (y === thisYear);
+
+      // 行の背景色は「最悪方位の深刻度」で決める（超最大凶・最大凶は年全体への警告）
+      // ただし「普通以上の方位が吉かどうか」も併せて伝える
+      const worstCls = 'yr-c-' + calClass(minSc).replace('c-', '');
+      const bestLbl  = maxSc >= 80 ? '吉' : maxSc >= 50 ? '普通' : '小凶';
+      const worstLbl = calLbl(minSc);
+
+      // 最良方位ピル
+      const bestColor  = maxSc >= 80 ? '#10a368' : '#6478a0';
+      const worstColor = minSc <= 3  ? '#880e4f'
+                       : minSc <= 8  ? '#c62828'
+                       : minSc <= 20 ? '#dc3c3c' : '#6478a0';
+
+      const row = document.createElement('div');
+      row.className = `year-row ${worstCls}${isCurrent ? ' yr-current' : ''}`;
+
+      // スコアバー：吉方位の割合（8方位中いくつが吉以上か）
+      const kichiCount = Object.values(dirScores).filter(s => s >= 80).length;
+      const barW = Math.round((kichiCount / 8) * 100);
+
+      row.innerHTML = `
+        <span class="yr-num">${y}年</span>
+        <span class="yr-era">${era}（${age}歳）</span>
+        <span class="yr-star" style="min-width:5.5rem;">${KYUSEI[ysei-1].n}</span>
+        <span style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;flex:1;min-width:0;">
+          <span style="font-size:.67rem;padding:.1rem .45rem;border-radius:10px;
+            background:${bestColor};color:white;white-space:nowrap;">
+            ✦${bestDir} ${bestLbl}
+          </span>
+          <span style="font-size:.67rem;padding:.1rem .45rem;border-radius:10px;
+            background:${worstColor};color:white;white-space:nowrap;">
+            ▼${worstDir} ${worstLbl}
+          </span>
+          <span style="font-size:.65rem;color:inherit;opacity:.6;white-space:nowrap;">吉${kichiCount}/8方位</span>
+        </span>
+        <div class="yr-bar" style="min-width:40px;max-width:60px;">
+          <div class="yr-bar-fill" style="width:${barW}%;background:${bestColor};"></div>
+        </div>
+      `;
+      row.style.cursor = 'pointer';
+      row.title = `${y}年　年盤：${KYUSEI[ysei-1].n}　最良：${bestDir}（${maxSc}）　最悪：${worstDir}（${minSc}）　吉方位数：${kichiCount}/8`;
+      (function(yy, bs, sc) {
+        row.addEventListener('click', () => {
+          const tsei = getseiFor(yy, 6);
+          openCalModal(yy, 6, 1, bs, hon, get, nisseiFor(yy, 6, 1), tsei, bs, sc.scores, sc.avg, sc.min, 'nen');
+        });
+      })(y, ysei, {scores: dirScores, avg, min: minSc});
+
+      timeline.appendChild(row);
+    }
+    grid.appendChild(timeline);
+
+    // 現在年にスクロール
+    setTimeout(() => {
+      const cur = grid.querySelector('.yr-current');
+      if (cur) cur.scrollIntoView({behavior:'smooth', block:'center'});
+    }, 100);
+  }
+}
+
+// 月・年ナビ
+function calChangeMonth(delta) {
+  _calMonth += delta;
+  if (_calMonth > 12) { _calMonth = 1;  _calYear++; }
+  if (_calMonth < 1)  { _calMonth = 12; _calYear--; }
+  calRedraw();
+}
+function calChangeYear(delta) {
+  _calYear += delta;
+  calRedraw();
+}
+function calGoToday() {
+  const t = new Date();
+  _calYear  = t.getFullYear();
+  _calMonth = t.getMonth() + 1;
+  calRedraw();
+}
+
+
+
+// ========== モーダルのスコアクラス・ラベル ==========
+function modalScoreClass(sc) {
+  if (sc >= 80) return 'mdc-c-kichi';
+  if (sc >= 50) return 'mdc-c-futsu';
+  if (sc >= 35) return 'mdc-c-syokyo';
+  if (sc >= 20) return 'mdc-c-kyo';
+  if (sc >= 8)  return 'mdc-c-daikyo';
+  if (sc >= 3)  return 'mdc-c-saidaikyo';
+  return 'mdc-c-chosaikyo';
+}
+function modalKichiLabel(sc) {
+  if (sc >= 80) return '吉';
+  if (sc >= 50) return '普通';
+  if (sc >= 35) return '小凶';
+  if (sc >= 20) return '凶';
+  if (sc >= 8)  return '⚠ 大凶';
+  if (sc >= 3)  return '❌ 最大凶';
+  return '☠ 超最大凶';
+}
+
+// ========== 日別方位モーダル ==========
+function openCalModal(y, m, d, banStar, hon, get, niss, tsei, ysei, dirScores, avg, minSc, banMode) {
+  const dw = ['日','月','火','水','木','金','土'][new Date(y, m-1, d).getDay()];
+  document.getElementById('mhDate').textContent = `${y}年${m}月${d}日（${dw}）`;
+
+  const banLabel = {nichi:'日盤', tsuki:'月盤', nen:'年盤'}[banMode] || '日盤';
+  document.getElementById('mhNissei').textContent =
+    `日盤：${KYUSEI[niss-1].n}　月盤：${KYUSEI[tsei-1].n}　年盤：${KYUSEI[ysei-1].n}　（判定軸：${banLabel}）`;
+
+  // 3×3グリッド
+  const grid = document.getElementById('modalDirGrid');
+  grid.innerHTML = '';
+  const MODAL_DIR_ORDER = [
+    {key:'NW',label:'北西'},{key:'N',label:'北'},{key:'NE',label:'北東'},
+    {key:'W', label:'西'}, {key:'C',label:'中'},{key:'E', label:'東'},
+    {key:'SW',label:'南西'},{key:'S',label:'南'},{key:'SE',label:'南東'},
+  ];
+
+  const kichiDirs=[], kyouDirs=[], daikiyouDirs=[];
+
+  MODAL_DIR_ORDER.forEach(di => {
+    const cell = document.createElement('div');
+    if (di.key === 'C') {
+      cell.className = 'modal-dir-cell center-cell';
+      cell.innerHTML = `<span class="mdc-dir" style="font-size:.85rem;color:var(--gold-light);">中央</span>
+        <span style="font-size:.6rem;color:rgba(201,168,76,.55);">${KYUSEI[banStar-1].n}</span>`;
+    } else {
+      const sc  = dirScores[di.key] ?? 50;
+      const cls = modalScoreClass(sc);
+      const lbl = modalKichiLabel(sc);
+      cell.className = `modal-dir-cell ${cls}`;
+      cell.innerHTML = `<span class="mdc-dir">${di.label}</span>
+        <span class="mdc-kichi">${lbl}</span>
+        <span class="mdc-score">score ${sc}</span>`;
+      if (sc >= 80) kichiDirs.push(di.label);
+      else if (sc <= 8) daikiyouDirs.push({label: di.label, sc});
+      else if (sc <= 20) kyouDirs.push(di.label);
+    }
+    grid.appendChild(cell);
+  });
+
+  // 三盤×吉凶カテゴリ別の影響解説
+  const IMPACT = {
+    吉: {
+      nichi: '外出・商談・人との出会いに好機。この方位への外出で運気が上がります。',
+      tsuki: 'この方位への転居・転職・契約など月単位の決断に追い風です。',
+      nen:   'この方位での結婚・独立・事業起こしなど人生を変える決断に最適の年です。',
+    },
+    凶: {
+      nichi: '足元に注意（躓き・転倒）、忘れ物・置き忘れ、うっかりミス、交通系トラブルが起きやすい方位です。',
+      tsuki: 'この方位への転居・契約は問題が長引く恐れがあります。できれば延期を。',
+      nen:   'この方位での大きな変化は後々まで響く恐れがあります。慎重に検討してください。',
+    },
+    大凶: {
+      nichi: '体調不良・急なアクシデント・貴重品の紛失など深刻なトラブルが起きやすい日です。この方位への移動は強く避けてください。',
+      tsuki: 'この方位への引越・転職は健康・財産・人間関係に深刻な打撃をもたらす可能性があります。',
+      nen:   'この方位での大きな決断は数年にわたる悪影響が出る恐れがあります。',
+    },
+    最大凶: {
+      nichi: '大けが・深刻な病気・重大な財産損失を招く可能性があります。絶対に避けてください。',
+      tsuki: 'この方位への大きな行動は人生を左右する危機を生む恐れがあります。',
+      nen:   '人生の節目となる決断をこの方位で行うことは厳禁です。',
+    },
+    超最大凶: {
+      nichi: '【最高警戒】生命・財産・家族に関わる取り返しのつかない事態が起こりえます。この方位への行動は一切避けるべきです。',
+      tsuki: '【最高警戒】この月、この方位への行動はすべて中止してください。',
+      nen:   '【最高警戒】この方位での人生の転機は絶対に避けてください。',
+    },
+  };
+
+  let summary = '';
+  if (kichiDirs.length > 0) {
+    const txt = IMPACT['吉'][banMode] || IMPACT['吉'].nichi;
+    summary += `<strong style="color:#0a6040">✦ 吉方位：${kichiDirs.join('・')}</strong><br>${txt}<br><br>`;
+  }
+  if (kyouDirs.length > 0) {
+    const txt = IMPACT['凶'][banMode] || IMPACT['凶'].nichi;
+    summary += `<strong style="color:#b02020">▼ 凶方位：${kyouDirs.join('・')}</strong><br>${txt}<br><br>`;
+  }
+  if (daikiyouDirs.length > 0) {
+    const labels = daikiyouDirs.map(x => x.label);
+    const worstSc = Math.min(...daikiyouDirs.map(x => x.sc));
+    const level = worstSc <= 1 ? '超最大凶' : worstSc <= 3 ? '最大凶' : '大凶';
+    const txt = (IMPACT[level] || IMPACT['大凶'])[banMode];
+    summary += `<strong style="color:#78001e">⚠ ${level}方位：${labels.join('・')}</strong><br>${txt}`;
+  }
+  if (!summary) {
+    summary = 'すべての方位が普通〜小凶の穏やかな日です。無理な行動を避ければ問題ありません。';
+  }
+  document.getElementById('modalSummary').innerHTML = summary;
+  document.getElementById('calModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeCalModal() {
+  document.getElementById('calModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCalModal(); });
+
+function buildKyuseiCards(honmei) {
+  const hon = KYUSEI[honmei - 1];
+  document.getElementById('kyuseiCards').innerHTML = `
+    <div style="display:flex;align-items:flex-start;gap:2rem;flex-wrap:wrap;">
+      <div><div class="badge ${hon.cls}" style="width:90px;height:90px;">
+        <span class="bn" style="font-size:1.8rem">${hon.num}</span>
+        <span class="bname">${hon.n}</span>
+      </div></div>
+      <div style="flex:1;min-width:280px;">
+        <h4 style="font-family:'Zen Old Mincho',serif;font-size:1.1rem;color:var(--indigo);letter-spacing:.2em;margin-bottom:1rem;">${hon.n}</h4>
+        <p style="font-size:.83rem;line-height:2.1;color:#3a3020;margin-bottom:1rem;">${hon.nature}</p>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-top:1rem;">
+          <div style="padding:.8rem;background:var(--kichi-bg);border-left:3px solid var(--jade);">
+            <div style="font-size:.68rem;letter-spacing:.1em;color:var(--smoke);margin-bottom:.3rem">吉方位</div>
+            <div style="font-family:'Zen Old Mincho',serif;font-size:.85rem;color:var(--jade);">${hon.kichi.join('・')}</div>
+          </div>
+          <div style="padding:.8rem;background:var(--hankichi-bg);border-left:3px solid var(--indigo);">
+            <div style="font-size:.68rem;letter-spacing:.1em;color:var(--smoke);margin-bottom:.3rem">半吉方位</div>
+            <div style="font-family:'Zen Old Mincho',serif;font-size:.85rem;color:var(--indigo);">${hon.hankichi.join('・')}</div>
+          </div>
+          <div style="padding:.8rem;background:var(--kyou-bg);border-left:3px solid var(--vermillion);">
+            <div style="font-size:.68rem;letter-spacing:.1em;color:var(--smoke);margin-bottom:.3rem">要注意方位</div>
+            <div style="font-family:'Zen Old Mincho',serif;font-size:.85rem;color:var(--vermillion);">${hon.kyou.join('・')}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ========== 地図機能（Leaflet.js + OpenStreetMap） ==========
+
+let _map = null;
+let _mapStep = 0; // 0=未開始 1=現在地クリック待ち 2=目的地クリック待ち 3=完了
+let _fromMarker = null, _toMarker = null;
+let _sectorLayers = [], _arrowLayer = null, _lineLayer = null;
+
+// アイコン定義
+const fromIcon = L.divIcon({
+  className: '',
+  html: `<div style="width:32px;height:32px;background:#1a2f5a;border:3px solid #c9a84c;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#c9a84c;font-size:13px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.35);">現</div>`,
+  iconSize: [32, 32], iconAnchor: [16, 16], popupAnchor: [0, -18]
+});
+const toIcon = L.divIcon({
+  className: '',
+  html: `<div style="width:32px;height:32px;background:#9b2335;border:3px solid #c9a84c;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.35);">先</div>`,
+  iconSize: [32, 32], iconAnchor: [16, 16], popupAnchor: [0, -18]
+});
+
+function initMap() {
+  if (_map) return;
+  _map = L.map('mapContainer', { zoomControl: true }).setView([35.676, 139.65], 10);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 18
+  }).addTo(_map);
+
+  _map.on('click', onMapClick);
+  _mapStep = 1;
+}
+
+function onMapClick(e) {
+  if (_mapStep === 1) {
+    // 現在地セット
+    if (_fromMarker) _map.removeLayer(_fromMarker);
+    _fromMarker = L.marker(e.latlng, { icon: fromIcon })
+      .addTo(_map)
+      .bindPopup('<b>現在地</b>').openPopup();
+    _mapStep = 2;
+    document.getElementById('mapInstructions').querySelector('.map-step:nth-child(2)').style.borderColor = '#c9a84c';
+  } else if (_mapStep === 2) {
+    // 目的地セット
+    if (_toMarker) _map.removeLayer(_toMarker);
+    _toMarker = L.marker(e.latlng, { icon: toIcon })
+      .addTo(_map)
+      .bindPopup('<b>目的地</b>').openPopup();
+    _mapStep = 3;
+    runMapJudge();
+  }
+}
+
+function runMapJudge() {
+  if (!_fromMarker || !_toMarker) return;
+
+  const from = _fromMarker.getLatLng();
+  const to   = _toMarker.getLatLng();
+
+  // 方位角計算（真北基準、時計回り）
+  const dLng = (to.lng - from.lng) * Math.PI / 180;
+  const lat1 = from.lat * Math.PI / 180;
+  const lat2 = to.lat   * Math.PI / 180;
+  const y = Math.sin(dLng) * Math.cos(lat2);
+  const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLng);
+  let bearing = Math.atan2(y, x) * 180 / Math.PI;
+  bearing = (bearing + 360) % 360;
+
+  // 距離（km）
+  const R = 6371;
+  const dLat = (to.lat - from.lat) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLng/2)**2;
+  const dist = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+  // 方位キーと名称
+  const BEAR_DIRS = [
+    {key:'N',  label:'北',  min:337.5, max:22.5},
+    {key:'NE', label:'北東', min:22.5,  max:67.5},
+    {key:'E',  label:'東',  min:67.5,  max:112.5},
+    {key:'SE', label:'南東', min:112.5, max:157.5},
+    {key:'S',  label:'南',  min:157.5, max:202.5},
+    {key:'SW', label:'南西', min:202.5, max:247.5},
+    {key:'W',  label:'西',  min:247.5, max:292.5},
+    {key:'NW', label:'北西', min:292.5, max:337.5},
+  ];
+  const dirObj = BEAR_DIRS.find(d =>
+    d.key === 'N' ? (bearing >= 337.5 || bearing < 22.5)
+                  : (bearing >= d.min && bearing < d.max)
+  ) || BEAR_DIRS[0];
+
+  // 九星判定（生年月日が入力されていれば使用）
+  const birthVal = getBirthVal();
+  const targetVal = document.getElementById('iTarget').value;
+  let hon = 5, niss = 5;
+  if (birthVal) {
+    const [by,bm,bd] = birthVal.split('-').map(Number);
+    hon = honmeisei(by, bm, bd);
+  }
+  if (targetVal) {
+    const [ty,tm,td] = targetVal.split('-').map(Number);
+    niss = nisseiFor(ty, tm, td);
+  }
+  const sc = calcScore(hon, 0, niss, dirObj.key);
+  const kichiStr = getKichiLabelFull(hon, niss, dirObj.key);
+  const kichiClass = getKichiClass(sc);
+
+  // 扇形オーバーレイ（8方位）を描画
+  drawSectors(from, hon, niss);
+
+  // 現在地→目的地の線
+  if (_lineLayer) _map.removeLayer(_lineLayer);
+  const lineColor = sc >= 80 ? '#10a368' : sc >= 50 ? '#6478a0' : sc >= 35 ? '#e6a01e' : '#dc3c3c';
+  _lineLayer = L.polyline([from, to], {
+    color: lineColor, weight: 3, opacity: 0.85,
+    dashArray: sc >= 50 ? null : '8,6'
+  }).addTo(_map);
+
+  // 目的地ポップアップ更新
+  const popupClass = kichiClass === 'kichi' ? 'popup-kichi' : kichiClass === 'kyou' ? 'popup-kyou' : 'popup-futsu';
+  _toMarker.bindPopup(
+    `<div style="font-family:'Noto Serif JP',serif;min-width:130px;">
+      <div style="font-size:.8rem;color:#555;margin-bottom:.2rem;">目的地 ／ ${dirObj.label}方位</div>
+      <div class="${popupClass}" style="font-size:1.1rem;">${kichiStr}</div>
+      <div style="font-size:.72rem;color:#888;margin-top:.2rem;">方位角 ${bearing.toFixed(1)}° ／ ${dist.toFixed(1)} km</div>
+    </div>`
+  ).openPopup();
+
+  // 結果バー更新
+  const mr = document.getElementById('mapResult');
+  mr.classList.add('show');
+  document.getElementById('mrAngle').textContent = bearing.toFixed(1) + '°';
+  document.getElementById('mrDir').textContent   = dirObj.label;
+  document.getElementById('mrDist').textContent  = dist.toFixed(1) + ' km';
+  const mrk = document.getElementById('mrKichi');
+  mrk.textContent  = kichiStr;
+  mrk.className    = 'mri-kichi ' + kichiClass;
+  document.getElementById('mrNissei').textContent = KYUSEI[niss-1]?.n || '─';
+
+  // 両マーカーが見えるようにズーム
+  _map.fitBounds(L.latLngBounds([from, to]), { padding: [60, 60] });
+
+  // 次クリックで目的地を変更できるようにstep=2に戻す
+  _mapStep = 2;
+}
+
+// 8方位扇形オーバーレイ
+// 緯度経度→画面ピクセルへの変換ヘルパー（SVG矢印用）
+function latlngToOffset(map, center, latTarget, lngTarget) {
+  const pCenter = map.latLngToContainerPoint(center);
+  const pTarget = map.latLngToContainerPoint(L.latLng(latTarget, lngTarget));
+  return { dx: pTarget.x - pCenter.x, dy: pTarget.y - pCenter.y };
+}
+
+function drawSectors(center, hon, niss) {
+  _sectorLayers.forEach(l => _map.removeLayer(l));
+  _sectorLayers = [];
+
+  const SECTOR_DIRS = [
+    {key:'N',  label:'北',  midAng:0,    start:337.5, end:22.5},
+    {key:'NE', label:'北東', midAng:45,   start:22.5,  end:67.5},
+    {key:'E',  label:'東',  midAng:90,   start:67.5,  end:112.5},
+    {key:'SE', label:'南東', midAng:135,  start:112.5, end:157.5},
+    {key:'S',  label:'南',  midAng:180,  start:157.5, end:202.5},
+    {key:'SW', label:'南西', midAng:225,  start:202.5, end:247.5},
+    {key:'W',  label:'西',  midAng:270,  start:247.5, end:292.5},
+    {key:'NW', label:'北西', midAng:315,  start:292.5, end:337.5},
+  ];
+
+  const SECTOR_COLORS = {
+    吉:       { fill: '#10a368', border: '#0a8050', opacity: 0.16, textColor: '#0a6040' },
+    普通:     { fill: '#6478a0', border: '#4a5880', opacity: 0.12, textColor: '#3a4870' },
+    小凶:     { fill: '#e6a01e', border: '#c08010', opacity: 0.16, textColor: '#906000' },
+    凶:       { fill: '#dc3c3c', border: '#b82020', opacity: 0.20, textColor: '#8a1010' },
+    大凶:     { fill: '#b41428', border: '#900010', opacity: 0.26, textColor: '#700010' },
+    最大凶:   { fill: '#78001e', border: '#550010', opacity: 0.32, textColor: '#450010' },
+    超最大凶: { fill: '#3c0014', border: '#280008', opacity: 0.38, textColor: '#280008' },
+  };
+
+  const bounds = _map.getBounds();
+  const latSpan = bounds.getNorth() - bounds.getSouth();
+  const sectorRadiusDeg = latSpan * 0.44;
+  const cosLat = Math.cos(center.lat * Math.PI / 180);
+
+  SECTOR_DIRS.forEach(d => {
+    const sc    = calcScore(hon, 0, niss, d.key);
+    const kichiStr = getKichiLabelFull(hon, niss, d.key);
+    const cinfo = SECTOR_COLORS[kichiStr] || { fill: '#888', border: '#666', opacity: 0.10, textColor: '#444' };
+
+    // ---- 扇形ポリゴン ----
+    const pts = [center];
+    const startRad = d.start * Math.PI / 180;
+    const rawEnd   = d.key === 'N' ? d.end + 360 : d.end;
+    const endRad   = rawEnd * Math.PI / 180;
+    const steps = 24;
+    for (let i = 0; i <= steps; i++) {
+      const ang = startRad + (endRad - startRad) * i / steps;
+      pts.push(L.latLng(
+        center.lat + sectorRadiusDeg * Math.cos(ang - Math.PI/2),
+        center.lng + (sectorRadiusDeg / cosLat) * Math.sin(ang - Math.PI/2)
+      ));
+    }
+    const poly = L.polygon(pts, {
+      color: cinfo.border, fillColor: cinfo.fill,
+      fillOpacity: cinfo.opacity, weight: 1.2, opacity: 0.6
+    }).addTo(_map);
+    poly.bindPopup(`<b style="color:${cinfo.textColor}">${d.label}｜${kichiStr}</b><br><span style="font-size:.78rem;color:#555">スコア ${sc}</span>`);
+    _sectorLayers.push(poly);
+
+    // ---- 方位ラベル（扇形中央） ----
+    const midRad = d.midAng * Math.PI / 180;
+    const lblR   = sectorRadiusDeg * 0.60;
+    const lblLat = center.lat + lblR * Math.cos(midRad - Math.PI/2);
+    const lblLng = center.lng + (lblR / cosLat) * Math.sin(midRad - Math.PI/2);
+
+    // 吉方位のみ矢印付きラベル、凶は小さめラベル
+    const isKichi = sc >= 80;
+    const arrowHtml = isKichi
+      ? `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+           <div style="width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:14px solid ${cinfo.fill};opacity:.9;transform:rotate(${d.midAng}deg);"></div>
+           <div style="background:${cinfo.fill};color:#fff;border-radius:3px;padding:2px 7px;font-family:'Noto Serif JP',serif;font-size:11px;font-weight:700;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.25);">${d.label}｜${kichiStr}</div>
+         </div>`
+      : `<div style="background:rgba(255,255,255,0.85);border:1.5px solid ${cinfo.border};border-radius:3px;padding:2px 6px;font-family:'Noto Serif JP',serif;font-size:10px;color:${cinfo.textColor};font-weight:700;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.12);">${d.label}<br><span style="font-size:9px;">${kichiStr}</span></div>`;
+
+    const lbl = L.divIcon({
+      className: '',
+      html: arrowHtml,
+      iconAnchor: isKichi ? [35, 28] : [30, 12]
+    });
+    const lblMarker = L.marker([lblLat, lblLng], { icon: lbl, interactive: false }).addTo(_map);
+    _sectorLayers.push(lblMarker);
+
+    // ---- 吉方位：方向指示矢印（現在地から扇形の外縁へ伸びる太矢印） ----
+    if (isKichi) {
+      const arrowR = sectorRadiusDeg * 0.88;
+      const arrLat = center.lat + arrowR * Math.cos(midRad - Math.PI/2);
+      const arrLng = center.lng + (arrowR / cosLat) * Math.sin(midRad - Math.PI/2);
+      const arrow = L.polyline([center, L.latLng(arrLat, arrLng)], {
+        color: cinfo.fill, weight: 3, opacity: 0.75,
+        dashArray: '6,4'
+      }).addTo(_map);
+      // 矢先マーカー
+      const headIcon = L.divIcon({
+        className: '',
+        html: `<div style="font-size:18px;color:${cinfo.fill};line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3));">▲</div>`,
+        iconAnchor: [9, 18],
+      });
+      // 矢先の少し手前に三角マーカー（回転はCSSで）
+      const headMarker = L.marker([arrLat, arrLng], {
+        icon: headIcon, interactive: false,
+        rotationAngle: d.midAng,
+        rotationOrigin: 'center'
+      }).addTo(_map);
+      _sectorLayers.push(arrow, headMarker);
+    }
+  });
+}
+
+function resetMap() {
+  if (_fromMarker) { _map.removeLayer(_fromMarker); _fromMarker = null; }
+  if (_toMarker)   { _map.removeLayer(_toMarker);   _toMarker   = null; }
+  if (_lineLayer)  { _map.removeLayer(_lineLayer);   _lineLayer  = null; }
+  _sectorLayers.forEach(l => _map.removeLayer(l));
+  _sectorLayers = [];
+  _mapStep = 1;
+  document.getElementById('mapResult').classList.remove('show');
+}
+
+// 地図はスクロールしてセクションに来たら初期化
+(function() {
+  const observer = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) { initMap(); observer.disconnect(); }
+  }, { threshold: 0.1 });
+  document.addEventListener('DOMContentLoaded', () => {
+    const el = document.getElementById('mapContainer');
+    if (el) observer.observe(el);
+  });
+})();
+
+// ========== 初期化 ==========
+(function() {
+  const today = new Date();
+  document.getElementById('iTarget').value =
+    today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+  // サンプル：デモ用に 1950-01-01 を初期値に
+  document.getElementById('iBirthY').value='1950'; document.getElementById('iBirthM').value='1'; document.getElementById('iBirthD').value='1'; onBirthChange();
+})();
+// 九星グリッド初期化
+document.addEventListener('DOMContentLoaded', function(){ if(typeof buildStarGrid==='function') buildStarGrid(); });
+
+</script>
+</body>
+</html>
