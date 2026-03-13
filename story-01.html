@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>至誠の覚醒 ── 連載小説 | 三原嘉明</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1208;
+    --paper: #f5f0e8;
+    --paper-dark: #ede7d9;
+    --gold: #b8960c;
+    --gold-light: #d4af37;
+    --vermillion: #c0392b;
+    --indigo: #1a3a5c;
+    --faded: #7a6e5f;
+    --line: #c8bfaa;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: 'Noto Serif JP', serif;
+    font-size: 17px;
+    line-height: 2.0;
+    min-height: 100vh;
+  }
+
+  /* 和紙テクスチャ背景 */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(180,160,120,0.08) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(180,160,120,0.04) 40px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ヘッダー */
+  header {
+    position: relative;
+    background: var(--ink);
+    color: var(--paper);
+    text-align: center;
+    padding: 60px 20px 50px;
+    overflow: hidden;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(184,150,12,0.15) 0%, transparent 70%);
+  }
+
+  header::after {
+    content: '至誠';
+    position: absolute;
+    font-family: 'Zen Old Mincho', serif;
+    font-size: 200px;
+    color: rgba(255,255,255,0.03);
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    letter-spacing: 0.1em;
+    pointer-events: none;
+  }
+
+  .header-series {
+    font-size: 12px;
+    letter-spacing: 0.4em;
+    color: var(--gold-light);
+    margin-bottom: 18px;
+    position: relative;
+  }
+
+  .header-title {
+    font-family: 'Zen Old Mincho', serif;
+    font-size: clamp(32px, 6vw, 56px);
+    letter-spacing: 0.15em;
+    line-height: 1.3;
+    position: relative;
+    margin-bottom: 20px;
+  }
+
+  .header-title span {
+    display: block;
+    font-size: clamp(14px, 2.5vw, 20px);
+    letter-spacing: 0.5em;
+    color: var(--gold-light);
+    margin-top: 8px;
+    font-weight: 300;
+  }
+
+  .header-author {
+    font-size: 13px;
+    letter-spacing: 0.3em;
+    color: rgba(245,240,232,0.5);
+    position: relative;
+  }
+
+  /* 金の区切り線 */
+  .gold-rule {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 auto;
+    max-width: 500px;
+    padding: 30px 20px;
+  }
+  .gold-rule::before,
+  .gold-rule::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .gold-rule-diamond {
+    width: 6px;
+    height: 6px;
+    background: var(--gold);
+    transform: rotate(45deg);
+    flex-shrink: 0;
+  }
+
+  /* メインコンテンツ */
+  main {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 20px 24px 80px;
+  }
+
+  /* 各話 */
+  .episode {
+    margin-bottom: 70px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUp 0.7s ease forwards;
+  }
+
+  .episode:nth-child(1) { animation-delay: 0.1s; }
+  .episode:nth-child(2) { animation-delay: 0.2s; }
+  .episode:nth-child(3) { animation-delay: 0.3s; }
+  .episode:nth-child(4) { animation-delay: 0.4s; }
+  .episode:nth-child(5) { animation-delay: 0.5s; }
+  .episode:nth-child(6) { animation-delay: 0.55s; }
+  .episode:nth-child(7) { animation-delay: 0.6s; }
+  .episode:nth-child(8) { animation-delay: 0.65s; }
+  .episode:nth-child(9) { animation-delay: 0.7s; }
+  .episode:nth-child(10) { animation-delay: 0.75s; }
+  .episode:nth-child(11) { animation-delay: 0.8s; }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .episode-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 22px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .episode-number {
+    font-family: 'Zen Old Mincho', serif;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .episode-title {
+    font-family: 'Zen Old Mincho', serif;
+    font-size: clamp(18px, 3.5vw, 24px);
+    letter-spacing: 0.1em;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+
+  .episode-body p {
+    margin-bottom: 1.4em;
+    text-indent: 1em;
+  }
+
+  .episode-body p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* 続くの行 */
+  .episode-continue {
+    text-align: right;
+    font-size: 13px;
+    color: var(--faded);
+    margin-top: 16px;
+    letter-spacing: 0.2em;
+  }
+
+  /* 話と話の区切り */
+  .episode-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 10px 0 60px;
+    color: var(--line);
+    font-size: 14px;
+    letter-spacing: 0.5em;
+  }
+
+  /* バナー */
+  .seimei-banner {
+    background: var(--ink);
+    color: var(--paper);
+    border: 1px solid rgba(184,150,12,0.4);
+    border-radius: 2px;
+    padding: 30px 28px;
+    margin: 60px 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .seimei-banner::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .seimei-banner::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .banner-label {
+    font-size: 10px;
+    letter-spacing: 0.5em;
+    color: var(--gold-light);
+    margin-bottom: 14px;
+  }
+
+  .banner-body {
+    font-size: 14px;
+    line-height: 1.9;
+    color: rgba(245,240,232,0.85);
+    margin-bottom: 20px;
+  }
+
+  .banner-link {
+    display: inline-block;
+    background: var(--gold);
+    color: var(--ink);
+    font-family: 'Zen Old Mincho', serif;
+    font-size: 14px;
+    letter-spacing: 0.15em;
+    padding: 10px 24px;
+    text-decoration: none;
+    font-weight: 700;
+    transition: background 0.2s;
+  }
+
+  .banner-link:hover {
+    background: var(--gold-light);
+  }
+
+  .banner-note {
+    font-size: 11px;
+    color: rgba(245,240,232,0.45);
+    margin-top: 14px;
+    line-height: 1.7;
+  }
+
+  /* フッター */
+  footer {
+    background: var(--ink);
+    color: rgba(245,240,232,0.4);
+    text-align: center;
+    padding: 40px 20px;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    line-height: 2.2;
+  }
+
+  footer a {
+    color: var(--gold);
+    text-decoration: none;
+  }
+
+  /* ナビ */
+  .nav-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    color: var(--faded);
+    text-decoration: none;
+    padding: 16px 0;
+    transition: color 0.2s;
+  }
+  .nav-back:hover { color: var(--gold); }
+  .nav-back::before { content: '◀'; font-size: 10px; }
+
+  @media (max-width: 600px) {
+    main { padding: 16px 18px 60px; }
+    .episode-header { flex-direction: column; gap: 6px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-series">連　載　小　説</div>
+  <h1 class="header-title">
+    至誠の覚醒
+    <span>SHISEI NO KAKUSEI</span>
+  </h1>
+  <div class="header-author">著　三原嘉明</div>
+</header>
+
+<main>
+
+  <a href="index.html" class="nav-back">トップへ戻る</a>
+
+  <!-- 第1話 -->
+  <article class="episode">
+    <div class="episode-header">
+      <div class="episode-number">第 一 話</div>
+      <h2 class="episode-title">清流の記憶</h2>
+    </div>
+    <div class="episode-body">
+      <p>東京・代沢。烏山川が今よりも清く流れていた頃の話だ。</p>
+      <p>下馬か代沢か、もう正確には思い出せない。ただ、小学校の低学年の頃、その辺りに女の子がいた。名前は知らない。ただ、その子のそばにいたかった。それだけだった。</p>
+      <p>記憶の中の少女は、川のそばに立っている。それ以上でも、それ以下でもない。</p>
+      <p>半世紀以上が過ぎた今も、その川の光だけは消えない。人が何かを愛するとき、それは言葉になる前に、もう始まっている。</p>
+    </div>
+    <div class="episode-continue">（つづく）</div>
+  </article>
+
+  <div class="episode-divider">◆　◆　◆</div>
+
+  <!-- 第2話 -->
+  <article class="episode">
+    <div class="episode-header">
+      <div class="episode-number">第 二 話</div>
+      <h2 class="episode-title">綱島から、世田谷へ</h2>
+    </div>
+    <div class="episode-body">
+      <p>小学校の4年か5年の頃だった。</p>
+      <p>杉浦友子という子がいた。それ以上のことは、うまく説明できない。ただ、その子と同じ場所にいたかった。それだけだった。</p>
+      <p>引っ越しが決まった。父は東京電力に勤めていた。社宅は、横浜の綱島にあった。松下通信工業の工場の角を右に折れ、東海道新幹線の手前に立つアパートだった。</p>
+      <p>進学先は、世田谷区立富士中学校に決まっていた。</p>
+      <p>毎朝、綱島から東横線に乗った。電車は満員だった。体とカバンが引き離された。床から足が浮いた。それでも私は毎朝、渋谷へ向かい、バスに乗り換え、富士中へ向かった。一時間以上かけて。</p>
+      <p>一年間、続けた。</p>
+      <p>その一年間で、杉浦友子に一度も会うことはなかった。同じ学校にいるはずだった。それでも、廊下ですれ違うことも、同じ教室に入ることも、なかった。</p>
+      <p>ある朝、私は気づいた。会えない、ということに。</p>
+      <p>それ以上でも、それ以下でもなかった。</p>
+      <p>私は翌年、綱島の次の駅、大倉山にある大綱中学校へ転校した。</p>
+    </div>
+    <div class="episode-continue">（つづく）</div>
+  </article>
+
+  <div class="episode-divider">◆　◆　◆</div>
+
+  <!-- 第3話 -->
+  <article class="episode">
+    <div class="episode-header">
+      <div class="episode-number">第 三 話</div>
+      <h2 class="episode-title">加島敬介</h2>
+    </div>
+    <div class="episode-body">
+      <p>大綱中学校は、迷うほど広かった。生徒数が多分3000人。一学年が、13とか15クラス。</p>
+      <p>校舎がいくつもあった。どこへ行けばいいのか、わからなかった。</p>
+      <p>その時、声をかけてくれた丸ぽちゃの可愛い生徒がいた。加島敬介という名前だった。彼は黙って私を教室まで案内した。たまたま、同じクラスだった。</p>
+      <p>後になって知ったことがある。彼の父は、ある寺を拠点とする新興宗教の教祖だった。だが、加島が中学生の頃、父はもういなかった。母が、父の代わりに教団を支えていた。</p>
+      <p>彼がそのことを話したのか、私が察したのか、もう覚えていない。ただ、彼は親切だった。それだけは確かだった。</p>
+      <p>あれから半世紀以上が経つ。数年前、私はバイクで彼を訪ねた。富士山麓にある教団の施設だった。広大な敷地に、礼拝堂があった。彼は、美男子で中学生のころとは見違えるほどの大男となった。</p>
+      <p>彼には子がいなかった。代わりに、大型犬が家族だった。笑顔が絶えなかった。</p>
+      <p>本当の宗教家は、勧誘しない。ただ、大切なことだけを、相手のことを考えて伝えようとする。加島にはそのひたむきさがあった。</p>
+      <p>私はその笑顔を見て、思った。この人は、解脱したのだ、と。</p>
+    </div>
+    <div class="episode-continue">（つづく）</div>
+  </article>
+
+  <div class="episode-divider">◆　◆　◆</div>
+
+  <!-- 第4話 -->
+  <article class="episode">
+    <div class="episode-header">
+      <div class="episode-number">第 四 話</div>
+      <h2 class="episode-title">兼田先生</h2>
+    </div>
+    <div class="episode-body">
+      <p>兼田敏恵先生は、音楽の教師だった。同時に、私のクラスの担任だった。</p>
+      <p>クラスには、番長の子分と思われる不良が二人いた。彼らは授業をボイコットした。先生に面と向かって意地悪をした。3000人を超えるマンモス校の、14も15もあるクラスの一つで、そういうことが静かに続いていた。</p>
+      <p>兼田先生は気丈だった。</p>
+      <p>乱れても、崩れなかった。二人を、まともな道へ導こうとし続けた。</p>
+      <p>私は何もしなかった。正確には、何もできなかった。ただ、先生の側に、少しだけ気持ちを傾けていた。それだけだった。</p>
+      <p>後になって知ったことがある。兼田先生には、体育の若い男性教師との恋愛があった。二人はその後、結婚した。気丈に立っていた先生に、そういう時間が流れていたのだと、ずっと後になって思った。</p>
+    </div>
+    <div class="episode-continue">（つづく）</div>
+  </article>
+
+  <div class="episode-divider">◆　◆　◆</div>
+
+  <!-- 第5話 -->
+  <article class="episode">
+    <div class="episode-header">
+      <div class="episode-number">第 五 話</div>
+      <h2 class="episode-title">安田陽子</h2>
+    </div>
+    <div class="episode-body">
+      <p>安田陽子はバレー部だった。</p>
+      <p>男勝りで、明るく、誰にでも好かれた。私は彼女が好きだった。それ以上のことは、うまく説明できない。</p>
+      <p>修学旅行で京都へ行った。同じ班だったのかもしれない。詳しいことは覚えていない。ただ、同じ場所にいた。その時の写真が、今も残っている。</p>
+      <p>卒業後、彼女は横浜商業高校へ進んだ。</p>
+      <p>それ以来、姿を見ていない。クラス会にも現れなかった。友人からやーさんと結婚したという噂を聞いたことがある。ただの噂だった。</p>
+      <p>忽然と、消えた。</p>
+      <p>今でも、どこかで生きていると思う。</p>
+    </div>
+    <div class="episode-continue">（つづく）</div>
+  </article>
+
+  <div class="episode-divider">◆　◆　◆</div>
+
+  <!-- 第6話 -->
+  <article class="episode">
+    <div class="episode-header">
+      <div class="episode-number">第 六 話</div>
+      <h2 class="episode-title">山田めぐみ</h2>
+    </div>
+    <div class="episode-body">
+      <p>川和高校まで、市営バスで通った。</p>
+      <p>小机駅で降り、バスに乗る。その路線を、山田めぐみも使っていた。すらっとした、美しい同級生だった。</p>
+      <p>毎朝、同じバスに乗っていた。それだけだった。</p>
+      <p>いつ告白したのか、どこでしたのか、覚えていない。ただ、答えがNoだったことだけは、はっきり覚えている。</p>
+      <p>冬の寒い日だった。</p>
+      <p>その頃、ラジオからよく流れていた曲がある。サイモンとガーファンクルの「明日に架ける橋」だった。今でもその曲を聴くと、あの冬の空気が戻ってくる。</p>
+    </div>
+    <div class="episode-continue">（つづく）</div>
+  </article>
+
+  <div class="episode-divider">◆　◆　◆</div>
+
+  <!-- 第7話 -->
+  <article class="episode">
+    <div class="episode-header">
+      <div class="episode-number">第 七 話</div>
+      <h2 class="episode-title">鶴見川</h2>
+    </div>
+    <div class="episode-body">
+      <p>後輩にブラスバンド部の女の子がいた。そばかすが可愛い、おさげ髪の子だった。新聞部にもいたかもしれない。名前は、もう思い出せない。</p>
+      <p>早春のことだった。鶴見川を、二人で歩いた。なぜそうなったのか、覚えていない。ただ、川沿いの道を並んで歩いた。</p>
+      <p>その時、彼女は告白した。</p>
+      <p>私は断った。山田めぐみへの失恋が、まだ胸の中にあった。それだけではなかった。私は、気持ちのない相手を自分のものにする人間ではなかった。</p>
+      <p>彼女の家まで送った。彼女が中で着替えていた。</p>
+      <p>私はそこで動かなかった。</p>
+      <p>馬鹿だと思う人もいるだろう。だが、その時の自分を、私は今も恥じていない。</p>
+      <p>彼女はその後、家の事情で岐阜へ引っ越した。</p>
+      <p>鶴見川の早春の光だけが、今も残っている。</p>
+    </div>
+    <div class="episode-continue">（つづく）</div>
+  </article>
+
+  <div class="episode-divider">◆　◆　◆</div>
+
+  <!-- 第8話 -->
+  <article class="episode">
+    <div class="episode-header">
+      <div class="episode-number">第 八 話</div>
+      <h2 class="episode-title">新聞部とJRC</h2>
+    </div>
+    <div class="episode-body">
+      <p>新聞部の仕事は、紙面を編集して神奈川新聞社へ持ち込むことだった。活字を並べ、レイアウトを組む。その作業が好きだった。</p>
+      <p>隣の部室にJRCがあった。そこに三人の先輩がいた。</p>
+      <p>本田敏雄先輩は豪快だった。香川稔先輩はいつも腕を組み、冷静に状況を観察していた。樋口京香先輩は小柄で美人で、聡明だった。本田先輩がひそかに彼女を想っていることは、なんとなくわかった。</p>
+      <p>ある日、本田先輩の家でお酒を飲んだ。初めてだった。</p>
+      <p>赤いラベルの大瓶から、ストレートでコップに注いだ。二杯、三杯。</p>
+      <p>そこから先の記憶がない。</p>
+      <p>気づくと、畳の上に新聞紙が敷かれていた。髪の毛がバリバリに固まっていた。数日間、そこで昏睡していたらしい。</p>
+      <p>それが、私が初めてお酒を飲んだ夜だった。</p>
+    </div>
+    <div class="episode-continue">（つづく）</div>
+  </article>
+
+  <div class="episode-divider">◆　◆　◆</div>
+
+  <!-- 第9話 -->
+  <article class="episode">
+    <div class="episode-header">
+      <div class="episode-number">第 九 話</div>
+      <h2 class="episode-title">月の夜</h2>
+    </div>
+    <div class="episode-body">
+      <p>夏合宿だった。新聞部だったか、JRCだったか、もう定かではない。</p>
+      <p>その夜、テレビの前に皆が集まった。</p>
+      <p>アポロ11号が、月面に着陸した。アームストロング船長の声が、スピーカーから流れた。</p>
+      <p>1969年の夏だった。</p>
+      <p>誰かが立ち上がった。気づくと皆でプールへ走っていた。夜中だった。水に飛び込んだ。誰かが笑っていた。誰かが叫んでいた。</p>
+      <p>月が、空にあった。人間が、その月に立っていた。</p>
+      <p>その高揚感が、何だったのか、今もうまく説明できない。ただ、あの夜の水の冷たさと、空の月だけは、今も残っている。</p>
+    </div>
+    <div class="episode-continue">（つづく）</div>
+  </article>
+
+  <div class="episode-divider">◆　◆　◆</div>
+
+  <!-- 第10話 -->
+  <article class="episode">
+    <div class="episode-header">
+      <div class="episode-number">第 十 話</div>
+      <h2 class="episode-title">井上先生</h2>
+    </div>
+    <div class="episode-body">
+      <p>川和高校は七期生だった。新設校の先生方は、井の中の蛙をどう覚醒させるか、それだけを考えていたように思う。</p>
+      <p>英語の井上先生は、よく煙草を吸っていた。職員室で、おいしそうに煙をくゆらせていた。</p>
+      <p>授業中、先生はこう言った。</p>
+      <p>「ONは接触だ」</p>
+      <p>それだけだった。説明はなかった。</p>
+      <p>だが、その一言で、私はONという前置詞の本質を完全に理解した。表面に触れている、乗っている、接している。すべてがその一言に収まった。</p>
+      <p>先生は早くに亡くなった。</p>
+      <p>今でも、ONという文字を見るたびに、煙草の煙と、あの声が戻ってくる。</p>
+    </div>
+    <div class="episode-continue">（つづく）</div>
+  </article>
+
+  <div class="episode-divider">◆　◆　◆</div>
+
+  <!-- 第11話 -->
+  <article class="episode">
+    <div class="episode-header">
+      <div class="episode-number">第十一話</div>
+      <h2 class="episode-title">大野先生と総代</h2>
+    </div>
+    <div class="episode-body">
+      <p>倫理社会の大野先生は、私の担任だった。いつも理性的で、理詰めで授業を進めた。</p>
+      <p>卒業式の前、先生は私を呼んだ。総代として、別れの挨拶をするよう言われた。なぜ私が選ばれたのか、わからなかった。</p>
+      <p>壇上に立った。</p>
+      <p>今思えば、若く、苦い挨拶だった。私は何かに腹を立てていた。歴史が隠されている。真実が見えなくされている。そういう怒りが、言葉になりきらないまま、口から出たような気がする。自分の無知を棚に上げて、何かのせいにしていた。それに気づいたのは、ずっと後のことだった。</p>
+      <p>大野先生はまだご存命だという。</p>
+      <p>いつか訪ねてみたいと思っている。なぜ、あの時私を選んだのか。それだけを聞きたい。</p>
+    </div>
+    <div class="episode-continue">（つづく）</div>
+  </article>
+
+  <!-- バナー -->
+  <div class="seimei-banner">
+    <div class="banner-label">◆　著者より　◆</div>
+    <div class="banner-body">
+      この連載の著者・三原嘉明は、昭和33年に発見された<br>
+      牧正人史式「姓名科学」の復活に取り組んでいます。<br>
+      あなたの名前にも、数理が宿っています。<br>
+      ぜひ一度、解析してみてください。
+    </div>
+    <a href="https://yymm77.github.io/seimei-kagaku/" class="banner-link">
+      【無料】姓名科学 解析システムへ ▶
+    </a>
+    <div class="banner-note">
+      ※現在検証中のシステムです。結果はあくまで参考としてご利用ください。<br>
+      皆様のフィードバックが精度向上につながります。<br>
+      お問い合わせ：seimei.kagaku.maki@gmail.com
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <div>連載小説「至誠の覚醒」</div>
+  <div>著者：三原嘉明　／　<a href="https://yymm77.github.io/seimei-kagaku/">姓名科学サイトへ</a></div>
+  <div style="margin-top:10px; font-size:11px;">© 三原嘉明　All Rights Reserved.</div>
+</footer>
+
+</body>
+</html>
