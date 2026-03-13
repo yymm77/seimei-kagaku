@@ -3726,9 +3726,9 @@ function resetMap() {
 (function() {
   const observer = new IntersectionObserver(entries => {
     if (entries[0].isIntersecting) { initMap(); observer.disconnect(); }
-  }, { threshold: 0.1 });
+  }, { threshold: 0 });  // threshold:0 で少しでも見えたら即初期化
   document.addEventListener('DOMContentLoaded', () => {
-    const el = document.getElementById('mapContainer');
+    const el = document.getElementById('map-sec');  // 親セクションを監視
     if (el) observer.observe(el);
   });
 })();
