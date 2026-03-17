@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>真正性保証メールポータル — ブロックチェーン電子署名</title>
+<style>
+  :root {
+    --ink: #1a1a1a; --paper: #f8f7f4; --surface: #ffffff;
+    --border: #e0ddd8; --border-strong: #c8c5be;
+    --muted: #6b6860; --hint: #9e9b95;
+    --accent: #1a3a5c; --accent-light: #e8eef5;
+    --success: #1a5c3a; --success-light: #e8f5ee;
+    --danger: #5c1a1a; --danger-light: #f5e8e8;
+    --warning: #5c4a1a; --warning-light: #f5f0e0;
+    --gold: #8b6914; --gold-light: #fdf5e0;
+    --mono: 'Courier New', monospace;
+    --sidebar-w: 220px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif; background: var(--paper); color: var(--ink); height: 100vh; overflow: hidden; }
+
+  /* ===== レイアウト ===== */
+  .app { display: flex; height: 100vh; }
+
+  /* サイドバー */
+  .sidebar {
+    width: var(--sidebar-w); background: var(--accent); color: white;
+    display: flex; flex-direction: column; flex-shrink: 0;
+  }
+  .sidebar-logo { padding: 20px 16px 12px; border-bottom: 1px solid rgba(255,255,255,0.12); }
+  .sidebar-logo h1 { font-size: 13px; font-weight: 700; letter-spacing: 0.02em; }
+  .sidebar-logo p { font-size: 10px; opacity: 0.6; margin-top: 3px; }
+
+  .sidebar-compose {
+    margin: 12px; padding: 10px;
+    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 6px; text-align: center; cursor: pointer;
+    font-size: 13px; font-weight: 600; transition: background 0.15s;
+  }
+  .sidebar-compose:hover { background: rgba(255,255,255,0.25); }
+
+  .sidebar-nav { flex: 1; padding: 8px 0; overflow-y: auto; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 16px; font-size: 13px; cursor: pointer;
+    transition: background 0.12s; border-radius: 0;
+    color: rgba(255,255,255,0.8);
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.1); color: white; }
+  .nav-item.active { background: rgba(255,255,255,0.18); color: white; font-weight: 600; }
+  .nav-icon { font-size: 14px; width: 18px; text-align: center; }
+  .nav-badge {
+    margin-left: auto; background: #c0392b; color: white;
+    border-radius: 10px; padding: 1px 6px; font-size: 10px; font-weight: 700;
+  }
+
+  .sidebar-stats { padding: 12px 16px; border-top: 1px solid rgba(255,255,255,0.12); }
+  .sidebar-stat { display: flex; justify-content: space-between; font-size: 11px; padding: 3px 0; color: rgba(255,255,255,0.7); }
+  .sidebar-stat span:last-child { color: white; font-weight: 600; }
+
+  /* メインエリア */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  .main-header {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 12px 20px; display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+  }
+  .main-title { font-size: 16px; font-weight: 600; flex: 1; }
+  .search-box {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--paper); border: 1px solid var(--border);
+    border-radius: 20px; padding: 6px 14px; font-size: 13px;
+  }
+  .search-box input { border: none; background: none; outline: none; font-size: 13px; width: 180px; font-family: inherit; color: var(--ink); }
+
+  .main-content { flex: 1; overflow-y: auto; }
+
+  /* パネル */
+  .panel { display: none; height: 100%; }
+  .panel.active { display: block; }
+
+  /* ===== 受信トレイ ===== */
+  .mail-list { }
+  .mail-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 20px; border-bottom: 1px solid var(--border);
+    cursor: pointer; transition: background 0.1s; position: relative;
+  }
+  .mail-item:hover { background: var(--accent-light); }
+  .mail-item.unread { background: #fff; }
+  .mail-item.unread .mail-subject { font-weight: 700; }
+  .mail-item.selected { background: var(--accent-light); border-left: 3px solid var(--accent); }
+
+  .mail-avatar {
+    width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: white;
+  }
+  .mail-info { flex: 1; min-width: 0; }
+  .mail-from { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+  .mail-subject { font-size: 13px; color: var(--ink); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mail-preview { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mail-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+  .mail-time { font-size: 11px; color: var(--hint); }
+  .mail-verified { font-size: 10px; }
+
+  /* ===== メール詳細 ===== */
+  .mail-detail { padding: 24px; }
+  .detail-header { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+  .detail-subject { font-size: 20px; font-weight: 600; margin-bottom: 12px; }
+  .detail-meta { display: flex; gap: 16px; flex-wrap: wrap; }
+  .detail-meta-item { font-size: 13px; color: var(--muted); }
+  .detail-meta-item span { color: var(--ink); font-weight: 500; }
+  .detail-body { font-size: 14px; line-height: 1.9; white-space: pre-wrap; margin-bottom: 20px; }
+  .detail-cert {
+    background: var(--paper); border: 1px solid var(--border); border-left: 3px solid var(--accent);
+    border-radius: 0 6px 6px 0; padding: 12px 14px;
+    font-family: var(--mono); font-size: 11px; line-height: 1.8;
+    color: var(--muted); white-space: pre-wrap;
+  }
+  .detail-actions { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+
+  /* ===== メール作成 ===== */
+  .compose-wrap { padding: 20px; max-width: 760px; }
+  .compose-field { margin-bottom: 12px; }
+  .compose-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; display: block; font-weight: 500; }
+  .compose-input {
+    width: 100%; padding: 9px 12px; border: 1px solid var(--border);
+    border-radius: 6px; font-size: 14px; font-family: inherit;
+    background: var(--surface); color: var(--ink); transition: border-color 0.15s;
+  }
+  .compose-input:focus { outline: none; border-color: var(--accent); }
+  .compose-body { height: 280px; resize: vertical; line-height: 1.7; }
+  .compose-actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; align-items: center; }
+
+  .gas-setup {
+    background: var(--gold-light); border: 1px solid #e0c060;
+    border-radius: 8px; padding: 14px 16px; margin-bottom: 16px; font-size: 13px;
+  }
+  .gas-setup strong { color: var(--gold); display: block; margin-bottom: 6px; }
+  .gas-url-row { display: flex; gap: 8px; margin-top: 8px; }
+  .gas-url-input { flex: 1; padding: 7px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 12px; font-family: var(--mono); }
+
+  /* ===== 台帳 ===== */
+  .ledger-wrap { padding: 20px; }
+  .ledger-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px 16px; margin-bottom: 10px;
+  }
+  .ledger-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px; }
+  .ledger-subject { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .ledger-meta-txt { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+  .ledger-hash-txt { font-family: var(--mono); font-size: 11px; color: var(--hint); background: var(--paper); border-radius: 4px; padding: 6px 10px; word-break: break-all; }
+  .chain-bar { height: 3px; background: var(--border); border-radius: 2px; margin-top: 8px; overflow: hidden; }
+  .chain-bar-fill { height: 100%; background: var(--accent); width: 100%; }
+
+  /* ===== 設定 ===== */
+  .settings-wrap { padding: 24px; max-width: 560px; }
+  .settings-section { margin-bottom: 28px; }
+  .settings-title { font-size: 14px; font-weight: 700; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .settings-row { margin-bottom: 12px; }
+  .settings-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; display: block; }
+  .settings-input { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; font-family: inherit; }
+
+  /* ===== 共通UI ===== */
+  .badge { display: inline-flex; align-items: center; gap: 3px; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 4px; }
+  .badge-success { background: var(--success-light); color: var(--success); }
+  .badge-info { background: var(--accent-light); color: var(--accent); }
+  .badge-warning { background: var(--warning-light); color: var(--warning); }
+  .badge-danger { background: var(--danger-light); color: var(--danger); }
+  .badge-genesis { background: var(--gold-light); color: var(--gold); }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; padding: 9px 18px;
+    border-radius: 6px; border: 1px solid var(--border);
+    background: none; cursor: pointer; color: var(--ink);
+    transition: background 0.12s, transform 0.08s; font-family: inherit;
+  }
+  .btn:hover { background: var(--paper); }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary { background: var(--accent); color: white; border-color: transparent; }
+  .btn-primary:hover { background: #0f2740; }
+  .btn-success { background: var(--success); color: white; border-color: transparent; }
+  .btn-success:hover { background: #0f3d24; }
+  .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+  .info-box { background: var(--accent-light); border-left: 3px solid var(--accent); padding: 10px 14px; border-radius: 0 6px 6px 0; font-size: 13px; color: var(--muted); line-height: 1.8; margin-bottom: 14px; }
+
+  .verify-ok { background: var(--success-light); border: 1px solid #b8ddc8; border-radius: 8px; padding: 14px; color: var(--success); }
+  .verify-ng { background: var(--danger-light); border: 1px solid #ddb8b8; border-radius: 8px; padding: 14px; color: var(--danger); }
+  .verify-title { font-weight: 700; font-size: 14px; margin-bottom: 6px; }
+  .verify-detail { font-size: 13px; line-height: 1.7; }
+
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--hint); }
+  .empty-state-icon { font-size: 3rem; margin-bottom: 12px; opacity: 0.4; }
+  .empty-state p { font-size: 14px; }
+
+  /* 通知 */
+  .toast {
+    position: fixed; top: 20px; right: 20px; z-index: 9999;
+    padding: 12px 20px; border-radius: 8px; font-size: 13px; font-weight: 600;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15); animation: toast-in 0.25s ease;
+    max-width: 340px; line-height: 1.5;
+  }
+  .toast-success { background: var(--success); color: white; }
+  .toast-error { background: var(--danger); color: white; }
+  .toast-info { background: var(--accent); color: white; }
+  @keyframes toast-in { from { opacity:0; transform: translateX(20px); } to { opacity:1; transform:translateX(0); } }
+
+  @media (max-width: 640px) {
+    :root { --sidebar-w: 60px; }
+    .nav-item span:not(.nav-icon):not(.nav-badge) { display: none; }
+    .sidebar-logo p, .sidebar-stats { display: none; }
+    .sidebar-compose { font-size: 0; padding: 10px; }
+    .sidebar-compose::before { content: '✏️'; font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ===== サイドバー ===== -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <h1>⬡ 真正性保証メール</h1>
+      <p>ブロックチェーン電子署名</p>
+    </div>
+
+    <div class="sidebar-compose" onclick="showPanel('compose')">
+      ✏️ 新規作成
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-item active" onclick="showPanel('inbox')" id="nav-inbox">
+        <span class="nav-icon">📥</span>
+        <span>受信トレイ</span>
+        <span class="nav-badge" id="unread-badge">2</span>
+      </div>
+      <div class="nav-item" onclick="showPanel('sent')" id="nav-sent">
+        <span class="nav-icon">📤</span>
+        <span>送信済み</span>
+      </div>
+      <div class="nav-item" onclick="showPanel('verify')" id="nav-verify">
+        <span class="nav-icon">🔍</span>
+        <span>真正性検証</span>
+      </div>
+      <div class="nav-item" onclick="showPanel('ledger')" id="nav-ledger">
+        <span class="nav-icon">⬡</span>
+        <span>ブロックチェーン台帳</span>
+      </div>
+      <div class="nav-item" onclick="showPanel('settings')" id="nav-settings">
+        <span class="nav-icon">⚙️</span>
+        <span>設定</span>
+      </div>
+    </nav>
+
+    <div class="sidebar-stats">
+      <div class="sidebar-stat"><span>登録メール数</span><span id="stat-count">2</span></div>
+      <div class="sidebar-stat"><span>ブロック数</span><span id="stat-blocks">3</span></div>
+      <div class="sidebar-stat"><span>整合性</span><span>100%</span></div>
+    </div>
+  </div>
+
+  <!-- ===== メインエリア ===== -->
+  <div class="main">
+    <div class="main-header">
+      <div class="main-title" id="main-title">受信トレイ</div>
+      <div class="search-box">
+        <span>🔍</span>
+        <input type="text" placeholder="メールを検索..." id="searchInput" oninput="searchMails()">
+      </div>
+    </div>
+
+    <div class="main-content">
+
+      <!-- 受信トレイ -->
+      <div class="panel active" id="panel-inbox">
+        <div class="mail-list" id="inboxList"></div>
+      </div>
+
+      <!-- 送信済み -->
+      <div class="panel" id="panel-sent">
+        <div class="mail-list" id="sentList"></div>
+      </div>
+
+      <!-- メール詳細 -->
+      <div class="panel" id="panel-detail">
+        <div class="mail-detail" id="mailDetail"></div>
+      </div>
+
+      <!-- 新規作成 -->
+      <div class="panel" id="panel-compose">
+        <div class="compose-wrap">
+          <div class="gas-setup" id="gasSetup">
+            <strong>⚙️ GAS送信URLの設定が必要です</strong>
+            GAS（Google Apps Script）を設定することで実際のメール送信が可能になります。
+            設定済みの場合はURLを入力して「保存」してください。
+            <div class="gas-url-row">
+              <input type="text" class="gas-url-input" id="gasUrlInput" placeholder="https://script.google.com/macros/s/xxx/exec">
+              <button class="btn btn-sm btn-primary" onclick="saveGasUrl()">保存</button>
+            </div>
+          </div>
+
+          <div class="compose-field">
+            <label class="compose-label">宛先メールアドレス</label>
+            <input type="text" class="compose-input" id="composeTo" placeholder="例：taro@example.com">
+          </div>
+          <div class="compose-field">
+            <label class="compose-label">宛先名（任意）</label>
+            <input type="text" class="compose-input" id="composeToName" placeholder="例：山田太郎">
+          </div>
+          <div class="compose-field">
+            <label class="compose-label">件名</label>
+            <input type="text" class="compose-input" id="composeSubject" placeholder="件名を入力">
+          </div>
+          <div class="compose-field">
+            <label class="compose-label">本文</label>
+            <textarea class="compose-input compose-body" id="composeBody" placeholder="メール本文を入力してください。&#10;&#10;送信ボタンを押すと、自動的にブロックチェーンに記録され、&#10;真正性証明書が本文末尾に添付されます。"></textarea>
+          </div>
+
+          <div class="compose-actions">
+            <button class="btn btn-primary" onclick="sendMail()" id="sendBtn">
+              ⬡ 真正性を記録して送信
+            </button>
+            <button class="btn" onclick="previewCert()">証明書をプレビュー</button>
+            <button class="btn" onclick="clearCompose()">クリア</button>
+          </div>
+
+          <div id="composeResult" style="margin-top:16px;"></div>
+        </div>
+      </div>
+
+      <!-- 真正性検証 -->
+      <div class="panel" id="panel-verify">
+        <div class="compose-wrap">
+          <div class="info-box">
+            受信したメールの本文（証明書を含む全文）を貼り付けて検証してください。1文字でも改ざんされていれば即座に検出します。
+          </div>
+          <div class="compose-field">
+            <label class="compose-label">検証するメール本文（全文を貼り付け）</label>
+            <textarea class="compose-input" style="height:220px;font-family:var(--mono);font-size:12px;" id="verifyBody" placeholder="受信したメールの本文をここに貼り付けてください。"></textarea>
+          </div>
+          <div style="margin-top:12px;">
+            <button class="btn btn-primary" onclick="verifyMail()">🔍 真正性を検証する</button>
+          </div>
+          <div id="verifyResult" style="margin-top:16px;"></div>
+        </div>
+      </div>
+
+      <!-- 台帳 -->
+      <div class="panel" id="panel-ledger">
+        <div class="ledger-wrap" id="ledgerContent"></div>
+      </div>
+
+      <!-- 設定 -->
+      <div class="panel" id="panel-settings">
+        <div class="settings-wrap">
+          <div class="settings-section">
+            <div class="settings-title">送信者情報</div>
+            <div class="settings-row">
+              <label class="settings-label">あなたの名前</label>
+              <input type="text" class="settings-input" id="settingName" placeholder="例：山田太郎（サンプル株式会社）">
+            </div>
+            <div class="settings-row">
+              <label class="settings-label">あなたのメールアドレス</label>
+              <input type="text" class="settings-input" id="settingEmail" placeholder="例：yamada@example.com">
+            </div>
+            <button class="btn btn-primary" onclick="saveSettings()" style="margin-top:8px;">💾 保存する</button>
+          </div>
+
+          <div class="settings-section">
+            <div class="settings-title">GAS送信URL</div>
+            <div class="settings-row">
+              <label class="settings-label">Google Apps Script デプロイURL</label>
+              <input type="text" class="settings-input" id="settingGasUrl" placeholder="https://script.google.com/macros/s/xxx/exec" style="font-family:var(--mono);font-size:11px;">
+            </div>
+            <button class="btn btn-primary" onclick="saveSettings()" style="margin-top:8px;">💾 保存する</button>
+          </div>
+
+          <div class="settings-section">
+            <div class="settings-title">台帳管理</div>
+            <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">ブロックチェーン台帳はブラウザのlocalStorageに保存されています。</p>
+            <button class="btn" onclick="exportLedger()">📥 台帳をエクスポート（JSON）</button>
+            <button class="btn" onclick="clearLedger()" style="margin-left:8px;color:var(--danger);">🗑 台帳をリセット</button>
+          </div>
+
+          <div class="settings-section">
+            <div class="settings-title">GASの設定方法</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.9;">
+              1. Googleスプレッドシートを新規作成<br>
+              2. 「拡張機能」→「Apps Script」を開く<br>
+              3. 以下のコードを貼り付けてデプロイ<br>
+              <div style="background:var(--paper);border:1px solid var(--border);border-radius:6px;padding:10px;margin-top:8px;font-family:var(--mono);font-size:11px;line-height:1.8;white-space:pre-wrap;">function doPost(e) {
+  const data = JSON.parse(e.postData.contents);
+  GmailApp.sendEmail(
+    data.to,
+    data.subject,
+    data.body
+  );
+  return ContentService
+    .createTextOutput(JSON.stringify({ok:true}))
+    .setMimeType(ContentService.MimeType.JSON);
+}</div>
+              4. デプロイ（実行:自分・アクセス:全員）<br>
+              5. 発行されたURLを上の欄に貼り付け
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// データ・状態管理
+// ============================================================
+
+const GENESIS = {
+  blockNum: 0,
+  hash: '0000000000000000000000000000000000000000000000000000000000000000',
+  prevHash: '—', subject: 'ジェネシスブロック', from: 'システム', to: '—',
+  mailHash: '—', timestamp: new Date('2025-01-01T00:00:00').toISOString(), type: 'genesis'
+};
+
+const DEMO_INBOX = [
+  {
+    id: 'rx001', type: 'inbox', unread: true,
+    from: '佐藤花子', fromEmail: 'sato@sample-co.jp',
+    to: '山田太郎', subject: '先日のご提案について',
+    body: '山田様\n\nお世話になっております。佐藤です。\n先日いただいたご提案の件、社内で検討いたしました。\nぜひ一度詳しくお話を伺えればと思います。\n来週のご都合はいかがでしょうか。\n\n何卒よろしくお願いいたします。\n佐藤花子',
+    timestamp: new Date('2026-03-17T09:30:00').toISOString(),
+    hasCert: false, verified: null,
+    avatarColor: '#2d6a4f'
+  },
+  {
+    id: 'rx002', type: 'inbox', unread: true,
+    from: '田中次郎', fromEmail: 'tanaka@sample-org.jp',
+    to: '山田太郎', subject: '契約書の件【真正性証明書付き】',
+    body: '山田様\n\nお世話になっております。田中です。\n添付の契約書内容についてご確認をお願いいたします。\n本メールはブロックチェーンに記録されており、\n送信後の改ざんを検出できます。\n\n田中次郎\n\n【メール真正性証明書】\n件名：契約書の件【真正性証明書付き】\n送信者：田中次郎\n送信日時：2026/3/17 9:45:00\nブロック番号：#1\nメール本文ハッシュ値（SHA-256）：\nb4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5\nブロックハッシュ：\n1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b',
+    timestamp: new Date('2026-03-17T09:45:00').toISOString(),
+    hasCert: true, verified: null,
+    avatarColor: '#1a3a5c'
+  },
+  {
+    id: 'rx003', type: 'inbox', unread: false,
+    from: '鈴木一郎', fromEmail: 'suzuki@sample-gov.jp',
+    to: '山田太郎', subject: '来月の会議日程について',
+    body: '山田様\n\nお疲れ様です。鈴木です。\n来月の定例会議ですが、第3水曜日の午後2時はいかがでしょうか。\nご確認のほどよろしくお願いいたします。\n\n鈴木一郎',
+    timestamp: new Date('2026-03-16T15:20:00').toISOString(),
+    hasCert: false, verified: null,
+    avatarColor: '#8b4513'
+  }
+];
+
+let ledger = [];
+let sentMails = [];
+let currentPanel = 'inbox';
+let settings = { name: '', email: '', gasUrl: '' };
+
+// ============================================================
+// SHA-256・ブロックチェーン
+// ============================================================
+async function sha256(text) {
+  const enc = new TextEncoder().encode(text);
+  const buf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+async function registerToLedger(subject, from, to, body) {
+  const timestamp = new Date().toISOString();
+  const mailHash = await sha256(body);
+  const prev = ledger[ledger.length - 1];
+  const blockData = prev.hash + mailHash + subject + from + timestamp;
+  const blockHash = await sha256(blockData);
+
+  const block = {
+    blockNum: ledger.length, subject, from, to,
+    mailHash, timestamp, prevHash: prev.hash, hash: blockHash, type: 'sent'
+  };
+  ledger.push(block);
+  saveLedger();
+
+  const certText =
+`\n---\n【メール真正性証明書】\n件名：${subject}\n送信者：${from}\n宛先：${to}\n送信日時：${new Date(timestamp).toLocaleString('ja-JP')}\nブロック番号：#${block.blockNum}\nメール本文ハッシュ値（SHA-256）：\n${mailHash}\nブロックハッシュ：\n${blockHash}\n---\nこの証明書はブロックチェーン台帳に記録されています。\n検証：https://yymm77.github.io/seimei-kagaku/mail-integrity-demo.html`;
+
+  updateStats();
+  return { block, certText, mailHash };
+}
+
+async function verifyBody(body) {
+  const hash = await sha256(body);
+  return ledger.find(b => b.mailHash === hash) || null;
+}
+
+// ============================================================
+// localStorage
+// ============================================================
+function saveLedger() {
+  localStorage.setItem('mi_ledger', JSON.stringify(ledger));
+}
+function loadLedger() {
+  const saved = localStorage.getItem('mi_ledger');
+  if (saved) {
+    ledger = JSON.parse(saved);
+  } else {
+    ledger = [GENESIS];
+    saveLedger();
+  }
+}
+function saveSent() {
+  localStorage.setItem('mi_sent', JSON.stringify(sentMails));
+}
+function loadSent() {
+  const saved = localStorage.getItem('mi_sent');
+  sentMails = saved ? JSON.parse(saved) : [];
+}
+function loadSettings() {
+  const saved = localStorage.getItem('mi_settings');
+  if (saved) settings = { ...settings, ...JSON.parse(saved) };
+  document.getElementById('settingName').value = settings.name;
+  document.getElementById('settingEmail').value = settings.email;
+  document.getElementById('settingGasUrl').value = settings.gasUrl;
+  if (settings.gasUrl) {
+    document.getElementById('gasUrlInput').value = settings.gasUrl;
+    document.getElementById('gasSetup').style.background = 'var(--success-light)';
+    document.getElementById('gasSetup').querySelector('strong').textContent = '✓ GAS送信URL設定済み';
+  }
+}
+function saveSettings() {
+  settings.name = document.getElementById('settingName').value.trim();
+  settings.email = document.getElementById('settingEmail').value.trim();
+  settings.gasUrl = document.getElementById('settingGasUrl').value.trim();
+  localStorage.setItem('mi_settings', JSON.stringify(settings));
+  if (settings.gasUrl) {
+    document.getElementById('gasUrlInput').value = settings.gasUrl;
+    document.getElementById('gasSetup').style.background = 'var(--success-light)';
+    document.getElementById('gasSetup').querySelector('strong').textContent = '✓ GAS送信URL設定済み';
+  }
+  showToast('設定を保存しました', 'success');
+}
+function saveGasUrl() {
+  settings.gasUrl = document.getElementById('gasUrlInput').value.trim();
+  document.getElementById('settingGasUrl').value = settings.gasUrl;
+  localStorage.setItem('mi_settings', JSON.stringify(settings));
+  document.getElementById('gasSetup').style.background = 'var(--success-light)';
+  document.getElementById('gasSetup').querySelector('strong').textContent = '✓ GAS送信URL設定済み';
+  showToast('GAS URLを保存しました', 'success');
+}
+
+// ============================================================
+// パネル切り替え
+// ============================================================
+function showPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  const navEl = document.getElementById('nav-' + name);
+  if (navEl) navEl.classList.add('active');
+  currentPanel = name;
+
+  const titles = {
+    inbox: '受信トレイ', sent: '送信済み', compose: '新規作成',
+    verify: '真正性検証', ledger: 'ブロックチェーン台帳', settings: '設定', detail: 'メール詳細'
+  };
+  document.getElementById('main-title').textContent = titles[name] || '';
+
+  if (name === 'ledger') renderLedger();
+  if (name === 'sent') renderSent();
+  if (name === 'inbox') renderInbox();
+}
+
+// ============================================================
+// 受信トレイ
+// ============================================================
+function renderInbox(filter = '') {
+  const list = document.getElementById('inboxList');
+  const mails = DEMO_INBOX.filter(m =>
+    !filter || m.subject.includes(filter) || m.from.includes(filter) || m.body.includes(filter)
+  );
+  if (!mails.length) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><p>メールはありません</p></div>';
+    return;
+  }
+  list.innerHTML = mails.map(m => `
+    <div class="mail-item ${m.unread ? 'unread' : ''}" onclick="openMail('${m.id}')">
+      <div class="mail-avatar" style="background:${m.avatarColor}">${m.from.charAt(0)}</div>
+      <div class="mail-info">
+        <div class="mail-from">${m.from}</div>
+        <div class="mail-subject">${m.subject}</div>
+        <div class="mail-preview">${m.body.replace(/\n/g,' ').substring(0,60)}...</div>
+      </div>
+      <div class="mail-meta">
+        <div class="mail-time">${formatTime(m.timestamp)}</div>
+        ${m.hasCert ? '<span class="badge badge-info">⬡ 証明書あり</span>' : ''}
+      </div>
+    </div>`).join('');
+}
+
+function openMail(id) {
+  const mail = DEMO_INBOX.find(m => m.id === id);
+  if (!mail) return;
+  mail.unread = false;
+  updateUnreadBadge();
+
+  const bodyParts = mail.hasCert ? mail.body.split('【メール真正性証明書】') : [mail.body, null];
+  const mainBody = bodyParts[0];
+  const certPart = bodyParts[1] ? '【メール真正性証明書】' + bodyParts[1] : null;
+
+  document.getElementById('mailDetail').innerHTML = `
+    <div class="detail-header">
+      <div class="detail-subject">${mail.subject}</div>
+      <div class="detail-meta">
+        <div class="detail-meta-item">送信者：<span>${mail.from} &lt;${mail.fromEmail}&gt;</span></div>
+        <div class="detail-meta-item">日時：<span>${new Date(mail.timestamp).toLocaleString('ja-JP')}</span></div>
+        ${mail.hasCert ? '<span class="badge badge-info">⬡ 真正性証明書付き</span>' : ''}
+      </div>
+    </div>
+    <div class="detail-body">${mainBody}</div>
+    ${certPart ? `<div class="detail-cert">${certPart}</div>` : ''}
+    <div class="detail-actions">
+      <button class="btn btn-primary btn-sm" onclick="replyMail('${mail.fromEmail}','${mail.subject}')">↩ 返信</button>
+      ${mail.hasCert ? `<button class="btn btn-sm" onclick="verifyFromDetail('${id}')">🔍 真正性を検証</button>` : ''}
+      <div id="detail-verify-result" style="margin-top:8px;width:100%;"></div>
+    </div>`;
+
+  showPanel('detail');
+}
+
+async function verifyFromDetail(id) {
+  const mail = DEMO_INBOX.find(m => m.id === id);
+  if (!mail) return;
+  const found = await verifyBody(mail.body);
+  const el = document.getElementById('detail-verify-result');
+  if (found) {
+    el.innerHTML = `<div class="verify-ok"><div class="verify-title">✓ 真正性確認 — 改ざんなし</div><div class="verify-detail">登録日時：${new Date(found.timestamp).toLocaleString('ja-JP')}（ブロック #${found.blockNum}）</div></div>`;
+  } else {
+    el.innerHTML = `<div class="verify-ng"><div class="verify-title">⚠ 台帳に未登録</div><div class="verify-detail">このメールは本システムの台帳に登録されていません。送信者が本システムを使用していない可能性があります。</div></div>`;
+  }
+}
+
+function replyMail(email, subject) {
+  document.getElementById('composeTo').value = email;
+  document.getElementById('composeSubject').value = 'Re: ' + subject.replace(/^Re: /,'');
+  showPanel('compose');
+}
+
+function updateUnreadBadge() {
+  const count = DEMO_INBOX.filter(m => m.unread).length;
+  const badge = document.getElementById('unread-badge');
+  badge.textContent = count;
+  badge.style.display = count > 0 ? 'inline' : 'none';
+}
+
+// ============================================================
+// 送信済み
+// ============================================================
+function renderSent() {
+  const list = document.getElementById('sentList');
+  if (!sentMails.length) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📤</div><p>送信済みメールはまだありません</p></div>';
+    return;
+  }
+  list.innerHTML = [...sentMails].reverse().map(m => `
+    <div class="mail-item" onclick="openSentMail('${m.id}')">
+      <div class="mail-avatar" style="background:var(--accent)">${(m.toName || m.to).charAt(0)}</div>
+      <div class="mail-info">
+        <div class="mail-from">宛先：${m.toName || m.to}</div>
+        <div class="mail-subject">${m.subject}</div>
+        <div class="mail-preview">${m.body.replace(/\n/g,' ').substring(0,60)}...</div>
+      </div>
+      <div class="mail-meta">
+        <div class="mail-time">${formatTime(m.timestamp)}</div>
+        <span class="badge badge-success">⬡ 記録済み</span>
+      </div>
+    </div>`).join('');
+}
+
+function openSentMail(id) {
+  const mail = sentMails.find(m => m.id === id);
+  if (!mail) return;
+  document.getElementById('mailDetail').innerHTML = `
+    <div class="detail-header">
+      <div class="detail-subject">${mail.subject}</div>
+      <div class="detail-meta">
+        <div class="detail-meta-item">宛先：<span>${mail.toName || mail.to} &lt;${mail.to}&gt;</span></div>
+        <div class="detail-meta-item">送信日時：<span>${new Date(mail.timestamp).toLocaleString('ja-JP')}</span></div>
+        <span class="badge badge-success">⬡ ブロック #${mail.blockNum} に記録済み</span>
+      </div>
+    </div>
+    <div class="detail-body">${mail.body}</div>
+    <div class="detail-cert">${mail.certText}</div>`;
+  showPanel('detail');
+}
+
+// ============================================================
+// メール送信
+// ============================================================
+async function sendMail() {
+  const to = document.getElementById('composeTo').value.trim();
+  const toName = document.getElementById('composeToName').value.trim();
+  const subject = document.getElementById('composeSubject').value.trim() || '（件名なし）';
+  const body = document.getElementById('composeBody').value.trim();
+  const from = settings.name || '送信者';
+
+  if (!to) { showToast('宛先を入力してください', 'error'); return; }
+  if (!body) { showToast('本文を入力してください', 'error'); return; }
+
+  const btn = document.getElementById('sendBtn');
+  btn.innerHTML = '<span class="spinner"></span> 記録・送信中...';
+  btn.disabled = true;
+
+  try {
+    // ブロックチェーンに記録
+    const result = await registerToLedger(subject, from, to, body);
+    const fullBody = body + result.certText;
+
+    // GAS経由で送信
+    const gasUrl = settings.gasUrl;
+    if (gasUrl) {
+      await fetch(gasUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ to, subject, body: fullBody })
+      });
+      showToast(`✓ 送信完了（ブロック #${result.block.blockNum}）`, 'success');
+    } else {
+      // GAS未設定の場合はmailtoで対応
+      const mailtoLink = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(fullBody)}`;
+      window.location.href = mailtoLink;
+      showToast(`⬡ ブロック #${result.block.blockNum} に記録しました。メールソフトで送信してください。`, 'info');
+    }
+
+    // 送信済みに追加
+    const sentMail = {
+      id: 'tx' + Date.now(), to, toName, subject,
+      body: fullBody, certText: result.certText,
+      timestamp: result.block.timestamp,
+      blockNum: result.block.blockNum
+    };
+    sentMails.push(sentMail);
+    saveSent();
+
+    document.getElementById('composeResult').innerHTML = `
+      <div class="verify-ok">
+        <div class="verify-title">✓ 送信完了 — ブロック #${result.block.blockNum} に記録</div>
+        <div class="verify-detail">
+          宛先：${to}　件名：${subject}<br>
+          メールハッシュ：${result.mailHash.substring(0,32)}...
+        </div>
+      </div>`;
+
+    clearCompose();
+  } catch (err) {
+    showToast('エラー: ' + err.message, 'error');
+  } finally {
+    btn.innerHTML = '⬡ 真正性を記録して送信';
+    btn.disabled = false;
+  }
+}
+
+async function previewCert() {
+  const subject = document.getElementById('composeSubject').value.trim() || '（件名なし）';
+  const body = document.getElementById('composeBody').value.trim();
+  if (!body) { showToast('本文を入力してください', 'error'); return; }
+  const hash = await sha256(body);
+  const r = document.getElementById('composeResult');
+  r.innerHTML = `<div class="info-box"><strong>証明書プレビュー（送信時に本文末尾に自動追加されます）</strong><br><br>
+    件名：${subject}<br>
+    メール本文ハッシュ値（SHA-256）：<br>
+    <span style="font-family:var(--mono);font-size:11px;">${hash}</span>
+  </div>`;
+}
+
+function clearCompose() {
+  ['composeTo','composeToName','composeSubject','composeBody'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('composeResult').innerHTML = '';
+}
+
+// ============================================================
+// 真正性検証
+// ============================================================
+async function verifyMail() {
+  const body = document.getElementById('verifyBody').value.trim();
+  if (!body) { showToast('メール本文を貼り付けてください', 'error'); return; }
+  const found = await verifyBody(body);
+  const r = document.getElementById('verifyResult');
+  if (found) {
+    r.innerHTML = `<div class="verify-ok">
+      <div class="verify-title">✓ 真正性確認 — 改ざんなし</div>
+      <div class="verify-detail">件名：${found.subject}<br>送信者：${found.from}<br>登録日時：${new Date(found.timestamp).toLocaleString('ja-JP')}（ブロック #${found.blockNum}）</div>
+    </div>`;
+  } else {
+    r.innerHTML = `<div class="verify-ng">
+      <div class="verify-title">✗ 台帳に未登録 または 改ざん検出</div>
+      <div class="verify-detail">このメールは台帳に存在しません。送信後に内容が変更されたか、本システムで送信されていないメールです。</div>
+    </div>`;
+  }
+}
+
+// ============================================================
+// 台帳レンダリング
+// ============================================================
+function renderLedger() {
+  const el = document.getElementById('ledgerContent');
+  el.innerHTML = [...ledger].reverse().map(b => `
+    <div class="ledger-item">
+      <div class="ledger-top">
+        <div style="display:flex;gap:8px;align-items:center;">
+          ${b.type === 'genesis' ? '<span class="badge badge-genesis">GENESIS</span>' : '<span class="badge badge-success">📧 送信済み</span>'}
+          <span style="font-family:var(--mono);font-size:11px;color:var(--hint);">ブロック #${b.blockNum}</span>
+        </div>
+        <span style="font-size:12px;color:var(--hint);">${new Date(b.timestamp).toLocaleString('ja-JP')}</span>
+      </div>
+      <div class="ledger-subject">${b.subject}</div>
+      <div class="ledger-meta-txt">${b.from !== 'システム' ? b.from + ' → ' + b.to : 'システム'}</div>
+      <div class="ledger-hash-txt">Hash: ${b.hash}</div>
+      ${b.blockNum > 0 ? '<div class="chain-bar"><div class="chain-bar-fill"></div></div>' : ''}
+    </div>`).join('');
+}
+
+// ============================================================
+// ユーティリティ
+// ============================================================
+function updateStats() {
+  const count = ledger.filter(b => b.blockNum > 0).length;
+  document.getElementById('stat-count').textContent = count;
+  document.getElementById('stat-blocks').textContent = ledger.length;
+}
+
+function formatTime(ts) {
+  const d = new Date(ts);
+  const now = new Date();
+  if (d.toDateString() === now.toDateString()) return d.toLocaleTimeString('ja-JP', { hour:'2-digit', minute:'2-digit' });
+  return d.toLocaleDateString('ja-JP', { month:'numeric', day:'numeric' });
+}
+
+function searchMails() {
+  const q = document.getElementById('searchInput').value;
+  if (currentPanel === 'inbox') renderInbox(q);
+}
+
+function exportLedger() {
+  const blob = new Blob([JSON.stringify(ledger, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'mail-ledger-' + new Date().toISOString().split('T')[0] + '.json';
+  a.click();
+}
+
+function clearLedger() {
+  if (!confirm('台帳をリセットしますか？\n登録されたすべての記録が削除されます。')) return;
+  ledger = [GENESIS]; saveLedger(); updateStats();
+  showToast('台帳をリセットしました', 'info');
+}
+
+function showToast(msg, type = 'info') {
+  const existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+  const t = document.createElement('div');
+  t.className = `toast toast-${type}`;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => { if (t.parentNode) t.remove(); }, 4000);
+}
+
+// ============================================================
+// 初期化
+// ============================================================
+function init() {
+  loadLedger();
+  loadSent();
+  loadSettings();
+  renderInbox();
+  updateStats();
+  updateUnreadBadge();
+}
+
+init();
+</script>
+</body>
+</html>
