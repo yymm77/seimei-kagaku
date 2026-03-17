@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ファイル金庫 — 姓名科学プロジェクト</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;700&family=Noto+Sans+JP:wght@300;400;500&display=swap');
+
+  :root {
+    --ink: #1a1208;
+    --ink-l: #6b5c45;
+    --paper: #f5f0e8;
+    --paper-d: #ede6d8;
+    --gold: #b8960c;
+    --gold-l: rgba(184,150,12,.12);
+    --indigo: #1a3a5c;
+    --border: #d4c9b0;
+    --success: #2d6a4f;
+    --danger: #c0392b;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 0 0 80px;
+  }
+
+  header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 20px 28px;
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+  }
+  header h1 { font-family: 'Shippori Mincho', serif; font-size: 1.3rem; letter-spacing: .25em; }
+  header span { font-size: .72rem; color: var(--gold); letter-spacing: .15em; }
+
+  .container { max-width: 860px; margin: 0 auto; padding: 28px 20px; }
+
+  /* ── トークン設定パネル ── */
+  .token-panel {
+    background: var(--paper-d);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px 24px;
+    margin-bottom: 28px;
+  }
+  .token-panel.connected {
+    border-color: var(--success);
+    background: rgba(45,106,79,.06);
+  }
+  .token-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .token-header .label {
+    font-family: 'Shippori Mincho', serif;
+    font-size: .85rem;
+    letter-spacing: .2em;
+    color: var(--gold);
+  }
+  .token-status {
+    font-size: .72rem;
+    padding: 2px 10px;
+    border-radius: 10px;
+    background: var(--danger);
+    color: #fff;
+    margin-left: auto;
+  }
+  .token-status.ok { background: var(--success); }
+  .token-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .token-input {
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 8px 12px;
+    font-size: .83rem;
+    font-family: inherit;
+    background: #fff;
+    color: var(--ink);
+    letter-spacing: .05em;
+  }
+  .token-input:focus { outline: none; border-color: var(--gold); }
+  .btn-token {
+    padding: 8px 18px;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    border-radius: 3px;
+    font-size: .8rem;
+    cursor: pointer;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+  .btn-token:hover { opacity: .8; }
+  .token-hint {
+    font-size: .72rem;
+    color: var(--ink-l);
+    margin-top: 8px;
+    line-height: 1.7;
+  }
+  .token-hint a { color: var(--indigo); }
+  .connected-info {
+    font-size: .83rem;
+    color: var(--success);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-disconnect {
+    font-size: .72rem;
+    color: var(--danger);
+    background: none;
+    border: 1px solid var(--danger);
+    border-radius: 3px;
+    padding: 3px 10px;
+    cursor: pointer;
+    font-family: inherit;
+    margin-left: auto;
+  }
+
+  /* ── ドロップゾーン ── */
+  .drop-zone {
+    border: 2px dashed var(--gold);
+    border-radius: 6px;
+    padding: 36px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: background .2s;
+    margin-bottom: 28px;
+    background: var(--gold-l);
+  }
+  .drop-zone:hover, .drop-zone.drag-over { background: rgba(184,150,12,.22); }
+  .drop-zone.disabled { opacity: .4; cursor: not-allowed; }
+  .drop-zone .icon { font-size: 2.4rem; margin-bottom: 10px; }
+  .drop-zone p { font-size: .9rem; color: var(--ink-l); line-height: 1.8; }
+  .drop-zone strong { color: var(--gold); font-size: 1rem; }
+  #file-input { display: none; }
+
+  /* ── 統計 ── */
+  .stats { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+  .stat-card {
+    flex: 1; min-width: 120px;
+    background: var(--paper-d);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px 16px;
+    text-align: center;
+  }
+  .stat-num { font-family: 'Shippori Mincho', serif; font-size: 1.6rem; color: var(--indigo); }
+  .stat-label { font-size: .7rem; color: var(--ink-l); letter-spacing: .1em; margin-top: 2px; }
+
+  /* ── フィルター ── */
+  .filter-bar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+  .filter-input {
+    flex: 1; min-width: 180px;
+    border: 1px solid var(--border); border-radius: 3px;
+    padding: 7px 12px; font-size: .83rem; font-family: inherit;
+    background: #fff; color: var(--ink);
+  }
+  .filter-input:focus { outline: none; border-color: var(--gold); }
+  .sort-btn {
+    padding: 7px 14px; border: 1px solid var(--border); border-radius: 3px;
+    background: #fff; font-size: .78rem; cursor: pointer; font-family: inherit; color: var(--ink-l);
+  }
+  .sort-btn.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+  /* ── ファイル一覧 ── */
+  .section-title {
+    font-family: 'Shippori Mincho', serif; font-size: .8rem;
+    letter-spacing: .3em; color: var(--gold);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .btn-refresh {
+    font-size: .72rem; padding: 3px 12px;
+    background: none; border: 1px solid var(--gold);
+    color: var(--gold); border-radius: 3px; cursor: pointer;
+    font-family: inherit; margin-left: auto;
+  }
+  .btn-refresh:hover { background: var(--gold-l); }
+  .btn-refresh:disabled { opacity: .4; cursor: default; }
+
+  .log-empty {
+    text-align: center; color: var(--ink-l); font-size: .85rem;
+    padding: 32px; border: 1px solid var(--border); border-radius: 4px;
+  }
+
+  .file-entry {
+    border: 1px solid var(--border); border-radius: 4px;
+    margin-bottom: 10px; background: #fff; overflow: hidden;
+    transition: box-shadow .15s;
+  }
+  .file-entry:hover { box-shadow: 0 2px 12px rgba(0,0,0,.08); }
+
+  .file-entry-head {
+    display: flex; align-items: center; padding: 12px 16px; gap: 12px; cursor: pointer;
+  }
+  .file-icon { font-size: 1.4rem; flex-shrink: 0; }
+  .file-meta { flex: 1; min-width: 0; }
+  .file-name {
+    font-size: .9rem; font-weight: 500;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ink);
+  }
+  .file-time { font-size: .72rem; color: var(--ink-l); margin-top: 2px; letter-spacing: .05em; }
+  .file-size { font-size: .72rem; color: var(--ink-l); flex-shrink: 0; }
+  .file-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+  .btn { padding: 6px 14px; border: none; border-radius: 3px; font-size: .78rem; cursor: pointer; font-family: inherit; transition: opacity .15s; }
+  .btn:hover { opacity: .8; }
+  .btn-dl  { background: var(--indigo); color: #fff; }
+  .btn-del { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
+
+  .file-note { padding: 0 16px 12px 16px; display: none; }
+  .file-note.open { display: block; }
+  .note-text {
+    font-size: .78rem; color: var(--ink-l);
+    padding: 6px 10px; background: var(--paper);
+    border: 1px solid var(--border); border-radius: 3px;
+    line-height: 1.6;
+  }
+  .gist-link {
+    font-size: .72rem; color: var(--indigo);
+    text-decoration: none; margin-left: 8px;
+  }
+  .gist-link:hover { text-decoration: underline; }
+
+  /* ── アップロード進捗 ── */
+  .upload-progress {
+    background: var(--paper-d); border: 1px solid var(--border);
+    border-radius: 4px; padding: 12px 16px; margin-bottom: 10px;
+    font-size: .83rem; color: var(--ink-l);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid var(--border);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+    flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── トースト ── */
+  #toast {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--ink); color: var(--paper);
+    padding: 10px 24px; border-radius: 4px; font-size: .85rem;
+    transition: transform .3s; z-index: 9999; white-space: nowrap;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  .badge-new {
+    background: var(--success); color: #fff; font-size: .65rem;
+    padding: 2px 7px; border-radius: 10px; margin-left: 6px; vertical-align: middle;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>◈ ファイル金庫</h1>
+  <span>姓名科学プロジェクト — バージョン管理 / GitHub Gist</span>
+</header>
+
+<div class="container">
+
+  <!-- トークン設定 -->
+  <div class="token-panel" id="token-panel">
+    <div class="token-header">
+      <span class="label">◈ GitHub 接続設定</span>
+      <span class="token-status" id="token-status">未接続</span>
+    </div>
+    <div id="token-form">
+      <div class="token-row">
+        <input type="password" class="token-input" id="token-input"
+               placeholder="ghp_xxxxxxxxxxxxxxxxxxxx（Personal Access Token）">
+        <button class="btn-token" onclick="connectToken()">接続</button>
+      </div>
+      <div class="token-hint">
+        ① <a href="https://github.com/settings/tokens/new" target="_blank">GitHub → Settings → Tokens (classic)</a> を開く<br>
+        ② Note: 任意の名前　③ Expiration: No expiration（または任意）<br>
+        ④ Scope: <strong>gist</strong> にチェック　⑤ Generate token → コピーして上に貼付<br>
+        ⑥ トークンはこのブラウザにのみ保存されます（サーバー送信なし）
+      </div>
+    </div>
+    <div id="connected-row" style="display:none">
+      <div class="connected-info">
+        <span>✅</span>
+        <span id="connected-user">接続済み</span>
+        <button class="btn-disconnect" onclick="disconnect()">切断</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ドロップゾーン -->
+  <div class="drop-zone disabled" id="drop-zone" onclick="onDropZoneClick()">
+    <div class="icon">📥</div>
+    <strong>ここにファイルをドラッグ＆ドロップ</strong>
+    <p>またはクリックしてファイルを選択<br>
+    1ファイル最大10MB・容量無制限（GitHub Gist）</p>
+  </div>
+  <input type="file" id="file-input" multiple>
+
+  <!-- 統計 -->
+  <div class="stats">
+    <div class="stat-card"><div class="stat-num" id="stat-count">—</div><div class="stat-label">保存ファイル数</div></div>
+    <div class="stat-card"><div class="stat-num" id="stat-size">—</div><div class="stat-label">合計サイズ</div></div>
+    <div class="stat-card"><div class="stat-num" id="stat-latest">—</div><div class="stat-label">最終更新</div></div>
+  </div>
+
+  <!-- フィルター -->
+  <div class="filter-bar">
+    <input type="text" class="filter-input" id="filter-input" placeholder="ファイル名で検索…" oninput="renderList()">
+    <button class="sort-btn active" id="sort-new" onclick="setSort('new')">新しい順</button>
+    <button class="sort-btn" id="sort-old" onclick="setSort('old')">古い順</button>
+    <button class="sort-btn" id="sort-name" onclick="setSort('name')">名前順</button>
+  </div>
+
+  <!-- ログ -->
+  <div class="section-title">
+    ◈ 保 存 履 歴
+    <button class="btn-refresh" id="btn-refresh" onclick="loadGists()" disabled>↻ 更新</button>
+  </div>
+  <div id="file-list">
+    <div class="log-empty">GitHub に接続すると保存履歴が表示されます。</div>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── 定数 ──
+const TOKEN_KEY = 'fv_gist_token';
+const GIST_DESC_PREFIX = '【ファイル金庫】';
+const API = 'https://api.github.com';
+
+// ── 状態 ──
+let token = '';
+let gists = [];      // キャッシュ
+let sortMode = 'new';
+
+// ── トークン管理 ──
+function loadToken() {
+  return localStorage.getItem(TOKEN_KEY) || '';
+}
+function saveToken(t) {
+  localStorage.setItem(TOKEN_KEY, t);
+}
+function clearToken() {
+  localStorage.removeItem(TOKEN_KEY);
+}
+
+// ── GitHub API ──
+function ghFetch(path, opts = {}) {
+  return fetch(API + path, {
+    ...opts,
+    headers: {
+      'Authorization': `token ${token}`,
+      'Accept': 'application/vnd.github.v3+json',
+      'Content-Type': 'application/json',
+      ...(opts.headers || {})
+    }
+  });
+}
+
+// ── 接続 ──
+async function connectToken() {
+  const val = document.getElementById('token-input').value.trim();
+  if (!val) { toast('❌ トークンを入力してください'); return; }
+  token = val;
+  try {
+    const res = await ghFetch('/user');
+    if (!res.ok) throw new Error('認証失敗');
+    const user = await res.json();
+    saveToken(token);
+    setConnected(user.login);
+    await loadGists();
+    toast(`✅ ${user.login} として接続しました`);
+  } catch(e) {
+    token = '';
+    toast('❌ 接続失敗。トークンを確認してください');
+  }
+}
+
+function setConnected(username) {
+  document.getElementById('token-panel').classList.add('connected');
+  document.getElementById('token-status').textContent = '接続済み';
+  document.getElementById('token-status').classList.add('ok');
+  document.getElementById('token-form').style.display = 'none';
+  document.getElementById('connected-user').textContent = `@${username} として接続中`;
+  document.getElementById('connected-row').style.display = 'block';
+  document.getElementById('drop-zone').classList.remove('disabled');
+  document.getElementById('btn-refresh').disabled = false;
+}
+
+function disconnect() {
+  if (!confirm('切断しますか？（ファイルは GitHub Gist に残ります）')) return;
+  token = '';
+  gists = [];
+  clearToken();
+  location.reload();
+}
+
+// ── Gist一覧取得 ──
+async function loadGists() {
+  const btn = document.getElementById('btn-refresh');
+  btn.disabled = true;
+  btn.textContent = '読込中…';
+  try {
+    // 全ページ取得（per_page=100 × 複数ページ）
+    let page = 1;
+    let all = [];
+    while (true) {
+      const res = await ghFetch(`/gists?per_page=100&page=${page}`);
+      if (!res.ok) throw new Error('取得失敗');
+      const data = await res.json();
+      if (data.length === 0) break;
+      all = all.concat(data);
+      if (data.length < 100) break;
+      page++;
+    }
+    // ファイル金庫のものだけ絞り込み
+    gists = all.filter(g => g.description && g.description.startsWith(GIST_DESC_PREFIX));
+    renderList();
+    updateStats();
+  } catch(e) {
+    toast('❌ Gist取得に失敗しました');
+  }
+  btn.disabled = false;
+  btn.textContent = '↻ 更新';
+}
+
+// ── ファイルアップロード ──
+async function uploadFile(file) {
+  const progressEl = showProgress(`${file.name} をアップロード中…`);
+  try {
+    const content = await readFileAsText(file);
+    // ファイル名に日時を付与
+    const d = new Date();
+    const pad = n => String(n).padStart(2,'0');
+    const dateStr = `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}`;
+    const ext = file.name.includes('.') ? '.' + file.name.split('.').pop() : '';
+    const base = file.name.replace(/\.[^.]+$/, '');
+    const gistFileName = `${base}_${dateStr}${ext}`;
+
+    const body = {
+      description: `${GIST_DESC_PREFIX}${file.name}`,
+      public: false,
+      files: {
+        [gistFileName]: { content }
+      }
+    };
+    const res = await ghFetch('/gists', {
+      method: 'POST',
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || 'アップロード失敗');
+    }
+    const gist = await res.json();
+    gists.unshift(gist);
+    removeProgress(progressEl);
+    renderList();
+    updateStats();
+    toast(`✅ ${file.name} を保存しました`);
+  } catch(e) {
+    removeProgress(progressEl);
+    toast(`❌ ${file.name}: ${e.message}`);
+  }
+}
+
+// ファイルをテキストとして読む（バイナリはbase64に変換）
+function readFileAsText(file) {
+  return new Promise((resolve, reject) => {
+    const isText = /\.(html|htm|js|css|txt|md|json|csv|xml|gs)$/i.test(file.name);
+    const reader = new FileReader();
+    if (isText) {
+      reader.onload = e => resolve(e.target.result);
+      reader.onerror = reject;
+      reader.readAsText(file, 'utf-8');
+    } else {
+      // バイナリファイルはBase64で保存
+      reader.onload = e => {
+        const b64 = e.target.result.split(',')[1];
+        resolve(`BASE64_ENCODED:\n${b64}`);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    }
+  });
+}
+
+// ── ダウンロード ──
+async function downloadFile(gistId) {
+  const gist = gists.find(g => g.id === gistId);
+  if (!gist) return;
+  toast('⏳ ダウンロード準備中…');
+  try {
+    // 最新の raw を取得
+    const res = await ghFetch(`/gists/${gistId}`);
+    const data = await res.json();
+    const fileKey = Object.keys(data.files)[0];
+    const fileObj = data.files[fileKey];
+
+    let content = fileObj.content;
+    // truncated の場合は raw_url から取得
+    if (fileObj.truncated) {
+      const raw = await fetch(fileObj.raw_url);
+      content = await raw.text();
+    }
+
+    let blob, dlName = fileKey;
+    if (content.startsWith('BASE64_ENCODED:\n')) {
+      const b64 = content.replace('BASE64_ENCODED:\n', '');
+      const byteChars = atob(b64);
+      const byteArr = new Uint8Array(byteChars.length);
+      for (let i = 0; i < byteChars.length; i++) byteArr[i] = byteChars.charCodeAt(i);
+      blob = new Blob([byteArr]);
+    } else {
+      blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    }
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = dlName;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast(`💾 ${dlName} をダウンロード`);
+  } catch(e) {
+    toast('❌ ダウンロードに失敗しました');
+  }
+}
+
+// ── 削除 ──
+async function deleteFile(gistId) {
+  const gist = gists.find(g => g.id === gistId);
+  const name = gist ? Object.keys(gist.files)[0] : 'ファイル';
+  if (!confirm(`「${name}」を削除しますか？\nGitHub Gist から完全に削除されます。`)) return;
+  try {
+    const res = await ghFetch(`/gists/${gistId}`, { method: 'DELETE' });
+    if (!res.ok && res.status !== 204) throw new Error('削除失敗');
+    gists = gists.filter(g => g.id !== gistId);
+    renderList();
+    updateStats();
+    toast('🗑 削除しました');
+  } catch(e) {
+    toast('❌ 削除に失敗しました');
+  }
+}
+
+// ── プログレス表示 ──
+function showProgress(msg) {
+  const el = document.createElement('div');
+  el.className = 'upload-progress';
+  el.innerHTML = `<div class="spinner"></div><span>${msg}</span>`;
+  document.getElementById('file-list').prepend(el);
+  return el;
+}
+function removeProgress(el) {
+  if (el && el.parentNode) el.parentNode.removeChild(el);
+}
+
+// ── リスト描画 ──
+function renderList() {
+  let data = [...gists];
+  const q = document.getElementById('filter-input').value.trim().toLowerCase();
+  if (q) data = data.filter(g => {
+    const fname = Object.keys(g.files)[0] || '';
+    return fname.toLowerCase().includes(q) || (g.description || '').toLowerCase().includes(q);
+  });
+
+  if (sortMode === 'new') data.sort((a,b) => new Date(b.updated_at) - new Date(a.updated_at));
+  else if (sortMode === 'old') data.sort((a,b) => new Date(a.updated_at) - new Date(b.updated_at));
+  else data.sort((a,b) => {
+    const fa = Object.keys(a.files)[0] || '';
+    const fb = Object.keys(b.files)[0] || '';
+    return fa.localeCompare(fb, 'ja');
+  });
+
+  const list = document.getElementById('file-list');
+  if (data.length === 0) {
+    list.innerHTML = '<div class="log-empty">保存されているファイルがありません。<br>上のエリアにファイルをドロップしてください。</div>';
+    return;
+  }
+
+  const now = Date.now();
+  list.innerHTML = data.map(g => {
+    const fileKey = Object.keys(g.files)[0] || '不明';
+    const fileInfo = g.files[fileKey];
+    const isNew = (now - new Date(g.created_at).getTime()) < 5 * 60 * 1000;
+    const icon = getIcon(fileKey);
+    const size = fileInfo.size ? fmtSize(fileInfo.size) : '—';
+    const origName = (g.description || '').replace(GIST_DESC_PREFIX, '');
+    const timeStr = fmtDate(g.updated_at);
+
+    return `<div class="file-entry">
+      <div class="file-entry-head" onclick="toggleNote('${g.id}')">
+        <div class="file-icon">${icon}</div>
+        <div class="file-meta">
+          <div class="file-name">${fileKey}${isNew ? '<span class="badge-new">NEW</span>' : ''}</div>
+          <div class="file-time">📅 ${timeStr}${origName && origName !== fileKey ? '　📁 ' + origName : ''}</div>
+        </div>
+        <div class="file-size">${size}</div>
+        <div class="file-actions" onclick="event.stopPropagation()">
+          <button class="btn btn-dl" onclick="downloadFile('${g.id}')">⬇ 取出</button>
+          <button class="btn btn-del" onclick="deleteFile('${g.id}')">削除</button>
+        </div>
+      </div>
+      <div class="file-note" id="note-${g.id}">
+        <div class="note-text">
+          🔗 Gist ID: <code>${g.id}</code>
+          <a class="gist-link" href="${g.html_url}" target="_blank">GitHub で開く →</a>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── 統計更新 ──
+function updateStats() {
+  document.getElementById('stat-count').textContent = gists.length;
+  const total = gists.reduce((s,g) => {
+    const f = g.files[Object.keys(g.files)[0]];
+    return s + (f ? (f.size || 0) : 0);
+  }, 0);
+  document.getElementById('stat-size').textContent = fmtSize(total);
+  if (gists.length > 0) {
+    const latest = gists.reduce((a,b) =>
+      new Date(a.updated_at) > new Date(b.updated_at) ? a : b
+    );
+    const d = new Date(latest.updated_at);
+    const pad = n => String(n).padStart(2,'0');
+    document.getElementById('stat-latest').textContent =
+      `${pad(d.getMonth()+1)}/${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  } else {
+    document.getElementById('stat-latest').textContent = '—';
+  }
+}
+
+// ── ユーティリティ ──
+function setSort(mode) {
+  sortMode = mode;
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sort-' + mode).classList.add('active');
+  renderList();
+}
+function toggleNote(id) {
+  const el = document.getElementById('note-' + id);
+  if (el) el.classList.toggle('open');
+}
+function fmtDate(iso) {
+  const d = new Date(iso);
+  const pad = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+function fmtSize(bytes) {
+  if (!bytes) return '—';
+  if (bytes < 1024) return bytes + 'B';
+  if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + 'KB';
+  return (bytes/1024/1024).toFixed(2) + 'MB';
+}
+function getIcon(name) {
+  if (/\.html?$/i.test(name)) return '🌐';
+  if (/\.js$/i.test(name))    return '📜';
+  if (/\.gs$/i.test(name))    return '⚙️';
+  if (/\.pdf$/i.test(name))   return '📄';
+  if (/\.xlsx?$/i.test(name)) return '📊';
+  if (/\.docx?$/i.test(name)) return '📝';
+  if (/\.(png|jpe?g|gif|webp)$/i.test(name)) return '🖼';
+  if (/\.json$/i.test(name))  return '🗂';
+  return '📁';
+}
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+// ── ファイル入力イベント ──
+function onDropZoneClick() {
+  if (!token) { toast('❌ 先にGitHubトークンを接続してください'); return; }
+  document.getElementById('file-input').click();
+}
+document.getElementById('file-input').addEventListener('change', async (e) => {
+  for (const file of e.target.files) await uploadFile(file);
+  e.target.value = '';
+});
+const dz = document.getElementById('drop-zone');
+dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('drag-over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+dz.addEventListener('drop', async (e) => {
+  e.preventDefault();
+  dz.classList.remove('drag-over');
+  if (!token) { toast('❌ 先にGitHubトークンを接続してください'); return; }
+  for (const file of e.dataTransfer.files) await uploadFile(file);
+});
+
+// ── 起動時：保存済みトークンがあれば自動接続 ──
+(async function init() {
+  const saved = loadToken();
+  if (!saved) return;
+  token = saved;
+  try {
+    const res = await ghFetch('/user');
+    if (!res.ok) throw new Error();
+    const user = await res.json();
+    document.getElementById('token-input').value = saved;
+    setConnected(user.login);
+    await loadGists();
+  } catch(e) {
+    token = '';
+    clearToken();
+    toast('⚠️ トークンが失効しました。再接続してください');
+  }
+})();
+</script>
+</body>
+</html>
