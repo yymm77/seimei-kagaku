@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>サイトマップ — 日昇リサーチ株式会社 デジタル信頼インフラ構想</title>
+<style>
+  :root {
+    --ink: #1a1a1a; --paper: #f8f7f4; --surface: #ffffff;
+    --border: #e0ddd8; --muted: #6b6860; --hint: #9e9b95;
+    --accent: #1a3a5c; --accent-light: #e8eef5;
+    --success: #1a5c3a; --success-light: #e8f5ee;
+    --gold: #8b6914; --gold-light: #fdf5e0;
+    --warning: #5c4a1a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif; background: var(--paper); color: var(--ink); line-height: 1.7; }
+
+  header { background: var(--accent); color: white; padding: 2.5rem 1.5rem 2rem; text-align: center; }
+  header h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+  header p { font-size: 0.85rem; opacity: 0.75; max-width: 600px; margin: 0 auto; }
+  .header-sub { display: inline-block; margin-top: 1rem; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 4px; padding: 4px 14px; font-size: 0.75rem; }
+
+  .container { max-width: 960px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+
+  /* ビジョン */
+  .vision { background: var(--gold-light); border: 1px solid #e0c060; border-radius: 10px; padding: 1.5rem 2rem; margin-bottom: 2.5rem; text-align: center; }
+  .vision-title { font-size: 1.1rem; font-weight: 700; color: var(--gold); margin-bottom: 0.5rem; }
+  .vision-text { font-size: 0.9rem; color: var(--warning); line-height: 1.9; }
+
+  /* レイヤー構造 */
+  .layers { margin-bottom: 2.5rem; }
+  .layers-title { font-size: 1rem; font-weight: 700; margin-bottom: 1rem; color: var(--accent); border-left: 3px solid var(--accent); padding-left: 10px; }
+  .layer { display: flex; gap: 14px; align-items: stretch; margin-bottom: 10px; }
+  .layer-num { background: var(--accent); color: white; border-radius: 6px; padding: 10px 14px; font-size: 1rem; font-weight: 700; display: flex; align-items: center; justify-content: center; min-width: 44px; flex-shrink: 0; }
+  .layer-body { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; }
+  .layer-name { font-weight: 600; font-size: 0.9rem; margin-bottom: 3px; }
+  .layer-desc { font-size: 0.82rem; color: var(--muted); }
+  .layer-status { margin-top: 6px; }
+  .badge { display: inline-flex; align-items: center; gap: 3px; font-size: 0.7rem; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
+  .badge-done { background: var(--success-light); color: var(--success); }
+  .badge-wip { background: var(--accent-light); color: var(--accent); }
+  .badge-future { background: #f0f0f0; color: #888; }
+
+  /* サイトマップグリッド */
+  .sitemap-title { font-size: 1rem; font-weight: 700; margin-bottom: 1rem; color: var(--accent); border-left: 3px solid var(--accent); padding-left: 10px; }
+  .sitemap-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 2.5rem; }
+
+  .site-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden; transition: border-color 0.15s, box-shadow 0.15s;
+    text-decoration: none; color: inherit; display: flex; flex-direction: column;
+  }
+  .site-card:hover { border-color: var(--accent); box-shadow: 0 4px 16px rgba(26,58,92,0.1); }
+  .site-card-header { padding: 16px 18px 12px; border-bottom: 1px solid var(--border); }
+  .site-card-icon { font-size: 1.6rem; margin-bottom: 6px; }
+  .site-card-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 4px; }
+  .site-card-url { font-size: 0.7rem; color: var(--accent); font-family: 'Courier New', monospace; word-break: break-all; }
+  .site-card-body { padding: 12px 18px; flex: 1; }
+  .site-card-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.7; margin-bottom: 10px; }
+  .site-card-features { list-style: none; }
+  .site-card-features li { font-size: 0.78rem; color: var(--muted); padding: 2px 0; }
+  .site-card-features li::before { content: '→ '; color: var(--accent); }
+  .site-card-footer { padding: 10px 18px; border-top: 1px solid var(--border); background: var(--paper); display: flex; gap: 6px; flex-wrap: wrap; }
+
+  /* ロードマップ */
+  .roadmap { margin-bottom: 2.5rem; }
+  .roadmap-item { display: flex; gap: 16px; margin-bottom: 16px; }
+  .roadmap-line { display: flex; flex-direction: column; align-items: center; }
+  .roadmap-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+  .roadmap-dot-done { background: var(--success); }
+  .roadmap-dot-wip { background: var(--accent); }
+  .roadmap-dot-future { background: #ccc; }
+  .roadmap-connector { width: 2px; flex: 1; margin: 4px 0; }
+  .roadmap-connector-done { background: var(--success); }
+  .roadmap-connector-wip { background: var(--accent); }
+  .roadmap-connector-future { background: #ddd; }
+  .roadmap-body { flex: 1; padding-bottom: 8px; }
+  .roadmap-phase { font-size: 0.72rem; font-weight: 700; color: var(--muted); letter-spacing: 0.05em; margin-bottom: 2px; }
+  .roadmap-name { font-size: 0.92rem; font-weight: 600; margin-bottom: 3px; }
+  .roadmap-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.7; }
+
+  footer { background: var(--surface); border-top: 1px solid var(--border); padding: 1.5rem; text-align: center; font-size: 0.75rem; color: var(--hint); }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  @media (max-width: 600px) {
+    .sitemap-grid { grid-template-columns: 1fr; }
+    header h1 { font-size: 1.2rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>デジタル信頼インフラ構想</h1>
+  <p>ブロックチェーン技術による知的財産保護・メール真正性保証・発信者認証の統合システム</p>
+  <div class="header-sub">日昇リサーチ株式会社 / 東京郷友連盟 — 2026年3月</div>
+</header>
+
+<div class="container">
+
+  <!-- ビジョン -->
+  <div class="vision">
+    <div class="vision-title">📡 構想のビジョン</div>
+    <div class="vision-text">
+      インターネットには「信頼」を証明する仕組みがありません。<br>
+      誰でも誰にでもなれる時代だからこそ、<strong>善意の側が先に立ち上がり、世界標準を作る</strong>必要があります。<br>
+      本プロジェクトは、日本発のデジタル信頼インフラとして、国立国会図書館・政府機関への提言と並行して構築を進めています。
+    </div>
+  </div>
+
+  <!-- 信頼レイヤー -->
+  <div class="layers">
+    <div class="layers-title">🏗 デジタル信頼の4層構造</div>
+
+    <div class="layer">
+      <div class="layer-num">1</div>
+      <div class="layer-body">
+        <div class="layer-name">内容の真正性 — 「何を送ったか」の証明</div>
+        <div class="layer-desc">SHA-256ハッシュ値をブロックチェーンに記録。1ビットの改ざんも即座に検出。知的創造物・メール・文書に適用。</div>
+        <div class="layer-status"><span class="badge badge-done">✓ 実装済み（デモ公開中）</span></div>
+      </div>
+    </div>
+
+    <div class="layer">
+      <div class="layer-num">2</div>
+      <div class="layer-body">
+        <div class="layer-name">送信者の真正性 — 「誰が送ったか」の証明</div>
+        <div class="layer-desc">World ID（虹彩認証）・マイナンバー・電子署名との連携により「この人間は実在する一人の人間である」をデジタルで証明。</div>
+        <div class="layer-status"><span class="badge badge-wip">🔄 設計中</span></div>
+      </div>
+    </div>
+
+    <div class="layer">
+      <div class="layer-num">3</div>
+      <div class="layer-body">
+        <div class="layer-name">組織の真正性 — 「どの組織か」の証明</div>
+        <div class="layer-desc">分散型認証機関ネットワーク。複数の独立した機関が相互検証。一つの組織を信頼するのではなく、連鎖で担保。</div>
+        <div class="layer-status"><span class="badge badge-future">📋 将来フェーズ</span></div>
+      </div>
+    </div>
+
+    <div class="layer">
+      <div class="layer-num">4</div>
+      <div class="layer-body">
+        <div class="layer-name">システム全体の信頼性 — 「仕組み自体」の証明</div>
+        <div class="layer-desc">オープンソース公開・第三者監査・国際条約への準拠（ベルヌ条約・TRIPS協定・WIPO著作権条約）。</div>
+        <div class="layer-status"><span class="badge badge-future">📋 将来フェーズ</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- サイトマップ -->
+  <div class="sitemap-title">🗺 公開システム一覧</div>
+  <div class="sitemap-grid">
+
+    <a class="site-card" href="https://yymm77.github.io/seimei-kagaku/blockchain-ip-demo-v2.html" target="_blank">
+      <div class="site-card-header">
+        <div class="site-card-icon">📚</div>
+        <div class="site-card-title">知的創造物保護システム v2.0</div>
+        <div class="site-card-url">blockchain-ip-demo-v2.html</div>
+      </div>
+      <div class="site-card-body">
+        <div class="site-card-desc">書籍・音楽・画像・映像などあらゆる知的創造物のデジタル指紋をブロックチェーンに記録。著作者への自動対価還元と法体系分析を含む。</div>
+        <ul class="site-card-features">
+          <li>SHA-256デジタル指紋生成</li>
+          <li>スマートコントラクト対価還元シミュレーション</li>
+          <li>著作権法・経済安保法・国際条約の分析</li>
+          <li>ブロックチェーン台帳・真正性検証</li>
+        </ul>
+      </div>
+      <div class="site-card-footer">
+        <span class="badge badge-done">✓ 公開中</span>
+        <span class="badge badge-wip">国会図書館提言資料</span>
+      </div>
+    </a>
+
+    <a class="site-card" href="https://yymm77.github.io/seimei-kagaku/mail-integrity-demo.html" target="_blank">
+      <div class="site-card-header">
+        <div class="site-card-icon">📧</div>
+        <div class="site-card-title">メール真正性保証システム</div>
+        <div class="site-card-url">mail-integrity-demo.html</div>
+      </div>
+      <div class="site-card-body">
+        <div class="site-card-desc">電子メールの改ざんを検出し、送信事実を証明するシステム。送信前にハッシュを記録し、受信者がいつでも検証可能。</div>
+        <ul class="site-card-features">
+          <li>メール本文のSHA-256ハッシュ生成・登録</li>
+          <li>真正性証明書の自動発行</li>
+          <li>Webメール・メールソフト両対応の送信手順</li>
+          <li>改ざん検出・台帳照合</li>
+        </ul>
+      </div>
+      <div class="site-card-footer">
+        <span class="badge badge-done">✓ 公開中</span>
+        <span class="badge badge-wip">個人・組織向け</span>
+      </div>
+    </a>
+
+    <a class="site-card" href="https://yymm77.github.io/seimei-kagaku/mail-portal.html" target="_blank">
+      <div class="site-card-header">
+        <div class="site-card-icon">🖥️</div>
+        <div class="site-card-title">真正性保証メールポータル</div>
+        <div class="site-card-url">mail-portal.html</div>
+      </div>
+      <div class="site-card-body">
+        <div class="site-card-desc">ブロックチェーン電子署名を標準装備したWebメールクライアント。受信・送信・検証・台帳管理をひとつの画面で。GAS連携で実際の送信も可能。</div>
+        <ul class="site-card-features">
+          <li>受信トレイ・送信済み管理</li>
+          <li>送信時に自動でブロックチェーン記録</li>
+          <li>GAS（Google Apps Script）連携送信</li>
+          <li>台帳エクスポート（JSON）</li>
+        </ul>
+      </div>
+      <div class="site-card-footer">
+        <span class="badge badge-done">✓ 公開中</span>
+        <span class="badge badge-wip">次世代メールソフト</span>
+      </div>
+    </a>
+
+    <a class="site-card" href="https://yymm77.github.io/seimei-kagaku/" target="_blank">
+      <div class="site-card-header">
+        <div class="site-card-icon">🔯</div>
+        <div class="site-card-title">姓名科学システム</div>
+        <div class="site-card-url">namemaster_v5.html</div>
+      </div>
+      <div class="site-card-body">
+        <div class="site-card-desc">牧正人史先生（昭和33年発見）の姓名科学体系をデジタル実装。姓名の字画から12分野の運勢・レーダーチャートを算出。一万例超の照合済み。</div>
+        <ul class="site-card-features">
+          <li>姓名・生年月日から12値を算出</li>
+          <li>健康・蓄財・愛情など12分野グラフ</li>
+          <li>相性解析・方位学との統合</li>
+          <li>Stripe月額課金（¥580）対応</li>
+        </ul>
+      </div>
+      <div class="site-card-footer">
+        <span class="badge badge-done">✓ 公開中</span>
+        <span class="badge badge-wip">収益化稼働中</span>
+      </div>
+    </a>
+
+    <a class="site-card" href="https://yymm77.github.io/seimei-kagaku/houigaku.html" target="_blank">
+      <div class="site-card-header">
+        <div class="site-card-icon">🧭</div>
+        <div class="site-card-title">方位学アプリ v1.2.0</div>
+        <div class="site-card-url">houigaku.html</div>
+      </div>
+      <div class="site-card-body">
+        <div class="site-card-desc">高木彬光著「改訂版 方位学入門」を原典とする本命星・月命星算出システム。日盤・月盤・年盤の三盤統合スコアで吉凶方位を判定。</div>
+        <ul class="site-card-features">
+          <li>生年月日→本命星・月命星算出</li>
+          <li>三盤統合スコア・7段階吉凶判定</li>
+          <li>OpenStreetMap地図連携</li>
+          <li>吉日検索・Claude AI相談</li>
+        </ul>
+      </div>
+      <div class="site-card-footer">
+        <span class="badge badge-done">✓ 公開中</span>
+        <span class="badge badge-wip">四緑〜九星精査中</span>
+      </div>
+    </a>
+
+    <div class="site-card" style="border-style:dashed;cursor:default;">
+      <div class="site-card-header">
+        <div class="site-card-icon">🔐</div>
+        <div class="site-card-title">発信者認証システム（構想中）</div>
+        <div class="site-card-url">coming soon</div>
+      </div>
+      <div class="site-card-body">
+        <div class="site-card-desc">World ID（虹彩認証）・マイナンバーと連携し「この人物は実在する一人の人間である」をデジタルで証明。なりすまし・偽情報対策の核心。</div>
+        <ul class="site-card-features">
+          <li>World App / World ID連携</li>
+          <li>分散型認証機関ネットワーク</li>
+          <li>組織・個人の真正性証明</li>
+          <li>国際標準化（WIPO提案）</li>
+        </ul>
+      </div>
+      <div class="site-card-footer">
+        <span class="badge badge-future">📋 設計中</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ロードマップ -->
+  <div class="roadmap">
+    <div class="sitemap-title">📅 ロードマップ</div>
+
+    <div class="roadmap-item">
+      <div class="roadmap-line">
+        <div class="roadmap-dot roadmap-dot-done"></div>
+        <div class="roadmap-connector roadmap-connector-done"></div>
+      </div>
+      <div class="roadmap-body">
+        <div class="roadmap-phase">フェーズ1 — 2026年3月 完了</div>
+        <div class="roadmap-name">デジタル指紋・台帳システムの構築</div>
+        <div class="roadmap-desc">知的創造物保護デモ・メール真正性保証・メールポータルの開発完了。国立国会図書館への提言書送付。GitHub Pagesで全システム公開。</div>
+      </div>
+    </div>
+
+    <div class="roadmap-item">
+      <div class="roadmap-line">
+        <div class="roadmap-dot roadmap-dot-wip"></div>
+        <div class="roadmap-connector roadmap-connector-wip"></div>
+      </div>
+      <div class="roadmap-body">
+        <div class="roadmap-phase">フェーズ2 — 2026年中</div>
+        <div class="roadmap-name">収益化・法整備提言の推進</div>
+        <div class="roadmap-desc">Stripe課金化・GAS自動設定ツール・姓名科学相性解析v2の完成。著作権法改正・電子署名法整備への政策提言。</div>
+      </div>
+    </div>
+
+    <div class="roadmap-item">
+      <div class="roadmap-line">
+        <div class="roadmap-dot roadmap-dot-future"></div>
+        <div class="roadmap-connector roadmap-connector-future"></div>
+      </div>
+      <div class="roadmap-body">
+        <div class="roadmap-phase">フェーズ3 — 2027年</div>
+        <div class="roadmap-name">発信者認証システムの構築</div>
+        <div class="roadmap-desc">World ID連携・分散型認証機関ネットワークの設計・実装。Hyperledger Fabricによる本番ブロックチェーン稼働。</div>
+      </div>
+    </div>
+
+    <div class="roadmap-item">
+      <div class="roadmap-line">
+        <div class="roadmap-dot roadmap-dot-future"></div>
+      </div>
+      <div class="roadmap-body">
+        <div class="roadmap-phase">フェーズ4 — 2028年以降</div>
+        <div class="roadmap-name">国際標準化・世界展開</div>
+        <div class="roadmap-desc">WIPO・G7各国の国立図書館との相互運用。日本発のデジタル信頼インフラとして国際標準を確立。善意の側による世界規模の信頼ネットワーク構築。</div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<footer>
+  <p>日昇リサーチ株式会社 / 東京郷友連盟</p>
+  <p style="margin-top:4px;">
+    <a href="https://yymm77.github.io/seimei-kagaku/">トップページ</a> —
+    <a href="https://yymm77.github.io/seimei-kagaku/blockchain-ip-demo-v2.html">知的創造物保護</a> —
+    <a href="https://yymm77.github.io/seimei-kagaku/mail-integrity-demo.html">メール真正性保証</a> —
+    <a href="https://yymm77.github.io/seimei-kagaku/mail-portal.html">メールポータル</a>
+  </p>
+</footer>
+
+</body>
+</html>
