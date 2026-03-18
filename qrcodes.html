@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QRコード一覧 — 日昇リサーチ</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;700&family=Noto+Serif+JP:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#0a0f1e;color:#f7f2e8;font-family:'Noto Serif JP',serif;padding:2rem;}
+
+h1{text-align:center;font-family:'Zen Old Mincho',serif;font-size:1.3rem;letter-spacing:.4em;color:#c9a84c;margin-bottom:.5rem;}
+.subtitle{text-align:center;font-size:.72rem;color:rgba(201,168,76,.6);letter-spacing:.3em;margin-bottom:2.5rem;}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1.5rem;max-width:1000px;margin:0 auto;}
+
+.card{background:rgba(26,47,90,.3);border:1px solid rgba(201,168,76,.25);padding:1.5rem;text-align:center;position:relative;}
+.card::after{content:'';position:absolute;top:4px;left:4px;right:-4px;bottom:-4px;border:1px solid rgba(201,168,76,.08);z-index:-1;}
+.card .flag{font-size:1.5rem;margin-bottom:.5rem;}
+.card .title{font-family:'Zen Old Mincho',serif;font-size:.85rem;letter-spacing:.2em;color:#c9a84c;margin-bottom:.3rem;}
+.card .url{font-size:.58rem;color:rgba(201,168,76,.45);margin-bottom:1rem;word-break:break-all;line-height:1.6;}
+.card .qr-box{background:white;padding:8px;display:inline-block;margin-bottom:1rem;}
+.card .dl-btn{display:block;background:rgba(26,47,90,.8);border:1px solid rgba(201,168,76,.4);color:#c9a84c;font-size:.65rem;letter-spacing:.2em;padding:.4rem .8rem;cursor:pointer;transition:.2s;text-decoration:none;}
+.card .dl-btn:hover{background:#c9a84c;color:#1a2f5a;}
+
+.note{text-align:center;font-size:.7rem;color:rgba(201,168,76,.4);letter-spacing:.15em;margin-top:2rem;line-height:2.2;}
+
+@media print{
+  body{background:white;color:#000;}
+  .card{border-color:#ccc;background:#f9f9f9;}
+  .card .title{color:#1a2f5a;}
+  .card .url{color:#666;}
+  .dl-btn{display:none;}
+  .note{display:none;}
+}
+</style>
+</head>
+<body>
+
+<h1>◈ QRコード一覧 ◈</h1>
+<div class="subtitle">日昇リサーチ株式会社　占術システム</div>
+
+<div class="grid" id="qrGrid"></div>
+
+<div class="note">
+  各QRコードを右クリック→「名前を付けて画像を保存」でダウンロードできます。<br>
+  Instagram・Facebook・印刷物などにご活用ください。<br>
+  Ctrl+P で印刷（一覧印刷）も可能です。
+</div>
+
+<script>
+const SITES = [
+  { flag:'🇯🇵', title:'日本語 TOP',        url:'https://yymm77.github.io/seimei-kagaku/',              id:'qr0' },
+  { flag:'🇺🇸', title:'English',           url:'https://yymm77.github.io/seimei-kagaku/en.html',       id:'qr1' },
+  { flag:'🇹🇼', title:'台灣版',             url:'https://yymm77.github.io/seimei-kagaku/tw.html',       id:'qr2' },
+  { flag:'🇨🇳', title:'中文版',             url:'https://yymm77.github.io/seimei-kagaku/zh.html',       id:'qr3' },
+  { flag:'🇰🇷', title:'한국어',             url:'https://yymm77.github.io/seimei-kagaku/ko.html',       id:'qr4' },
+  { flag:'🧭', title:'方位学の殿堂',         url:'https://yymm77.github.io/seimei-kagaku/houigaku.html', id:'qr5' },
+  { flag:'☯',  title:'易経門',              url:'https://yymm77.github.io/seimei-kagaku/iching.html',   id:'qr6' },
+  { flag:'◈',  title:'姓名科学の殿堂',      url:'https://yymm77.github.io/seimei-kagaku/namemaster_v5.html', id:'qr7' },
+];
+
+const grid = document.getElementById('qrGrid');
+
+SITES.forEach(site => {
+  // カード生成
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+    <div class="flag">${site.flag}</div>
+    <div class="title">${site.title}</div>
+    <div class="url">${site.url}</div>
+    <div class="qr-box" id="${site.id}"></div>
+    <a class="dl-btn" id="dl-${site.id}" href="#" download="${site.id}.png">⬇ ダウンロード</a>
+  `;
+  grid.appendChild(card);
+
+  // QRコード生成
+  setTimeout(() => {
+    new QRCode(document.getElementById(site.id), {
+      text: site.url,
+      width: 160,
+      height: 160,
+      colorDark: '#000000',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.H
+    });
+
+    // ダウンロードボタンの設定
+    setTimeout(() => {
+      const canvas = document.querySelector(`#${site.id} canvas`);
+      if (canvas) {
+        const dlBtn = document.getElementById('dl-' + site.id);
+        dlBtn.href = canvas.toDataURL('image/png');
+        dlBtn.download = site.title.replace(/\s/g,'_') + '_QR.png';
+      }
+    }, 500);
+  }, 100);
+});
+</script>
+</body>
+</html>
