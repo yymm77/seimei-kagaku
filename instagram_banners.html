@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instagram告知バナー — 4言語セット</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;700;900&family=Noto+Serif+JP:wght@300;400;700&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&family=Noto+Serif+TC:wght@400;700&family=Noto+Serif+KR:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#1a1a2e;padding:2rem;font-family:sans-serif;}
+h1{color:#c9a84c;text-align:center;font-size:1rem;letter-spacing:.3em;margin-bottom:2rem;font-family:'Noto Serif JP',serif;}
+.controls{text-align:center;margin-bottom:2rem;}
+.controls button{background:#1a2f5a;color:#c9a84c;border:1px solid #c9a84c;padding:.5rem 1.5rem;margin:.3rem;cursor:pointer;font-size:.8rem;letter-spacing:.1em;transition:.2s;}
+.controls button:hover,.controls button.active{background:#c9a84c;color:#1a2f5a;}
+
+.banner-wrap{display:flex;justify-content:center;margin-bottom:1.5rem;}
+
+/* ======== バナー本体 1080×1080相当 ======== */
+.banner{
+  width:540px;height:540px;position:relative;overflow:hidden;
+  background:#0a0f1e;flex-shrink:0;
+}
+
+/* 背景装飾 */
+.banner .bg-compass{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);opacity:.06;animation:spin 80s linear infinite;}
+@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg);}}
+.banner .bg-grad{position:absolute;inset:0;background:radial-gradient(ellipse at 30% 30%,rgba(26,47,90,.8),transparent 60%),radial-gradient(ellipse at 70% 70%,rgba(155,35,53,.3),transparent 60%);}
+.banner .bg-lines{position:absolute;inset:0;opacity:.08;}
+
+/* 枠線 */
+.banner .frame-outer{position:absolute;inset:12px;border:1px solid rgba(201,168,76,.4);}
+.banner .frame-inner{position:absolute;inset:18px;border:1px solid rgba(201,168,76,.15);}
+.banner .corner{position:absolute;width:20px;height:20px;border-color:#c9a84c;border-style:solid;opacity:.7;}
+.banner .corner.tl{top:8px;left:8px;border-width:2px 0 0 2px;}
+.banner .corner.tr{top:8px;right:8px;border-width:2px 2px 0 0;}
+.banner .corner.bl{bottom:8px;left:8px;border-width:0 0 2px 2px;}
+.banner .corner.br{bottom:8px;right:8px;border-width:0 2px 2px 0;}
+
+/* コンテンツ */
+.banner .content{position:relative;z-index:10;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center;}
+
+.banner .lang-badge{font-size:.55rem;letter-spacing:.25em;color:rgba(201,168,76,.7);border:1px solid rgba(201,168,76,.3);padding:.2rem .8rem;margin-bottom:1rem;}
+.banner .icon{font-size:2.2rem;margin-bottom:.6rem;line-height:1;}
+.banner .main-text{font-size:1.35rem;font-weight:700;color:#f7f2e8;line-height:1.5;margin-bottom:.5rem;letter-spacing:.05em;}
+.banner .sub-text{font-size:.72rem;color:rgba(201,168,76,.8);letter-spacing:.15em;margin-bottom:1.2rem;}
+.banner .divider{width:60px;height:1px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin:0 auto .9rem;}
+.banner .desc{font-size:.65rem;color:rgba(200,190,170,.75);line-height:1.9;max-width:360px;margin-bottom:1.2rem;}
+.banner .systems{display:flex;gap:1.2rem;margin-bottom:1.2rem;}
+.banner .sys-item{background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.2);padding:.5rem .9rem;font-size:.6rem;color:var(--gold,#c9a84c);letter-spacing:.1em;text-align:center;}
+.banner .sys-item .sys-icon{font-size:1.1rem;display:block;margin-bottom:.2rem;}
+.banner .url{font-size:.52rem;color:rgba(201,168,76,.5);letter-spacing:.08em;border-top:1px solid rgba(201,168,76,.15);padding-top:.6rem;width:100%;}
+.banner .free-badge{display:inline-block;background:rgba(30,92,58,.8);border:1px solid rgba(30,92,58,1);color:#90e8b0;font-size:.55rem;letter-spacing:.15em;padding:.15rem .6rem;margin-bottom:.8rem;}
+
+/* 言語別フォント */
+.banner.en .main-text{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:600;}
+.banner.zh .main-text,.banner.tw .main-text{font-family:'Noto Serif TC',serif;}
+.banner.ko .main-text{font-family:'Noto Serif KR',serif;}
+.banner.ja .main-text{font-family:'Zen Old Mincho',serif;}
+
+/* 台湾版アクセント */
+.banner.tw .bg-grad{background:radial-gradient(ellipse at 30% 30%,rgba(26,47,90,.8),transparent 60%),radial-gradient(ellipse at 70% 70%,rgba(190,0,0,.2),transparent 60%);}
+.banner.tw .friendship{font-size:.7rem;color:rgba(201,168,76,.6);letter-spacing:.2em;margin-bottom:.5rem;}
+
+.note{text-align:center;color:rgba(201,168,76,.5);font-size:.75rem;letter-spacing:.15em;margin-top:1rem;font-family:'Noto Serif JP',serif;line-height:2;}
+</style>
+</head>
+<body>
+
+<h1>◈ Instagram 告知バナー 4言語セット ◈</h1>
+
+<div class="controls">
+  <button class="active" onclick="showBanner('en')">🇺🇸 English</button>
+  <button onclick="showBanner('zh')">🇨🇳 中文</button>
+  <button onclick="showBanner('tw')">🇹🇼 台灣</button>
+  <button onclick="showBanner('ko')">🇰🇷 한국어</button>
+</div>
+
+<!-- English Banner -->
+<div class="banner-wrap" id="wrap-en">
+<div class="banner en">
+  <svg class="bg-compass" width="480" height="480" viewBox="0 0 480 480" fill="none" stroke="white">
+    <circle cx="240" cy="240" r="220" stroke-width="1"/><circle cx="240" cy="240" r="170" stroke-width=".5"/>
+    <circle cx="240" cy="240" r="120" stroke-width=".5"/><circle cx="240" cy="240" r="70" stroke-width=".3"/>
+    <line x1="240" y1="20" x2="240" y2="460" stroke-width=".5"/>
+    <line x1="20" y1="240" x2="460" y2="240" stroke-width=".5"/>
+    <line x1="84" y1="84" x2="396" y2="396" stroke-width=".3"/>
+    <line x1="396" y1="84" x2="84" y2="396" stroke-width=".3"/>
+    <polygon points="240,25 236,240 240,210 244,240" fill="white" opacity=".5"/>
+  </svg>
+  <div class="bg-grad"></div>
+  <div class="frame-outer"></div><div class="frame-inner"></div>
+  <div class="corner tl"></div><div class="corner tr"></div>
+  <div class="corner bl"></div><div class="corner br"></div>
+  <div class="content">
+    <div class="lang-badge">JAPANESE DIVINATION PORTAL</div>
+    <div class="free-badge">✦ COMPLETELY FREE ✦</div>
+    <div class="main-text">Ancient Wisdom.<br>Digital Precision.</div>
+    <div class="sub-text">Authentic Japanese Divination Systems</div>
+    <div class="divider"></div>
+    <div class="systems">
+      <div class="sys-item"><span class="sys-icon">🧭</span>Nine Star Ki<br>方位学</div>
+      <div class="sys-item"><span class="sys-icon">☯</span>I Ching<br>易経門</div>
+    </div>
+    <div class="desc">Enter your birth date. Discover your auspicious directions.<br>64 hexagrams. 3,000 years of wisdom.</div>
+    <div class="url">yymm77.github.io/seimei-kagaku/en.html</div>
+  </div>
+</div>
+</div>
+
+<!-- 中文 Banner -->
+<div class="banner-wrap" id="wrap-zh" style="display:none;">
+<div class="banner zh">
+  <svg class="bg-compass" width="480" height="480" viewBox="0 0 480 480" fill="none" stroke="white">
+    <circle cx="240" cy="240" r="220" stroke-width="1"/><circle cx="240" cy="240" r="170" stroke-width=".5"/>
+    <circle cx="240" cy="240" r="120" stroke-width=".5"/><circle cx="240" cy="240" r="70" stroke-width=".3"/>
+    <line x1="240" y1="20" x2="240" y2="460" stroke-width=".5"/>
+    <line x1="20" y1="240" x2="460" y2="240" stroke-width=".5"/>
+    <line x1="84" y1="84" x2="396" y2="396" stroke-width=".3"/>
+    <line x1="396" y1="84" x2="84" y2="396" stroke-width=".3"/>
+    <polygon points="240,25 236,240 240,210 244,240" fill="white" opacity=".5"/>
+  </svg>
+  <div class="bg-grad"></div>
+  <div class="frame-outer"></div><div class="frame-inner"></div>
+  <div class="corner tl"></div><div class="corner tr"></div>
+  <div class="corner bl"></div><div class="corner br"></div>
+  <div class="content">
+    <div class="lang-badge">日本占術門戶　正宗古典系統</div>
+    <div class="free-badge">✦ 完全免費 ✦</div>
+    <div class="main-text">千年智慧<br>數位精準</div>
+    <div class="sub-text">正宗日本占術　經原典核對驗證</div>
+    <div class="divider"></div>
+    <div class="systems">
+      <div class="sys-item"><span class="sys-icon">🧭</span>九星氣學<br>方位判定</div>
+      <div class="sys-item"><span class="sys-icon">☯</span>周易易經<br>六十四卦</div>
+    </div>
+    <div class="desc">輸入生年月日，判定搬遷・出行・開業的吉方位。<br>六十四卦完整收錄，三千年的智慧在指尖。</div>
+    <div class="url">yymm77.github.io/seimei-kagaku/zh.html</div>
+  </div>
+</div>
+</div>
+
+<!-- 台灣 Banner -->
+<div class="banner-wrap" id="wrap-tw" style="display:none;">
+<div class="banner tw">
+  <svg class="bg-compass" width="480" height="480" viewBox="0 0 480 480" fill="none" stroke="white">
+    <circle cx="240" cy="240" r="220" stroke-width="1"/><circle cx="240" cy="240" r="170" stroke-width=".5"/>
+    <circle cx="240" cy="240" r="120" stroke-width=".5"/><circle cx="240" cy="240" r="70" stroke-width=".3"/>
+    <line x1="240" y1="20" x2="240" y2="460" stroke-width=".5"/>
+    <line x1="20" y1="240" x2="460" y2="240" stroke-width=".5"/>
+    <line x1="84" y1="84" x2="396" y2="396" stroke-width=".3"/>
+    <line x1="396" y1="84" x2="84" y2="396" stroke-width=".3"/>
+    <polygon points="240,25 236,240 240,210 244,240" fill="white" opacity=".5"/>
+  </svg>
+  <div class="bg-grad"></div>
+  <div class="frame-outer"></div><div class="frame-inner"></div>
+  <div class="corner tl"></div><div class="corner tr"></div>
+  <div class="corner bl"></div><div class="corner br"></div>
+  <div class="content">
+    <div class="friendship">🇯🇵 🌸 來自日本，獻給台灣的朋友 🌸 🇹🇼</div>
+    <div class="free-badge">✦ 完全免費 ✦</div>
+    <div class="main-text">日台共鳴<br>千年智慧</div>
+    <div class="sub-text">正宗日本占術　台灣版</div>
+    <div class="divider"></div>
+    <div class="systems">
+      <div class="sys-item"><span class="sys-icon">🧭</span>九星氣學<br>方位判定</div>
+      <div class="sys-item"><span class="sys-icon">☯</span>周易易經<br>六十四卦</div>
+    </div>
+    <div class="desc">與台灣風水文化一脈相承的日本方位學。<br>六十四卦原典精髓，台灣人最熟悉的易學智慧。</div>
+    <div class="url">yymm77.github.io/seimei-kagaku/tw.html</div>
+  </div>
+</div>
+</div>
+
+<!-- 한국어 Banner -->
+<div class="banner-wrap" id="wrap-ko" style="display:none;">
+<div class="banner ko">
+  <svg class="bg-compass" width="480" height="480" viewBox="0 0 480 480" fill="none" stroke="white">
+    <circle cx="240" cy="240" r="220" stroke-width="1"/><circle cx="240" cy="240" r="170" stroke-width=".5"/>
+    <circle cx="240" cy="240" r="120" stroke-width=".5"/><circle cx="240" cy="240" r="70" stroke-width=".3"/>
+    <line x1="240" y1="20" x2="240" y2="460" stroke-width=".5"/>
+    <line x1="20" y1="240" x2="460" y2="240" stroke-width=".5"/>
+    <line x1="84" y1="84" x2="396" y2="396" stroke-width=".3"/>
+    <line x1="396" y1="84" x2="84" y2="396" stroke-width=".3"/>
+    <polygon points="240,25 236,240 240,210 244,240" fill="white" opacity=".5"/>
+  </svg>
+  <div class="bg-grad"></div>
+  <div class="frame-outer"></div><div class="frame-inner"></div>
+  <div class="corner tl"></div><div class="corner tr"></div>
+  <div class="corner bl"></div><div class="corner br"></div>
+  <div class="content">
+    <div class="lang-badge">일본 점술 포털　정통 고전 시스템</div>
+    <div class="free-badge">✦ 완전 무료 ✦</div>
+    <div class="main-text">천년의 지혜<br>디지털 정밀도</div>
+    <div class="sub-text">정통 일본 점술　원전 대조 검증</div>
+    <div class="divider"></div>
+    <div class="systems">
+      <div class="sys-item"><span class="sys-icon">🧭</span>구성기학<br>방위판정</div>
+      <div class="sys-item"><span class="sys-icon">☯</span>주역 점술<br>64괘</div>
+    </div>
+    <div class="desc">생년월일 입력으로 이사・여행・창업의 길방위를 판정.<br>64괘 전체 수록, 3,000년 동아시아 지혜가 손끝에.</div>
+    <div class="url">yymm77.github.io/seimei-kagaku/ko.html</div>
+  </div>
+</div>
+</div>
+
+<div class="note">
+  각 바너를 스크린샷하여 Instagram에 게시하세요。<br>
+  各バナーをスクリーンショットしてInstagramに投稿してください。<br>
+  推奨：Windows → Win+Shift+S　/ Mac → Cmd+Shift+4<br>
+  バナー部分のみ切り取ってご使用ください。
+</div>
+
+<script>
+function showBanner(lang) {
+  ['en','zh','tw','ko'].forEach(l => {
+    document.getElementById('wrap-'+l).style.display = l===lang ? 'flex' : 'none';
+  });
+  document.querySelectorAll('.controls button').forEach((btn,i) => {
+    btn.classList.toggle('active', ['en','zh','tw','ko'][i]===lang);
+  });
+}
+</script>
+</body>
+</html>
