@@ -184,6 +184,14 @@
   .ai-loading.visible{display:block}
   .ai-loading-dots::after{content:'';animation:dots 1.5s infinite}
   /* ── グラフ解説パネル ── */
+  /* ── 12ポイント表：数意解説展開 ── */
+  #p-table{width:100%;border-collapse:collapse}
+  #p-table th{font-size:10px;letter-spacing:.3em;color:var(--mist);padding:6px 10px;border-bottom:1px solid rgba(184,150,12,.2);font-weight:400;text-align:left}
+  #p-table td{padding:8px 10px;border-bottom:1px solid rgba(184,150,12,.08);vertical-align:top}
+  #p-table tbody tr:hover{background:rgba(184,150,12,.04)}
+  .desc-preview{font-size:11px;color:var(--mist);line-height:1.6}
+  .desc-full{font-size:11px;color:var(--ink);line-height:1.8;display:none;padding:8px 10px;margin-top:6px;background:rgba(26,18,8,.04);border-left:2px solid var(--gold);border-radius:1px}
+  /* ── グラフ解説パネル ── */
   .graph-insight-panel{background:var(--paper);border:1px solid rgba(184,150,12,.2);border-radius:2px;padding:0;margin-top:16px;overflow:hidden}
   .graph-insight-tabs{display:flex;flex-wrap:wrap;gap:0;border-bottom:1px solid rgba(184,150,12,.2);background:rgba(184,150,12,.04)}
   .gi-tab{padding:7px 14px;font-size:10px;letter-spacing:.4em;border:none;background:none;cursor:pointer;color:var(--mist);border-bottom:2px solid transparent;transition:all .2s;font-family:'Noto Serif JP',serif}
@@ -496,7 +504,7 @@ _cntBanner(); cntVisit();
     </div>
     <div class="domains-grid" id="d-grid"></div>
     <div class="sec">計算ポイント詳細</div>
-    <table><thead><tr><th>ポイント</th><th>画数値</th><th>点数</th><th>数意</th></tr></thead><tbody id="p-body"></tbody></table>
+    <table id="p-table"><thead><tr><th>ポイント</th><th>画数値</th><th>点数</th><th>数意と解説</th></tr></thead><tbody id="p-body"></tbody></table>
     <details class="dbg">
       <summary>▶ セル計算値（Excelとの照合用）</summary>
       <div class="dbg-grid" id="dbg-grid"></div>
@@ -1760,8 +1768,70 @@ function renderResult(pts, displayName, originYear, birthAge) {
   const pb=document.getElementById('p-body');pb.innerHTML='';
   ['I5','C9','K3','I9','K9','D20','I13','A9','D24','F20','F24','K15'].forEach(k=>{
     const raw=pts[k],sq=suugi(raw),cl=scl(sq.点数);
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td style="font-size:11px;color:var(--mist);letter-spacing:.1em">${PNAMES[k]}</td><td style="font-weight:700;font-family:'Zen Old Mincho',serif;font-size:18px">${raw}画</td><td><span class="badge ${cl}">${sq.点数}</span></td><td style="font-size:12px">${sq.数意}</td><td style="font-size:10px;color:var(--mist);max-width:220px;line-height:1.5">${sq.解説 ? sq.解説.substring(0,60)+"…" : ""}</td>`;
+    const desc = sq.解説 || '';
+    const isLong = desc.length > 40;
+    const preview = isLong ? desc.substring(0,40)+'…' : desc;
+
+    const tr = document.createElement('tr');
+    tr.style.cssText = 'transition:background .15s';
+    tr.onmouseenter = ()=>{ tr.style.background='rgba(184,150,12,.04)'; };
+    tr.onmouseleave = ()=>{ tr.style.background=''; };
+
+    // 分野名セル
+    const tdName = document.createElement('td');
+    tdName.style.cssText = 'font-size:11px;color:var(--mist);letter-spacing:.1em;white-space:nowrap';
+    tdName.textContent = PNAMES[k];
+
+    // 画数セル
+    const tdRaw = document.createElement('td');
+    tdRaw.innerHTML = '<span style="font-weight:700;font-family:\'Zen Old Mincho\',serif;font-size:18px">'+raw+'</span><span style="font-size:10px;color:var(--mist)">画</span>';
+
+    // 点数セル
+    const tdScore = document.createElement('td');
+    tdScore.innerHTML = '<span class="badge '+cl+'">'+sq.点数+'</span>';
+
+    // 数意＋解説セル（クリックで展開）
+    const tdDesc = document.createElement('td');
+    tdDesc.style.cssText = 'max-width:280px;cursor:'+(isLong?'pointer':'default');
+
+    const nameSpan = document.createElement('div');
+    nameSpan.style.cssText = 'font-size:12px;font-weight:600;margin-bottom:3px';
+    nameSpan.textContent = sq.数意;
+
+    const previewSpan = document.createElement('div');
+    previewSpan.className = 'desc-preview';
+    previewSpan.style.cssText = 'font-size:11px;color:var(--mist);line-height:1.6';
+    previewSpan.textContent = preview;
+
+    const fullSpan = document.createElement('div');
+    fullSpan.className = 'desc-full';
+    fullSpan.style.cssText = 'font-size:11px;color:var(--ink);line-height:1.8;display:none;padding:8px 10px;margin-top:6px;background:rgba(26,18,8,.04);border-left:2px solid var(--gold);border-radius:1px';
+    fullSpan.textContent = desc;
+
+    if(isLong){
+      const toggleBtn = document.createElement('span');
+      toggleBtn.style.cssText = 'font-size:9px;color:var(--gold);letter-spacing:.3em;cursor:pointer;user-select:none;display:inline-block;margin-top:3px';
+      toggleBtn.textContent = '▶ 全文を読む';
+      toggleBtn.addEventListener('click', function(e){
+        e.stopPropagation();
+        const isOpen = fullSpan.style.display !== 'none';
+        fullSpan.style.display = isOpen ? 'none' : 'block';
+        previewSpan.style.display = isOpen ? 'block' : 'none';
+        toggleBtn.textContent = isOpen ? '▶ 全文を読む' : '▲ 閉じる';
+      });
+      tdDesc.appendChild(nameSpan);
+      tdDesc.appendChild(previewSpan);
+      tdDesc.appendChild(fullSpan);
+      tdDesc.appendChild(toggleBtn);
+    } else {
+      tdDesc.appendChild(nameSpan);
+      tdDesc.appendChild(previewSpan);
+    }
+
+    tr.appendChild(tdName);
+    tr.appendChild(tdRaw);
+    tr.appendChild(tdScore);
+    tr.appendChild(tdDesc);
     pb.appendChild(tr);
   });
   const dg=document.getElementById('dbg-grid');dg.innerHTML='';
