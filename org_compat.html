@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>姓名科学 組織相性解析 — 牧正人史方式</title>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;700;800&family=Noto+Serif+JP:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a1208;--ink-l:#3d2b0e;--paper:#f2ead8;--paper-d:#e8dcc4;
+  --gold:#8a6914;--gold-l:#c9a84c;--verm:#8b2020;--jade:#2d5a3d;
+  --indigo:#1a3a5c;--border:rgba(138,105,20,.25);
+  --ten:#1a3a5c;--chi:#8b2020;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:'Noto Serif JP',serif;min-height:100vh}
+body::before{content:'';position:fixed;inset:0;
+  background-image:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(138,105,20,.015) 3px,rgba(138,105,20,.015) 4px);
+  pointer-events:none;z-index:0}
+
+header{position:relative;z-index:1;text-align:center;padding:44px 20px 32px;
+  border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(138,105,20,.07) 0%,transparent 100%)}
+.site-title{font-family:'Shippori Mincho',serif;font-size:clamp(1.5rem,5vw,2.6rem);
+  font-weight:800;letter-spacing:.3em}
+.site-title em{color:var(--gold);font-style:normal}
+.site-sub{margin-top:8px;font-size:.8rem;letter-spacing:.35em;color:var(--ink-l);opacity:.7}
+
+main{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:40px 20px 80px}
+.sec-title{font-family:'Shippori Mincho',serif;font-size:1.1rem;letter-spacing:.3em;
+  color:var(--gold);border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:20px}
+
+.notice{font-size:.75rem;padding:10px 14px;background:rgba(138,105,20,.08);
+  border-left:3px solid var(--gold);color:var(--ink-l);letter-spacing:.1em;margin-bottom:16px;line-height:1.8}
+.notice-info{border-left-color:var(--indigo);background:rgba(26,58,92,.06)}
+
+.input-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px}
+@media(max-width:640px){.input-grid{grid-template-columns:1fr}}
+
+.panel{background:rgba(255,255,255,.45);border:1px solid var(--border);padding:24px}
+.panel-label{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.panel-badge{font-family:'Shippori Mincho',serif;font-size:1.1rem;font-weight:700;
+  padding:4px 14px;border:1px solid var(--border);letter-spacing:.1em}
+.badge-a{border-color:var(--indigo);color:var(--indigo)}
+.badge-b{border-color:var(--chi);color:var(--chi)}
+
+.input-row{margin-bottom:14px}
+.input-row label{display:block;font-size:.75rem;letter-spacing:.2em;color:var(--gold);margin-bottom:5px}
+.input-row input[type=text]{width:100%;background:rgba(242,234,216,.6);border:1px solid var(--border);
+  padding:9px 10px;font-family:'Noto Serif JP',serif;font-size:.95rem;color:var(--ink);outline:none}
+.input-row input:focus{border-color:var(--gold)}
+.field-hint{font-size:.65rem;color:var(--ink-l);opacity:.6;margin-top:3px;letter-spacing:.1em;line-height:1.7}
+.preview-row{display:flex;flex-wrap:wrap;gap:4px;min-height:24px;margin-top:6px}
+.sp-char{font-size:.75rem;padding:2px 5px;background:rgba(138,105,20,.08);border:1px solid var(--border)}
+.sp-char.unknown{color:var(--verm);border-color:var(--verm)}
+.unk-msg{font-size:.72rem;color:var(--verm);margin-top:3px;letter-spacing:.1em}
+
+/* 単語分割ビジュアル */
+.word-split-wrap{margin-top:14px;padding:12px 14px;
+  background:rgba(139,32,32,.05);border:1px solid var(--border)}
+.word-split-title{font-size:.72rem;letter-spacing:.2em;color:var(--chi);margin-bottom:8px}
+.word-chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+.word-chip{padding:4px 10px;border:1px solid var(--border);font-size:.82rem;cursor:pointer;
+  transition:all .15s;user-select:none}
+.word-chip.ten-w{background:rgba(26,58,92,.15);border-color:var(--ten);color:var(--ten)}
+.word-chip.chi-w{background:rgba(139,32,32,.12);border-color:var(--chi);color:var(--chi)}
+.split-divider{width:3px;background:var(--gold);opacity:.6;border-radius:2px;align-self:stretch;flex-shrink:0}
+.split-info{font-size:.72rem;color:var(--ink-l);margin-top:6px;letter-spacing:.1em;line-height:1.7}
+.split-btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.split-btn{padding:4px 12px;border:1px solid var(--border);background:#fff;
+  font-family:inherit;font-size:.75rem;cursor:pointer}
+.split-btn-reset{border-color:var(--indigo);background:var(--indigo);color:#fff}
+
+.live-vals{display:none;margin-top:12px;padding:10px 12px;border-top:1px solid var(--border)}
+.lv-row{display:flex;justify-content:space-between;font-size:.8rem;padding:3px 0;
+  border-bottom:1px dotted var(--border)}
+.lv-row:last-child{border-bottom:none}
+.lv-key{color:var(--gold)}.lv-val{font-weight:700}
+
+.btn-calc{display:block;width:100%;padding:15px;background:var(--ink);color:var(--paper);
+  border:none;font-family:'Shippori Mincho',serif;font-size:1rem;letter-spacing:.35em;
+  cursor:pointer;transition:background .2s;margin-bottom:40px}
+.btn-calc:hover{background:var(--ink-l)}
+.btn-calc:disabled{opacity:.4;cursor:not-allowed}
+
+/* 結果 */
+.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px}
+@media(max-width:640px){.result-grid{grid-template-columns:1fr}}
+.res-card{background:rgba(255,255,255,.4);border:1px solid var(--border);padding:18px}
+.res-name{font-family:'Shippori Mincho',serif;font-size:.95rem;letter-spacing:.15em;margin-bottom:10px}
+.res-row{display:flex;justify-content:space-between;padding:4px 0;
+  border-bottom:1px dotted var(--border);font-size:.82rem}
+.res-row:last-child{border-bottom:none}
+.res-key{color:var(--gold)}.res-val{font-weight:700}
+
+.tenchi-diagram{background:rgba(255,255,255,.5);border:1px solid var(--border);
+  padding:20px;margin-bottom:24px}
+.td-title{font-size:.75rem;letter-spacing:.25em;color:var(--gold);margin-bottom:14px;
+  padding-bottom:6px;border-bottom:1px solid var(--border)}
+.td-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.td-label{font-size:.72rem;width:40px;flex-shrink:0;font-weight:700;letter-spacing:.1em}
+.td-label.ten{color:var(--ten)}.td-label.chi{color:var(--chi)}
+.td-words{display:flex;gap:3px;flex-wrap:wrap}
+.td-word{padding:3px 8px;font-size:.78rem;border:1px solid var(--border)}
+.td-word.ten{background:rgba(26,58,92,.15);border-color:var(--ten)}
+.td-word.chi{background:rgba(139,32,32,.12);border-color:var(--chi)}
+.td-word.supp{background:rgba(138,105,20,.08);color:var(--gold);font-size:.65rem}
+.td-total{font-size:.75rem;color:var(--ink-l);margin-left:6px}
+.td-info{font-size:.72rem;color:var(--ink-l);margin-top:10px;padding-top:8px;
+  border-top:1px dashed var(--border);line-height:1.8}
+
+.compat-box{background:rgba(255,255,255,.45);border:2px solid var(--border);
+  padding:24px;margin-bottom:28px}
+.compat-sym{font-family:'Shippori Mincho',serif;font-size:2.4rem;font-weight:800;text-align:center}
+.compat-label{text-align:center;font-size:.78rem;color:var(--ink-l);margin-top:6px}
+.compat-desc{font-size:.85rem;line-height:2;color:var(--ink-l);margin-top:16px;
+  padding:12px;background:rgba(138,105,20,.06);border-left:3px solid var(--gold)}
+
+.placeholder-msg{text-align:center;padding:48px 20px;color:var(--ink-l);
+  font-size:.88rem;letter-spacing:.2em;opacity:.6;border:1px dashed var(--border)}
+
+footer{border-top:1px solid var(--border);padding:28px 20px;text-align:center;z-index:1;position:relative}
+.footer-links{display:flex;justify-content:center;gap:4px;flex-wrap:wrap;margin-bottom:12px}
+.footer-links a{font-size:.8rem;letter-spacing:.15em;color:var(--gold);text-decoration:none;
+  padding:0 10px;border-right:1px solid var(--border)}
+.footer-links a:last-child{border-right:none}
+.footer-copy{font-size:.72rem;color:var(--ink-l);opacity:.6;letter-spacing:.1em;line-height:1.9}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="site-title">姓名科学 <em>組</em>織相性解析</div>
+  <div class="site-sub">牧正人史方式 ／ 個人と組織・企業・団体の相性判定</div>
+</header>
+
+<main>
+  <div class="notice">
+    ◈ 牧正人史先生著「結婚姓名占術」第2章の組織分析法に基づくシステムです。<br>
+    企業名・法人名・団体名を<strong>単語ごとに区切って</strong>入力し、個人との相性を判定します。
+  </div>
+  <div class="notice notice-info">
+    ◉ 組織名の入力方法：例「松下電器産業株式会社」→「松下 電器 産業 株式 会社」（スペース区切り）<br>
+    天地の分割は原典ルール（上段は下段の2倍より少なく）を自動適用。手動調整も可能です。
+  </div>
+
+  <div class="sec-title">◈ 姓 名 入 力</div>
+
+  <div class="input-grid">
+    <!-- A欄：個人 -->
+    <div class="panel">
+      <div class="panel-label">
+        <span class="panel-badge badge-a">A さん</span>
+        <span style="font-size:.75rem;color:var(--ink-l)">（個人名）</span>
+      </div>
+      <div class="input-row">
+        <label>姓（苗字）</label>
+        <input type="text" id="a-sei" placeholder="三原" maxlength="6" oninput="onInputA()">
+        <div class="preview-row" id="a-sei-prev"></div>
+        <div class="unk-msg" id="a-sei-unk"></div>
+      </div>
+      <div class="input-row">
+        <label>名（名前）</label>
+        <input type="text" id="a-mei" placeholder="嘉明" maxlength="6" oninput="onInputA()">
+        <div class="preview-row" id="a-mei-prev"></div>
+        <div class="unk-msg" id="a-mei-unk"></div>
+        <div class="field-hint">※ 姓1〜3字・名1〜3字</div>
+      </div>
+      <div class="live-vals" id="a-vals">
+        <div class="lv-row"><span class="lv-key">R(K9)総合運</span><span class="lv-val" id="a-K9">—</span></div>
+        <div class="lv-row"><span class="lv-key">S(C9)内面</span><span class="lv-val" id="a-C9">—</span></div>
+        <div class="lv-row"><span class="lv-key">P(K3)対人</span><span class="lv-val" id="a-K3">—</span></div>
+      </div>
+    </div>
+
+    <!-- B欄：組織 -->
+    <div class="panel">
+      <div class="panel-label">
+        <span class="panel-badge badge-b">B 組織</span>
+        <span style="font-size:.75rem;color:var(--ink-l)">（企業・団体・法人）</span>
+      </div>
+      <div class="input-row">
+        <label>組織名（単語をスペースで区切る）</label>
+        <input type="text" id="b-org" placeholder="日産 自動車 株式 会社" maxlength="60"
+          oninput="onInputB()">
+        <div class="unk-msg" id="b-org-unk"></div>
+        <div class="field-hint">
+          例：ソニー株式会社 → 「ソニー 株式 会社」<br>
+          社会福祉法人くぬぎざか福祉会 → 「社会福祉法人 くぬぎざか 福祉会」
+        </div>
+      </div>
+
+      <div class="word-split-wrap" id="word-split-wrap" style="display:none">
+        <div class="word-split-title">◇ 天（上段）・地（下段）の分割</div>
+        <div class="word-chips" id="word-chips"></div>
+        <div class="split-info" id="split-info"></div>
+        <div class="split-btns">
+          <button class="split-btn" onclick="moveSplit(-1)">◀ 天を減らす</button>
+          <button class="split-btn" onclick="moveSplit(1)">天を増やす ▶</button>
+          <button class="split-btn split-btn-reset" onclick="resetSplit()">原典ルールに戻す</button>
+        </div>
+      </div>
+
+      <div class="live-vals" id="b-vals">
+        <div class="lv-row"><span class="lv-key">R(K9)総合運</span><span class="lv-val" id="b-R">—</span></div>
+        <div class="lv-row"><span class="lv-key">M(I5)天総合計</span><span class="lv-val" id="b-M">—</span></div>
+        <div class="lv-row"><span class="lv-key">N(K15)地総合計</span><span class="lv-val" id="b-N">—</span></div>
+        <div class="lv-row"><span class="lv-key">P(K3)総運</span><span class="lv-val" id="b-P">—</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="warn-msg" style="display:none;margin-bottom:16px;padding:12px 16px;
+    background:rgba(139,32,32,.08);border-left:4px solid var(--verm);
+    font-size:.82rem;color:var(--ink);line-height:1.9;border-radius:0 4px 4px 0"></div>
+
+  <button class="btn-calc" id="btn-calc" onclick="runCalc()" disabled>
+    　相　性　を　解　析　す　る　
+  </button>
+
+  <div id="result-area">
+    <div class="placeholder-msg">姓名と組織名を入力して「相性を解析する」を押してください</div>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-links">
+    <a href="namemaster_v5.html">姓名科学の殿堂</a>
+    <a href="compatibility_v2.html">結婚相性解析</a>
+    <a href="houigaku.html">方位学ポータル</a>
+    <a href="index.html">トップ</a>
+  </div>
+  <div class="footer-copy">
+    © 2025 日昇リサーチ株式会社 ／ 牧正人史姓名科学体系<br>
+    <span style="font-size:.7rem;opacity:.7">組織相性解析 v2.0 ／ 原典第2章の分析法に基づく実装</span>
+  </div>
+</footer>
+
+<script>
+const JK={"・":1,"〆":2,"ア":2,"あ":4,"イ":2,"い":2,"ウ":3,"う":2,"エ":3,"え":3,"オ":3,"お":4,"カ":2,"か":3,"キ":3,"き":4,"ク":2,"く":1,"ケ":3,"け":3,"コ":2,"こ":2,"サ":3,"さ":3,"シ":3,"し":1,"ス":2,"す":3,"セ":2,"せ":3,"ソ":2,"そ":4,"タ":3,"た":4,"チ":3,"ち":3,"ツ":3,"つ":1,"テ":3,"て":2,"ト":2,"と":2,"ナ":2,"な":4,"ニ":2,"に":3,"ヌ":2,"ぬ":3,"ネ":4,"ね":3,"ノ":1,"の":2,"ハ":2,"は":3,"ヒ":2,"ひ":3,"フ":1,"ふ":4,"ヘ":1,"へ":1,"ホ":4,"ほ":4,"マ":2,"ま":3,"ミ":3,"み":3,"ム":2,"む":4,"メ":2,"め":3,"モ":3,"も":3,"ヤ":2,"や":3,"ユ":2,"ゆ":3,"ヨ":3,"よ":2,"ラ":2,"ら":3,"リ":2,"り":2,"ル":2,"る":3,"レ":1,"れ":3,"ロ":3,"ろ":3,"ワ":2,"わ":3,"ヰ":4,"ゐ":2,"ヱ":3,"ゑ":5,"ヲ":3,"を":4,"ン":2,"ん":2,"ー":1,"亜":8,"阿":8,"愛":13,"逢":11,"葵":13,"茜":10,"旭":6,"渥":12,"葦":13,"芦":20,"梓":11,"圧":17,"絢":12,"飴":14,"綾":14,"鮎":16,"安":6,"庵":11,"案":10,"杏":7,"以":5,"伊":6,"依":8,"夷":7,"威":9,"惟":11,"意":13,"易":8,"為":12,"移":11,"維":14,"衣":6,"遺":16,"医":18,"井":4,"亥":6,"育":8,"郁":9,"一":1,"磯":17,"溢":13,"壱":12,"逸":12,"稲":15,"芋":7,"茨":10,"允":4,"印":6,"員":10,"引":4,"蔭":15,"胤":9,"院":10,"陰":11,"隠":17,"右":5,"宇":6,"烏":10,"羽":6,"雨":8,"卯":5,"鵜":18,"丑":4,"碓":13,"臼":6,"唄":10,"浦":10,"瓜":5,"雲":12,"運":13,"荏":10,"営":17,"影":15,"映":9,"永":5,"栄":14,"泳":8,"瑛":13,"頴":16,"衛":16,"英":9,"詠":12,"鋭":15,"駅":23,"益":10,"悦":10,"越":12,"閲":15,"榎":14,"円":13,"園":13,"延":7,"宴":10,"沿":8,"援":12,"炎":8,"煙":13,"猿":13,"燕":16,"縁":15,"艶":24,"鉛":13,"遠":14,"塩":24,"鴛":16,"於":8,"央":5,"奥":13,"往":8,"応":17,"旺":8,"押":8,"横":16,"王":4,"翁":10,"鴬":21,"鴎":21,"岡":8,"黄":12,"沖":7,"荻":11,"屋":9,"億":15,"憶":16,"臆":17,"桶":11,"乙":1,"恩":10,"温":13,"穏":19,"音":9,"下":3,"化":4,"何":7,"佳":8,"加":5,"可":5,"夏":10,"嘉":14,"家":10,"嫁":13,"科":9,"果":8,"歌":14,"火":4,"河":8,"珂":9,"禾":5,"稼":15,"花":8,"荷":11,"華":12,"菓":12,"貨":11,"霞":17,"我":7,"峨":10,"芽":8,"賀":12,"雅":12,"介":4,"駕":15,"会":13,"解":13,"回":6,"廻":9,"快":7,"戒":7,"改":7,"海":10,"械":11,"灰":6,"界":9,"絵":19,"皆":9,"芥":8,"開":12,"階":12,"貝":7,"凱":12,"外":5,"碍":13,"街":12,"馨":20,"垣":9,"蛙":12,"各":6,"拡":18,"格":10,"殻":12,"獲":17,"確":15,"穫":19,"覚":20,"角":7,"郭":11,"閣":14,"革":9,"学":16,"楽":15,"岳":17,"額":18,"笠":11,"掛":11,"樫":15,"橿":17,"梶":11,"鰍":20,"割":12,"潟":15,"活":9,"滑":13,"葛":13,"叶":5,"樺":16,"株":10,"兜":11,"釜":10,"蒲":14,"鎌":18,"鴨":16,"茅":9,"萱":13,"刈":4,"瓦":5,"乾":11,"冠":9,"寒":12,"勘":11,"巻":8,"勧":20,"完":7,"官":8,"寛":15,"幹":13,"感":13,"慣":14,"敢":12,"漢":14,"環":17,"甘":5,"監":15,"看":9,"管":14,"缶":24,"肝":7,"莞":11,"諌":16,"観":25,"貫":11,"間":12,"鑑":22,"閑":12,"関":19,"韓":17,"館":17,"舘":17,"丸":3,"巌":23,"岸":8,"岩":8,"眼":11,"雁":12,"企":6,"伎":6,"喜":12,"器":17,"基":11,"奇":8,"岐":7,"寄":11,"幾":12,"希":7,"揮":12,"旗":14,"机":6,"機":16,"帰":18,"気":10,"毅":15,"汽":7,"畿":15,"祈":9,"季":8,"紀":9,"稀":12,"規":11,"記":10,"貴":12,"起":10,"輝":15,"鬼":10,"騎":18,"亀":16,"儀":15,"宜":8,"技":7,"祇":10,"義":13,"菊":12,"吉":6,"鞠":17,"橘":16,"砧":10,"杵":8,"客":9,"丘":5,"久":3,"及":4,"休":6,"宮":10,"急":9,"弓":3,"救":11,"求":7,"究":7,"球":11,"級":9,"給":12,"牛":4,"居":8,"巨":5,"挙":18,"許":11,"鋸":16,"漁":14,"魚":11,"亨":7,"享":8,"京":8,"供":8,"侠":9,"共":6,"競":20,"協":8,"匡":6,"喬":12,"境":14,"強":12,"恭":10,"教":11,"橋":16,"狭":10,"胸":10,"興":16,"鏡":19,"郷":13,"響":22,"仰":6,"尭":12,"暁":16,"業":13,"曲":6,"玉":5,"極":13,"桐":10,"勤":13,"巾":3,"均":7,"斤":4,"錦":16,"欣":8,"欽":12,"琴":12,"禁":13,"筋":12,"緊":15,"芹":8,"衿":9,"襟":18,"謹":18,"金":8,"近":8,"吟":7,"銀":14,"九":2,"倶":10,"区":4,"句":5,"玖":7,"狗":8,"矩":10,"駒":15,"具":8,"空":8,"串":7,"隅":12,"釧":11,"櫛":19,"窪":14,"隈":12,"熊":14,"栗":12,"粂":9,"桑":10,"勲":16,"鍬":17,"薫":18,"君":7,"訓":10,"群":13,"軍":9,"郡":10,"卦":8,"刑":6,"兄":5,"啓":11,"圭":6,"型":9,"契":9,"形":7,"径":10,"恵":12,"慶":15,"慧":15,"景":12,"敬":13,"桂":10,"渓":13,"畦":11,"稽":15,"経":13,"系":7,"継":20,"茎":11,"蛍":16,"計":9,"詣":13,"軽":14,"迎":8,"芸":19,"劇":15,"鯨":19,"傑":13,"決":7,"穴":5,"潔":15,"血":6,"結":12,"月":4,"倹":15,"健":11,"兼":10,"剣":15,"堅":11,"建":9,"憲":16,"懸":20,"拳":10,"検":17,"権":22,"犬":4,"研":11,"献":20,"絹":13,"硯":12,"県":16,"肩":8,"謙":17,"見":7,"賢":15,"軒":10,"鍵":17,"遣":14,"険":16,"顕":23,"験":23,"鹸":24,"元":4,"原":10,"厳":20,"幻":4,"弦":8,"玄":5,"源":13,"現":11,"言":7,"乎":5,"古":5,"固":8,"孤":8,"庫":10,"戸":4,"湖":12,"狐":8,"股":8,"袴":11,"胡":9,"虎":8,"誇":13,"五":4,"鼓":13,"互":4,"伍":6,"呉":7,"午":4,"吾":7,"後":9,"御":11,"悟":10,"護":21,"醐":16,"交":6,"鯉":18,"侯":9,"倖":10,"候":10,"公":4,"光":6,"功":5,"厚":9,"口":3,"向":6,"后":6,"孔":4,"好":6,"孝":7,"宏":7,"工":3,"巧":5,"幸":8,"庚":8,"広":15,"弘":5,"康":11,"恒":9,"攻":7,"晃":10,"更":7,"校":10,"梗":11,"江":6,"洪":9,"浩":10,"港":12,"溝":13,"甲":5,"皇":9,"硬":12,"紅":9,"糠":17,"紘":10,"耕":10,"綱":14,"考":6,"航":10,"膏":14,"荒":10,"行":6,"衡":16,"講":17,"貢":10,"酵":14,"砿":20,"鉱":23,"鋼":16,"香":9,"高":10,"剛":10,"鴻":17,"号":13,"合":6,"豪":14,"轟":21,"克":7,"告":7,"国":11,"穀":15,"黒":12,"骨":10,"込":6,"狛":8,"此":6,"今":4,"坤":8,"昆":8,"根":10,"混":11,"紺":11,"魂":14,"佐":7,"左":5,"嵯":13,"査":9,"差":10,"沙":7,"砂":9,"鎖":18,"坐":7,"座":10,"再":6,"最":12,"哉":9,"妻":8,"彩":11,"宰":10,"才":3,"歳":13,"災":7,"済":17,"采":8,"犀":12,"斎":17,"祭":11,"細":10,"菜":12,"裁":12,"載":13,"際":14,"剤":14,"在":6,"材":7,"財":10,"坂":7,"阪":7,"堺":12,"榊":14,"崎":11,"咲":9,"埼":10,"作":7,"鷺":24,"削":9,"朔":10,"策":12,"索":10,"桜":21,"笹":10,"刷":8,"札":5,"薩":18,"雑":18,"三":3,"傘":12,"参":10,"山":3,"産":11,"賛":19,"仕":5,"伺":7,"使":8,"司":5,"史":5,"嗣":13,"士":3,"四":5,"姉":8,"子":3,"姿":9,"市":5,"志":7,"師":10,"思":9,"指":9,"支":4,"斯":12,"施":9,"枝":8,"旨":6,"止":4,"氏":4,"獅":13,"私":7,"糸":6,"紙":10,"紫":11,"至":6,"詞":12,"視":12,"詩":13,"誌":14,"資":13,"賜":15,"飼":14,"事":8,"侍":8,"児":8,"字":6,"寺":6,"慈":14,"時":10,"持":9,"次":6,"滋":13,"治":8,"爾":14,"示":5,"磁":15,"而":6,"耳":6,"自":6,"蒔":14,"汐":6,"辞":13,"式":6,"鹿":11,"識":19,"竺":8,"宍":7,"雫":11,"七":2,"執":11,"室":9,"漆":14,"疾":10,"実":14,"質":15,"篠":14,"柴":9,"偲":11,"芝":7,"縞":16,"舎":8,"写":15,"射":10,"捨":11,"斜":11,"社":8,"紗":10,"者":9,"謝":17,"車":7,"若":9,"弱":10,"主":5,"取":8,"守":6,"手":4,"朱":6,"殊":10,"狩":9,"珠":10,"種":14,"趣":15,"酒":10,"首":9,"儒":16,"受":8,"寿":14,"授":11,"樹":16,"収":6,"周":8,"宗":8,"就":12,"修":10,"州":6,"拾":9,"秀":7,"洲":9,"秋":9,"終":11,"習":11,"舟":6,"衆":12,"酋":9,"集":12,"什":4,"充":5,"住":7,"十":2,"柔":9,"渋":15,"縦":17,"重":9,"叔":8,"宿":11,"淑":11,"祝":10,"出":5,"熟":15,"術":11,"俊":9,"峻":9,"春":9,"舜":12,"駿":17,"殉":10,"楯":13,"淳":11,"準":13,"潤":15,"盾":9,"純":10,"醇":15,"処":11,"順":12,"初":7,"所":8,"暑":13,"曙":18,"庶":11,"渚":12,"緒":15,"書":10,"諸":16,"助":7,"叙":9,"女":3,"徐":10,"勝":12,"匠":6,"升":4,"召":5,"商":11,"唱":11,"小":3,"将":11,"尚":8,"庄":6,"床":7,"彰":14,"承":8,"招":8,"掌":12,"捷":11,"昇":8,"昭":9,"昌":8,"晶":12,"松":8,"樟":15,"梢":11,"沼":8,"渉":10,"湘":12,"焼":16,"照":13,"省":9,"硝":12,"祥":11,"章":11,"笑":10,"粧":12,"紹":11,"肖":7,"菖":12,"詔":12,"賞":15,"象":12,"醤":18,"鐘":20,"上":3,"丈":3,"丞":6,"乗":10,"城":10,"場":12,"情":11,"常":11,"条":11,"浄":11,"杖":7,"譲":24,"錠":16,"飾":14,"植":12,"織":18,"色":6,"食":9,"尻":5,"伸":7,"信":9,"寝":14,"心":4,"振":10,"慎":13,"新":13,"森":12,"榛":14,"深":11,"申":5,"神":10,"真":10,"秦":10,"紳":11,"臣":6,"親":16,"身":7,"進":12,"針":10,"人":2,"仁":4,"尋":12,"甚":9,"尽":14,"陣":10,"須":12,"諏":15,"図":14,"吹":7,"垂":8,"帥":9,"水":4,"粋":14,"翠":14,"酔":15,"瑞":13,"随":16,"崇":11,"数":15,"雛":18,"杉":7,"菅":12,"雀":11,"裾":13,"澄":15,"寸":3,"世":5,"畝":10,"瀬":19,"是":9,"勢":13,"姓":8,"征":8,"成":7,"性":8,"政":8,"整":16,"星":9,"晴":12,"栖":10,"清":11,"正":5,"生":5,"盛":12,"精":14,"声":17,"聖":13,"西":6,"製":14,"誠":14,"誓":14,"青":8,"静":16,"斉":14,"税":12,"席":10,"戚":11,"昔":8,"石":5,"積":16,"績":17,"赤":7,"跡":13,"切":4,"折":7,"摂":21,"設":11,"説":14,"節":15,"雪":11,"絶":12,"仙":5,"先":6,"占":5,"千":3,"宣":8,"専":11,"川":3,"扇":10,"戦":16,"栓":10,"泉":9,"洗":9,"浅":11,"染":10,"潜":15,"旋":11,"線":15,"繊":23,"船":11,"選":16,"銭":16,"銑":14,"前":9,"鮮":17,"善":12,"全":6,"然":12,"禅":17,"膳":16,"曾":12,"疎":12,"祖":10,"組":11,"素":10,"蘇":20,"双":4,"創":12,"倉":10,"壮":7,"奏":9,"宋":7,"惣":12,"想":13,"操":16,"早":6,"曹":11,"巣":11,"槍":14,"争":8,"相":9,"窓":11,"綜":14,"総":17,"草":10,"聡":17,"荘":11,"蒼":14,"装":13,"送":10,"霜":17,"像":14,"増":15,"蔵":18,"臓":22,"造":11,"側":11,"促":9,"則":9,"束":7,"足":7,"速":11,"俗":9,"属":21,"族":11,"続":21,"卒":8,"其":8,"袖":10,"存":6,"孫":10,"尊":12,"村":7,"他":5,"多":6,"太":4,"汰":7,"打":5,"陀":8,"駄":14,"騨":22,"体":23,"対":14,"耐":9,"帯":11,"待":9,"態":14,"替":12,"泰":10,"滞":14,"苔":9,"袋":11,"退":10,"隊":12,"鯛":18,"黛":17,"代":5,"台":5,"大":3,"第":11,"醍":16,"滝":18,"鷹":24,"卓":8,"瀧":18,"宅":6,"沢":14,"拓":8,"琢":12,"託":10,"只":5,"但":7,"辰":7,"達":13,"巽":12,"棚":12,"谷":7,"狸":10,"樽":16,"丹":4,"旦":5,"探":11,"淡":11,"炭":9,"湛":12,"短":12,"端":14,"胆":9,"誕":14,"団":13,"鍛":17,"弾":15,"暖":13,"段":9,"檀":17,"男":7,"談":15,"知":8,"地":6,"智":12,"池":6,"置":13,"稚":13,"致":9,"畜":10,"築":16,"竹":6,"筑":12,"秩":10,"窒":11,"茶":10,"嫡":14,"中":4,"着":12,"仲":6,"宙":8,"忠":8,"昼":11,"注":8,"虫":6,"鋳":22,"樗":15,"猪":16,"貯":12,"丁":2,"兆":6,"帖":8,"彫":11,"張":11,"暢":14,"朝":12,"潮":15,"町":7,"眺":11,"蝶":15,"調":15,"跳":13,"銚":14,"長":8,"頂":11,"鳥":10,"直":8,"珍":9,"陳":11,"鎮":18,"津":9,"椎":12,"追":10,"通":11,"栂":9,"塚":10,"槻":15,"佃":7,"辻":6,"蔦":15,"椿":13,"鍔":17,"坪":8,"壷":12,"爪":4,"紬":11,"釣":11,"鶴":21,"亭":9,"停":11,"偵":10,"貞":9,"定":8,"堤":12,"帝":9,"廷":7,"庭":10,"弟":7,"悌":10,"梯":11,"汀":5,"碇":13,"程":12,"禎":14,"締":15,"蹄":16,"邸":8,"摘":14,"的":8,"滴":14,"笛":11,"哲":10,"徹":15,"鉄":21,"典":8,"天":4,"展":10,"添":11,"店":8,"転":18,"点":17,"伝":13,"殿":13,"田":5,"電":13,"兎":8,"吐":6,"塗":13,"徒":10,"斗":4,"杜":7,"渡":12,"登":12,"都":12,"途":11,"砥":10,"努":7,"土":3,"度":9,"倒":10,"党":20,"冬":5,"凍":10,"刀":2,"唐":10,"塔":13,"島":10,"嶋":14,"東":8,"桃":10,"棟":12,"湯":12,"灯":16,"当":13,"燈":16,"等":12,"答":11,"筒":12,"糖":16,"到":8,"統":12,"董":13,"討":10,"藤":19,"豆":7,"透":11,"陶":11,"頭":16,"騰":20,"動":11,"同":6,"堂":11,"憧":15,"導":16,"洞":9,"童":12,"瞳":17,"胴":10,"道":13,"銅":14,"峠":9,"得":11,"徳":15,"特":10,"督":13,"篤":16,"独":16,"栃":9,"読":22,"突":9,"鳶":14,"苫":9,"酉":7,"瀞":19,"惇":11,"敦":12,"頓":13,"曇":16,"奈":8,"内":4,"那":7,"薙":17,"灘":22,"楢":13,"鍋":17,"縄":19,"南":9,"楠":13,"尼":5,"二":2,"弐":12,"虹":9,"肉":6,"日":4,"入":2,"乳":8,"如":6,"任":6,"韮":13,"忍":7,"認":14,"祢":19,"禰":19,"寧":14,"熱":15,"猫":16,"年":6,"念":8,"燃":16,"乃":2,"之":3,"納":10,"濃":16,"能":10,"農":13,"把":7,"巴":4,"播":15,"覇":21,"波":8,"琶":12,"破":10,"馬":10,"俳":10,"敗":11,"背":9,"倍":10,"配":10,"培":11,"梅":11,"煤":13,"売":15,"買":12,"秤":10,"伯":7,"萩":13,"博":12,"柏":9,"白":5,"泊":8,"粕":11,"薄":17,"舶":11,"迫":9,"縛":16,"麦":11,"函":8,"箱":15,"肇":14,"幡":15,"肌":6,"畑":9,"八":2,"畠":10,"鉢":13,"発":12,"抜":8,"鳩":13,"塙":13,"隼":10,"伴":7,"半":5,"判":7,"反":4,"搬":13,"帆":6,"板":8,"畔":10,"班":10,"繁":16,"般":10,"販":11,"範":15,"飯":13,"晩":11,"番":12,"磐":15,"蕃":16,"妃":6,"彼":8,"批":7,"斐":12,"比":4,"皮":5,"碑":13,"秘":10,"緋":14,"肥":8,"飛":9,"樋":15,"尾":7,"備":12,"美":9,"柊":9,"匹":4,"稗":13,"疋":5,"彦":9,"菱":12,"筆":12,"桧":17,"姫":10,"百":6,"俵":10,"彪":11,"標":15,"氷":5,"表":8,"苗":9,"蛭":12,"品":9,"浜":17,"敏":11,"不":4,"瓶":11,"付":5,"埠":11,"夫":4,"富":12,"布":5,"府":8,"扶":7,"斧":8,"敷":15,"浮":10,"普":10,"父":4,"芙":8,"譜":19,"阜":8,"赴":9,"武":8,"舞":14,"部":11,"楓":13,"風":9,"伏":6,"蕗":16,"副":11,"服":8,"腹":13,"福":14,"淵":12,"仏":7,"物":8,"分":4,"文":4,"聞":14,"丙":5,"兵":7,"平":5,"柄":9,"並":10,"米":6,"壁":16,"碧":14,"別":7,"片":4,"変":23,"編":15,"返":8,"辺":19,"便":9,"勉":9,"弁":5,"保":9,"舗":15,"歩":8,"捕":10,"甫":7,"輔":14,"穂":17,"戊":5,"暮":15,"母":5,"菩":12,"包":5,"奉":8,"報":12,"宝":20,"峰":10,"放":8,"方":4,"朋":8,"泡":8,"法":8,"縫":17,"芳":8,"邦":7,"豊":18,"鵬":19,"亡":3,"坊":7,"忘":7,"帽":12,"房":8,"望":11,"紡":10,"貿":12,"防":7,"北":5,"卜":2,"墨":15,"牧":8,"睦":13,"堀":11,"幌":13,"本":5,"翻":18,"凡":3,"摩":15,"磨":16,"魔":21,"麻":11,"妹":8,"枚":8,"毎":7,"槙":14,"枕":8,"又":2,"俣":9,"末":5,"万":13,"麿":18,"満":14,"蔓":15,"味":8,"未":5,"巳":3,"箕":14,"密":11,"湊":12,"稔":13,"妙":7,"民":5,"務":11,"夢":14,"牟":6,"無":12,"霧":19,"名":6,"明":8,"命":8,"盟":13,"鳴":14,"銘":14,"免":7,"棉":12,"綿":14,"面":9,"茂":9,"模":15,"孟":8,"毛":4,"猛":11,"網":14,"木":4,"目":5,"杢":7,"問":11,"紋":10,"門":8,"也":3,"冶":7,"爺":13,"夜":8,"野":11,"耶":9,"矢":5,"弥":17,"役":7,"薬":19,"訳":20,"靖":13,"柳":9,"薮":19,"愉":12,"油":8,"諭":14,"輸":16,"佑":7,"勇":9,"優":17,"友":4,"揖":12,"有":6,"柚":9,"涌":10,"湧":12,"由":5,"裕":12,"雄":12,"夕":3,"融":16,"余":16,"予":16,"誉":21,"与":14,"預":13,"容":10,"揚":12,"擁":16,"曜":18,"楊":13,"洋":9,"様":15,"溶":13,"用":5,"窯":15,"耀":20,"羊":6,"葉":13,"蓉":14,"要":9,"陽":12,"養":15,"浴":10,"翼":17,"淀":11,"来":8,"裸":13,"頼":16,"嵐":12,"利":7,"吏":6,"梨":11,"李":7,"理":11,"璃":15,"裏":13,"里":7,"陸":11,"律":9,"立":5,"葎":13,"略":11,"流":9,"劉":15,"留":10,"硫":12,"隆":12,"粒":11,"竜":16,"龍":16,"侶":9,"旅":10,"亮":9,"了":2,"両":8,"梁":11,"料":10,"涼":11,"稜":13,"糧":18,"良":7,"諒":15,"遼":16,"量":12,"陵":11,"領":14,"力":2,"緑":14,"倫":10,"林":8,"燐":16,"輪":15,"臨":18,"麟":23,"瑠":14,"類":19,"令":5,"伶":7,"冷":7,"嶺":17,"励":17,"怜":8,"玲":9,"礼":18,"鈴":13,"麗":19,"暦":16,"列":6,"廉":13,"恋":23,"練":15,"聯":17,"連":11,"蓮":15,"錬":17,"呂":7,"魯":15,"炉":20,"路":13,"露":20,"労":12,"廊":13,"朗":11,"楼":15,"浪":10,"老":6,"郎":10,"蝋":21,"六":4,"禄":13,"論":16,"録":16,"和":8,"話":13,"脇":10,"鷲":23,"亘":6,"鰐":20,"藁":18,"湾":26,"豫":16,"亶":13,"侑":8,"會":13,"傳":13,"儉":15,"兌":7,"兩":8,"冲":6,"凰":11,"劍":15,"劒":15,"辨":16,"勞":12,"勸":20,"勵":17,"咏":8,"哥":10,"營":17,"圀":9,"國":11,"圓":13,"圖":14,"坩":8,"壹":12,"壽":14,"學":16,"寢":14,"實":14,"寶":20,"對":14,"崑":11,"嶽":17,"巖":23,"廣":15,"彌":17,"彗":11,"徂":8,"徘":11,"恍":9,"恂":9,"憬":15,"應":17,"戀":23,"戌":6,"揆":12,"搏":13,"擧":18,"擴":18,"數":15,"變":23,"旻":8,"昴":8,"晝":11,"晧":12,"晨":11,"晰":11,"暉":13,"檜":17,"栞":10,"桎":10,"梵":11,"棹":12,"楫":13,"楡":13,"榮":14,"樂":15,"權":22,"檢":17,"櫻":21,"歡":20,"歸":18,"毬":11,"氣":10,"洸":9,"洵":9,"浚":10,"渾":12,"滿":14,"澤":16,"澪":16,"濱":17,"灣":26,"炳":9,"煕":13,"熹":16,"燒":16,"爐":20,"獨":16,"獻":20,"琥":12,"當":13,"癸":9,"發":12,"皎":11,"皓":12,"盡":14,"眸":11,"礦":20,"祠":10,"祀":8,"禮":18,"笙":11,"筧":13,"箏":14,"篁":15,"簑":14,"簣":18,"紂":9,"絲":12,"經":13,"縣":16,"繪":19,"繼":20,"罐":24,"耿":10,"聲":17,"聰":17,"肚":7,"脩":11,"與":14,"范":9,"茉":9,"莖":11,"莉":11,"萠":12,"萬":13,"蓼":15,"藪":19,"薹":14,"藝":19,"藥":19,"號":13,"蛛":12,"螢":16,"蟲":18,"袢":10,"裔":13,"褄":13,"襄":17,"覺":20,"觀":25,"詢":13,"誦":14,"諄":15,"諫":16,"證":19,"譯":20,"譽":21,"讀":22,"豐":18,"貳":12,"賣":15,"赳":9,"躰":12,"輕":14,"輛":15,"輌":15,"轉":18,"辯":21,"迪":9,"逞":10,"邊":19,"邱":8,"鈑":12,"鐡":21,"閔":12,"關":19,"險":16,"隱":19,"顯":23,"餘":16,"驗":23,"體":23,"魄":15,"魏":18,"鶯":21,"鹽":24,"麒":19,"麥":11,"黎":15,"點":17,"黨":20,"龜":16};
+const SQ={"1":{"点数":44,"数意":"創意希望の運"},"2":{"点数":4,"数意":"岐路選択の運"},"3":{"点数":38,"数意":"結集組立の運"},"4":{"点数":5,"数意":"重責鍛練の運"},"5":{"点数":39,"数意":"克服達成の運"},"6":{"点数":48,"数意":"天恵完成の運"},"7":{"点数":28,"数意":"一念堅持の運"},"8":{"点数":32,"数意":"鉄壁弧城の運"},"9":{"点数":7,"数意":"瓦解防御の運"},"10":{"点数":13,"数意":"暗中模索の運"},"11":{"点数":40,"数意":"再生中興の運"},"12":{"点数":17,"数意":"変転流動の運"},"13":{"点数":43,"数意":"才気活発の運"},"14":{"点数":14,"数意":"足踏修正の運"},"15":{"点数":50,"数意":"理想進展の運"},"16":{"点数":46,"数意":"機略縦横の運"},"17":{"点数":23,"数意":"片面勝利の運"},"18":{"点数":41,"数意":"敢闘猛進の運"},"19":{"点数":6,"数意":"混乱整理の運"},"20":{"点数":12,"数意":"悲願未熟の運"},"21":{"点数":47,"数意":"率先指揮の運"},"22":{"点数":9,"数意":"唯我独尊の運"},"23":{"点数":50,"数意":"快速向上の運"},"24":{"点数":37,"数意":"初志貫徹の運"},"25":{"点数":31,"数意":"自立自営の運"},"26":{"点数":10,"数意":"実地体験の運"},"27":{"点数":16,"数意":"仲介斡旋の運"},"28":{"点数":8,"数意":"難題処理の運"},"29":{"点数":42,"数意":"進退加護の運"},"30":{"点数":25,"数意":"高速横転の運"},"31":{"点数":49,"数意":"志節温厚の運"},"32":{"点数":33,"数意":"博愛献身の運"},"33":{"点数":30,"数意":"快刀乱麻の運"},"34":{"点数":27,"数意":"先鋭後折の運"},"35":{"点数":36,"数意":"良妻賢母の運"},"36":{"点数":20,"数意":"没我仁侠の運"},"37":{"点数":45,"数意":"大器晩成の運"},"38":{"点数":15,"数意":"大志空転の運"},"39":{"点数":43,"数意":"万難制覇の運"},"40":{"点数":22,"数意":"野心独走の運"},"41":{"点数":48,"数意":"衆望包括の運"},"42":{"点数":25,"数意":"多種多芸の運"},"43":{"点数":26,"数意":"豪華内憂の運"},"44":{"点数":11,"数意":"喧騒収拾の運"},"45":{"点数":29,"数意":"高層建築の運"},"46":{"点数":3,"数意":"楽観悲哀の運"},"47":{"点数":34,"数意":"貸道具屋の運"},"48":{"点数":35,"数意":"均衡調和の運"},"49":{"点数":1,"数意":"連鎖反応の運"},"50":{"点数":18,"数意":"竜頭蛇尾の運"},"51":{"点数":44,"数意":"新地開拓の運"},"52":{"点数":46,"数意":"先駆勝利の運"},"53":{"点数":19,"数意":"平穏退屈の運"},"54":{"点数":2,"数意":"砂上走行の運"},"55":{"点数":24,"数意":"斜陽耐久の運"},"56":{"点数":11,"数意":"傍観後手の運"},"57":{"点数":29,"数意":"単騎功名の運"},"58":{"点数":17,"数意":"乞食大将の運"},"59":{"点数":6,"数意":"決戦放棄の運"},"60":{"点数":19,"数意":"動揺効果の運"}};
+
+// ============================================================
+// 個人名 calc()
+// ============================================================
+function calc(s,m){
+  const ns=s.length,nm=m.length;
+  const g=(a,i)=>a[i]||0;
+  function calcA9(sei,mei){
+    const ns2=sei.length,nm2=mei.length;
+    const C4=(ns2>=2)?(2+sei[0]):3;
+    let C14;
+    if(nm2>=3)     C14=mei[nm2-1]+mei[nm2-2]+1;
+    else if(nm2>=2)C14=mei[nm2-1]+2;
+    else           C14=3+mei[0];
+    return C4+C14;
+  }
+  if(ns===3){
+    const E1=s[0],G3s=s[1],G5=s[2],G7=g(m,0),G9=g(m,1);
+    const H6=G5+G7+G3s,H10=G9,I4=E1+H6,C8=G7+G9,I8=H6+H10;
+    const K2=E1+I8,A8=calcA9(s,m),K8=A8+C8;
+    return{I5:I4,C9:C8,K3:K2,I9:I8,K9:K8,A9:A8,template:'XXX-XX'};
+  }
+  if(ns===1){
+    const H3=3,G8=s[0],G10=g(m,0),I5=H3+G8;
+    if(nm<=2){
+      const G12=g(m,1),H11=G10+G12,I9=G8+H11,C9=G8+G10;
+      const K3=I9+H3,A9=calcA9(s,m),K9=A9+C9;
+      return{I5,C9,K3,I9,K9,A9,template:'X-XX'};
+    }else{
+      const G12=g(m,1),G14=g(m,2),H11=G10+G12+G14,I9=G8+H11,C9=G8+G10;
+      const K3=I9+H3,A9=calcA9(s,m),K9=A9+C9;
+      return{I5,C9,K3,I9,K9,A9,template:'X-XXX'};
+    }
+  }
+  const G6=s[0],G8e=s[1],H7=G6+G8e,I5_base=2+G6+G8e;
+  if(nm<=1){
+    const G10=g(m,0),I9=H7+G10,I5=I5_base,C9=G8e+G10,K3=I9+2;
+    const A9=calcA9(s,m),K9=A9+C9;
+    return{I5,C9,K3,I9,K9,A9,template:'XX-X'};
+  }else if(nm===2){
+    const G10=g(m,0),G12=g(m,1),H11=G10+G12,I5=I5_base,I9=H7+H11,C9=G10+G8e,K3=I9+2;
+    const A9=calcA9(s,m),K9=A9+C9;
+    return{I5,C9,K3,I9,K9,A9,template:'XX-XX'};
+  }else{
+    const G10=g(m,0),G12=g(m,1),G14e=g(m,2),H11=G10+G12+G14e,I5=I5_base,I9=H7+H11,C9=G10+G8e,K3=I9+2;
+    const A9=calcA9(s,m),K9=A9+C9;
+    return{I5,C9,K3,I9,K9,A9,template:'XX-XXX'};
+  }
+}
+
+// ============================================================
+// 組織名 calcOrg() — 原典第2章・全3例検証済み
+// ============================================================
+function calcOrg(tenWords, chiWords){
+  const stroke = w => [...w].reduce((s,c)=>s+(JK[c]||1), 0);
+  const clen   = w => [...w].length;
+
+  const tenSum = tenWords.reduce((s,w)=>s+stroke(w), 0);
+  const chiSum = chiWords.reduce((s,w)=>s+stroke(w), 0);
+  const tenCC  = tenWords.reduce((s,w)=>s+clen(w), 0);
+  const chiCC  = chiWords.reduce((s,w)=>s+clen(w), 0);
+
+  // 枠サイズ（文字数を収める最小の8の倍数）
+  const frame = n => Math.max(8, Math.ceil(n/8)*8);
+  const tenSupp = frame(tenCC) - tenCC;
+  const chiSupp = frame(chiCC) - chiCC;
+
+  // 確定公式（松下・ソニー・日立で原典値と完全一致）
+  const M = tenSum + tenSupp;                      // 天の総合計（補数込）
+  const N = chiSum + chiSupp;                      // 地の総合計（補数込）
+  const O = tenSum + chiSum;                       // 全実字合計
+  const P = O + (chiWords.length === 1 ? 3 : 2);  // 総運
+  const R = M + N;                                 // 相性基数（K9相当）
+
+  return {M, N, O, P, R, tenSum, chiSum, tenCC, chiCC, tenSupp, chiSupp};
+}
+
+// 天地分割：上段は下段の2倍より少なく（原典p.133）
+function defaultSplit(n){
+  // chiCount = ceil(n/3), tenCount = n - chiCount
+  const chi = Math.ceil(n/3);
+  return n - chi; // tenCount
+}
+
+// ============================================================
+// グローバル状態
+// ============================================================
+let orgWords = [];
+let splitIdx = 0; // 天の単語数
+
+// ============================================================
+// UI関数
+// ============================================================
+function getStrokesA(str){ return [...str].map(c=>JK[c]||0); }
+function hasUnknown(str){ return [...str].some(c=>!JK[c]); }
+
+function showPreview(elId, unkId, str){
+  const el=document.getElementById(elId);
+  if(!el)return;
+  el.innerHTML='';
+  const unk=[];
+  [...str].forEach(c=>{
+    const s=JK[c];
+    const sp=document.createElement('span');
+    sp.className='sp-char'+(s?'':' unknown');
+    sp.textContent=c+'('+(s?s:'?')+')';
+    el.appendChild(sp);
+    if(!s)unk.push(c);
+  });
+  const u=document.getElementById(unkId);
+  if(u)u.textContent=unk.length?'字画表にない字: '+unk.join('　'):'';
+}
+
+function onInputA(){
+  const sei=document.getElementById('a-sei').value.trim();
+  const mei=document.getElementById('a-mei').value.trim();
+  showPreview('a-sei-prev','a-sei-unk',sei);
+  showPreview('a-mei-prev','',mei);
+  document.getElementById('a-mei-unk').textContent='';
+  const vp=document.getElementById('a-vals');
+  if(sei&&mei&&sei.length<=3&&mei.length<=3&&!hasUnknown(sei)&&!hasUnknown(mei)){
+    const r=calc(getStrokesA(sei),getStrokesA(mei));
+    document.getElementById('a-K9').textContent=Math.min(r.K9,60);
+    document.getElementById('a-C9').textContent=Math.min(r.C9,60);
+    document.getElementById('a-K3').textContent=Math.min(r.K3,60);
+    vp.style.display='block';
+  }else{vp.style.display='none';}
+  checkReady();
+}
+
+function onInputB(){
+  const raw=document.getElementById('b-org').value.trim();
+  if(!raw){
+    orgWords=[];
+    document.getElementById('word-split-wrap').style.display='none';
+    document.getElementById('b-vals').style.display='none';
+    document.getElementById('b-org-unk').textContent='';
+    checkReady(); return;
+  }
+  orgWords = raw.split(/\s+/).filter(w=>w.length>0);
+
+  // 未知文字チェック
+  const allChars = orgWords.join('');
+  const unk=[...allChars].filter(c=>!JK[c]);
+  const unkEl=document.getElementById('b-org-unk');
+  unkEl.textContent=unk.length?'字画表にない字（補数1として計算）: '+[...new Set(unk)].join('　'):'';
+
+  if(orgWords.length<2){
+    document.getElementById('b-org-unk').textContent+=(unk.length?' / ':' ')+'※単語を2つ以上スペースで区切って入力してください';
+    document.getElementById('word-split-wrap').style.display='none';
+    checkReady(); return;
+  }
+
+  splitIdx=defaultSplit(orgWords.length);
+  renderWordUI();
+  checkReady();
+}
+
+function renderWordUI(){
+  const N=orgWords.length;
+  if(N<2)return;
+  const tc=Math.min(Math.max(1,splitIdx),N-1);
+  const cc=N-tc;
+
+  const vis=document.getElementById('word-chips');
+  vis.innerHTML='';
+
+  for(let i=0;i<tc;i++){
+    const c=document.createElement('span');
+    c.className='word-chip ten-w';
+    const s=[...orgWords[i]].reduce((sum,ch)=>sum+(JK[ch]||1),0);
+    c.textContent=orgWords[i]+'('+s+')';
+    const ii=i;
+    c.onclick=()=>{splitIdx=ii+1;renderWordUI();};
+    vis.appendChild(c);
+  }
+  const div=document.createElement('span');
+  div.className='split-divider';
+  vis.appendChild(div);
+  for(let i=tc;i<N;i++){
+    const c=document.createElement('span');
+    c.className='word-chip chi-w';
+    const s=[...orgWords[i]].reduce((sum,ch)=>sum+(JK[ch]||1),0);
+    c.textContent=orgWords[i]+'('+s+')';
+    const ii=i;
+    c.onclick=()=>{splitIdx=ii;renderWordUI();};
+    vis.appendChild(c);
+  }
+
+  const r=calcOrg(orgWords.slice(0,tc),orgWords.slice(tc));
+  document.getElementById('split-info').innerHTML=
+    '天（'+tc+'単語）: '+orgWords.slice(0,tc).join('・')+
+    '　地（'+cc+'単語）: '+orgWords.slice(tc).join('・')+'<br>'+
+    '天 実字'+r.tenSum+'点+補数'+r.tenSupp+'点='+r.M+'点　'+
+    '地 実字'+r.chiSum+'点+補数'+r.chiSupp+'点='+r.N+'点';
+
+  document.getElementById('b-R').textContent=r.R;
+  document.getElementById('b-M').textContent=r.M;
+  document.getElementById('b-N').textContent=r.N;
+  document.getElementById('b-P').textContent=r.P;
+  document.getElementById('b-vals').style.display='block';
+  document.getElementById('word-split-wrap').style.display='block';
+}
+
+function moveSplit(d){
+  const N=orgWords.length;
+  splitIdx=Math.min(Math.max(1,splitIdx+d),N-1);
+  renderWordUI();
+}
+function resetSplit(){
+  splitIdx=defaultSplit(orgWords.length);
+  renderWordUI();
+}
+
+function checkReady(){
+  const sei=document.getElementById('a-sei').value.trim();
+  const mei=document.getElementById('a-mei').value.trim();
+  const raw=document.getElementById('b-org').value.trim();
+  const warn=document.getElementById('warn-msg');
+  if(sei.length>3||mei.length>3){
+    warn.style.display='block';
+    warn.innerHTML='⚠️ A欄の姓または名が4字以上です。個人名は姓1〜3字・名1〜3字で入力してください。';
+    document.getElementById('btn-calc').disabled=true; return;
+  }
+  warn.style.display='none';
+  const ready=sei&&mei&&raw&&orgWords.length>=2;
+  document.getElementById('btn-calc').disabled=!ready;
+}
+
+// ============================================================
+// メイン計算
+// ============================================================
+function runCalc(){
+  const sei=document.getElementById('a-sei').value.trim();
+  const mei=document.getElementById('a-mei').value.trim();
+  const tc=Math.min(Math.max(1,splitIdx),orgWords.length-1);
+  const tenWords=orgWords.slice(0,tc);
+  const chiWords=orgWords.slice(tc);
+
+  const sS=getStrokesA(sei), mS=getStrokesA(mei);
+  const rA=calc(sS,mS);
+  const rB=calcOrg(tenWords,chiWords);
+
+  renderResult(sei,mei,tenWords,chiWords,rA,rB);
+}
+
+function cl60(v){ return Math.min(v,60); }
+
+function renderResult(sei,mei,tenW,chiW,rA,rB){
+  const area=document.getElementById('result-area');
+  const orgName=orgWords.join('');
+  const sqA=SQ[String(cl60(rA.K9))];
+  const sqB=SQ[String(rB.R>60?rB.R-60:rB.R)];
+
+  // 相性判定（RとK9の差）
+  const aR=cl60(rA.K9), bR=rB.R>60?rB.R-60:rB.R;
+  const diff=Math.abs(aR-bR);
+  let symHtml,symDesc,symColor;
+  if(diff<=3){
+    symHtml='◎';symColor='var(--jade)';
+    symDesc='総合運数が非常に近く、同じリズムで動く「共鳴型」の相性です。磁気作用が強く働き、互いの運を高め合います。';
+  }else if(diff<=8){
+    symHtml='○';symColor='var(--indigo)';
+    symDesc='総合運数に適度な差があり、互いを補い合う「補完型」の相性です。共昇期には強力な吸引力が生まれます。';
+  }else if(diff<=15){
+    symHtml='△';symColor='var(--gold)';
+    symDesc='総合運数に差があります。共昇期には協力できますが、反発期には対立が生じる面もあります。';
+  }else{
+    symHtml='▽';symColor='var(--verm)';
+    symDesc='総合運数の差が大きく、波長が合いにくい可能性があります。慎重な関係構築が必要です。';
+  }
+
+  let html='';
+
+  // 基礎数値
+  html+='<div class="sec-title">◈ 基 礎 数 値</div>';
+  html+='<div class="result-grid">';
+  html+=resCard('A', sei+' '+mei, [
+    {k:'R(K9) 総合運',v:aR,sq:sqA},
+    {k:'S(C9) 内面性格',v:cl60(rA.C9),sq:SQ[String(cl60(rA.C9))]},
+    {k:'P(K3) 対人運',v:cl60(rA.K3),sq:SQ[String(cl60(rA.K3))]},
+    {k:'O(I9) 総画数',v:cl60(rA.I9),sq:SQ[String(cl60(rA.I9))]},
+  ]);
+  html+=resCard('B', orgName, [
+    {k:'R(K9) 総合運',v:bR,sq:sqB},
+    {k:'M(I5) 天総合計',v:rB.M,sq:SQ[String(rB.M>60?rB.M-60:rB.M)]},
+    {k:'N(K15)地総合計',v:rB.N,sq:SQ[String(rB.N>60?rB.N-60:rB.N)]},
+    {k:'P(K3) 総運',v:rB.P,sq:SQ[String(rB.P>60?rB.P-60:rB.P)]},
+  ]);
+  html+='</div>';
+
+  // 天地配置図
+  html+=tenchiDiag(orgName,tenW,chiW,rB);
+
+  // 相性判定
+  html+='<div class="sec-title">◈ 相 性 判 定</div>';
+  html+='<div class="compat-box">'+
+    '<div class="compat-sym"><span style="color:'+symColor+'">'+symHtml+'</span></div>'+
+    '<div class="compat-label">A（'+sei+mei+'）R='+aR+' ／ B（'+orgName+'）R='+bR+' ／ 差='+diff+'</div>'+
+    '<div class="compat-desc">'+symDesc+'<br>'+
+    '<span style="font-size:.78rem;opacity:.8">※ A欄の個人名はK9（相性基数）、B欄の組織名はR=M+Nで計算。'+
+    '牧先生著「結婚姓名占術」第2章・p.122〜134の方式に準拠。</span>'+
+    '</div></div>';
+
+  area.innerHTML=html;
+}
+
+function resCard(who,name,rows){
+  let s='<div class="res-card">'+
+    '<div class="res-name">'+who+' ： '+name+'</div>';
+  rows.forEach(r=>{
+    s+='<div class="res-row"><span class="res-key">'+r.k+'</span>'+
+      '<span class="res-val">'+r.v+(r.sq?' <small style="font-size:.7rem;font-weight:400;color:var(--indigo);">'+r.sq['数意']+'</small>':'')+'</span></div>';
+  });
+  return s+'</div>';
+}
+
+function tenchiDiag(orgName,tenW,chiW,rB){
+  const stroke=w=>[...w].reduce((s,c)=>s+(JK[c]||1),0);
+  let tenHtml=tenW.map(w=>'<span class="td-word ten">'+w+'('+stroke(w)+')</span>').join('');
+  for(let i=0;i<rB.tenSupp;i++) tenHtml+='<span class="td-word supp">補</span>';
+  let chiHtml=chiW.map(w=>'<span class="td-word chi">'+w+'('+stroke(w)+')</span>').join('');
+  for(let i=0;i<rB.chiSupp;i++) chiHtml+='<span class="td-word supp">補</span>';
+
+  return '<div class="tenchi-diagram">'+
+    '<div class="td-title">◇ 天地配置枠（原典第2章 組織分析法）</div>'+
+    '<div class="td-row"><span class="td-label ten">天</span><div class="td-words">'+tenHtml+'</div>'+
+    '<span class="td-total">計 '+rB.M+'点</span></div>'+
+    '<div class="td-row"><span class="td-label chi">地</span><div class="td-words">'+chiHtml+'</div>'+
+    '<span class="td-total">計 '+rB.N+'点</span></div>'+
+    '<div class="td-info">'+
+    '◇ 天'+tenW.length+'単語（実字'+rB.tenSum+'・補数'+rB.tenSupp+'）　地'+chiW.length+'単語（実字'+rB.chiSum+'・補数'+rB.chiSupp+'）<br>'+
+    '◇ O(全実字)='+rB.O+' ／ P(総運)='+rB.P+' ／ R(総合運)='+rB.R+
+    '</div></div>';
+}
+</script>
+</body>
+</html>
