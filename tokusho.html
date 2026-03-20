@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>特定商取引法に基づく表記 | 姓名科学プレミアム</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1208;
+    --paper: #f5f0e8;
+    --gold: #b8960c;
+    --gold-light: #d4af37;
+    --indigo: #1a3a5c;
+    --vermillion: #c0392b;
+    --jade: #2d6a4f;
+    --muted: #6b5e4a;
+    --border: rgba(184,150,12,0.25);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 16px; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Noto Serif JP', serif;
+    line-height: 1.9;
+    min-height: 100vh;
+  }
+
+  /* ヘッダー */
+  header {
+    background: var(--indigo);
+    padding: 32px 24px;
+    text-align: center;
+    border-bottom: 3px solid var(--gold);
+  }
+  header .site-name {
+    font-family: 'Zen Old Mincho', serif;
+    font-size: clamp(13px, 2.5vw, 15px);
+    letter-spacing: 0.4em;
+    color: var(--gold-light);
+    margin-bottom: 10px;
+  }
+  header h1 {
+    font-family: 'Zen Old Mincho', serif;
+    font-size: clamp(18px, 4vw, 26px);
+    letter-spacing: 0.25em;
+    color: #f5f0e8;
+    font-weight: 700;
+  }
+  header .en {
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: rgba(212,175,55,0.6);
+    margin-top: 8px;
+    text-transform: uppercase;
+  }
+
+  /* メインコンテンツ */
+  main {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  /* 注意書き */
+  .notice {
+    background: rgba(184,150,12,0.08);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--gold);
+    padding: 16px 20px;
+    margin-bottom: 40px;
+    font-size: 13.5px;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+
+  /* テーブル */
+  .tokusho-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 48px;
+    font-size: 14.5px;
+  }
+  .tokusho-table th,
+  .tokusho-table td {
+    padding: 16px 20px;
+    border: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.85;
+  }
+  .tokusho-table th {
+    background: rgba(26,58,92,0.07);
+    color: var(--indigo);
+    font-weight: 600;
+    font-family: 'Zen Old Mincho', serif;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    width: 34%;
+  }
+  .tokusho-table td {
+    background: #fff;
+    color: var(--ink);
+  }
+  .tokusho-table tr:hover td {
+    background: rgba(245,240,232,0.7);
+  }
+
+  /* セクションタイトル */
+  .section-title {
+    font-family: 'Zen Old Mincho', serif;
+    font-size: 16px;
+    letter-spacing: 0.2em;
+    color: var(--indigo);
+    border-bottom: 2px solid var(--gold);
+    padding-bottom: 8px;
+    margin: 48px 0 24px;
+  }
+
+  /* 価格表 */
+  .price-box {
+    background: #fff;
+    border: 1px solid var(--border);
+    padding: 24px;
+    margin-bottom: 12px;
+  }
+  .price-box .plan-name {
+    font-family: 'Zen Old Mincho', serif;
+    font-size: 15px;
+    color: var(--indigo);
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+  }
+  .price-box .price {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 0.05em;
+  }
+  .price-box .price span {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 400;
+  }
+  .price-box .desc {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  /* 重要事項 */
+  .important {
+    background: rgba(192,57,43,0.05);
+    border: 1px solid rgba(192,57,43,0.2);
+    border-left: 4px solid var(--vermillion);
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-size: 13.5px;
+    line-height: 1.85;
+  }
+  .important strong {
+    color: var(--vermillion);
+  }
+
+  /* フッター */
+  footer {
+    background: var(--indigo);
+    color: rgba(245,240,232,0.5);
+    text-align: center;
+    padding: 28px 24px;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+  }
+  footer a {
+    color: var(--gold-light);
+    text-decoration: none;
+  }
+  footer a:hover { text-decoration: underline; }
+  footer .back-link {
+    display: inline-block;
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: var(--gold-light);
+  }
+
+  @media (max-width: 600px) {
+    .tokusho-table th,
+    .tokusho-table td {
+      display: block;
+      width: 100%;
+    }
+    .tokusho-table th {
+      border-bottom: none;
+      padding-bottom: 8px;
+    }
+    .tokusho-table td {
+      padding-top: 8px;
+      margin-bottom: 4px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="site-name">姓名科学プレミアム</div>
+  <h1>特定商取引法に基づく表記</h1>
+  <div class="en">Specified Commercial Transaction Act</div>
+</header>
+
+<main>
+
+  <div class="notice">
+    本ページは、特定商取引に関する法律（特定商取引法）第11条に基づく表示事項を記載したものです。
+  </div>
+
+  <!-- 事業者情報 -->
+  <h2 class="section-title">事業者情報</h2>
+  <table class="tokusho-table">
+    <tr>
+      <th>販売業者名</th>
+      <td>日昇リサーチ株式会社</td>
+    </tr>
+    <tr>
+      <th>代表者名</th>
+      <td>三原 嘉明</td>
+    </tr>
+    <tr>
+      <th>所在地</th>
+      <td>〒206-0015<br>東京都多摩市連光寺4－5－4</td>
+    </tr>
+    <tr>
+      <th>電話番号</th>
+      <td>042-355-5678<br><small style="color:#6b5e4a">受付時間：平日 10:00〜17:00（土日祝日を除く）</small></td>
+    </tr>
+    <tr>
+      <th>メールアドレス</th>
+      <td><a href="mailto:paf00556@nifty.com" style="color:var(--indigo)">paf00556@nifty.com</a></td>
+    </tr>
+    <tr>
+      <th>ウェブサイト</th>
+      <td><a href="https://yymm77.github.io/seimei-kagaku/" style="color:var(--indigo)">https://yymm77.github.io/seimei-kagaku/</a></td>
+    </tr>
+  </table>
+
+  <!-- 販売価格 -->
+  <h2 class="section-title">販売価格・サービス内容</h2>
+
+  <div class="price-box">
+    <div class="plan-name">■ プレミアムプラン（月額サブスクリプション）</div>
+    <div class="price">¥580 <span>／月（税込）</span></div>
+    <div class="desc">全ツール使い放題・姓名科学解析・相性解析・方位学・易経など全機能が対象</div>
+  </div>
+
+  <div class="price-box">
+    <div class="plan-name">■ 都度利用（単発プラン）</div>
+    <div class="price">¥300〜¥500 <span>／回（税込・サービスにより異なる）</span></div>
+    <div class="desc">各ツールの単発利用プラン。詳細は各ページにてご確認ください。</div>
+  </div>
+
+  <!-- 支払い・提供 -->
+  <h2 class="section-title">お支払い・サービス提供</h2>
+  <table class="tokusho-table">
+    <tr>
+      <th>支払い方法</th>
+      <td>クレジットカード（Visa・Mastercard・American Express・JCB）<br>Apple Pay・Google Pay<br>※決済代行：Stripe, Inc.</td>
+    </tr>
+    <tr>
+      <th>支払い時期</th>
+      <td>お申し込み時に即時決済いたします。<br>月額プランは毎月同日に自動更新・課金されます。</td>
+    </tr>
+    <tr>
+      <th>サービス提供時期</th>
+      <td>決済完了後、即時ご利用いただけます。</td>
+    </tr>
+    <tr>
+      <th>動作環境</th>
+      <td>
+        対応ブラウザ：Google Chrome・Firefox・Safari・Microsoft Edge（各最新版）<br>
+        対応デバイス：PC・スマートフォン・タブレット<br>
+        ※インターネット接続環境が必要です。<br>
+        ※Internet Explorerは非対応です。
+      </td>
+    </tr>
+  </table>
+
+  <!-- キャンセル・返金 -->
+  <h2 class="section-title">キャンセル・返金について</h2>
+
+  <div class="important">
+    <strong>【重要】</strong> デジタルコンテンツ・オンラインサービスの性質上、サービス提供開始後の返金は原則として承っておりません。ご購入前に無料体験をご活用ください。
+  </div>
+
+  <table class="tokusho-table">
+    <tr>
+      <th>月額プランの解約</th>
+      <td>
+        マイページまたはメール（paf00556@nifty.com）にてお申し出ください。<br>
+        解約はお申し出の翌月以降の請求から停止されます。<br>
+        月の途中での解約の場合、当月分の返金はいたしかねます。
+      </td>
+    </tr>
+    <tr>
+      <th>返金条件</th>
+      <td>
+        以下の場合は、返金対応を検討いたします。<br>
+        ・システム障害により長期間（72時間以上）サービスが利用できなかった場合<br>
+        ・二重決済など、当社の過失による場合<br><br>
+        返金をご希望の場合は、paf00556@nifty.com までご連絡ください。
+      </td>
+    </tr>
+    <tr>
+      <th>無料利用について</th>
+      <td>各ツールは、ご登録なしに基本機能を無料でお試しいただけます（一部機能制限あり）。</td>
+    </tr>
+  </table>
+
+  <!-- その他 -->
+  <h2 class="section-title">その他</h2>
+  <table class="tokusho-table">
+    <tr>
+      <th>販売数量の制限</th>
+      <td>特になし</td>
+    </tr>
+    <tr>
+      <th>引き渡し時期</th>
+      <td>決済完了後、即時にオンラインサービスをご利用いただけます。</td>
+    </tr>
+    <tr>
+      <th>不良・不具合時の対応</th>
+      <td>サービスに不具合が発生した場合は、メール（paf00556@nifty.com）にてご連絡ください。速やかに対応いたします。</td>
+    </tr>
+    <tr>
+      <th>個人情報の取り扱い</th>
+      <td>ご提供いただいた個人情報は、サービス提供および問い合わせ対応のみに使用し、第三者への提供は行いません。</td>
+    </tr>
+  </table>
+
+  <div class="notice" style="margin-top:0; margin-bottom:0;">
+    本表記は予告なく変更される場合があります。最新の情報は本ページにてご確認ください。<br>
+    最終更新日：2026年3月
+  </div>
+
+</main>
+
+<footer>
+  <a class="back-link" href="https://yymm77.github.io/seimei-kagaku/">← サイトトップへ戻る</a><br>
+  © 2026 日昇リサーチ株式会社 All Rights Reserved.
+</footer>
+
+</body>
+</html>
