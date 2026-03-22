@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>予測技術ポータル — 日昇リサーチ</title>
+<meta name="description" content="姓名科学・方位学・易経門・吉日相性。牧正人史先生の学問を礎とした予測技術の総合ポータルサイト。">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;700;800&family=Noto+Serif+JP:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #1a1208;
+  --ink-light: #3d2b0e;
+  --paper: #f2ead8;
+  --paper-dark: #e8dcc4;
+  --gold: #8a6914;
+  --gold-light: #c9a84c;
+  --vermillion: #8b2020;
+  --jade: #2d5a3d;
+  --indigo: #1a3a5c;
+  --border: rgba(138,105,20,0.25);
+  --shadow: rgba(26,18,8,0.12);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Noto Serif JP', serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* 和紙テクスチャ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(138,105,20,0.018) 3px, rgba(138,105,20,0.018) 4px),
+    repeating-linear-gradient(90deg, transparent, transparent 10px, rgba(138,105,20,0.012) 10px, rgba(138,105,20,0.012) 11px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ===== ヒーロー ===== */
+.hero {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 72px 20px 56px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(138,105,20,0.07) 0%, transparent 100%);
+  overflow: hidden;
+}
+
+.hero::after {
+  content: '易';
+  position: absolute;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 320px;
+  font-weight: 800;
+  color: rgba(138,105,20,0.04);
+  right: -40px;
+  top: -60px;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+.hero-label {
+  display: inline-block;
+  font-size: 0.72rem;
+  letter-spacing: 0.5em;
+  color: var(--gold);
+  border: 1px solid var(--border);
+  padding: 4px 16px;
+  margin-bottom: 20px;
+  animation: fadeDown 0.8s ease both;
+}
+
+.hero-title {
+  font-family: 'Shippori Mincho', serif;
+  font-size: clamp(2.2rem, 7vw, 5rem);
+  font-weight: 800;
+  letter-spacing: 0.25em;
+  line-height: 1.15;
+  color: var(--ink);
+  animation: fadeDown 0.8s 0.1s ease both;
+}
+
+.hero-title em {
+  font-style: normal;
+  color: var(--gold);
+}
+
+.hero-sub {
+  margin-top: 16px;
+  font-size: 0.88rem;
+  letter-spacing: 0.3em;
+  color: var(--ink-light);
+  opacity: 0.75;
+  animation: fadeDown 0.8s 0.2s ease both;
+}
+
+.hero-desc {
+  margin-top: 24px;
+  max-width: 540px;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 0.88rem;
+  line-height: 2;
+  color: var(--ink-light);
+  animation: fadeDown 0.8s 0.3s ease both;
+}
+
+/* ===== メインナビ ===== */
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  border-bottom: 1px solid var(--border);
+  background: rgba(242,234,216,0.95);
+  backdrop-filter: blur(8px);
+}
+
+.site-nav a {
+  padding: 13px 22px;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.18em;
+  color: var(--ink-light);
+  text-decoration: none;
+  border-right: 1px solid var(--border);
+  transition: all 0.2s;
+}
+
+.site-nav a:first-child { border-left: 1px solid var(--border); }
+.site-nav a:hover { background: rgba(138,105,20,0.1); color: var(--ink); }
+
+/* ===== メインコンテンツ ===== */
+main {
+  position: relative;
+  z-index: 1;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 60px 20px 80px;
+}
+
+/* セクションタイトル */
+.section-head {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.section-head h2 {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 1.6rem;
+  letter-spacing: 0.35em;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+
+.section-head p {
+  font-size: 0.82rem;
+  letter-spacing: 0.2em;
+  color: var(--ink-light);
+  opacity: 0.65;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 56px 0 48px;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.divider span {
+  font-size: 1.1rem;
+  color: var(--gold);
+  opacity: 0.6;
+  letter-spacing: 0.3em;
+}
+
+/* ===== カードグリッド ===== */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.card-grid.featured {
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+
+.card {
+  background: rgba(255,255,255,0.45);
+  border: 1px solid var(--border);
+  padding: 32px 28px;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all 0.25s;
+  position: relative;
+  overflow: hidden;
+  animation: fadeUp 0.6s ease both;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--gold);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  background: rgba(255,255,255,0.7);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 32px var(--shadow);
+}
+
+.card:hover::before { transform: scaleX(1); }
+
+.card-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.card-tag {
+  display: inline-block;
+  font-size: 0.68rem;
+  letter-spacing: 0.3em;
+  color: var(--paper);
+  padding: 2px 10px;
+  border-radius: 2px;
+  align-self: flex-start;
+}
+
+.tag-gold { background: var(--gold); }
+.tag-jade { background: var(--jade); }
+.tag-indigo { background: var(--indigo); }
+.tag-vermillion { background: var(--vermillion); }
+.tag-free { background: var(--ink-light); }
+
+.card-title {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 1.25rem;
+  letter-spacing: 0.1em;
+  color: var(--ink);
+  line-height: 1.4;
+}
+
+.card-desc {
+  font-size: 0.82rem;
+  line-height: 1.9;
+  color: var(--ink-light);
+  flex: 1;
+}
+
+.card-version {
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--gold);
+  opacity: 0.8;
+}
+
+.card-arrow {
+  align-self: flex-end;
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  color: var(--gold);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.card:hover .card-arrow { opacity: 1; }
+
+/* 大きなカード（フィーチャード） */
+.card.large {
+  padding: 40px 36px;
+}
+
+.card.large .card-title {
+  font-size: 1.5rem;
+}
+
+/* ===== お知らせ欄 ===== */
+.notice-box {
+  background: rgba(138,105,20,0.06);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--gold);
+  padding: 20px 24px;
+  margin-bottom: 48px;
+}
+
+.notice-box h3 {
+  font-size: 0.8rem;
+  letter-spacing: 0.3em;
+  color: var(--gold);
+  margin-bottom: 10px;
+}
+
+.notice-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.notice-list li {
+  display: flex;
+  gap: 16px;
+  align-items: baseline;
+  font-size: 0.82rem;
+  line-height: 1.7;
+  color: var(--ink-light);
+}
+
+.notice-date {
+  font-size: 0.72rem;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+  flex-shrink: 0;
+}
+
+/* ===== フッター ===== */
+footer {
+  border-top: 2px solid var(--border);
+  background: linear-gradient(0deg, rgba(138,105,20,0.08) 0%, transparent 100%);
+  padding: 36px 20px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.footer-inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.footer-counter img {
+  height: 20px;
+  vertical-align: middle;
+}
+
+.footer-copy {
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  color: var(--ink-light);
+  opacity: 0.65;
+  line-height: 1.9;
+}
+
+/* ===== アニメーション ===== */
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.card:nth-child(1) { animation-delay: 0.05s; }
+.card:nth-child(2) { animation-delay: 0.12s; }
+.card:nth-child(3) { animation-delay: 0.19s; }
+.card:nth-child(4) { animation-delay: 0.26s; }
+.card:nth-child(5) { animation-delay: 0.33s; }
+
+/* ===== レスポンシブ ===== */
+@media (max-width: 600px) {
+  .site-nav a { padding: 11px 12px; font-size: 0.75rem; letter-spacing: 0.08em; }
+  .card-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ヒーロー -->
+<header class="hero">
+  <div class="hero-label">NISSHO RESEARCH</div>
+  <h1 class="hero-title">予測技術<em>門</em></h1>
+  <p class="hero-sub">姓名科学 ／ 方位学 ／ 易経 ／ 吉日相性</p>
+  <p class="hero-desc">
+    牧正人史先生が昭和33年に体系化した姓名科学を礎とし、<br>
+    方位学・易経・吉日術など日本の伝統的予測技術を<br>
+    現代のAI技術と融合させたポータルサイトです。
+  </p>
+</header>
+
+<!-- ナビ -->
+<nav class="site-nav">
+  <a href="#tools">占術ツール</a>
+  <a href="#novel">連載小説</a>
+  <a href="#research">研究・論考</a>
+  <a href="https://yymm77.github.io/seimei-kagaku/namemaster_v5.html">姓名科学</a>
+</nav>
+
+<main>
+
+  <!-- お知らせ -->
+  <div class="notice-box">
+    <h3>◈ 最新情報</h3>
+    <ul class="notice-list">
+      <li><span class="notice-date">2026.03</span>易経門（六十四卦占術ポータル）を公開しました。第一分卧法による本格易占い・Claude AI解釈連携。</li>
+      <li><span class="notice-date">2025.12</span>吉日・相性アプリ v1.2.0 を公開。Claude API連携・ステップガイドUI搭載。</li>
+      <li><span class="notice-date">2025.11</span>方位学ポータル v1.2.0 公開。三盤統合表・吉日検索・ドラッグ可能マーカー実装。</li>
+    </ul>
+  </div>
+
+  <!-- 占術ツール -->
+  <div id="tools" class="section-head">
+    <h2>占 術 ツ ー ル</h2>
+    <p>すべて純粋HTML＋CSS＋JS。サーバー不要・ブラウザだけで動作します</p>
+  </div>
+
+  <div class="card-grid featured">
+
+    <a class="card large" href="namemaster_v5.html">
+      <div class="card-icon">𝌋</div>
+      <span class="card-tag tag-gold">月額プレミアム</span>
+      <div class="card-title">姓名科学の殿堂</div>
+      <div class="card-desc">
+        牧正人史先生著「結婚姓名占術」を原典とするAIシステム。
+        12の分野（健康・蓄財・愛情・職業など）をグラフで可視化。
+        原典精度95%・一万例超の照合済みデータベース。
+      </div>
+      <div class="card-version">namemaster v5.0 ／ 原典精度95%</div>
+      <div class="card-arrow">開く →</div>
+    </a>
+
+    <a class="card large" href="iching.html">
+      <div class="card-icon">☰</div>
+      <span class="card-tag tag-indigo">Claude AI連携</span>
+      <div class="card-title">易 経 門</div>
+      <div class="card-desc">
+        第一分卧法（大衍の数）による本格易占い。
+        六十四卦の詳細解説（周易原典＋Dr.Murphy）を収録。
+        変爻・之卦まで表示し、AIが問いに対する現代語解釈を生成。
+      </div>
+      <div class="card-version">iching v1.0 ／ 第一分卧法実装</div>
+      <div class="card-arrow">開く →</div>
+    </a>
+
+    <a class="card" href="houigaku.html">
+      <div class="card-icon">🧭</div>
+      <span class="card-tag tag-jade">月額プレミアム</span>
+      <div class="card-title">方位学ポータル</div>
+      <div class="card-desc">
+        本命星・月命星算出、日盤・月盤・年盤カレンダー、
+        三盤統合スコア判定、吉日検索、地図連携。
+        高木彬光著「方位学入門」準拠。
+      </div>
+      <div class="card-version">houigaku v1.2.0</div>
+      <div class="card-arrow">開く →</div>
+    </a>
+
+    <a class="card" href="aisei.html">
+      <div class="card-icon">🌸</div>
+      <span class="card-tag tag-jade">Claude AI連携</span>
+      <div class="card-title">吉日・相性アプリ</div>
+      <div class="card-desc">
+        吉日検索（1人でも動作）とステップガイドUI。
+        Claude APIによる総合鑑定文を生成。
+        方位学データと組み合わせた深い考察が可能。
+      </div>
+      <div class="card-version">aisei v1.2.0</div>
+      <div class="card-arrow">開く →</div>
+    </a>
+
+    <a class="card" href="compatibility_v2.html">
+      <div class="card-icon">⚖️</div>
+      <span class="card-tag tag-gold">月額プレミアム</span>
+      <div class="card-title">相性解析</div>
+      <div class="card-desc">
+        姓名科学による相性診断。内面性格（A:B）と対人性格（A:C）
+        の2軸で10タイプ（S1〜S5陽・K1〜K5陰）に分類。
+      </div>
+      <div class="card-version">compatibility v2.0（準備中）</div>
+      <div class="card-arrow">開く →</div>
+    </a>
+
+  </div>
+
+  <!-- 連載小説 -->
+  <div class="divider"><span>☽</span></div>
+
+  <div id="novel" class="section-head">
+    <h2>連 載 小 説</h2>
+    <p>三原嘉明による半生の記録・無料公開</p>
+  </div>
+
+  <div class="card-grid">
+    <a class="card" href="https://plaza.rakuten.co.jp/" target="_blank">
+      <div class="card-icon">📖</div>
+      <span class="card-tag tag-free">無料</span>
+      <div class="card-title">至誠の覚醒</div>
+      <div class="card-desc">
+        語り手・三原嘉明（本名）。第1〜21話公開済み。
+        牧正人史先生との出会い、姓名科学との邂逅、
+        そして日本の歴史的陰謀への気づきを描く自伝的連載。
+      </div>
+      <div class="card-version">楽天ブログにて連載中</div>
+      <div class="card-arrow">読む →</div>
+    </a>
+  </div>
+
+  <!-- 研究・論考 -->
+  <div class="divider"><span>☾</span></div>
+
+  <div id="research" class="section-head">
+    <h2>研 究 ・ 論 考</h2>
+    <p>史料・数値論考・ブロックチェーン知財構想</p>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon">📜</div>
+      <span class="card-tag tag-free">無料・準備中</span>
+      <div class="card-title">日本侵食の解析</div>
+      <div class="card-desc">
+        史料と数値に基づく歴史的論考。
+        東京郷友連盟執行委員として関わる書物デジタル化の
+        知見を踏まえた独自の考察。
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">🔗</div>
+      <span class="card-tag tag-free">無料・準備中</span>
+      <div class="card-title">新著作権の構想</div>
+      <div class="card-desc">
+        ブロックチェーン技術を活用した知的財産の新しい保護モデル。
+        デジタル時代における著作権のあり方を提言。
+      </div>
+    </div>
+
+    <a class="card" href="fai-proposal.html">
+      <div class="card-icon">🤖</div>
+      <span class="card-tag tag-indigo">新着・無料</span>
+      <div class="card-title">移民より、FAI。<br>日本にはこの答えがある。</div>
+      <div class="card-desc">
+        人口減少・災害列島・地政学的脅威——三つの危機を人型AIで突破する国家戦略提言。
+        介護から災害へ、産業へ、そして「人が死なない抑止力」へ。
+        鉄腕アトムの予言が、今現実になろうとしている。
+      </div>
+      <div class="card-version">FAI国家戦略提言 ／ 令和8年（2026年）</div>
+      <div class="card-arrow">読む →</div>
+    </a>
+
+  </div>
+
+</main>
+
+<!-- フッター -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-counter">
+      <img src="https://hits.sh/yymm77.github.io/seimei-kagaku.svg?style=flat-square&color=b8960c&labelColor=1a1208&label=訪問者数" alt="訪問者数">
+    </div>
+    <div class="footer-copy">
+      © 2026 日昇リサーチ株式会社<br>
+      牧正人史先生（昭和33年発見・姓名科学体系の創始者）の学問の普及を使命として設立<br>
+      <span style="font-size:0.7rem;opacity:0.7;">GitHub: yymm77 ／ お問い合わせ: 042-355-5678</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
