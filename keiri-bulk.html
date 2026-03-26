@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Excel一括仕分けツール｜日昇リサーチ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;700&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a1208;--paper:#f5f0e8;--gold:#b8960c;--gold-light:#e8d48a;
+  --indigo:#1a3a5c;--indigo-light:#e6f1fb;--jade:#2d6a4f;--jade-light:#e1f5ee;
+  --vermillion:#c0392b;--vermillion-light:#faece7;--mid:#6b6050;--border:rgba(26,18,8,0.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Serif JP',serif;background:var(--paper);color:var(--ink);min-height:100vh;display:flex;flex-direction:column}
+
+/* ヘッダー */
+#site-header{background:var(--indigo);color:#fff;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+#site-logo{font-family:'Zen Old Mincho',serif;font-size:16px;letter-spacing:0.1em}
+#site-nav{display:flex;gap:16px}
+#site-nav a{color:#fff;text-decoration:none;font-size:13px;opacity:0.8}
+#site-nav a:hover{opacity:1}
+#site-nav a.active{color:var(--gold-light);font-weight:700;opacity:1}
+
+/* 免責バナー */
+#disclaimer{background:#fef9e7;border-bottom:1px solid #f0c040;padding:8px 20px;font-size:12px;color:#7a6000;text-align:center;line-height:1.6}
+#disclaimer strong{color:#5a4000}
+
+/* メイン */
+#main{flex:1;max-width:860px;width:100%;margin:0 auto;padding:24px 20px;display:flex;flex-direction:column;gap:20px}
+
+/* カード共通 */
+.card{background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.card-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.card-logo{width:34px;height:34px;border-radius:8px;background:var(--indigo);display:flex;align-items:center;justify-content:center;font-family:'Zen Old Mincho',serif;font-size:15px;color:var(--gold-light);flex-shrink:0}
+.card-title{font-size:15px;font-weight:700;color:var(--indigo)}
+.card-sub{font-size:11px;color:var(--mid)}
+.card-body{padding:18px}
+
+/* ステップ表示 */
+#steps{display:flex;align-items:center;gap:0;background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;padding:14px 18px;gap:8px}
+.step{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--mid)}
+.step.active{color:var(--indigo);font-weight:700}
+.step.done{color:var(--jade)}
+.step-num{width:22px;height:22px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.step.done .step-num{background:var(--jade);color:#fff;border-color:var(--jade)}
+.step.active .step-num{background:var(--indigo);color:#fff;border-color:var(--indigo)}
+.step-arrow{color:var(--border);font-size:14px;flex-shrink:0}
+
+/* ドロップゾーン */
+#drop-zone{border:2px dashed var(--gold-light);border-radius:8px;padding:40px 20px;text-align:center;cursor:pointer;background:var(--paper);transition:background 0.15s}
+#drop-zone:hover,#drop-zone.drag{background:var(--gold-light)}
+#dz-icon{font-size:36px;margin-bottom:12px}
+#dz-main{font-size:15px;font-weight:700;color:var(--indigo);margin-bottom:6px}
+#dz-sub{font-size:12px;color:var(--mid)}
+#dz-name{font-size:13px;font-weight:700;color:var(--indigo);margin-top:10px}
+#file-input{display:none}
+
+/* テーブル共通 */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:8px;max-height:240px;overflow-y:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{background:var(--paper);padding:7px 10px;text-align:left;font-weight:700;font-size:11px;color:var(--mid);border-bottom:1px solid var(--border);white-space:nowrap;position:sticky;top:0}
+tbody td{padding:6px 10px;border-bottom:1px solid rgba(26,18,8,0.06);color:var(--ink)}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--paper)}
+
+/* ボタン */
+.btn-primary{width:100%;padding:12px;border-radius:8px;background:var(--indigo);color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Serif JP',serif;margin-top:14px;transition:background 0.15s}
+.btn-primary:hover{background:#0f2a45}
+.btn-primary:disabled{opacity:0.45;cursor:not-allowed}
+.btn-success{background:var(--jade)}.btn-success:hover{background:#1e5038}
+.btn-outline{width:100%;padding:11px;border-radius:8px;border:1px solid var(--border);background:#fff;color:var(--ink);font-size:13px;cursor:pointer;font-family:'Noto Serif JP',serif;margin-top:10px;transition:background 0.15s}
+.btn-outline:hover{background:var(--paper)}
+
+/* プログレス */
+#progress-wrap{display:none}
+#prog-text{font-size:13px;color:var(--mid);margin-bottom:10px;text-align:center}
+#prog-bar-bg{background:var(--paper);border-radius:20px;height:7px;overflow:hidden;border:1px solid var(--border)}
+#prog-bar{background:var(--indigo);height:7px;border-radius:20px;width:0%;transition:width 0.4s}
+
+/* 質問表 */
+#q-summary{font-size:13px;color:var(--mid);margin-bottom:14px;padding:10px 14px;background:var(--indigo-light);border-radius:6px;border-left:3px solid var(--indigo)}
+#q-list{display:flex;flex-direction:column;gap:12px;max-height:360px;overflow-y:auto}
+.q-item{border:1px solid var(--border);border-radius:8px;padding:12px 15px;background:var(--paper)}
+.q-item.answered{border-color:var(--jade);background:var(--jade-light)}
+.q-row-info{font-size:11px;color:var(--mid);margin-bottom:4px}
+.q-desc{font-size:13px;font-weight:700;color:var(--indigo);margin-bottom:10px}
+.q-choices{display:flex;flex-wrap:wrap;gap:7px}
+.qch{padding:5px 12px;border:1px solid var(--gold);border-radius:20px;font-size:12px;cursor:pointer;background:#fff;color:var(--indigo);font-family:'Noto Serif JP',serif;transition:all 0.15s}
+.qch:hover{background:var(--gold-light)}
+.qch.selected{background:var(--indigo);color:#fff;border-color:var(--indigo)}
+.qch-free{border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-size:12px;font-family:'Noto Serif JP',serif;color:var(--ink);background:#fff;width:180px}
+.qch-free:focus{outline:none;border-color:var(--gold)}
+
+/* タグ */
+.tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700}
+.ti{background:var(--jade-light);color:var(--jade)}
+.te{background:var(--vermillion-light);color:var(--vermillion)}
+.th{background:var(--indigo-light);color:var(--indigo)}
+.tp{background:#f3e8ff;color:#6b21a8}
+
+/* 統計カード */
+#r-stats{display:flex;gap:12px;margin-bottom:16px}
+.rstat{flex:1;background:var(--paper);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center}
+.rstat .rl{font-size:11px;color:var(--mid);margin-bottom:4px}
+.rstat .rv{font-size:20px;font-weight:700}
+.rv.inc{color:var(--jade)}.rv.exp{color:var(--vermillion)}
+
+/* フッター */
+#footer{background:var(--indigo);color:rgba(255,255,255,0.6);font-size:11px;text-align:center;padding:10px 20px}
+#footer a{color:var(--gold-light);text-decoration:none}
+
+/* 非表示 */
+.hidden{display:none!important}
+
+@media(max-width:600px){
+  #site-nav{display:none}
+  #steps{flex-wrap:wrap;gap:4px}
+  .step-arrow{display:none}
+  #r-stats{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<header id="site-header">
+  <div id="site-logo">日昇リサーチ</div>
+  <nav id="site-nav">
+    <a href="index.html">ホーム</a>
+    <a href="namemaster_v5.html">姓名科学</a>
+    <a href="houigaku.html">方位学</a>
+    <a href="keiri.html">経理AI（チャット）</a>
+    <a href="keiri-bulk.html" class="active">経理AI（一括）</a>
+  </nav>
+</header>
+
+<div id="disclaimer">
+  <strong>ご注意：</strong>本ツールは帳簿記録・仕分けの補助を目的としています。税務申告の最終判断は税理士または利用者ご自身の責任においてお願いします。
+</div>
+
+<div id="main">
+
+  <!-- ステップ表示 -->
+  <div id="steps">
+    <div class="step active" id="step1"><span class="step-num">1</span>ファイル読み込み</div>
+    <span class="step-arrow">›</span>
+    <div class="step" id="step2"><span class="step-num">2</span>AI自動分析</div>
+    <span class="step-arrow">›</span>
+    <div class="step" id="step3"><span class="step-num">3</span>不明点を一括回答</div>
+    <span class="step-arrow">›</span>
+    <div class="step" id="step4"><span class="step-num">4</span>仕分け完成・出力</div>
+  </div>
+
+  <!-- フェーズ1: アップロード -->
+  <div class="card" id="phase-upload">
+    <div class="card-header">
+      <div class="card-logo">経</div>
+      <div>
+        <div class="card-title">Excel一括仕分けツール</div>
+        <div class="card-sub">支出・収入データをアップロード → AIが自動分類 → 不明点のみ一括確認</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div id="profile-banner" style="display:none;margin-bottom:12px;padding:10px 14px;border-radius:6px;font-size:12px;line-height:1.7"></div>
+      <div id="drop-zone"
+           onclick="document.getElementById('file-input').click()"
+           ondragover="event.preventDefault();this.classList.add('drag')"
+           ondragleave="this.classList.remove('drag')"
+           ondrop="onDrop(event)">
+        <div id="dz-icon">📊</div>
+        <div id="dz-main">Excelファイルをここにドロップ</div>
+        <div id="dz-sub">xlsx・xls・csv 対応　　クリックでもファイルを選択できます</div>
+        <div id="dz-name"></div>
+      </div>
+      <input type="file" id="file-input" accept=".xlsx,.xls,.csv" onchange="onFile(this.files[0])">
+    </div>
+  </div>
+
+  <!-- フェーズ1.5: プレビュー -->
+  <div class="card hidden" id="phase-preview">
+    <div class="card-header">
+      <div class="card-logo">確</div>
+      <div>
+        <div class="card-title">データ確認</div>
+        <div class="card-sub" id="preview-sub">読み込み件数を確認してください</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="tbl-wrap"><table><thead id="preview-head"></thead><tbody id="preview-body"></tbody></table></div>
+      <div id="progress-wrap" style="margin-top:14px">
+        <div id="prog-text">AIが全データを分析中...</div>
+        <div id="prog-bar-bg"><div id="prog-bar"></div></div>
+      </div>
+      <button class="btn-primary" id="analyze-btn" onclick="startAnalysis()">AI で一括仕分けを開始する（<span id="row-count">0</span>件）</button>
+      <button class="btn-outline" onclick="resetAll()">別のファイルを選び直す</button>
+    </div>
+  </div>
+
+  <!-- フェーズ2: 質問表 -->
+  <div class="card hidden" id="phase-questions">
+    <div class="card-header">
+      <div class="card-logo">？</div>
+      <div>
+        <div class="card-title">確認が必要な項目</div>
+        <div class="card-sub">以下の項目について、選択肢をクリックして回答してください</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div id="q-summary"></div>
+      <div id="q-list"></div>
+      <button class="btn-primary btn-success" onclick="finalize()">回答を確定して仕分けを完成させる</button>
+    </div>
+  </div>
+
+  <!-- フェーズ3: 結果 -->
+  <div class="card hidden" id="phase-result">
+    <div class="card-header">
+      <div class="card-logo">完</div>
+      <div>
+        <div class="card-title">仕分け完成</div>
+        <div class="card-sub">会計ソフト取込用CSVでダウンロードできます</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div id="r-stats">
+        <div class="rstat"><div class="rl">収入合計</div><div class="rv inc" id="r-inc">¥0</div></div>
+        <div class="rstat"><div class="rl">支出合計</div><div class="rv exp" id="r-exp">¥0</div></div>
+        <div class="rstat"><div class="rl">仕分け件数</div><div class="rv" id="r-count">0件</div></div>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>日付</th><th>支払先</th><th>区分</th><th>勘定科目</th><th>金額</th><th>摘要</th></tr></thead>
+          <tbody id="result-body"></tbody>
+        </table>
+      </div>
+      <button class="btn-primary btn-success" onclick="downloadCSV()">CSV でダウンロード（弥生・freee取込用）</button>
+      <button class="btn-outline" onclick="resetAll()">別のファイルを処理する</button>
+    </div>
+  </div>
+
+</div>
+
+<footer id="footer">
+  © 日昇リサーチ株式会社　<a href="index.html">サイトトップへ</a>　｜　<a href="keiri.html">チャット型経理AIへ</a>　｜　本ツールは税理士業務の代替ではありません
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+
+// GAS経由でClaude APIを呼び出す（CORS対応）
+function callGAS(body) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST',  + GAS_URL + );
+    xhr.setRequestHeader('Content-Type', 'text/plain');
+    xhr.onload = () => {
+      try {
+        resolve(JSON.parse(xhr.responseText));
+      } catch(e) {
+        reject(new Error('JSONパースエラー: ' + xhr.responseText.slice(0, 100)));
+      }
+    };
+    xhr.onerror = () => reject(new Error('通信エラー'));
+    xhr.send(JSON.stringify(body));
+  });
+}
+
+/* ===== 状態 ===== */
+let rawData = [];
+let finalEntries = [];
+let pendingQuestions = [];
+
+/* ===== ユーティリティ ===== */
+function fy(n){ return '¥' + Math.round(n||0).toLocaleString(); }
+function show(id){ document.getElementById(id).classList.remove('hidden'); }
+function hide(id){ document.getElementById(id).classList.add('hidden'); }
+function setStep(n){
+  [1,2,3,4].forEach(i=>{
+    const s = document.getElementById('step'+i);
+    s.classList.remove('active','done');
+    if(i < n) s.classList.add('done');
+    else if(i === n) s.classList.add('active');
+  });
+}
+
+/* ===== プロフィール読み込み ===== */
+function loadProfile(){
+  try{ return JSON.parse(localStorage.getItem('keiri_profile')||'null'); }catch(e){ return null; }
+}
+function buildProfileContext(p){
+  if(!p) return '';
+  const lines=['【利用者プロフィール】'];
+  if(p.entity_label) lines.push('事業形態：'+p.entity_label);
+  if(p.corp_name)    lines.push('法人名：'+(p.corp_type||'')+p.corp_name);
+  if(p.corp_rep)     lines.push('代表者：'+p.corp_rep);
+  if(p.corp_invoice) lines.push('インボイス番号：'+p.corp_invoice);
+  if(p.corp_tax_method) lines.push('消費税方式：'+p.corp_tax_method);
+  if(p.sole_name)    lines.push('個人氏名：'+p.sole_name);
+  if(p.sole_blue)    lines.push('申告方式：'+p.sole_blue);
+  if(p.entity==='both') lines.push('※ 法人・個人混在。不明な支出は必ず確認してください。');
+  return lines.join('\n');
+}
+
+/* ===== ファイル読み込み ===== */
+function onDrop(ev){
+  ev.preventDefault();
+  document.getElementById('drop-zone').classList.remove('drag');
+  const f = ev.dataTransfer.files[0];
+  if(f) onFile(f);
+}
+
+function onFile(file){
+  if(!file) return;
+  document.getElementById('dz-name').textContent = '📎 ' + file.name;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try{
+      const data = new Uint8Array(e.target.result);
+      const wb = XLSX.read(data, {type:'array', cellDates:true});
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      // 全シートを結合して読み込む（月別シート対応）
+      let allData = [];
+      let sheetSummary = [];
+      wb.SheetNames.forEach(sheetName => {
+        const sh = wb.Sheets[sheetName];
+        const rows = XLSX.utils.sheet_to_json(sh, {defval:''});
+        if(rows.length > 0){
+          // 各行にシート名（月）を付加
+          rows.forEach(r => r['__sheet'] = sheetName);
+          allData = allData.concat(rows);
+          sheetSummary.push(`${sheetName}（${rows.length}件）`);
+        }
+      });
+      rawData = allData;
+      if(!rawData.length){ alert('データが読み込めませんでした。ヘッダー行があるか確認してください。'); return; }
+      // シート情報を表示
+      document.getElementById('dz-sub').textContent = `シート：${sheetSummary.join(' / ')}`;
+      showPreview(file.name);
+    }catch(err){ alert('ファイルの読み込みに失敗しました：' + err.message); }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function showPreview(fname){
+  // __sheet列を除いた表示用キー
+  const keys = Object.keys(rawData[0]).filter(k => k !== '__sheet');
+  const limit = Math.min(rawData.length, 6);
+  const sheetCount = new Set(rawData.map(r=>r['__sheet'])).size;
+  document.getElementById('preview-sub').textContent =
+    `${fname}　${sheetCount}シート・全${rawData.length}件（先頭${limit}件を表示）`;
+  document.getElementById('row-count').textContent = rawData.length;
+  document.getElementById('preview-head').innerHTML =
+    '<tr><th>シート</th>' + keys.map(k=>`<th>${k}</th>`).join('') + '</tr>';
+  document.getElementById('preview-body').innerHTML = rawData.slice(0,limit).map(row=>
+    '<tr><td style="font-size:11px;color:var(--mid)">' + (row['__sheet']||'') + '</td>' +
+    keys.map(k=>`<td>${row[k]??''}</td>`).join('') + '</tr>'
+  ).join('');
+  hide('phase-upload');
+  show('phase-preview');
+  setStep(1);
+}
+
+/* ===== AI分析 ===== */
+function buildSYS_BULK(){
+  const p = loadProfile();
+  const ctx = buildProfileContext(p);
+  const corpName = p?.corp_name || '法人';
+  const soleName = p?.sole_name || p?.corp_rep || '個人';
+  const entityRule = p?.entity === 'sole'
+    ? `個人事業主（${soleName}）の経理です。基本的に全件「個人」として処理し、法人向け支出と思われる場合のみ確認してください。`
+    : p?.entity === 'corp'
+    ? `法人（${corpName}）の経理です。基本的に全件「法人」として処理してください。`
+    : `法人（${corpName}）と個人（${soleName}）が混在しています。コンビニ・スーパー・生活用品は「個人」、業務関連は「法人」と判断し、不明な場合は質問リストに追加してください。`;
+
+  return `あなたは専属経理AIです。
+${entityRule}
+
+${ctx}
+
+Excelの収支データを受け取り、仕分けを行います。
+
+ルール：
+- 勘定科目を割り当てる（売上/受取報酬/雑収入/交通費/通信費/消耗品費/接待交際費/広告宣伝費/地代家賃/水道光熱費/雑費 など）
+- 50%以上の確信がなければ質問リストに追加する
+
+返答はJSONのみ（前置き・後置きテキスト一切不要）：
+{
+  "auto_classified": [
+    {
+      "row_index": 0,
+      "date": "YYYY-MM-DD",
+      "vendor": "支払先名",
+      "amount": 数値,
+      "type": "収入" または "支出",
+      "entity": "法人" または "個人",
+      "category": "勘定科目",
+      "memo": "摘要（簡潔に）"
+    }
+  ],
+  "need_questions": [
+    {
+      "row_index": 1,
+      "date": "YYYY-MM-DD",
+      "vendor": "支払先名",
+      "amount": 数値,
+      "original_desc": "元データの説明文",
+      "question": "確認したい内容（短く）",
+      "choices": ["法人の〇〇費", "個人の〇〇費", "その他"]
+    }
+  ]
+}
+今日：${new Date().toISOString().slice(0,10)}`;}
+
+async function startAnalysis(){
+  document.getElementById('analyze-btn').disabled = true;
+  document.getElementById('progress-wrap').style.display = '';
+  setStep(2);
+  animateProgress();
+
+  const CHUNK = 50;
+  const chunks = [];
+  for(let i=0; i<rawData.length; i+=CHUNK) chunks.push(rawData.slice(i,i+CHUNK).map((r,j)=>({_idx:i+j,...r})));
+
+  finalEntries = [];
+  pendingQuestions = [];
+
+  try{
+    for(const chunk of chunks){
+      const prompt = `以下のデータを仕分けしてください。JSONのみで返答してください。\n\n${JSON.stringify(chunk)}`;
+      const data = await callGAS({model:'claude-sonnet-4-20250514', max_tokens:4000, system:buildSYS_BULK(), messages:[{role:'user',content:prompt}]});
+      const raw = (data.content?.map(b=>b.text||'').join('')||'').replace(/```json|```/g,'').trim();
+      const result = JSON.parse(raw);
+      finalEntries.push(...(result.auto_classified||[]));
+      pendingQuestions.push(...(result.need_questions||[]));
+    }
+    document.getElementById('prog-bar').style.width = '100%';
+    setTimeout(()=>{
+      document.getElementById('progress-wrap').style.display = 'none';
+      if(pendingQuestions.length > 0) showQuestions();
+      else finalize();
+    }, 400);
+  }catch(e){
+    document.getElementById('progress-wrap').style.display = 'none';
+    document.getElementById('analyze-btn').disabled = false;
+    alert('分析中にエラーが発生しました。\n' + e.message);
+  }
+}
+
+function animateProgress(){
+  let w = 0;
+  const bar = document.getElementById('prog-bar');
+  const msgs = ['データを読み込んでいます...','勘定科目を判定中...','法人・個人を分類中...','質問リストを生成中...'];
+  let mi = 0;
+  const iv = setInterval(()=>{
+    w = Math.min(w + (86-w)*0.05, 85);
+    bar.style.width = w+'%';
+    if(mi < msgs.length-1 && w > (mi+1)*21){ mi++; document.getElementById('prog-text').textContent = msgs[mi]; }
+    if(w >= 85) clearInterval(iv);
+  }, 200);
+}
+
+/* ===== 質問表 ===== */
+function showQuestions(){
+  hide('phase-preview');
+  setStep(3);
+  document.getElementById('q-summary').innerHTML =
+    `自動仕分け完了：<strong>${finalEntries.length}件</strong>　　確認が必要：<strong>${pendingQuestions.length}件</strong>　（以下に回答してください）`;
+
+  const list = document.getElementById('q-list');
+  list.innerHTML = '';
+  pendingQuestions.forEach((q, qi) => {
+    const div = document.createElement('div');
+    div.className = 'q-item';
+    div.id = 'qi-'+qi;
+    const amtStr = q.amount ? fy(q.amount) : '金額不明';
+    div.innerHTML = `
+      <div class="q-row-info">${q.date||'日付不明'}　／　${q.vendor||'支払先不明'}　／　${amtStr}</div>
+      <div class="q-desc">${q.question}</div>
+      <div class="q-choices" id="qc-${qi}"></div>`;
+
+    const choicesEl = div.querySelector(`#qc-${qi}`);
+    (q.choices||[]).forEach(c => {
+      const btn = document.createElement('button');
+      btn.className='qch'; btn.textContent=c;
+      btn.onclick = function(){
+        choicesEl.querySelectorAll('.qch').forEach(b=>b.classList.remove('selected'));
+        this.classList.add('selected');
+        pendingQuestions[qi]._answer = c;
+        document.getElementById('qi-'+qi).classList.add('answered');
+      };
+      choicesEl.appendChild(btn);
+    });
+    const inp = document.createElement('input');
+    inp.className='qch-free'; inp.placeholder='その他（自由入力）';
+    inp.oninput = ()=>{ pendingQuestions[qi]._answer = inp.value; document.getElementById('qi-'+qi).classList.add('answered'); };
+    choicesEl.appendChild(inp);
+
+    list.appendChild(div);
+  });
+  show('phase-questions');
+}
+
+/* ===== 回答確定 ===== */
+async function finalize(){
+  hide('phase-questions');
+  setStep(4);
+
+  const answered = pendingQuestions.filter(q=>q._answer).map(q=>({
+    row_index: q.row_index, date: q.date, vendor: q.vendor,
+    amount: q.amount, original_desc: q.original_desc, answer: q._answer
+  }));
+
+  if(answered.length > 0){
+    // 回答を反映して仕分け確定
+    show('phase-preview');
+    document.getElementById('progress-wrap').style.display = '';
+    document.getElementById('prog-text').textContent = '回答を反映して仕分けを確定中...';
+    document.getElementById('prog-bar').style.width = '50%';
+
+    const SYS2 = `経理AIです。ユーザーの回答をもとに仕分けを確定してください。JSONのみで返答。
+{"entries":[{"row_index":0,"date":"","vendor":"","amount":0,"type":"収入/支出","entity":"法人/個人","category":"勘定科目","memo":""}]}`;
+    try{
+      const data = await callGAS({model:'claude-sonnet-4-20250514', max_tokens:2000, system:SYS2,
+          messages:[{role:'user', content:`以下の回答をもとに仕分けを確定してください：\n${JSON.stringify(answered)}`}]});
+      const raw = (data.content?.map(b=>b.text||'').join('')||'').replace(/```json|```/g,'').trim();
+      const result = JSON.parse(raw);
+      finalEntries.push(...(result.entries||[]));
+    }catch(e){ console.error('回答反映エラー:', e); }
+
+    document.getElementById('prog-bar').style.width = '100%';
+    setTimeout(()=>{ hide('phase-preview'); showResult(); }, 400);
+  } else {
+    showResult();
+  }
+}
+
+/* ===== 結果表示 ===== */
+function showResult(){
+  let totalInc=0, totalExp=0;
+  // row_indexでソート
+  finalEntries.sort((a,b)=>(a.row_index??0)-(b.row_index??0));
+  finalEntries.forEach(e=>{ if(e.type==='収入') totalInc+=e.amount||0; else totalExp+=e.amount||0; });
+
+  document.getElementById('r-inc').textContent = fy(totalInc);
+  document.getElementById('r-exp').textContent = fy(totalExp);
+  document.getElementById('r-count').textContent = finalEntries.length + '件';
+
+  document.getElementById('result-body').innerHTML = finalEntries.map(e=>{
+    const tt = e.type==='収入'?'<span class="tag ti">収入</span>':'<span class="tag te">支出</span>';
+    const et = e.entity==='法人'?'<span class="tag th">法人</span>':'<span class="tag tp">個人</span>';
+    return `<tr>
+      <td>${e.date||'—'}</td>
+      <td>${e.vendor||'—'}</td>
+      <td>${et}&nbsp;${tt}</td>
+      <td>${e.category||'—'}</td>
+      <td style="font-weight:700;color:${e.type==='収入'?'var(--jade)':'var(--vermillion)'}">${fy(e.amount)}</td>
+      <td style="font-size:11px;color:var(--mid)">${e.memo||''}</td>
+    </tr>`;
+  }).join('');
+
+  show('phase-result');
+}
+
+/* ===== CSV出力 ===== */
+function downloadCSV(){
+  const header = ['月（シート）','日付','支払先','収支区分','法人_個人','勘定科目','金額','摘要'];
+  const rows = finalEntries.map(e=>{
+    // row_indexからシート名を取得
+    const srcRow = rawData[e.row_index] || {};
+    const sheet = srcRow['__sheet'] || '';
+    return [sheet, e.date||'',e.vendor||'',e.type||'',e.entity||'',e.category||'',e.amount||0,e.memo||''];
+  });
+  const csv = '\uFEFF' + [header,...rows].map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download='仕分け結果_'+new Date().toISOString().slice(0,10)+'.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ===== リセット ===== */
+function resetAll(){
+  rawData=[]; finalEntries=[]; pendingQuestions=[];
+  ['phase-preview','phase-questions','phase-result'].forEach(hide);
+  document.getElementById('dz-name').textContent='';
+  document.getElementById('file-input').value='';
+  document.getElementById('analyze-btn').disabled=false;
+  document.getElementById('prog-bar').style.width='0%';
+  show('phase-upload');
+  setStep(1);
+}
+
+/* ===== 初期化 ===== */
+(function init(){
+  const p = loadProfile();
+  const banner = document.getElementById('profile-banner');
+  if(!p){
+    banner.style.display='block';
+    banner.style.background='#fef3cd';
+    banner.style.border='1px solid #f0c040';
+    banner.style.color='#7a6000';
+    banner.innerHTML='⚙️ <strong>初回設定がまだです。</strong> <a href="keiri-setup.html" style="color:#1a3a5c;font-weight:700">こちらで設定</a>すると、AI が法人・個人を自動判断できるようになります。';
+  } else {
+    const name = p.corp_name || p.sole_name || '設定済み';
+    banner.style.display='block';
+    banner.style.background='#e1f5ee';
+    banner.style.border='1px solid #9fe1cb';
+    banner.style.color='#2d6a4f';
+    banner.innerHTML=`✅ <strong>${name}</strong>（${p.entity_label||''}）の設定を読み込みました。 <a href="keiri-setup.html" style="color:#1a3a5c">設定を変更</a>`;
+  }
+})();
+</script>
+</body>
+</html>
