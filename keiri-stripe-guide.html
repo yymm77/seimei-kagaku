@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stripe決済設定手順書｜AI経理アシスタント</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;700&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a1208;--paper:#f5f0e8;--gold:#b8960c;--gold-light:#e8d48a;
+  --indigo:#1a3a5c;--indigo-light:#e6f1fb;--jade:#2d6a4f;--jade-light:#e1f5ee;
+  --amber:#c07800;--amber-light:#fef3cd;
+  --mid:#6b6050;--border:rgba(26,18,8,0.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Serif JP',serif;background:var(--paper);color:var(--ink);line-height:1.9}
+#site-header{background:var(--indigo);color:#fff;padding:10px 20px;display:flex;align-items:center;justify-content:space-between}
+#site-logo{font-family:'Zen Old Mincho',serif;font-size:16px;letter-spacing:0.1em}
+
+#main{max-width:740px;margin:0 auto;padding:36px 24px 80px}
+.doc-title{font-family:'Zen Old Mincho',serif;font-size:22px;color:var(--indigo);margin-bottom:6px}
+.doc-sub{font-size:13px;color:var(--mid);margin-bottom:32px;line-height:1.7}
+
+/* ステップカード */
+.step-card{background:#fff;border:1px solid var(--border);border-radius:10px;margin-bottom:20px;overflow:hidden}
+.step-header{background:var(--indigo);color:#fff;padding:12px 18px;display:flex;align-items:center;gap:12px}
+.step-num{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--gold-light);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--gold-light);flex-shrink:0}
+.step-title{font-size:15px;font-weight:700}
+.step-body{padding:18px 20px}
+.step-body p{font-size:14px;margin-bottom:10px}
+.step-body ul{padding-left:20px;margin-bottom:10px}
+.step-body li{font-size:14px;margin-bottom:6px}
+
+/* 操作指示 */
+.action{background:var(--indigo-light);border-left:3px solid var(--indigo);border-radius:0 6px 6px 0;padding:10px 14px;margin:10px 0;font-size:13px;color:var(--indigo)}
+.action strong{display:block;font-size:12px;color:var(--mid);margin-bottom:2px}
+
+/* コード */
+.code-box{background:#1a1208;color:#e8d48a;padding:12px 16px;border-radius:6px;font-family:'Courier New',monospace;font-size:13px;margin:10px 0;word-break:break-all;position:relative}
+.copy-code{position:absolute;top:8px;right:8px;padding:3px 10px;border-radius:4px;border:1px solid var(--gold-light);background:transparent;color:var(--gold-light);font-size:11px;cursor:pointer}
+.copy-code:hover{background:var(--gold-light);color:var(--indigo)}
+.copy-code.done{background:var(--jade);border-color:var(--jade)}
+
+/* 注意 */
+.note{background:var(--amber-light);border:1px solid #e8b84b;border-radius:6px;padding:12px 16px;font-size:13px;color:var(--amber);margin:12px 0;line-height:1.8}
+.note strong{display:block;margin-bottom:4px}
+.ok{background:var(--jade-light);border:1px solid #9fe1cb;border-radius:6px;padding:12px 16px;font-size:13px;color:var(--jade);margin:12px 0;line-height:1.8}
+.ok strong{display:block;margin-bottom:4px}
+
+/* チェックリスト */
+.checklist-final{background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin-top:24px}
+.checklist-final h3{font-size:15px;font-weight:700;color:var(--indigo);margin-bottom:14px}
+.cl-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.cl-item:last-child{border-bottom:none}
+.cl-item input{width:18px;height:18px;flex-shrink:0;margin-top:2px;accent-color:var(--jade)}
+.cl-label{font-size:13px;color:var(--ink)}
+.cl-label span{font-size:11px;color:var(--mid);display:block}
+
+#footer{background:var(--indigo);color:rgba(255,255,255,0.6);font-size:11px;text-align:center;padding:10px 20px}
+#footer a{color:var(--gold-light);text-decoration:none}
+@media(max-width:600px){#main{padding:20px 16px 60px}}
+</style>
+</head>
+<body>
+
+<header id="site-header">
+  <div id="site-logo">日昇リサーチ 経理AI ― 設定手順書</div>
+</header>
+
+<div id="main">
+  <div class="doc-title">Stripe 月額決済 設定手順書</div>
+  <div class="doc-sub">
+    月額580円のプレミアムプランを受け付けるための設定です。<br>
+    所要時間：約30〜60分（本人確認書類の準備が必要です）
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="step-card">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div class="step-title">Stripeアカウントを作成する</div>
+    </div>
+    <div class="step-body">
+      <div class="action"><strong>ブラウザで開く</strong>https://stripe.com/jp</div>
+      <ul>
+        <li>「今すぐ始める」→ メールアドレスと名前・パスワードを入力</li>
+        <li>メール認証を完了する</li>
+        <li>ダッシュボードが開いたら成功</li>
+      </ul>
+      <div class="note"><strong>⚠️ この時点ではテストモードです</strong>本番の支払いを受け取るには、STEP 2の本人確認が必要です。</div>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step-card">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div class="step-title">本人確認・銀行口座を設定する（本番利用に必須）</div>
+    </div>
+    <div class="step-body">
+      <div class="action"><strong>ダッシュボード上部のバナーをクリック</strong>「本番環境を有効にする」または「アカウントを有効にする」</div>
+      <p>以下の情報を準備してください：</p>
+      <ul>
+        <li>法人名・代表者名・住所（日昇リサーチ株式会社の情報）</li>
+        <li>本人確認書類（運転免許証またはマイナンバーカード）</li>
+        <li>振込先銀行口座（売上の受け取り先）</li>
+        <li>電話番号（042-355-5678）</li>
+      </ul>
+      <div class="note"><strong>⚠️ 審査に1〜3営業日かかります</strong>承認されるとメールが届きます。</div>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step-card">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div class="step-title">月額580円の商品（Price）を作成する</div>
+    </div>
+    <div class="step-body">
+      <div class="action"><strong>左メニュー → 「製品カタログ」→「商品を追加」</strong></div>
+      <ul>
+        <li><strong>商品名：</strong>AI経理アシスタント プレミアムプラン</li>
+        <li><strong>説明：</strong>AI対話仕分け・Excel一括処理・検証ツール 全機能使い放題</li>
+        <li><strong>料金モデル：</strong>定額</li>
+        <li><strong>価格：</strong>580</li>
+        <li><strong>通貨：</strong>JPY（日本円）</li>
+        <li><strong>請求期間：</strong>月次</li>
+      </ul>
+      <p>「商品を保存する」をクリック → 商品が作成されます。</p>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="step-card">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <div class="step-title">Payment Link（決済リンク）を作成する</div>
+    </div>
+    <div class="step-body">
+      <div class="action"><strong>左メニュー → 「Payment Links」→「リンクを作成」</strong></div>
+      <ul>
+        <li>先ほど作成した商品を選択</li>
+        <li>「数量を調整できるようにする」→ オフ</li>
+        <li>「リンクを作成」をクリック</li>
+      </ul>
+      <p>URLが生成されます。例：</p>
+      <div class="code-box" id="stripe-url-example">https://buy.stripe.com/XXXXXXXXXX
+<button class="copy-code" onclick="copyCode('stripe-url-example',this)">コピー</button></div>
+      <div class="ok"><strong>✅ このURLをコピーしておいてください</strong>次のSTEPで keiri.html に貼り付けます。</div>
+    </div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="step-card">
+    <div class="step-header">
+      <div class="step-num">5</div>
+      <div class="step-title">keiri.html に Payment Link を設定する</div>
+    </div>
+    <div class="step-body">
+      <p>ダウンロードした <code>keiri.html</code> をメモ帳（またはテキストエディタ）で開きます。</p>
+      <p>以下の行を探してください（スクリプトの先頭付近にあります）：</p>
+      <div class="code-box">const STRIPE_URL = ''; // ← Stripe Payment LinkのURLをここに貼る</div>
+      <p>空欄部分にSTEP 4でコピーしたURLを貼り付けます：</p>
+      <div class="code-box">const STRIPE_URL = 'https://buy.stripe.com/XXXXXXXXXX';</div>
+      <p>ファイルを保存して、GitHubにアップロードします。</p>
+      <div class="ok"><strong>✅ 完了！</strong>「無料回数を使い切りました」のモーダルから「Stripeで登録する」ボタンを押すと、決済ページに飛ぶようになります。</div>
+    </div>
+  </div>
+
+  <!-- STEP 6 -->
+  <div class="step-card">
+    <div class="step-header">
+      <div class="step-num">6</div>
+      <div class="step-title">会員管理：GASでスプレッドシート連携する（任意・推奨）</div>
+    </div>
+    <div class="step-body">
+      <p>Stripeのダッシュボードで誰が課金しているかは確認できます。ただし「このユーザーはプレミアムか？」をリアルタイムに判定するには、Stripe Webhookの設定が必要です。</p>
+      <p>簡易的な方法として、以下の手順で手動管理できます：</p>
+      <ul>
+        <li>Stripeダッシュボード → 「顧客」で課金ユーザー一覧を確認</li>
+        <li>Googleスプレッドシートにメールアドレスとステータスをメモ</li>
+        <li>ユーザーからの問い合わせに対して個別にプレミアムコードを発行</li>
+      </ul>
+      <div class="note"><strong>⚠️ 本格的なWebhook連携は将来対応</strong>初期はStripeダッシュボードの手動確認で十分です。まず課金ユーザーが10人を超えたら自動化を検討してください。</div>
+    </div>
+  </div>
+
+  <!-- STEP 7 -->
+  <div class="step-card">
+    <div class="step-header">
+      <div class="step-num">7</div>
+      <div class="step-title">GitHub Personal Access Token を取得する（保存機能の設定）</div>
+    </div>
+    <div class="step-body">
+      <p>経理データをGitHub Gistに保存するための設定です。</p>
+      <div class="action"><strong>https://github.com/settings/tokens にアクセス</strong></div>
+      <ul>
+        <li>「Generate new token」→「Generate new token (classic)」</li>
+        <li><strong>Note（メモ）：</strong>keiri-storage</li>
+        <li><strong>Expiration：</strong>No expiration（無期限）</li>
+        <li><strong>スコープ：</strong>「gist」にチェック（これだけでOK）</li>
+        <li>「Generate token」をクリック</li>
+      </ul>
+      <p>生成されたトークン（<code>ghp_...</code>で始まる文字列）をコピーしてメモ帳に貼り付けてください。</p>
+      <div class="note"><strong>⚠️ トークンはこの画面でしか表示されません</strong>閉じると二度と確認できないので、必ずコピーしてください。</div>
+      <div class="ok"><strong>✅ このトークンを keiri-setup.html の「Gist設定」欄に入力します</strong>（keiri-setup.htmlにGist設定UIを追加予定）</div>
+    </div>
+  </div>
+
+  <!-- 完了チェックリスト -->
+  <div class="checklist-final">
+    <h3>✅ 設定完了チェックリスト</h3>
+    <div class="cl-item"><input type="checkbox"><div class="cl-label">Stripeアカウントを作成した<span>stripe.com/jp</span></div></div>
+    <div class="cl-item"><input type="checkbox"><div class="cl-label">本人確認・銀行口座の設定が完了した<span>審査完了メールを確認</span></div></div>
+    <div class="cl-item"><input type="checkbox"><div class="cl-label">月額580円の商品を作成した<span>製品カタログで確認</span></div></div>
+    <div class="cl-item"><input type="checkbox"><div class="cl-label">Payment Link URLをコピーした<span>https://buy.stripe.com/...</span></div></div>
+    <div class="cl-item"><input type="checkbox"><div class="cl-label">keiri.html の STRIPE_URL に貼り付けた<span>GitHubにアップロード済み</span></div></div>
+    <div class="cl-item"><input type="checkbox"><div class="cl-label">keiri-legal.html をGitHubにアップロードした<span>規約・プライバシーポリシー</span></div></div>
+    <div class="cl-item"><input type="checkbox"><div class="cl-label">GitHub Personal Access Tokenを取得した<span>gistスコープのみ</span></div></div>
+    <div class="cl-item"><input type="checkbox"><div class="cl-label">各SNSに告知を投稿した<span>keiri_sns_copy.html の投稿文を使用</span></div></div>
+  </div>
+</div>
+
+<footer id="footer">
+  © 日昇リサーチ株式会社　本手順書は社内向けです
+</footer>
+
+<script>
+function copyCode(id, btn){
+  const el = document.getElementById(id);
+  const text = el.childNodes[0].textContent.trim();
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.textContent='コピー済み'; btn.classList.add('done');
+    setTimeout(()=>{ btn.textContent='コピー'; btn.classList.remove('done'); }, 2000);
+  });
+}
+</script>
+</body>
+</html>

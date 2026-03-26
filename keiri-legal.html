@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>利用規約・プライバシーポリシー｜AI経理アシスタント</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;700&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a1208;--paper:#f5f0e8;--gold:#b8960c;--gold-light:#e8d48a;
+  --indigo:#1a3a5c;--mid:#6b6050;--border:rgba(26,18,8,0.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Serif JP',serif;background:var(--paper);color:var(--ink);line-height:1.9}
+#site-header{background:var(--indigo);color:#fff;padding:10px 20px;display:flex;align-items:center;justify-content:space-between}
+#site-logo{font-family:'Zen Old Mincho',serif;font-size:16px;letter-spacing:0.1em}
+#site-nav a{color:#fff;text-decoration:none;font-size:13px;opacity:0.8;margin-left:16px}
+#site-nav a:hover{opacity:1}
+
+/* タブ */
+#tab-nav{background:#fff;border-bottom:1px solid var(--border);padding:0 32px;display:flex;gap:0;position:sticky;top:0;z-index:10}
+.tab-btn{padding:13px 20px;font-size:13px;font-weight:700;color:var(--mid);cursor:pointer;border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;font-family:inherit;white-space:nowrap}
+.tab-btn:hover{color:var(--indigo)}
+.tab-btn.active{color:var(--indigo);border-bottom-color:var(--indigo)}
+
+.doc{display:none;max-width:740px;margin:0 auto;padding:40px 24px 80px}
+.doc.active{display:block}
+
+/* 文書スタイル */
+.doc-title{font-family:'Zen Old Mincho',serif;font-size:24px;font-weight:400;color:var(--indigo);margin-bottom:8px;letter-spacing:0.05em}
+.doc-meta{font-size:12px;color:var(--mid);margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+h2{font-size:16px;font-weight:700;color:var(--indigo);margin:32px 0 10px;padding-left:10px;border-left:3px solid var(--gold)}
+h3{font-size:14px;font-weight:700;color:var(--ink);margin:20px 0 8px}
+p{font-size:14px;margin-bottom:12px}
+ul,ol{padding-left:22px;margin-bottom:12px}
+li{font-size:14px;margin-bottom:6px}
+.important{background:#fef9e7;border:1px solid #f0c040;border-radius:6px;padding:14px 18px;margin:16px 0;font-size:13px;color:#7a6000;line-height:1.8}
+.important strong{color:#5a4000;display:block;margin-bottom:4px}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}
+th{background:var(--indigo);color:#fff;padding:8px 12px;text-align:left;font-weight:500}
+td{padding:8px 12px;border-bottom:1px solid var(--border)}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(26,18,8,0.03)}
+.footer-note{margin-top:48px;padding:16px 18px;background:#fff;border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--mid);line-height:1.8}
+
+#footer{background:var(--indigo);color:rgba(255,255,255,0.6);font-size:11px;text-align:center;padding:10px 20px}
+#footer a{color:var(--gold-light);text-decoration:none}
+
+@media(max-width:600px){
+  .doc{padding:24px 16px 60px}
+  #tab-nav{padding:0 16px}
+}
+</style>
+</head>
+<body>
+
+<header id="site-header">
+  <div id="site-logo">日昇リサーチ</div>
+  <nav id="site-nav">
+    <a href="index.html">ホーム</a>
+    <a href="keiri.html">経理AI</a>
+  </nav>
+</header>
+
+<div id="tab-nav">
+  <button class="tab-btn active" onclick="switchDoc('terms', this)">利用規約</button>
+  <button class="tab-btn" onclick="switchDoc('privacy', this)">プライバシーポリシー</button>
+  <button class="tab-btn" onclick="switchDoc('legal', this)">特定商取引法に基づく表記</button>
+</div>
+
+<!-- 利用規約 -->
+<div class="doc active" id="doc-terms">
+  <div class="doc-title">利用規約</div>
+  <div class="doc-meta">制定日：2025年4月1日　　運営：日昇リサーチ株式会社</div>
+
+  <div class="important">
+    <strong>⚠️ 重要：税務に関する免責事項</strong>
+    本サービスは帳簿記録・仕分けの補助を目的としたAIツールです。税務申告の最終判断、節税アドバイス、税務相談は税理士法に基づき税理士が行うべき業務です。本サービスは税理士業務の代替ではありません。申告内容の正確性については、利用者ご自身または税理士にご確認ください。
+  </div>
+
+  <h2>第1条（適用）</h2>
+  <p>本規約は、日昇リサーチ株式会社（以下「当社」）が提供するAI経理アシスタントサービス（以下「本サービス」）の利用条件を定めるものです。利用者は本規約に同意の上、本サービスを利用するものとします。</p>
+
+  <h2>第2条（サービスの内容）</h2>
+  <p>本サービスは以下の機能を提供します。</p>
+  <ul>
+    <li>AI対話による収支仕分け補助</li>
+    <li>レシート・領収書・PDF画像の自動読み取りと仕分け提案</li>
+    <li>Excelデータの一括仕分け処理</li>
+    <li>入力ミス・重複チェック機能</li>
+    <li>青色申告・eTax向けデータ整形出力</li>
+    <li>関連法令の参考情報表示</li>
+  </ul>
+
+  <h2>第3条（料金・決済）</h2>
+  <table>
+    <tr><th>プラン</th><th>内容</th><th>料金</th></tr>
+    <tr><td>無料プラン</td><td>AI経理チャット3回まで</td><td>無料</td></tr>
+    <tr><td>プレミアムプラン</td><td>全機能使い放題</td><td>月額580円（税込）</td></tr>
+  </table>
+  <p>決済はStripe（Stripe, Inc.）を通じて行います。月額料金は毎月自動更新されます。解約はいつでも可能で、次回更新日の前日までに手続きを完了した場合、翌月分の請求は発生しません。</p>
+
+  <h2>第4条（禁止事項）</h2>
+  <p>利用者は以下の行為を行ってはなりません。</p>
+  <ul>
+    <li>本サービスを税理士への相談の完全な代替として利用すること</li>
+    <li>本サービスの出力結果を無検証のまま申告書類に使用すること</li>
+    <li>他人のアカウントを不正に使用すること</li>
+    <li>本サービスのシステムに不正アクセスすること</li>
+    <li>虚偽の情報を入力すること</li>
+    <li>法令または公序良俗に反する目的での利用</li>
+  </ul>
+
+  <h2>第5条（免責事項）</h2>
+  <p>当社は以下の事項について責任を負いません。</p>
+  <ul>
+    <li>AIが提案した仕分け・勘定科目の正確性</li>
+    <li>本サービスを利用した結果として生じた税務上の不利益</li>
+    <li>税務署・国税庁からの指摘・修正申告の要求</li>
+    <li>システムの一時停止・障害によるデータの損失</li>
+    <li>関連法令の改正により本サービスの情報が陳腐化した場合の不利益</li>
+  </ul>
+  <p>本サービスはあくまで「補助ツール」です。最終的な申告内容の責任は利用者に帰属します。</p>
+
+  <h2>第6条（データの取り扱い）</h2>
+  <p>利用者が入力したデータの取り扱いは以下の通りです。</p>
+  <ul>
+    <li>入力データはAI処理のためAnthropicのAPIに送信されます（Anthropicのプライバシーポリシーが適用されます）</li>
+    <li>保存データは利用者が設定したGitHub Gistに保存され、当社のサーバーには保存されません</li>
+    <li>当社は利用者の経理データを収集・分析・第三者提供しません</li>
+  </ul>
+
+  <h2>第7条（サービスの変更・終了）</h2>
+  <p>当社は事前通告なくサービス内容を変更、または提供を終了することがあります。その場合、当サービスサイト上でお知らせします。</p>
+
+  <h2>第8条（準拠法・管轄）</h2>
+  <p>本規約は日本法を準拠法とします。本サービスに関する紛争は、東京地方裁判所を第一審の専属的合意管轄裁判所とします。</p>
+
+  <div class="footer-note">
+    本規約に関するお問い合わせ：日昇リサーチ株式会社<br>
+    メール：paf00556@nifty.com　　電話：042-355-5678
+  </div>
+</div>
+
+<!-- プライバシーポリシー -->
+<div class="doc" id="doc-privacy">
+  <div class="doc-title">プライバシーポリシー</div>
+  <div class="doc-meta">制定日：2025年4月1日　　運営：日昇リサーチ株式会社</div>
+
+  <h2>第1条（収集する情報）</h2>
+  <p>本サービスは以下の情報を収集します。</p>
+
+  <h3>利用者が入力する情報</h3>
+  <ul>
+    <li>氏名・法人名・住所・電話番号・メールアドレス（初回設定時に任意入力）</li>
+    <li>収支データ（金額・日付・支払先・勘定科目）</li>
+    <li>アップロードしたレシート・領収書・Excelファイルの内容</li>
+  </ul>
+
+  <h3>自動的に収集する情報</h3>
+  <ul>
+    <li>利用回数（ブラウザのlocalStorageに保存）</li>
+    <li>プレミアム会員のステータス（localStorageに保存）</li>
+  </ul>
+
+  <h2>第2条（情報の利用目的）</h2>
+  <ul>
+    <li>AI仕分け処理の実行（Anthropic Claude APIへの送信）</li>
+    <li>利用回数の管理・プレミアム判定</li>
+    <li>サービスの改善・不具合対応</li>
+  </ul>
+
+  <h2>第3条（第三者への情報提供）</h2>
+  <p>当社は以下の場合を除き、利用者の情報を第三者に提供しません。</p>
+  <ul>
+    <li><strong>Anthropic, Inc.：</strong>AI処理のため入力内容を送信します。Anthropicのプライバシーポリシーに従い処理されます。</li>
+    <li><strong>Stripe, Inc.：</strong>決済処理のため必要な情報を送信します。</li>
+    <li><strong>GitHub, Inc.：</strong>データ保存のためGist APIを利用します（利用者自身のGistに保存）。</li>
+    <li>法令に基づく開示が必要な場合。</li>
+  </ul>
+
+  <div class="important">
+    <strong>重要：経理データの保存について</strong>
+    本サービスで入力・処理した経理データは、当社のサーバーには一切保存されません。データは利用者自身のGitHub GistまたはブラウザのlocalStorageに保存されます。当社は利用者の経理データにアクセスできません。
+  </div>
+
+  <h2>第4条（Cookie・localStorageの使用）</h2>
+  <p>本サービスはCookieは使用しません。ブラウザのlocalStorageを以下の目的で使用します。</p>
+  <ul>
+    <li>初回設定情報（法人名・事業形態等）の保存</li>
+    <li>無料利用回数のカウント</li>
+    <li>プレミアム会員ステータスの保存</li>
+  </ul>
+  <p>localStorageのデータはブラウザの設定から削除できます。</p>
+
+  <h2>第5条（データの保存期間）</h2>
+  <ul>
+    <li>localStorageのデータ：利用者がブラウザから削除するまで</li>
+    <li>GitHub Gistのデータ：利用者がGistを削除するまで</li>
+    <li>AI処理に送信したデータ：Anthropicのデータ保持ポリシーに準じます</li>
+  </ul>
+
+  <h2>第6条（お問い合わせ）</h2>
+  <p>プライバシーに関するお問い合わせは下記までご連絡ください。</p>
+  <p>日昇リサーチ株式会社<br>
+  メール：paf00556@nifty.com<br>
+  電話：042-355-5678</p>
+
+  <div class="footer-note">
+    本ポリシーは法令の改正・サービス内容の変更に応じて更新することがあります。更新日はページ上部に表示します。
+  </div>
+</div>
+
+<!-- 特定商取引法 -->
+<div class="doc" id="doc-legal">
+  <div class="doc-title">特定商取引法に基づく表記</div>
+  <div class="doc-meta">AI経理アシスタント プレミアムプラン</div>
+
+  <table>
+    <tr><th style="width:35%">項目</th><th>内容</th></tr>
+    <tr><td>販売事業者</td><td>日昇リサーチ株式会社</td></tr>
+    <tr><td>代表者</td><td>三原嘉明</td></tr>
+    <tr><td>所在地</td><td>請求があった場合は遅滞なく開示します</td></tr>
+    <tr><td>電話番号</td><td>042-355-5678（受付：平日10時〜17時）</td></tr>
+    <tr><td>メールアドレス</td><td>paf00556@nifty.com</td></tr>
+    <tr><td>サービス名</td><td>AI経理アシスタント プレミアムプラン</td></tr>
+    <tr><td>販売価格</td><td>月額580円（税込）</td></tr>
+    <tr><td>料金以外の費用</td><td>インターネット接続料金（利用者負担）</td></tr>
+    <tr><td>支払方法</td><td>クレジットカード（Stripe経由）</td></tr>
+    <tr><td>支払時期</td><td>契約時および毎月の自動更新日</td></tr>
+    <tr><td>サービス提供時期</td><td>決済完了後、即時利用可能</td></tr>
+    <tr><td>解約・返金</td><td>いつでも解約可能。解約月の日割り返金は行いません。翌月以降の請求は発生しません。</td></tr>
+    <tr><td>動作環境</td><td>インターネット接続環境が必要。主要ブラウザ（Chrome・Firefox・Safari・Edge）対応。</td></tr>
+    <tr><td>特記事項</td><td>本サービスは税理士業務の代替ではありません。仕分け結果の正確性については利用者ご自身でご確認ください。</td></tr>
+  </table>
+
+  <div class="important" style="margin-top:24px">
+    <strong>クーリングオフについて</strong>
+    本サービスはデジタルコンテンツ・継続的役務提供に該当します。特定商取引法上のクーリングオフ制度の適用外となりますが、初回決済から8日以内にサービスを一切利用していない場合は、個別にご相談ください。
+  </div>
+
+  <div class="footer-note">
+    ご不明な点はお気軽にお問い合わせください。<br>
+    メール：paf00556@nifty.com　　電話：042-355-5678（平日10時〜17時）
+  </div>
+</div>
+
+<footer id="footer">
+  © 日昇リサーチ株式会社　<a href="index.html">サイトトップへ</a>　｜　<a href="keiri.html">AI経理アシスタント</a>
+</footer>
+
+<script>
+function switchDoc(id, btn){
+  document.querySelectorAll('.doc').forEach(d=>d.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('doc-'+id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
