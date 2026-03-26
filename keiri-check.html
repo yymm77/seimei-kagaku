@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>経理データ検証ツール｜日昇リサーチ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;700&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a1208;--paper:#f5f0e8;--gold:#b8960c;--gold-light:#e8d48a;
+  --indigo:#1a3a5c;--indigo-light:#e6f1fb;--jade:#2d6a4f;--jade-light:#e1f5ee;
+  --vermillion:#c0392b;--vermillion-light:#faece7;
+  --amber:#c07800;--amber-light:#fef3cd;
+  --mid:#6b6050;--border:rgba(26,18,8,0.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Serif JP',serif;background:var(--paper);color:var(--ink);min-height:100vh;display:flex;flex-direction:column}
+#site-header{background:var(--indigo);color:#fff;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+#site-logo{font-family:'Zen Old Mincho',serif;font-size:16px;letter-spacing:0.1em}
+#site-nav{display:flex;gap:16px}
+#site-nav a{color:#fff;text-decoration:none;font-size:13px;opacity:0.8}
+#site-nav a:hover{opacity:1}
+#site-nav a.active{color:var(--gold-light);font-weight:700;opacity:1}
+#disclaimer{background:#fef9e7;border-bottom:1px solid #f0c040;padding:8px 20px;font-size:12px;color:#7a6000;text-align:center}
+#disclaimer strong{color:#5a4000}
+#main{flex:1;max-width:900px;width:100%;margin:0 auto;padding:24px 20px;display:flex;flex-direction:column;gap:18px}
+
+/* 法令バナー */
+#law-banner{background:var(--indigo-light);border:1px solid #b5d4f4;border-radius:8px;padding:11px 16px;display:flex;align-items:flex-start;gap:10px;font-size:12px;color:var(--indigo)}
+#law-banner .lb-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+#law-banner .lb-body{flex:1;line-height:1.7}
+#law-banner .lb-date{font-size:10px;color:var(--mid);margin-top:2px}
+
+/* カード */
+.card{background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.card-header{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.card-logo{width:32px;height:32px;border-radius:8px;background:var(--indigo);display:flex;align-items:center;justify-content:center;font-family:'Zen Old Mincho',serif;font-size:14px;color:var(--gold-light);flex-shrink:0}
+.card-title{font-size:14px;font-weight:700;color:var(--indigo)}
+.card-sub{font-size:11px;color:var(--mid)}
+.card-body{padding:16px 18px}
+
+/* ドロップゾーン */
+#drop-zone{border:2px dashed var(--gold-light);border-radius:8px;padding:32px 20px;text-align:center;cursor:pointer;background:var(--paper);transition:background 0.15s}
+#drop-zone:hover,#drop-zone.drag{background:var(--gold-light)}
+#dz-main{font-size:14px;font-weight:700;color:var(--indigo);margin-bottom:5px}
+#dz-sub{font-size:12px;color:var(--mid)}
+#dz-name{font-size:12px;font-weight:700;color:var(--indigo);margin-top:8px}
+#file-input{display:none}
+
+/* ボタン */
+.btn{width:100%;padding:11px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Serif JP',serif;border:none;margin-top:12px;transition:background 0.15s}
+.btn-primary{background:var(--indigo);color:#fff}.btn-primary:hover{background:#0f2a45}
+.btn-primary:disabled{opacity:0.45;cursor:not-allowed}
+.btn-outline{background:#fff;color:var(--ink);border:1px solid var(--border)!important}.btn-outline:hover{background:var(--paper)}
+
+/* プログレス */
+#prog-wrap{display:none;margin-top:12px}
+#prog-text{font-size:12px;color:var(--mid);margin-bottom:8px;text-align:center}
+#prog-bg{background:var(--paper);border-radius:20px;height:6px;border:1px solid var(--border)}
+#prog-bar{background:var(--indigo);height:6px;border-radius:20px;width:0%;transition:width 0.3s}
+
+/* サマリー */
+#summary-row{display:flex;gap:10px;flex-wrap:wrap}
+.scard{flex:1;min-width:130px;background:var(--paper);border:1px solid var(--border);border-radius:8px;padding:10px 14px;text-align:center}
+.scard .sl{font-size:10px;color:var(--mid);margin-bottom:4px}
+.scard .sv{font-size:22px;font-weight:700}
+.sv.ok{color:var(--jade)}.sv.warn{color:var(--amber)}.sv.err{color:var(--vermillion)}
+
+/* 問題リスト */
+#issues-wrap{display:flex;flex-direction:column;gap:10px;margin-top:4px}
+.issue{border-radius:8px;padding:12px 15px;border-left:4px solid}
+.issue.error{background:var(--vermillion-light);border-color:var(--vermillion)}
+.issue.warning{background:var(--amber-light);border-color:var(--amber)}
+.issue.info{background:var(--jade-light);border-color:var(--jade)}
+.issue-header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.issue-badge{padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700}
+.badge-error{background:var(--vermillion);color:#fff}
+.badge-warning{background:var(--amber);color:#fff}
+.badge-info{background:var(--jade);color:#fff}
+.issue-title{font-size:13px;font-weight:700;color:var(--ink)}
+.issue-body{font-size:12px;color:var(--mid);line-height:1.7}
+.issue-rows{margin-top:6px;font-size:11px;background:rgba(255,255,255,0.6);border-radius:4px;padding:6px 10px;color:var(--ink)}
+
+/* テーブル */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:8px;max-height:260px;overflow-y:auto;margin-top:12px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{background:var(--paper);padding:6px 10px;text-align:left;font-weight:700;font-size:11px;color:var(--mid);border-bottom:1px solid var(--border);white-space:nowrap;position:sticky;top:0}
+tbody td{padding:5px 10px;border-bottom:1px solid rgba(26,18,8,0.06);color:var(--ink)}
+tbody tr:last-child td{border-bottom:none}
+tbody tr.hl-err td{background:rgba(192,57,43,0.06)}
+tbody tr.hl-warn td{background:rgba(192,120,0,0.06)}
+.tag{display:inline-block;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700}
+.tag-err{background:var(--vermillion-light);color:var(--vermillion)}
+.tag-warn{background:var(--amber-light);color:var(--amber)}
+.tag-ok{background:var(--jade-light);color:var(--jade)}
+
+/* eTax出力 */
+#etax-section{display:none}
+.etax-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px}
+.etax-table th{background:var(--indigo);color:#fff;padding:7px 10px;font-size:11px;font-weight:700;text-align:left}
+.etax-table td{padding:6px 10px;border-bottom:1px solid var(--border)}
+.etax-table tr:last-child td{border-bottom:none;font-weight:700;background:var(--paper)}
+
+#footer{background:var(--indigo);color:rgba(255,255,255,0.6);font-size:11px;text-align:center;padding:10px 20px}
+#footer a{color:var(--gold-light);text-decoration:none}
+.hidden{display:none!important}
+@media(max-width:600px){#site-nav{display:none}#summary-row{flex-direction:column}}
+</style>
+</head>
+<body>
+
+<header id="site-header">
+  <div id="site-logo">日昇リサーチ</div>
+  <nav id="site-nav">
+    <a href="index.html">ホーム</a>
+    <a href="keiri.html">経理AI（チャット）</a>
+    <a href="keiri-bulk.html">経理AI（一括）</a>
+    <a href="keiri-check.html" class="active">経理AI（検証）</a>
+  </nav>
+</header>
+
+<div id="disclaimer">
+  <strong>ご注意：</strong>本ツールは帳簿記録・検証の補助です。税務申告の最終判断は税理士または利用者ご自身の責任においてお願いします。
+</div>
+
+<div id="main">
+
+  <!-- 法令バナー -->
+  <div id="law-banner">
+    <div class="lb-icon">📋</div>
+    <div class="lb-body">
+      <strong>関連法令・最新情報：</strong>
+      <span id="law-text">読み込み中...</span>
+      <div class="lb-date" id="law-date"></div>
+    </div>
+  </div>
+
+  <!-- アップロード -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-logo">検</div>
+      <div>
+        <div class="card-title">経理データ検証ツール</div>
+        <div class="card-sub">入力ミス・重複・異常値・PDF証票との突合を自動チェック</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div id="drop-zone"
+           onclick="document.getElementById('file-input').click()"
+           ondragover="event.preventDefault();this.classList.add('drag')"
+           ondragleave="this.classList.remove('drag')"
+           ondrop="onDrop(event)">
+        <div style="font-size:32px;margin-bottom:10px">🔍</div>
+        <div id="dz-main">Excelファイル（または仕分け済みCSV）をドロップ</div>
+        <div id="dz-sub">xlsx・xls・csv 対応　　クリックでも選択できます</div>
+        <div id="dz-name"></div>
+      </div>
+      <input type="file" id="file-input" accept=".xlsx,.xls,.csv" onchange="onFile(this.files[0])">
+
+      <!-- PDF突合（オプション） -->
+      <div style="margin-top:12px;padding:10px 14px;background:var(--paper);border-radius:8px;border:1px solid var(--border)">
+        <div style="font-size:12px;font-weight:700;color:var(--indigo);margin-bottom:6px">📎 PDF証票ファイル（任意・複数可）</div>
+        <div style="font-size:11px;color:var(--mid);margin-bottom:8px">領収書・レシートのPDFをまとめてドロップすると、Excelデータと金額を突合します</div>
+        <div id="pdf-drop"
+             style="border:1.5px dashed var(--border);border-radius:6px;padding:12px;text-align:center;cursor:pointer;font-size:12px;color:var(--mid)"
+             ondragover="event.preventDefault();this.style.background='var(--gold-light)'"
+             ondragleave="this.style.background=''"
+             ondrop="onPdfDrop(event)"
+             onclick="document.getElementById('pdf-input').click()">
+          PDFをここにドロップ（複数可）
+        </div>
+        <input type="file" id="pdf-input" accept=".pdf" multiple onchange="onPdfFiles(this.files)">
+        <div id="pdf-list" style="font-size:11px;color:var(--indigo);margin-top:6px"></div>
+      </div>
+
+      <div id="prog-wrap">
+        <div id="prog-text">データを検証中...</div>
+        <div id="prog-bg"><div id="prog-bar"></div></div>
+      </div>
+      <button class="btn btn-primary" id="check-btn" onclick="startCheck()" disabled>データを検証する</button>
+    </div>
+  </div>
+
+  <!-- 結果サマリー -->
+  <div class="card hidden" id="result-card">
+    <div class="card-header">
+      <div class="card-logo">結</div>
+      <div>
+        <div class="card-title">検証結果</div>
+        <div class="card-sub" id="result-sub">検証完了</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div id="summary-row">
+        <div class="scard"><div class="sl">エラー（要対応）</div><div class="sv err" id="cnt-err">0</div></div>
+        <div class="scard"><div class="sl">警告（要確認）</div><div class="sv warn" id="cnt-warn">0</div></div>
+        <div class="scard"><div class="sl">PDF突合</div><div class="sv" id="cnt-pdf" style="color:var(--mid)">—</div></div>
+        <div class="scard"><div class="sl">総合判定</div><div class="sv" id="cnt-judge">—</div></div>
+      </div>
+
+      <!-- 問題一覧 -->
+      <div id="issues-wrap" style="margin-top:16px"></div>
+
+      <!-- 全データ表示 -->
+      <div style="margin-top:16px;font-size:12px;font-weight:700;color:var(--mid)">全データ一覧（問題箇所をハイライト表示）</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead id="data-head"></thead>
+          <tbody id="data-body"></tbody>
+        </table>
+      </div>
+
+      <!-- eTax向け出力 -->
+      <div id="etax-section">
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+          <div style="font-size:13px;font-weight:700;color:var(--indigo);margin-bottom:4px">📤 eTax・青色申告向けデータ整形</div>
+          <div style="font-size:11px;color:var(--mid);margin-bottom:12px">以下の集計を確定申告書B・青色申告決算書の入力欄に転記してください</div>
+          <table class="etax-table">
+            <thead><tr><th>勘定科目</th><th>法人（日昇）</th><th>個人</th><th>合計</th></tr></thead>
+            <tbody id="etax-body"></tbody>
+          </table>
+          <button class="btn btn-outline" style="margin-top:10px" onclick="downloadEtaxCSV()">eTax用CSVをダウンロード</button>
+        </div>
+      </div>
+
+      <button class="btn btn-outline" style="margin-top:14px" onclick="resetAll()">別のファイルを検証する</button>
+    </div>
+  </div>
+
+</div>
+
+<footer id="footer">
+  © 日昇リサーチ株式会社　<a href="index.html">サイトトップへ</a>　｜　
+  <a href="keiri.html">チャット型</a>　<a href="keiri-bulk.html">一括仕分け</a>　｜　本ツールは税理士業務の代替ではありません
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+/* ===== 状態 ===== */
+let rawData = [];
+let pdfFiles = [];
+let pdfAmounts = [];
+let checkResult = null;
+
+/* ===== 法令バナー ===== */
+const LAW_INFO = [
+  { text:'【電子帳簿保存法】2024年1月より電子取引データの電子保存が完全義務化。PDFで受け取った請求書・領収書は電子データのまま保存が必要です。', date:'2024年1月施行' },
+  { text:'【インボイス制度】2023年10月より適格請求書等保存方式（インボイス制度）開始。仕入税額控除には登録番号（T+13桁）の記載が必要です。', date:'2023年10月施行' },
+  { text:'【消費税】標準税率10%・軽減税率8%（飲食料品・新聞）。経費処理時は税率区分の記載が必要です。', date:'現行法令' },
+  { text:'【所得税・青色申告】青色申告特別控除65万円を受けるには、電子申告（eTax）または電子帳簿の利用が条件です。', date:'現行法令' },
+  { text:'【帳簿保存期間】法人税法・所得税法上、帳簿書類は7年間（欠損金がある場合は10年間）の保存義務があります。', date:'現行法令' },
+];
+(function initLawBanner(){
+  const item = LAW_INFO[Math.floor(Math.random() * LAW_INFO.length)];
+  document.getElementById('law-text').textContent = item.text;
+  document.getElementById('law-date').textContent = '参照：' + item.date + '　　※法令は改正される場合があります。国税庁サイト（nta.go.jp）で最新情報をご確認ください。';
+})();
+
+/* ===== ユーティリティ ===== */
+function fy(n){ return n != null ? '¥' + Math.round(n).toLocaleString() : '—'; }
+function show(id){ document.getElementById(id).classList.remove('hidden'); }
+function hide(id){ document.getElementById(id).classList.add('hidden'); }
+
+/* ===== ファイル読み込み ===== */
+function onDrop(ev){
+  ev.preventDefault();
+  document.getElementById('drop-zone').classList.remove('drag');
+  const f = ev.dataTransfer.files[0];
+  if(f) onFile(f);
+}
+function onFile(file){
+  if(!file) return;
+  document.getElementById('dz-name').textContent = '📊 ' + file.name;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try{
+      const data = new Uint8Array(e.target.result);
+      const wb = XLSX.read(data, {type:'array', cellDates:true});
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      rawData = XLSX.utils.sheet_to_json(sheet, {defval:''});
+      if(!rawData.length){ alert('データが読み込めませんでした。'); return; }
+      document.getElementById('check-btn').disabled = false;
+      document.getElementById('check-btn').textContent = `データを検証する（${rawData.length}件）`;
+    }catch(err){ alert('読み込みエラー：' + err.message); }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+/* ===== PDF読み込み ===== */
+function onPdfDrop(ev){
+  ev.preventDefault();
+  ev.currentTarget.style.background = '';
+  onPdfFiles(ev.dataTransfer.files);
+}
+function onPdfFiles(files){
+  for(const f of files){
+    if(f.type === 'application/pdf' && !pdfFiles.find(p=>p.name===f.name)){
+      pdfFiles.push(f);
+    }
+  }
+  document.getElementById('pdf-list').textContent = pdfFiles.length + '件のPDF読み込み済み：' + pdfFiles.map(f=>f.name).join('、');
+}
+
+/* ===== PDF金額抽出（Claude API） ===== */
+async function extractPdfAmounts(){
+  if(!pdfFiles.length) return [];
+  const results = [];
+  for(const file of pdfFiles){
+    const b64 = await toBase64(file);
+    try{
+      const res = await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          model:'claude-sonnet-4-20250514', max_tokens:300,
+          system:'PDFから合計金額・日付・支払先を抽出してJSONのみで返す。{"amount":数値,"date":"YYYY-MM-DD","vendor":"名称","invoice_no":"T番号または空"}',
+          messages:[{role:'user', content:[
+            {type:'document', source:{type:'base64', media_type:'application/pdf', data:b64}},
+            {type:'text', text:'この証票の合計金額・日付・支払先・インボイス番号を抽出してください。JSONのみで返してください。'}
+          ]}]
+        })
+      });
+      const data = await res.json();
+      const raw = (data.content?.map(b=>b.text||'').join('')||'').replace(/```json|```/g,'').trim();
+      const parsed = JSON.parse(raw);
+      results.push({file: file.name, ...parsed});
+    }catch(e){ results.push({file: file.name, amount:null, date:null, vendor:null}); }
+  }
+  return results;
+}
+
+function toBase64(file){
+  return new Promise((res,rej)=>{
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(',')[1]);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+
+/* ===== 数値正規化 ===== */
+function toNum(v){
+  if(v == null || v === '') return null;
+  const s = String(v).replace(/[,，￥¥\s]/g,'').replace(/[^\d.-]/g,'');
+  const n = parseFloat(s);
+  return isNaN(n) ? null : n;
+}
+function toDateStr(v){
+  if(!v) return null;
+  if(v instanceof Date) return v.toISOString().slice(0,10);
+  const s = String(v).replace(/[年月\/]/g,'-').replace(/日/g,'').trim();
+  const m = s.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if(m) return `${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;
+  return null;
+}
+
+/* ===== キー列の推定 ===== */
+function guessColumns(keys){
+  const find = (candidates) => keys.find(k => candidates.some(c => k.includes(c))) || null;
+  return {
+    date:   find(['日付','日','date','Date','DATE','年月日']),
+    amount: find(['金額','合計','支払','amount','Amount','AMOUNT','¥','円']),
+    vendor: find(['支払先','店名','相手先','取引先','vendor','Vendor','名称','摘要']),
+    type:   find(['区分','収支','type','Type','種別','収入','支出']),
+    cat:    find(['勘定','科目','category','Category']),
+  };
+}
+
+/* ===== メインチェック処理 ===== */
+async function startCheck(){
+  document.getElementById('check-btn').disabled = true;
+  document.getElementById('prog-wrap').style.display = '';
+  const issues = [];
+  let prog = 0;
+  const setP = (p, t) => { document.getElementById('prog-bar').style.width=p+'%'; document.getElementById('prog-text').textContent=t; };
+
+  /* --- 1. キー列推定 --- */
+  setP(10, 'データ構造を解析中...');
+  const keys = Object.keys(rawData[0]);
+  const cols = guessColumns(keys);
+
+  /* --- 2. 基本チェック --- */
+  setP(25, '入力ミス・欠損を確認中...');
+  const missingDate=[], missingAmount=[], zeroAmount=[], missingVendor=[];
+  rawData.forEach((row, i) => {
+    const d = cols.date ? toDateStr(row[cols.date]) : null;
+    const a = cols.amount ? toNum(row[cols.amount]) : null;
+    const v = cols.vendor ? String(row[cols.vendor]||'').trim() : '';
+    if(cols.date && !d) missingDate.push(i+2);
+    if(cols.amount && a == null) missingAmount.push(i+2);
+    if(cols.amount && a != null && a === 0) zeroAmount.push(i+2);
+    if(cols.vendor && !v) missingVendor.push(i+2);
+  });
+  if(missingDate.length) issues.push({level:'error', title:'日付が空欄または不正な行があります', body:'日付が未入力だと帳簿として認められません。', rows: missingDate});
+  if(missingAmount.length) issues.push({level:'error', title:'金額が読み取れない行があります', body:'金額欄に数値以外の文字が含まれています。', rows: missingAmount});
+  if(zeroAmount.length) issues.push({level:'warning', title:'金額が0円の行があります', body:'意図した0円取引か、入力漏れの可能性があります。', rows: zeroAmount});
+  if(missingVendor.length) issues.push({level:'warning', title:'支払先が空欄の行があります', body:'帳簿には取引先の記載が必要です。', rows: missingVendor});
+
+  /* --- 3. 重複チェック --- */
+  setP(40, '重複データを確認中...');
+  if(cols.date && cols.amount){
+    const seen = {}, dupRows = [];
+    rawData.forEach((row, i) => {
+      const key = `${toDateStr(row[cols.date])}_${toNum(row[cols.amount])}_${String(row[cols.vendor]||'').trim()}`;
+      if(seen[key] != null) dupRows.push([seen[key]+2, i+2]);
+      else seen[key] = i;
+    });
+    if(dupRows.length){
+      issues.push({level:'error', title:`重複の可能性がある行が${dupRows.length}組あります`, body:'同日・同金額・同支払先の行が複数あります。二重入力でないか確認してください。', rows: dupRows.flat()});
+    }
+  }
+
+  /* --- 4. 異常値チェック（前月比3倍超） --- */
+  setP(55, '異常値を確認中...');
+  if(cols.date && cols.amount){
+    const monthly = {};
+    rawData.forEach(row => {
+      const d = toDateStr(row[cols.date]);
+      const a = toNum(row[cols.amount]);
+      if(d && a != null){
+        const ym = d.slice(0,7);
+        monthly[ym] = (monthly[ym]||0) + Math.abs(a);
+      }
+    });
+    const months = Object.keys(monthly).sort();
+    const spikeMonths = [];
+    for(let i=1; i<months.length; i++){
+      const prev = monthly[months[i-1]], curr = monthly[months[i]];
+      if(curr > prev * 3) spikeMonths.push(`${months[i]}（${fy(curr)}、前月${fy(prev)}）`);
+    }
+    if(spikeMonths.length){
+      issues.push({level:'warning', title:'月次合計が前月比3倍超の月があります', body:'入力ミスまたは特殊取引の可能性があります。確認してください。', rows:[], extra: spikeMonths.join(' / ')});
+    }
+  }
+
+  /* --- 5. PDF突合 --- */
+  setP(68, 'PDF証票と突合中...');
+  let pdfMatchCount = 0, pdfMismatch = [];
+  if(pdfFiles.length){
+    pdfAmounts = await extractPdfAmounts();
+    pdfAmounts.forEach(pdf => {
+      if(pdf.amount == null) return;
+      const matched = rawData.some(row => {
+        const a = cols.amount ? toNum(row[cols.amount]) : null;
+        return a != null && Math.abs(a - pdf.amount) < 1;
+      });
+      if(matched) pdfMatchCount++;
+      else pdfMismatch.push(`${pdf.file}（${fy(pdf.amount)}）`);
+    });
+    if(pdfMismatch.length){
+      issues.push({level:'warning', title:`PDF証票${pdfMismatch.length}件がExcelデータと一致しません`, body:'証票の金額とExcelの記録に差異があります。', rows:[], extra: pdfMismatch.join(' / ')});
+    }
+  }
+
+  /* --- 6. AI総合評価 --- */
+  setP(82, 'AIが総合評価中...');
+  let aiComment = '';
+  try{
+    const summary = {
+      total_rows: rawData.length,
+      error_count: issues.filter(i=>i.level==='error').length,
+      warning_count: issues.filter(i=>i.level==='warning').length,
+      columns_detected: cols,
+      issues_summary: issues.map(i=>i.title),
+    };
+    const res = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:300,
+        system:'あなたは経理検証AIです。検証結果のサマリーを受け取り、50〜100文字で総合コメントを返してください。深刻な問題があれば強調してください。',
+        messages:[{role:'user', content:`検証結果：${JSON.stringify(summary)}`}]
+      })
+    });
+    const data = await res.json();
+    aiComment = data.content?.map(b=>b.text||'').join('') || '';
+  }catch(e){ aiComment = ''; }
+
+  setP(100, '検証完了');
+  setTimeout(()=>{
+    document.getElementById('prog-wrap').style.display = 'none';
+    showResult(issues, pdfMatchCount, aiComment, cols);
+  }, 300);
+}
+
+/* ===== 結果表示 ===== */
+function showResult(issues, pdfMatchCount, aiComment, cols){
+  const errCount = issues.filter(i=>i.level==='error').length;
+  const warnCount = issues.filter(i=>i.level==='warning').length;
+
+  document.getElementById('cnt-err').textContent = errCount;
+  document.getElementById('cnt-warn').textContent = warnCount;
+  document.getElementById('cnt-pdf').textContent = pdfFiles.length ? `${pdfMatchCount}/${pdfFiles.length}件一致` : '—';
+
+  const judgeEl = document.getElementById('cnt-judge');
+  if(errCount === 0 && warnCount === 0){
+    judgeEl.textContent = '合格'; judgeEl.className = 'sv ok';
+    document.getElementById('result-sub').textContent = '問題は検出されませんでした';
+  } else if(errCount > 0){
+    judgeEl.textContent = '要修正'; judgeEl.className = 'sv err';
+    document.getElementById('result-sub').textContent = `エラー${errCount}件を修正してください`;
+  } else {
+    judgeEl.textContent = '要確認'; judgeEl.className = 'sv warn';
+    document.getElementById('result-sub').textContent = `警告${warnCount}件を確認してください`;
+  }
+
+  /* AI総合コメント */
+  if(aiComment){
+    issues.unshift({level:'info', title:'AI総合評価', body: aiComment, rows:[]});
+  }
+
+  /* 問題リスト */
+  const wrap = document.getElementById('issues-wrap');
+  wrap.innerHTML = '';
+  if(!issues.length){
+    wrap.innerHTML = '<div class="issue info"><div class="issue-header"><span class="issue-badge badge-info">OK</span><span class="issue-title">問題は検出されませんでした</span></div><div class="issue-body">入力ミス・重複・異常値は見当たりません。</div></div>';
+  } else {
+    issues.forEach(issue => {
+      const div = document.createElement('div');
+      div.className = `issue ${issue.level}`;
+      const badgeClass = issue.level==='error'?'badge-error':issue.level==='warning'?'badge-warning':'badge-info';
+      const label = issue.level==='error'?'エラー':issue.level==='warning'?'警告':'情報';
+      let rowsHtml = '';
+      if(issue.rows?.length) rowsHtml = `<div class="issue-rows">該当行（Excel行番号）：${issue.rows.join('、')} 行</div>`;
+      if(issue.extra) rowsHtml += `<div class="issue-rows">${issue.extra}</div>`;
+      div.innerHTML = `<div class="issue-header"><span class="issue-badge ${badgeClass}">${label}</span><span class="issue-title">${issue.title}</span></div><div class="issue-body">${issue.body}</div>${rowsHtml}`;
+      wrap.appendChild(div);
+    });
+  }
+
+  /* 全データテーブル（問題行ハイライト） */
+  const errorRows = new Set(issues.filter(i=>i.level==='error').flatMap(i=>i.rows||[]).map(r=>r-2));
+  const warnRows  = new Set(issues.filter(i=>i.level==='warning').flatMap(i=>i.rows||[]).map(r=>r-2));
+  const keys = Object.keys(rawData[0]);
+  document.getElementById('data-head').innerHTML = '<tr>' + keys.map(k=>`<th>${k}</th>`).join('') + '</tr>';
+  document.getElementById('data-body').innerHTML = rawData.map((row,i)=>{
+    const cls = errorRows.has(i)?'hl-err':warnRows.has(i)?'hl-warn':'';
+    return `<tr class="${cls}">` + keys.map(k=>`<td>${row[k]??''}</td>`).join('') + '</tr>';
+  }).join('');
+
+  /* eTax整形 */
+  buildEtaxTable(cols);
+
+  show('result-card');
+}
+
+/* ===== eTax向け集計 ===== */
+function buildEtaxTable(cols){
+  if(!cols.amount || !cols.cat) return;
+  const catTotals = {};
+  rawData.forEach(row => {
+    const cat = String(row[cols.cat]||'未分類').trim();
+    const amount = toNum(row[cols.amount]) || 0;
+    const entity = cols.entity ? String(row[cols.entity]||'').trim() : '';
+    if(!catTotals[cat]) catTotals[cat] = {corp:0, personal:0};
+    if(entity === '個人') catTotals[cat].personal += amount;
+    else catTotals[cat].corp += amount;
+  });
+  const body = document.getElementById('etax-body');
+  let corpTotal=0, personalTotal=0;
+  body.innerHTML = Object.entries(catTotals).map(([cat,v])=>{
+    corpTotal+=v.corp; personalTotal+=v.personal;
+    return `<tr><td>${cat}</td><td style="text-align:right">${fy(v.corp)}</td><td style="text-align:right">${fy(v.personal)}</td><td style="text-align:right;font-weight:700">${fy(v.corp+v.personal)}</td></tr>`;
+  }).join('') + `<tr><td style="font-weight:700">合計</td><td style="text-align:right;font-weight:700">${fy(corpTotal)}</td><td style="text-align:right;font-weight:700">${fy(personalTotal)}</td><td style="text-align:right;font-weight:700">${fy(corpTotal+personalTotal)}</td></tr>`;
+  document.getElementById('etax-section').style.display = '';
+}
+
+function downloadEtaxCSV(){
+  const rows = [['勘定科目','法人（日昇リサーチ）','個人','合計']];
+  document.querySelectorAll('#etax-body tr').forEach(tr=>{
+    rows.push(Array.from(tr.querySelectorAll('td')).map(td=>td.textContent.trim()));
+  });
+  const csv = '\uFEFF' + rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
+  const blob = new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download='eTax用集計_'+new Date().toISOString().slice(0,10)+'.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ===== リセット ===== */
+function resetAll(){
+  rawData=[]; pdfFiles=[]; pdfAmounts=[];
+  document.getElementById('dz-name').textContent='';
+  document.getElementById('pdf-list').textContent='';
+  document.getElementById('file-input').value='';
+  document.getElementById('pdf-input').value='';
+  document.getElementById('check-btn').disabled=true;
+  document.getElementById('check-btn').textContent='データを検証する';
+  document.getElementById('prog-bar').style.width='0%';
+  hide('result-card');
+}
+</script>
+</body>
+</html>
