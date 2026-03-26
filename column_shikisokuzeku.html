@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>閑話・色即是空｜至誠の覚醒</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;700&family=Shippori+Mincho:wght@400;600;800&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a1208;--paper:#f5f0e8;--gold:#8a6914;--gold-light:#c9a84c;
+  --indigo:#1a3a5c;--smoke:#8a7f6e;--border:rgba(138,105,20,.2);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Noto Serif JP',serif;
+  background:var(--paper);color:var(--ink);
+  line-height:2;min-height:100vh;
+}
+
+/* 和紙テクスチャ */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:
+    repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(138,105,20,.015) 3px,rgba(138,105,20,.015) 4px),
+    repeating-linear-gradient(90deg,transparent,transparent 10px,rgba(138,105,20,.01) 10px,rgba(138,105,20,.01) 11px);
+  pointer-events:none;z-index:0;
+}
+
+/* ヘッダー */
+.story-header{
+  background:var(--indigo);color:#fff;
+  padding:10px 24px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:relative;z-index:1;
+}
+.story-header a{color:var(--gold-light);text-decoration:none;font-size:12px;letter-spacing:.1em;}
+.story-series{font-family:'Zen Old Mincho',serif;font-size:14px;letter-spacing:.3em;opacity:.8;}
+
+/* メインコンテンツ */
+main{
+  max-width:680px;margin:0 auto;
+  padding:60px 28px 100px;
+  position:relative;z-index:1;
+}
+
+/* コラムラベル */
+.column-label{
+  display:inline-flex;align-items:center;gap:10px;
+  margin-bottom:32px;
+}
+.cl-line{width:40px;height:1px;background:var(--gold);}
+.cl-text{
+  font-family:'Zen Old Mincho',serif;
+  font-size:11px;letter-spacing:.5em;color:var(--gold);
+}
+
+/* タイトル */
+.column-title{
+  font-family:'Shippori Mincho',serif;
+  font-size:2rem;font-weight:800;
+  color:var(--indigo);
+  letter-spacing:.15em;
+  line-height:1.5;
+  margin-bottom:8px;
+}
+.column-subtitle{
+  font-size:13px;color:var(--smoke);
+  letter-spacing:.2em;margin-bottom:48px;
+  padding-bottom:24px;
+  border-bottom:1px solid var(--border);
+}
+
+/* 本文 */
+.column-body{
+  font-size:15px;line-height:2.4;color:var(--ink);
+}
+.column-body p{
+  margin-bottom:2em;
+  text-indent:1em;
+}
+.column-body p.no-indent{
+  text-indent:0;
+}
+
+/* 引用・強調ブロック */
+.column-quote{
+  margin:2.5em 0;
+  padding:1.4em 1.8em;
+  border-left:3px solid var(--gold);
+  background:rgba(201,168,76,.06);
+  font-family:'Shippori Mincho',serif;
+  font-size:1.05em;
+  line-height:2.2;
+  color:var(--indigo);
+  letter-spacing:.08em;
+}
+.column-quote .qs{
+  display:block;
+  font-size:.72em;color:var(--smoke);
+  letter-spacing:.15em;margin-bottom:.5em;
+}
+
+/* 章の区切り */
+.section-mark{
+  text-align:center;
+  color:var(--gold);
+  font-size:18px;
+  letter-spacing:.8em;
+  margin:3em 0;
+  opacity:.6;
+}
+
+/* ルビ風傍点 */
+.dot{
+  text-decoration:underline dotted var(--gold);
+  text-underline-offset:4px;
+}
+
+/* 末尾署名 */
+.column-sign{
+  margin-top:4em;
+  padding-top:2em;
+  border-top:1px solid var(--border);
+  text-align:right;
+  font-size:12px;color:var(--smoke);
+  letter-spacing:.15em;
+  line-height:2.2;
+}
+
+/* ナビゲーション */
+.story-nav{
+  margin-top:3em;
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:12px;
+  padding-top:2em;border-top:1px solid var(--border);
+}
+.story-nav a{
+  color:var(--indigo);text-decoration:none;
+  letter-spacing:.1em;opacity:.8;
+}
+.story-nav a:hover{opacity:1;text-decoration:underline;}
+.nav-center{
+  font-family:'Zen Old Mincho',serif;
+  font-size:11px;color:var(--smoke);letter-spacing:.3em;
+}
+</style>
+</head>
+<body>
+
+<header class="story-header">
+  <div class="story-series">至誠の覚醒</div>
+  <a href="index.html">← サイトトップへ</a>
+</header>
+
+<main>
+
+  <div class="column-label">
+    <div class="cl-line"></div>
+    <div class="cl-text">閑 話 　 寄 り 道</div>
+    <div class="cl-line"></div>
+  </div>
+
+  <h1 class="column-title">色即是空<br>空即是色</h1>
+  <div class="column-subtitle">— 決まっているようで、決まっていない —</div>
+
+  <div class="column-body">
+
+    <p>レンタカーの予約が、入っていなかった。</p>
+
+    <p>前日の夜、会員登録を済ませ「登録できました」という画面を見て、安心して眠りについた。当日の朝になって初めて気づいた。車両の予約と、会員登録は、別の話だったのだと。</p>
+
+    <p>てんやわんやの末、幸いにも別の車両が手配できて事なきを得た。しかし後から方位盤を開いてみると、その日——2026年3月26日は、大凶と出ていた。</p>
+
+    <p class="no-indent">「ああ、そういうことか」</p>
+
+    <p>と、思うか。</p>
+
+    <p class="no-indent">「たまたまだろう」</p>
+
+    <p>と、一蹴するか。</p>
+
+    <p>どちらが正しいかを、私は決めない。それよりも、もっと面白いことを考えている。</p>
+
+    <div class="section-mark">✦　✦　✦</div>
+
+    <p>量子力学に、こういう話がある。</p>
+
+    <p>電子は観測されるまで、「波」として複数の場所に同時に存在している。しかし観測した瞬間、一つの場所に「粒」として確定する。観測という行為そのものが、現実を決定する。</p>
+
+    <p>アインシュタインはこれを嫌った。「神はサイコロを振らない」と言って最後まで認めようとしなかった。しかし実験は繰り返され、今では量子コンピュータの基礎となっている。</p>
+
+    <p>世界は<span class="dot">決まっているようで、決まっていない</span>。</p>
+
+    <div class="section-mark">✦　✦　✦</div>
+
+    <p>方位学も、似た構造を持っていると私は思う。</p>
+
+    <p>吉方位があるということは、凶方位もあるということだ。どちらへ行くかを、最終的に決めるのは自分である。方位盤は「観測装置」であって、「運命の宣告」ではない。</p>
+
+    <p>もし3月26日の朝、方位盤を開いていたら。「大凶」という文字を見ていたら。私はもう少し慎重に、予約の確認をしたかもしれない。あるいはそもそも外出を控えたかもしれない。</p>
+
+    <p>見なかったから、確認しなかった。</p>
+
+    <p>これは「大凶だったから失敗した」のではなく、「観測しなかったから、波が最悪の形で収束した」と言えないだろうか。</p>
+
+    <div class="section-mark">✦　✦　✦</div>
+
+    <div class="column-quote">
+      <span class="qs">般若心経より</span>
+      色即是空　空即是色
+    </div>
+
+    <p>「形あるものはすべて空であり、空はそのまま形である」——仏教の言葉だが、量子力学の教科書に書いてあっても違和感がない。粒子は波であり、波は粒子である。観測が現実を作る。</p>
+
+    <p>長い間、方位学も姓名科学も「迷信」と言われてきた。しかし牧正人史先生が昭和33年に発見された体系は、一万例を超える照合で精度95%を示している。これは「信じる信じない」の話ではなく、統計の話だ。</p>
+
+    <p>迷信と科学の境界線は、実は非常に曖昧である。かつて「地球が丸い」と言った人間も迷信扱いされた。「手を洗えば病気が減る」と言った医師も、同僚に嘲笑された。</p>
+
+    <p>真理はいつも、<span class="dot">時代より少し早く生まれてくる</span>。</p>
+
+    <div class="section-mark">✦　✦　✦</div>
+
+    <p>レンタカー騒動の翌日、私はもう一度方位盤を開いた。</p>
+
+    <p>今日の日盤、月盤、年盤。三つの星回りを確認し、吉方位を頭に入れてから外出する。郵便を出すなら、ポストの方角を確認する。手紙の宛先が北方向なら、北のポストを探す。</p>
+
+    <p>くだらないと笑う人もいるだろう。</p>
+
+    <p>しかし私はこの19年間、そうやって生きてきた。大きな失敗をしたときは後から必ず方位盤と照合し、符合することに静かに驚いてきた。確信は、押しつけではなく積み重ねから生まれる。</p>
+
+    <p>人生は決まっているようで、決まっていない。</p>
+
+    <p>その「決まっていない部分」を、どう使うか。それが方位学という道具の、本当の意味だと私は思っている。</p>
+
+  </div>
+
+  <div class="column-sign">
+    制作者　記<br>
+    令和八年　春
+  </div>
+
+  <div class="story-nav">
+    <a href="#">← 前の話へ</a>
+    <div class="nav-center">至誠の覚醒</div>
+    <a href="#">次の話へ →</a>
+  </div>
+
+</main>
+
+</body>
+</html>
