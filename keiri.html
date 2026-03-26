@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI経理アシスタント｜日昇リサーチ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;700&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
+<script src="keiri-storage.js"></script>
+<style>
+/* ===== 変数・リセット ===== */
+:root {
+  --ink: #1a1208;
+  --paper: #f5f0e8;
+  --gold: #b8960c;
+  --gold-light: #e8d48a;
+  --indigo: #1a3a5c;
+  --indigo-light: #e6f1fb;
+  --jade: #2d6a4f;
+  --jade-light: #e1f5ee;
+  --vermillion: #c0392b;
+  --vermillion-light: #faece7;
+  --mid: #6b6050;
+  --border: rgba(26,18,8,0.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Serif JP',serif;background:var(--paper);color:var(--ink);min-height:100vh;display:flex;flex-direction:column}
+
+/* ===== ヘッダー ===== */
+#site-header{background:var(--indigo);color:#fff;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+#site-header a{color:#fff;text-decoration:none;font-size:13px;opacity:0.8}
+#site-header a:hover{opacity:1}
+#site-logo{font-family:'Zen Old Mincho',serif;font-size:16px;letter-spacing:0.1em}
+#site-nav{display:flex;gap:16px}
+
+/* ===== 免責バナー ===== */
+#disclaimer{background:#fef9e7;border-bottom:1px solid #f0c040;padding:8px 20px;font-size:12px;color:#7a6000;text-align:center;line-height:1.6;flex-shrink:0}
+#disclaimer strong{color:#5a4000}
+
+/* ===== メインレイアウト ===== */
+#main{flex:1;display:flex;flex-direction:column;max-width:800px;width:100%;margin:0 auto;padding:0}
+
+/* ===== ヘッダー（チャット上部） ===== */
+#chat-header{padding:14px 20px;border-bottom:1px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+#ch-left{display:flex;align-items:center;gap:10px}
+#ch-logo{width:36px;height:36px;border-radius:8px;background:var(--indigo);display:flex;align-items:center;justify-content:center;font-family:'Zen Old Mincho',serif;font-size:16px;color:var(--gold-light)}
+#ch-title{font-size:15px;font-weight:700;color:var(--indigo)}
+#ch-sub{font-size:11px;color:var(--mid)}
+#ch-stats{display:flex;gap:16px}
+.st .sl{font-size:10px;color:var(--mid);text-align:right}
+.st .sv{font-size:14px;font-weight:700;text-align:right}
+.sv.inc{color:var(--jade)}.sv.exp{color:var(--vermillion)}
+
+/* ===== メッセージエリア ===== */
+#messages{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:12px;background:var(--paper);min-height:320px;max-height:calc(100vh - 380px)}
+.m{max-width:88%}
+.m.ai{align-self:flex-start}.m.user{align-self:flex-end}
+.bbl{padding:11px 15px;font-size:14px;line-height:1.7;border-radius:12px;font-family:'Noto Serif JP',serif}
+.ai .bbl{background:#fff;border:1px solid var(--border);color:var(--ink);border-radius:4px 12px 12px 12px}
+.user .bbl{background:var(--indigo);color:#fff;border-radius:12px 4px 12px 12px}
+.mt{font-size:10px;color:var(--mid);margin-top:3px;padding:0 4px}
+.ai .mt{text-align:left}.user .mt{text-align:right}
+
+/* ===== 仕分けカード ===== */
+.card{background:var(--paper);border:1px solid var(--gold-light);border-radius:8px;padding:10px 14px;margin-top:8px;font-size:13px}
+.cr{display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid rgba(184,150,12,0.1)}
+.cr:last-child{border-bottom:none}
+.ck{color:var(--mid);font-size:12px}.cv{font-weight:700;color:var(--ink)}
+.cv.inc{color:var(--jade)}.cv.exp{color:var(--vermillion)}
+.tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700}
+.ti{background:var(--jade-light);color:var(--jade)}
+.te{background:var(--vermillion-light);color:var(--vermillion)}
+.th{background:var(--indigo-light);color:var(--indigo)}
+.tp{background:#f3e8ff;color:#6b21a8}
+
+/* ===== 選択肢ボタン ===== */
+.choices{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.ch{padding:6px 13px;border:1px solid var(--gold);border-radius:20px;font-size:13px;cursor:pointer;background:#fff;color:var(--indigo);font-family:'Noto Serif JP',serif;transition:background 0.15s}
+.ch:hover{background:var(--gold-light)}
+
+/* ===== 入力エリア ===== */
+#iarea{padding:12px 20px;border-top:1px solid var(--border);background:#fff;flex-shrink:0}
+#upload-zone{border:2px dashed var(--gold-light);border-radius:8px;padding:12px 16px;text-align:center;cursor:pointer;margin-bottom:10px;background:var(--paper);transition:background 0.15s}
+#upload-zone:hover,#upload-zone.drag{background:var(--gold-light)}
+#uz-main{font-size:13px;color:var(--mid)}
+#uz-sub{font-size:11px;color:#aaa;margin-top:2px}
+#uz-name{font-size:12px;font-weight:700;color:var(--indigo);margin-top:4px}
+#file-input{display:none}
+#irow{display:flex;gap:8px;align-items:flex-end}
+#tinput{flex:1;border:1px solid var(--border);border-radius:8px;padding:9px 13px;font-size:14px;resize:none;font-family:'Noto Serif JP',serif;color:var(--ink);background:#fff;min-height:40px;max-height:80px;overflow-y:auto}
+#tinput:focus{outline:none;border-color:var(--gold)}
+#sbtn{width:40px;height:40px;border-radius:8px;border:1px solid var(--gold);background:var(--indigo);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;transition:background 0.15s}
+#sbtn:hover{background:var(--gold)}
+
+/* ===== タイピング ===== */
+.typing{display:flex;align-items:center;gap:5px;padding:11px 15px;background:#fff;border:1px solid var(--border);border-radius:4px 12px 12px 12px;width:fit-content}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:bk 1s infinite}
+.dot:nth-child(2){animation-delay:.15s}.dot:nth-child(3){animation-delay:.3s}
+@keyframes bk{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+
+/* ===== フッター ===== */
+#footer{background:var(--indigo);color:rgba(255,255,255,0.6);font-size:11px;text-align:center;padding:10px 20px;flex-shrink:0}
+#footer a{color:var(--gold-light);text-decoration:none}
+
+/* ===== プレミアムモーダル ===== */
+#premium-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100;align-items:center;justify-content:center}
+#premium-modal.show{display:flex}
+#pm-box{background:#fff;border-radius:12px;padding:28px 32px;max-width:400px;width:90%;text-align:center;border-top:4px solid var(--gold)}
+#pm-box h2{font-family:'Zen Old Mincho',serif;font-size:20px;color:var(--indigo);margin-bottom:8px}
+#pm-box p{font-size:13px;color:var(--mid);line-height:1.8;margin-bottom:16px}
+#pm-price{font-size:28px;font-weight:700;color:var(--gold);margin-bottom:4px}
+#pm-price span{font-size:14px;color:var(--mid)}
+.pm-btn{display:block;width:100%;padding:12px;border-radius:8px;font-size:15px;font-family:'Noto Serif JP',serif;cursor:pointer;margin-top:10px;font-weight:700;border:none}
+#pm-stripe{background:var(--indigo);color:#fff}
+#pm-stripe:hover{background:#0f2a45}
+#pm-close{background:transparent;color:var(--mid);border:1px solid var(--border);font-size:13px}
+#use-count{font-size:12px;color:var(--mid);text-align:right;margin-bottom:6px}
+
+@media(max-width:600px){
+  #site-nav{display:none}
+  #ch-stats{gap:10px}
+  #messages{max-height:calc(100vh - 420px)}
+}
+</style>
+</head>
+<body>
+
+<!-- サイトヘッダー -->
+<header id="site-header">
+  <div id="site-logo">日昇リサーチ</div>
+  <nav id="site-nav">
+    <a href="index.html">ホーム</a>
+    <a href="namemaster_v5.html">姓名科学</a>
+    <a href="houigaku.html">方位学</a>
+    <a href="keiri.html" style="color:var(--gold-light);font-weight:700">経理AI</a>
+  </nav>
+</header>
+
+<!-- 免責バナー -->
+<div id="disclaimer">
+  <strong>ご注意：</strong>本ツールは帳簿記録・仕分けの補助を目的としています。税務申告の最終判断は税理士または利用者ご自身の責任においてお願いします。本ツールは税理士業務の代替ではありません。
+</div>
+
+<!-- メイン -->
+<div id="main">
+  <!-- チャットヘッダー -->
+  <div id="chat-header">
+    <div id="ch-left">
+      <div id="ch-logo">経</div>
+      <div>
+        <div id="ch-title">AI経理アシスタント</div>
+        <div id="ch-sub">レシート・PDF・テキスト入力対応</div>
+      </div>
+    </div>
+    <div id="ch-stats">
+      <div class="st"><div class="sl">今月の収入</div><div class="sv inc" id="s-inc">¥0</div></div>
+      <div class="st"><div class="sl">今月の支出</div><div class="sv exp" id="s-exp">¥0</div></div>
+    </div>
+  </div>
+
+  <!-- メッセージ -->
+  <div id="messages"></div>
+
+  <!-- 入力エリア -->
+  <div id="iarea">
+    <div id="use-count">無料残り：<span id="uc-num">3</span>回</div>
+    <div id="upload-zone"
+         onclick="document.getElementById('file-input').click()"
+         ondragover="event.preventDefault();this.classList.add('drag')"
+         ondragleave="this.classList.remove('drag')"
+         ondrop="onDrop(event)">
+      <div id="uz-main">レシート・領収書・請求書をドロップ（PDF・JPG・PNG）</div>
+      <div id="uz-sub">クリックでも選択できます</div>
+      <div id="uz-name"></div>
+    </div>
+    <input type="file" id="file-input" accept=".pdf,.jpg,.jpeg,.png" onchange="onFile(this.files[0])">
+    <div id="irow">
+      <textarea id="tinput" placeholder="「タクシー代2,300円」など、ざっくりでOKです" rows="1"
+                onkeydown="hkey(event)" oninput="ars(this)"></textarea>
+      <button id="sbtn" onclick="sendText()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- フッター -->
+<footer id="footer">
+  © 日昇リサーチ株式会社　<a href="index.html">サイトトップへ</a>　|　本ツールは税理士業務の代替ではありません
+</footer>
+
+<!-- プレミアムモーダル -->
+<div id="premium-modal">
+  <div id="pm-box">
+    <h2>無料回数を使い切りました</h2>
+    <p>プレミアム会員になると、AI経理アシスタントが使い放題になります。姓名科学・方位学ツールもすべて利用できます。</p>
+    <div id="pm-price">¥580<span>／月（税込）</span></div>
+    <button class="pm-btn" id="pm-stripe" onclick="goStripe()">Stripeで登録する</button>
+    <button class="pm-btn" id="pm-close" onclick="closeModal()">閉じる</button>
+  </div>
+</div>
+
+<script>
+/* ===== 状態管理 ===== */
+const STRIPE_URL = 'https://buy.stripe.com/3cI00ldw980I9zl7fkbEA01';
+const GAS_URL   = ''; // ← GASのデプロイURLをここに貼る
+const FREE_LIMIT = 3;
+
+let useCount   = parseInt(localStorage.getItem('keiri_use') || '0');
+let isPremium  = localStorage.getItem('keiri_premium') === '1';
+let totalInc   = 0, totalExp = 0;
+let history    = [];
+
+/* ===== プロフィール読み込み ===== */
+function loadProfile() {
+  try { return JSON.parse(localStorage.getItem('keiri_profile') || 'null'); } catch(e) { return null; }
+}
+
+function buildProfileContext(p) {
+  if (!p) return '';
+  const lines = ['【利用者プロフィール（設定済み）】'];
+  if (p.entity_label) lines.push('事業形態：' + p.entity_label);
+  if (p.corp_name)    lines.push('法人名：' + (p.corp_type||'') + p.corp_name);
+  if (p.corp_rep)     lines.push('代表者：' + p.corp_rep);
+  if (p.corp_invoice) lines.push('インボイス番号：' + p.corp_invoice);
+  if (p.corp_tax_method) lines.push('消費税方式：' + p.corp_tax_method);
+  if (p.corp_fy_start) lines.push('事業年度：' + p.corp_fy_start + '月始まり');
+  if (p.corp_tax_office) lines.push('所轄税務署：' + p.corp_tax_office);
+  if (p.sole_name)    lines.push('個人氏名：' + p.sole_name);
+  if (p.sole_trade_name) lines.push('屋号：' + p.sole_trade_name);
+  if (p.sole_blue)    lines.push('申告方式：' + p.sole_blue);
+  if (p.sole_tax_method) lines.push('個人消費税：' + p.sole_tax_method);
+  if (p.address)      lines.push('所在地：' + p.address);
+  if (p.entity === 'both') lines.push('※ 法人・個人が混在しています。支出の都度、どちらに帰属するか確認してください。');
+  return lines.join('\n');
+}
+
+/* ===== 初期表示（スクリプト末尾で呼ぶ） ===== */
+
+function updateUseCount() {
+  const rem = Math.max(0, FREE_LIMIT - useCount);
+  document.getElementById('uc-num').textContent = isPremium ? '∞' : rem;
+}
+function canUse() {
+  return isPremium || useCount < FREE_LIMIT;
+}
+function consumeUse() {
+  if (!isPremium) {
+    useCount++;
+    localStorage.setItem('keiri_use', useCount);
+    updateUseCount();
+  }
+}
+
+/* ===== UI ヘルパー ===== */
+const msgsEl = document.getElementById('messages');
+const inp    = document.getElementById('tinput');
+
+function ftime() {
+  const d = new Date();
+  return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+}
+function fy(n) { return '¥' + Math.round(n).toLocaleString(); }
+function ars(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 80) + 'px'; }
+function hkey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendText(); } }
+
+function addMsg(text, role, extra) {
+  const d = document.createElement('div');
+  d.className = 'm ' + role;
+  const b = document.createElement('div');
+  b.className = 'bbl';
+  b.innerHTML = text;
+  if (extra) b.appendChild(extra);
+  d.appendChild(b);
+  const t = document.createElement('div');
+  t.className = 'mt';
+  t.textContent = ftime();
+  d.appendChild(t);
+  msgsEl.appendChild(d);
+  msgsEl.scrollTop = msgsEl.scrollHeight;
+}
+
+function showTyping() {
+  const d = document.createElement('div');
+  d.className = 'm ai'; d.id = 'typ';
+  d.innerHTML = '<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+  msgsEl.appendChild(d);
+  msgsEl.scrollTop = msgsEl.scrollHeight;
+}
+function removeTyping() { const t = document.getElementById('typ'); if (t) t.remove(); }
+
+/* ===== レスポンス解析 ===== */
+function parseResp(raw) {
+  let text = raw, entry = null, choices = [];
+  const em = raw.match(/<entry>([\s\S]*?)<\/entry>/);
+  if (em) {
+    try { entry = JSON.parse(em[1].trim()); } catch(e) {}
+    text = text.replace(/<entry>[\s\S]*?<\/entry>/, '');
+  }
+  const cm = text.match(/<choices>(.*?)<\/choices>/);
+  if (cm) {
+    choices = cm[1].split('|').map(s => s.trim()).filter(Boolean);
+    text = text.replace(/<choices>.*?<\/choices>/, '');
+  }
+  return { text: text.trim(), entry, choices };
+}
+
+function buildCard(e) {
+  const d = document.createElement('div');
+  d.className = 'card';
+  const tt = e.type === '収入' ? '<span class="tag ti">収入</span>' : '<span class="tag te">支出</span>';
+  const et = e.entity === '法人' ? '<span class="tag th">法人</span>' : '<span class="tag tp">個人</span>';
+  let inv = e.invoice_no ? `<div class="cr"><span class="ck">インボイス番号</span><span class="cv" style="font-size:11px">${e.invoice_no}</span></div>` : '';
+  let tax = e.tax_amount ? `<div class="cr"><span class="ck">消費税</span><span class="cv">${fy(e.tax_amount)}</span></div>` : '';
+  d.innerHTML = `
+    <div class="cr"><span class="ck">日付</span><span class="cv">${e.date}</span></div>
+    <div class="cr"><span class="ck">支払先</span><span class="cv">${e.vendor||'—'}</span></div>
+    <div class="cr"><span class="ck">区分</span><span>${et} ${tt}</span></div>
+    <div class="cr"><span class="ck">勘定科目</span><span class="cv">${e.category}</span></div>
+    <div class="cr"><span class="ck">金額</span><span class="cv ${e.type==='収入'?'inc':'exp'}" style="font-size:16px">${fy(e.amount)}</span></div>
+    ${tax}${inv}
+    <div class="cr"><span class="ck">摘要</span><span class="cv" style="font-size:11px;color:var(--mid)">${e.memo}</span></div>`;
+  return d;
+}
+
+function buildChoices(choices) {
+  if (!choices.length) return null;
+  const d = document.createElement('div');
+  d.className = 'choices';
+  choices.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'ch'; btn.textContent = c;
+    btn.onclick = () => { inp.value = c; sendText(); };
+    d.appendChild(btn);
+  });
+  return d;
+}
+
+function updateStats(entry) {
+  if (!entry) return;
+  if (entry.type === '収入') { totalInc += entry.amount; document.getElementById('s-inc').textContent = fy(totalInc); }
+  else { totalExp += entry.amount; document.getElementById('s-exp').textContent = fy(totalExp); }
+}
+
+/* ===== Claude API ===== */
+function buildSYS() {
+  const p = loadProfile();
+  const profileCtx = buildProfileContext(p);
+  const corpName = p?.corp_name || '利用者の法人';
+  const soleName = p?.sole_name || p?.corp_rep || '利用者';
+  const entityNote = p?.entity === 'both'
+    ? `法人（${corpName}）と個人（${soleName}）が混在しています。支出の用途が不明な場合は必ず法人・個人どちらかを確認してください。`
+    : p?.entity === 'sole'
+    ? `個人事業主（${soleName}）の経理です。`
+    : `法人（${corpName}）の経理です。`;
+
+  return `あなたは専属の経理アシスタントです。
+${entityNote}
+
+${profileCtx}
+
+レシート・領収書・PDF・テキストが届いたら：
+1. 店名・日付・合計金額・インボイス登録番号（Tから始まる13桁）・消費税額を自動抽出
+2. 法人・個人の区別、用途が不明なら短く質問する（プロフィールから明らかな場合は質問不要）
+3. 質問は1回に1〜2個まで。選択肢がある場合は <choices> タグで提示
+4. 仕分けが完成したら <entry> タグでJSONを出力
+
+仕分け完成時のJSON：
+<entry>
+{
+  "date": "YYYY-MM-DD",
+  "entity": "法人" または "個人",
+  "type": "収入" または "支出",
+  "category": "勘定科目",
+  "amount": 数値,
+  "tax_amount": 消費税額（不明なら0）,
+  "invoice_no": "インボイス番号（なければ空文字）",
+  "vendor": "支払先名",
+  "memo": "摘要"
+}
+</entry>
+
+選択肢提示：<choices>選択肢1|選択肢2|選択肢3</choices>
+
+今日：${new Date().toISOString().slice(0,10)}
+回答は簡潔・親しみやすく。必ず日本語で。`;
+}
+
+async function callAI(messages) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json', 'x-api-key': 'YOUR_API_KEY_HERE', 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true'},
+    body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, system: buildSYS(), messages })
+  });
+  const data = await res.json();
+  return data.content?.map(b => b.text || '').join('') || 'エラーが発生しました';
+}
+
+async function sendWithContent(userContent, displayText) {
+  if (!canUse()) { showModal(); return; }
+  consumeUse();
+  addMsg(displayText, 'user');
+  history.push({ role: 'user', content: userContent });
+  showTyping();
+  try {
+    const raw = await callAI(history);
+    removeTyping();
+    history.push({ role: 'assistant', content: raw });
+    const { text, entry, choices } = parseResp(raw);
+    const extra = document.createElement('div');
+    if (entry) extra.appendChild(buildCard(entry));
+    const cEl = buildChoices(choices);
+    if (cEl) extra.appendChild(cEl);
+    addMsg(text, 'ai', extra.children.length ? extra : null);
+    updateStats(entry);
+    if (entry) saveEntry(entry);
+  } catch(e) {
+    removeTyping();
+    addMsg('通信エラーが発生しました。もう一度お試しください。', 'ai');
+  }
+}
+
+function sendText() {
+  const txt = inp.value.trim();
+  if (!txt) return;
+  inp.value = ''; inp.style.height = 'auto';
+  sendWithContent(txt, txt);
+}
+
+/* ===== ファイル読み込み ===== */
+function toBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(',')[1]);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+
+async function onFile(file) {
+  if (!file) return;
+  document.getElementById('uz-name').textContent = '📎 ' + file.name;
+  const b64 = await toBase64(file);
+  const isImg = file.type.startsWith('image/');
+  const mediaType = isImg ? file.type : 'application/pdf';
+  const docType = isImg ? 'image' : 'document';
+  const content = [
+    { type: docType, source: { type: 'base64', media_type: mediaType, data: b64 } },
+    { type: 'text', text: 'このレシート・領収書・書類を読み取って、仕分けに必要な情報を抽出してください。不明な点は質問してください。' }
+  ];
+  await sendWithContent(content, '📎 ' + file.name + ' を送信しました');
+}
+
+function onDrop(ev) {
+  ev.preventDefault();
+  document.getElementById('upload-zone').classList.remove('drag');
+  const f = ev.dataTransfer.files[0];
+  if (f) onFile(f);
+}
+
+/* ===== データ保存（Gist） ===== */
+async function saveEntry(entry) {
+  // GAS保存（設定済みの場合）
+  if (GAS_URL) {
+    fetch(GAS_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: {'Content-Type': 'application/json', 'x-api-key': 'YOUR_API_KEY_HERE', 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true'},
+      body: JSON.stringify({ type: 'keiri', entry })
+    });
+  }
+  // Gist保存（設定済みの場合）
+  if (typeof KS !== 'undefined' && KS.isConfigured()) {
+    try {
+      await KS.addEntry(entry);
+      showSaveToast('✅ Gistに保存しました');
+    } catch(e) {
+      showSaveToast('⚠️ Gist保存に失敗しました');
+    }
+  } else if (typeof KS !== 'undefined') {
+    showSaveToast('💾 <a href="keiri-setup.html" style="color:var(--gold-light)">Gistを設定</a>するとデータが永続保存されます');
+  }
+}
+
+function showSaveToast(msg) {
+  const t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:20px;right:20px;background:var(--indigo);color:#fff;padding:10px 16px;border-radius:8px;font-size:12px;z-index:999;line-height:1.6;max-width:280px';
+  t.innerHTML = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+/* ===== Stripe / モーダル ===== */
+function showModal() { document.getElementById('premium-modal').classList.add('show'); }
+function closeModal() { document.getElementById('premium-modal').classList.remove('show'); }
+function goStripe() {
+  if (STRIPE_URL) window.open(STRIPE_URL, '_blank');
+  else alert('Stripe URLを設定してください（STRIPE_URL定数）');
+}
+
+/* ===== 初期メッセージ ===== */
+function initGreet() {
+  const p = loadProfile();
+  const extra = document.createElement('div');
+
+  // 設定未完了バナー
+  if (!p) {
+    const banner = document.createElement('div');
+    banner.style.cssText = 'background:#fef3cd;border:1px solid #f0c040;border-radius:6px;padding:10px 13px;margin-bottom:10px;font-size:12px;color:#7a6000;line-height:1.7';
+    banner.innerHTML = '⚙️ <strong>初回設定がまだです。</strong><a href="keiri-setup.html" style="color:var(--indigo);font-weight:700">こちらで法人・個人情報を設定</a>すると、毎回の質問が減ります。';
+    extra.appendChild(banner);
+  }
+
+  const choices = buildChoices([
+    p?.corp_name ? p.corp_name + 'の売上を記録' : 'Stripe売上が入金された',
+    'タクシー代を払った',
+    'コンビニで買い物した',
+    '今月の損益を見たい'
+  ]);
+  if (choices) extra.appendChild(choices);
+
+  const name = p?.corp_name || p?.sole_name || '';
+  const greeting = name ? `${name} の経理アシスタントです。` : 'こんにちは。';
+
+  addMsg(
+    greeting + 'レシート・支払いをざっくり入力してください。<br>' +
+    (p?.entity === 'both'
+      ? `法人（${p.corp_name||'法人'}）と個人（${p.sole_name||p.corp_rep||'個人'}）が混在している場合は、都度確認しながら整理します。`
+      : '法人・個人の区別や勘定科目は、私が確認しながら整理します。') +
+    '<br>PDF・画像のレシートもそのままドロップできます。',
+    'ai', extra
+  );
+}
+
+/* ===== 初期化（全関数・変数の定義が終わってから実行） ===== */
+updateUseCount();
+initGreet();
+</script>
+</body>
+</html>
