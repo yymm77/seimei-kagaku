@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>九星暦の読み方 ｜ 解説篇</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;700;900&family=Noto+Serif+JP:wght@300;400;700&family=Shippori+Mincho:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:#0d0b08; --paper:#f7f2e8; --aged:#e8dfc8; --gold:#a07c20;
+  --gold-light:#c9a84c; --vermillion:#9b2335; --indigo:#1a2f5a;
+  --jade:#1e5c3a; --smoke:#6b6358;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--paper);color:var(--ink);font-family:'Noto Serif JP',serif;line-height:2;overflow-x:hidden;}
+
+/* ヘッダー */
+header{background:var(--indigo);padding:0;overflow:hidden;position:relative;}
+header::before{content:'';position:absolute;top:-60px;right:-60px;width:300px;height:300px;border:1px solid rgba(201,168,76,.15);border-radius:50%;}
+header::after{content:'';position:absolute;bottom:-80px;left:-40px;width:200px;height:200px;border:1px solid rgba(201,168,76,.1);border-radius:50%;}
+.header-inner{max-width:900px;margin:0 auto;padding:2.5rem 2rem;display:flex;align-items:center;gap:2rem;position:relative;z-index:2;}
+.header-icon{font-size:3rem;opacity:.8;}
+.header-text h1{font-family:'Zen Old Mincho',serif;font-size:1.6rem;color:#f7f2e8;letter-spacing:.35em;}
+.header-text p{font-size:.72rem;color:var(--gold-light);letter-spacing:.35em;margin-top:.3rem;}
+
+/* ナビ */
+nav{background:rgba(8,12,28,.95);border-top:1px solid rgba(201,168,76,.25);border-bottom:1px solid rgba(201,168,76,.25);}
+nav ul{display:flex;list-style:none;max-width:900px;margin:0 auto;flex-wrap:wrap;}
+nav ul li a{display:block;padding:.7rem 1.4rem;color:#c9c0aa;text-decoration:none;font-size:.75rem;letter-spacing:.1em;transition:.3s;}
+nav ul li a:hover{color:var(--gold-light);background:rgba(201,168,76,.1);}
+.nav-back{margin-left:auto;}
+
+/* メインコンテンツ */
+main{max-width:860px;margin:0 auto;padding:3rem 2rem 6rem;}
+
+/* 目次 */
+.toc{background:var(--indigo);color:var(--gold-light);padding:2rem 2.5rem;border-radius:2px;margin-bottom:3.5rem;position:relative;}
+.toc::before{content:'目次';font-family:'Zen Old Mincho',serif;font-size:.65rem;letter-spacing:.4em;color:var(--gold);display:block;margin-bottom:1rem;border-bottom:1px solid rgba(201,168,76,.3);padding-bottom:.5rem;}
+.toc ol{padding-left:1.2rem;}
+.toc li{font-size:.82rem;line-height:2.2;letter-spacing:.05em;}
+.toc li a{color:var(--gold-light);text-decoration:none;transition:.2s;}
+.toc li a:hover{color:#fff;}
+.toc .toc-sub{font-size:.72rem;color:rgba(201,168,76,.65);margin-left:1rem;}
+
+/* セクション */
+.section{margin-bottom:5rem;}
+.section-header{display:flex;align-items:baseline;gap:1.2rem;margin-bottom:2rem;border-bottom:2px solid var(--gold);padding-bottom:.8rem;}
+.section-num{font-family:'Shippori Mincho',serif;font-size:3rem;font-weight:800;color:var(--aged);line-height:1;}
+.section-title{font-family:'Zen Old Mincho',serif;font-size:1.25rem;letter-spacing:.2em;color:var(--indigo);}
+.section-sub{font-family:'Zen Old Mincho',serif;font-size:1rem;letter-spacing:.15em;color:var(--indigo);margin:2rem 0 .8rem;padding-left:.8rem;border-left:3px solid var(--gold);}
+
+p{margin-bottom:1.2rem;font-size:.9rem;line-height:2.1;}
+
+/* カード */
+.card{background:white;border:1px solid rgba(160,124,32,.2);padding:1.8rem;box-shadow:0 3px 16px rgba(0,0,0,.05);margin:1.5rem 0;}
+.card-title{font-family:'Zen Old Mincho',serif;font-size:.88rem;letter-spacing:.15em;color:var(--indigo);margin-bottom:.8rem;padding-bottom:.4rem;border-bottom:1px solid rgba(160,124,32,.2);}
+
+/* 強調ボックス */
+.box-gold{background:rgba(160,124,32,.08);border:1px solid rgba(160,124,32,.3);border-left:4px solid var(--gold);padding:1.2rem 1.5rem;margin:1.5rem 0;border-radius:0 2px 2px 0;}
+.box-indigo{background:rgba(26,47,90,.06);border:1px solid rgba(26,47,90,.2);border-left:4px solid var(--indigo);padding:1.2rem 1.5rem;margin:1.5rem 0;border-radius:0 2px 2px 0;}
+.box-label{font-size:.65rem;letter-spacing:.3em;color:var(--smoke);margin-bottom:.4rem;}
+.box-main{font-size:.9rem;line-height:1.9;}
+
+/* SVG図解 */
+.figure{margin:2rem 0;text-align:center;}
+.figure figcaption{font-size:.72rem;color:var(--smoke);letter-spacing:.1em;margin-top:.6rem;}
+
+/* テーブル */
+table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:.82rem;}
+th{background:var(--indigo);color:var(--gold-light);padding:.6rem .8rem;text-align:center;font-family:'Zen Old Mincho',serif;font-weight:400;letter-spacing:.1em;}
+td{padding:.5rem .8rem;border:1px solid rgba(160,124,32,.2);text-align:center;}
+tr:nth-child(even) td{background:rgba(160,124,32,.04);}
+
+/* 区切り線 */
+.divider{display:flex;align-items:center;gap:1rem;margin:3rem 0;opacity:.4;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--gold);}
+.divider span{font-family:'Zen Old Mincho',serif;font-size:.7rem;color:var(--gold);letter-spacing:.3em;}
+
+/* ポイント */
+.point-list{list-style:none;margin:1rem 0;}
+.point-list li{padding:.5rem 0 .5rem 1.8rem;position:relative;font-size:.88rem;border-bottom:1px dotted rgba(160,124,32,.2);}
+.point-list li::before{content:'✦';position:absolute;left:0;color:var(--gold);font-size:.7rem;top:.6rem;}
+
+/* フッター */
+footer{background:var(--indigo);padding:2rem;text-align:center;}
+footer p{color:rgba(201,168,76,.6);font-size:.7rem;letter-spacing:.15em;}
+
+/* レスポンシブ */
+@media(max-width:640px){
+  main{padding:2rem 1.2rem 4rem;}
+  .section-num{font-size:2rem;}
+  .section-title{font-size:1rem;}
+  .header-inner{padding:1.5rem 1.2rem;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-icon">☯</div>
+    <div class="header-text">
+      <h1>九 星 暦 の 読 み 方</h1>
+      <p>解 説 篇 ｜ 暦 日 大 鑑 に 基 づ く 九 星 気 学 の 基 礎</p>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <ul>
+    <li><a href="#part1">入門篇</a></li>
+    <li><a href="#part2">仕組み篇</a></li>
+    <li><a href="#part3">実践篇</a></li>
+    <li class="nav-back"><a href="houigaku.html">← 方位学ツールへ戻る</a></li>
+  </ul>
+</nav>
+
+<main>
+
+  <!-- 目次 -->
+  <nav class="toc">
+    <ol>
+      <li><a href="#s1">九星とは何か</a></li>
+      <li><a href="#s2">三盤の構造——年盤・月盤・日盤</a></li>
+      <li><a href="#s3">陽遁と陰遁——日盤の流れ方</a></li>
+      <li><a href="#s4">節入りと月盤の切り替わり</a></li>
+      <li><a href="#s5">吉方位の考え方</a></li>
+      <li><a href="#s6">方位学ツールの使い方</a></li>
+    </ol>
+  </nav>
+
+  <!-- 入門篇 -->
+  <div class="divider"><span>入 門 篇</span></div>
+
+  <!-- 第一節 -->
+  <section class="section" id="s1">
+    <div class="section-header">
+      <span class="section-num">一</span>
+      <span class="section-title">九星とは何か</span>
+    </div>
+
+    <p>九星気学は、中国古来の陰陽五行思想を基礎とし、日本で独自に発展した暦学の一体系です。天地の気の流れを「九つの星」で表し、生年・生月・生日に対応する星と、行動する日時・方位の星との関係から吉凶を判断します。</p>
+
+    <p>九星は一白水星から九紫火星まで九種あり、それぞれ固有の気質・五行・方位を持ちます。</p>
+
+    <div class="figure">
+      <svg viewBox="0 0 700 180" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;width:100%;">
+        <defs>
+          <style>
+            .star-box{rx:4;ry:4;}
+            .star-name{font-family:'Noto Serif JP',serif;font-size:11px;fill:#f7f2e8;text-anchor:middle;}
+            .star-num{font-family:'Shippori Mincho',serif;font-size:22px;font-weight:800;text-anchor:middle;}
+            .star-elem{font-family:'Noto Serif JP',serif;font-size:9px;fill:rgba(255,255,255,.65);text-anchor:middle;}
+          </style>
+          <!-- 五行カラー -->
+        </defs>
+        <!-- 一白水星 -->
+        <rect x="10" y="20" width="70" height="140" fill="#1a2f5a" class="star-box"/>
+        <text x="45" y="52" class="star-num" fill="#7ab8e8">一</text>
+        <text x="45" y="95" class="star-name">白</text>
+        <text x="45" y="113" class="star-name">水</text>
+        <text x="45" y="131" class="star-name">星</text>
+        <text x="45" y="150" class="star-elem">水・北</text>
+        <!-- 二黒土星 -->
+        <rect x="88" y="20" width="70" height="140" fill="#3d2b1f" class="star-box"/>
+        <text x="123" y="52" class="star-num" fill="#c8a87a">二</text>
+        <text x="123" y="95" class="star-name">黒</text>
+        <text x="123" y="113" class="star-name">土</text>
+        <text x="123" y="131" class="star-name">星</text>
+        <text x="123" y="150" class="star-elem">土・南西</text>
+        <!-- 三碧木星 -->
+        <rect x="166" y="20" width="70" height="140" fill="#1e4d2b" class="star-box"/>
+        <text x="201" y="52" class="star-num" fill="#7ecf8e">三</text>
+        <text x="201" y="95" class="star-name">碧</text>
+        <text x="201" y="113" class="star-name">木</text>
+        <text x="201" y="131" class="star-name">星</text>
+        <text x="201" y="150" class="star-elem">木・東</text>
+        <!-- 四緑木星 -->
+        <rect x="244" y="20" width="70" height="140" fill="#1e4d2b" class="star-box"/>
+        <text x="279" y="52" class="star-num" fill="#a8e0a0">四</text>
+        <text x="279" y="95" class="star-name">緑</text>
+        <text x="279" y="113" class="star-name">木</text>
+        <text x="279" y="131" class="star-name">星</text>
+        <text x="279" y="150" class="star-elem">木・東南</text>
+        <!-- 五黄土星 -->
+        <rect x="322" y="20" width="70" height="140" fill="#5a4000" class="star-box"/>
+        <text x="357" y="52" class="star-num" fill="#f0c040">五</text>
+        <text x="357" y="95" class="star-name">黄</text>
+        <text x="357" y="113" class="star-name">土</text>
+        <text x="357" y="131" class="star-name">星</text>
+        <text x="357" y="150" class="star-elem">土・中央</text>
+        <!-- 六白金星 -->
+        <rect x="400" y="20" width="70" height="140" fill="#3a3a3a" class="star-box"/>
+        <text x="435" y="52" class="star-num" fill="#e8e0c8">六</text>
+        <text x="435" y="95" class="star-name">白</text>
+        <text x="435" y="113" class="star-name">金</text>
+        <text x="435" y="131" class="star-name">星</text>
+        <text x="435" y="150" class="star-elem">金・北西</text>
+        <!-- 七赤金星 -->
+        <rect x="478" y="20" width="70" height="140" fill="#6b1a1a" class="star-box"/>
+        <text x="513" y="52" class="star-num" fill="#f08080">七</text>
+        <text x="513" y="95" class="star-name">赤</text>
+        <text x="513" y="113" class="star-name">金</text>
+        <text x="513" y="131" class="star-name">星</text>
+        <text x="513" y="150" class="star-elem">金・西</text>
+        <!-- 八白土星 -->
+        <rect x="556" y="20" width="70" height="140" fill="#3d2b1f" class="star-box"/>
+        <text x="591" y="52" class="star-num" fill="#e8d0a0">八</text>
+        <text x="591" y="95" class="star-name">白</text>
+        <text x="591" y="113" class="star-name">土</text>
+        <text x="591" y="131" class="star-name">星</text>
+        <text x="591" y="150" class="star-elem">土・北東</text>
+        <!-- 九紫火星 -->
+        <rect x="634" y="20" width="66" height="140" fill="#6b1a2f" class="star-box"/>
+        <text x="667" y="52" class="star-num" fill="#f0607a">九</text>
+        <text x="667" y="95" class="star-name">紫</text>
+        <text x="667" y="113" class="star-name">火</text>
+        <text x="667" y="131" class="star-name">星</text>
+        <text x="667" y="150" class="star-elem">火・南</text>
+      </svg>
+      <figcaption>九星一覧（左：一白水星 ～ 右：九紫火星）</figcaption>
+    </div>
+
+    <p>九星は年・月・日それぞれに配当され、年ごと・月ごと・日ごとに一つずつ逆行（九紫→八白→七赤→…→一白→九紫）していきます。ただし日盤だけは「陽遁・陰遁」により順行と逆行が切り替わります（詳細は第三節）。</p>
+
+    <div class="box-gold">
+      <div class="box-label">ポイント</div>
+      <div class="box-main">人は生まれた年・月から「本命星」と「月命星」を持ちます。この二星と、行動する日・方位の九星との関係が、吉凶判断の核心です。</div>
+    </div>
+
+  </section>
+
+  <!-- 入門篇 第二節 -->
+  <section class="section" id="s2">
+    <div class="section-header">
+      <span class="section-num">二</span>
+      <span class="section-title">三盤の構造——年盤・月盤・日盤</span>
+    </div>
+
+    <p>九星気学では、時間の流れを「年・月・日」の三層で捉えます。それぞれに九星が配当され、この三層を重ね合わせて方位の吉凶を判断します。</p>
+
+    <div class="figure">
+      <svg viewBox="0 0 600 260" xmlns="http://www.w3.org/2000/svg" style="max-width:600px;width:100%;">
+        <!-- 年盤 -->
+        <rect x="20" y="10" width="560" height="68" rx="4" fill="#1a2f5a" opacity=".95"/>
+        <text x="40" y="35" font-family="'Zen Old Mincho',serif" font-size="11" fill="#c9a84c" letter-spacing="3">年　盤</text>
+        <text x="40" y="60" font-family="'Noto Serif JP',serif" font-size="11" fill="#e8e0c8">今年（2026年）の九星　→　一白水星　　1年を通じた大きな気の流れ</text>
+        <rect x="500" y="22" width="64" height="44" rx="3" fill="rgba(201,168,76,.15)"/>
+        <text x="532" y="42" font-family="'Shippori Mincho',serif" font-size="20" fill="#c9a84c" text-anchor="middle" font-weight="800">一</text>
+        <text x="532" y="58" font-family="'Noto Serif JP',serif" font-size="9" fill="#c9a84c" text-anchor="middle">白水星</text>
+
+        <!-- 矢印 -->
+        <line x1="300" y1="82" x2="300" y2="102" stroke="#a07c20" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <polygon points="296,100 300,110 304,100" fill="#a07c20"/>
+
+        <!-- 月盤 -->
+        <rect x="50" y="114" width="500" height="68" rx="4" fill="#1e5c3a" opacity=".9"/>
+        <text x="70" y="139" font-family="'Zen Old Mincho',serif" font-size="11" fill="#c9a84c" letter-spacing="3">月　盤</text>
+        <text x="70" y="164" font-family="'Noto Serif JP',serif" font-size="11" fill="#e8e0c8">今月（3月）の九星　→　七赤金星　　節入りから次の節入り前日まで</text>
+        <rect x="480" y="126" width="54" height="44" rx="3" fill="rgba(201,168,76,.15)"/>
+        <text x="507" y="146" font-family="'Shippori Mincho',serif" font-size="20" fill="#c9a84c" text-anchor="middle" font-weight="800">七</text>
+        <text x="507" y="162" font-family="'Noto Serif JP',serif" font-size="9" fill="#c9a84c" text-anchor="middle">赤金星</text>
+
+        <!-- 矢印 -->
+        <line x1="300" y1="186" x2="300" y2="206" stroke="#a07c20" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <polygon points="296,204 300,214 304,204" fill="#a07c20"/>
+
+        <!-- 日盤 -->
+        <rect x="80" y="218" width="440" height="32" rx="4" fill="#6b1a1a" opacity=".9"/>
+        <text x="100" y="237" font-family="'Zen Old Mincho',serif" font-size="11" fill="#c9a84c" letter-spacing="3">日　盤</text>
+        <text x="100" y="237" font-family="'Noto Serif JP',serif" font-size="11" fill="#e8e0c8" x="180">　　　　今日の九星　→　毎日変わる（陽遁・陰遁あり）</text>
+        <text x="460" y="240" font-family="'Noto Serif JP',serif" font-size="10" fill="#e8e0c8">毎日変わる</text>
+      </svg>
+      <figcaption>三盤の重層構造——年盤が最も大きな流れ、日盤が最も細かい流れ</figcaption>
+    </div>
+
+    <div class="section-sub">年盤（年家九星）</div>
+    <p>年ごとに変わる九星です。毎年立春（2月4日頃）を境に切り替わり、1年間同じ星が年盤に入ります。年盤は引越・結婚・独立など人生の大きな転機を判断する基盤です。</p>
+
+    <div class="section-sub">月盤（月家九星）</div>
+    <p>月ごとに変わる九星です。立春・啓蟄・清明など「節」と呼ばれる二十四節気の節入り日に切り替わります（暦の月替わりとは異なります）。転職・引越など月単位の決断に用います。</p>
+
+    <div class="section-sub">日盤（日家九星）</div>
+    <p>毎日変わる九星です。年盤・月盤とは異なり、「陽遁・陰遁」という独特の仕組みがあります（次節で詳述）。日々の行動・外出方位の判断に用います。</p>
+
+    <table>
+      <tr><th>盤</th><th>切り替わり</th><th>用途</th><th>重み</th></tr>
+      <tr><td>年盤</td><td>立春（2/4頃）</td><td>引越・結婚・人生の転機</td><td>最大</td></tr>
+      <tr><td>月盤</td><td>各月の節入り日</td><td>転職・契約・月単位の決断</td><td>中</td></tr>
+      <tr><td>日盤</td><td>毎日</td><td>外出・訪問・日々の行動</td><td>小</td></tr>
+    </table>
+
+  </section>
+
+  <!-- 仕組み篇 -->
+  <div class="divider"><span>仕 組 み 篇</span></div>
+
+  <!-- 第三節 -->
+  <section class="section" id="s3">
+    <div class="section-header">
+      <span class="section-num">三</span>
+      <span class="section-title">陽遁と陰遁——日盤の流れ方</span>
+    </div>
+
+    <p>日盤の九星は単純に毎日変わるのではなく、一年を二つの期間に分けて流れ方が逆転します。これを「陽遁（ようとん）」と「陰遁（いんとん）」と呼びます。</p>
+
+    <div class="box-gold">
+      <div class="box-label">陽遁と陰遁の定義</div>
+      <div class="box-main">
+        <strong>陽遁</strong>：冬至近傍の丙午日〜夏至近傍の丙午日の前日。日盤が <strong>順行</strong>（一白→二黒→三碧…と増える）。<br>
+        <strong>陰遁</strong>：夏至近傍の丙午日〜冬至近傍の丙午日の前日。日盤が <strong>逆行</strong>（九紫→八白→七赤…と減る）。
+      </div>
+    </div>
+
+    <div class="figure">
+      <svg viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;width:100%;">
+        <!-- 年の帯 -->
+        <rect x="20" y="80" width="660" height="60" rx="0" fill="#e8dfc8"/>
+
+        <!-- 陽遁帯 -->
+        <rect x="20" y="80" width="310" height="60" fill="#1a2f5a" opacity=".85"/>
+        <text x="175" y="108" font-family="'Zen Old Mincho',serif" font-size="14" fill="#c9a84c" text-anchor="middle" letter-spacing="4">陽　遁</text>
+        <text x="175" y="128" font-family="'Noto Serif JP',serif" font-size="10" fill="#c9c0aa" text-anchor="middle">順行：一白→二黒→三碧…</text>
+
+        <!-- 陰遁帯 -->
+        <rect x="330" y="80" width="350" height="60" fill="#6b1a2f" opacity=".85"/>
+        <text x="505" y="108" font-family="'Zen Old Mincho',serif" font-size="14" fill="#f0a0b0" text-anchor="middle" letter-spacing="4">陰　遁</text>
+        <text x="505" y="128" font-family="'Noto Serif JP',serif" font-size="10" fill="#e8c0c8" text-anchor="middle">逆行：九紫→八白→七赤…</text>
+
+        <!-- 冬至 -->
+        <line x1="20" y1="60" x2="20" y2="150" stroke="#c9a84c" stroke-width="1.5"/>
+        <text x="20" y="50" font-family="'Zen Old Mincho',serif" font-size="10" fill="#a07c20" text-anchor="middle">冬至</text>
+        <text x="20" y="165" font-family="'Noto Serif JP',serif" font-size="9" fill="#6b6358" text-anchor="middle">丙午日</text>
+        <text x="20" y="178" font-family="'Noto Serif JP',serif" font-size="9" fill="#6b6358" text-anchor="middle">陽遁開始</text>
+
+        <!-- 夏至 -->
+        <line x1="330" y1="60" x2="330" y2="150" stroke="#c9a84c" stroke-width="1.5"/>
+        <text x="330" y="50" font-family="'Zen Old Mincho',serif" font-size="10" fill="#a07c20" text-anchor="middle">夏至</text>
+        <text x="330" y="165" font-family="'Noto Serif JP',serif" font-size="9" fill="#6b6358" text-anchor="middle">丙午日</text>
+        <text x="330" y="178" font-family="'Noto Serif JP',serif" font-size="9" fill="#6b6358" text-anchor="middle">陰遁開始</text>
+
+        <!-- 翌冬至 -->
+        <line x1="680" y1="60" x2="680" y2="150" stroke="#c9a84c" stroke-width="1.5"/>
+        <text x="680" y="50" font-family="'Zen Old Mincho',serif" font-size="10" fill="#a07c20" text-anchor="middle">冬至</text>
+        <text x="680" y="165" font-family="'Noto Serif JP',serif" font-size="9" fill="#6b6358" text-anchor="middle">丙午日</text>
+        <text x="680" y="178" font-family="'Noto Serif JP',serif" font-size="9" fill="#6b6358" text-anchor="middle">陽遁開始</text>
+
+        <!-- 矢印（陽遁） -->
+        <defs>
+          <marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#c9a84c"/>
+          </marker>
+        </defs>
+        <line x1="40" y1="110" x2="300" y2="110" stroke="#c9a84c" stroke-width="1.2" marker-end="url(#arr)"/>
+
+        <!-- 矢印（陰遁） -->
+        <defs>
+          <marker id="arr2" markerWidth="8" markerHeight="6" refX="0" refY="3" orient="auto">
+            <polygon points="8 0, 0 3, 8 6" fill="#f0a0b0"/>
+          </marker>
+        </defs>
+        <line x1="660" y1="110" x2="360" y2="110" stroke="#f0a0b0" stroke-width="1.2" marker-end="url(#arr2)"/>
+
+        <!-- 月ラベル -->
+        <text x="175" y="210" font-family="'Noto Serif JP',serif" font-size="9" fill="#6b6358" text-anchor="middle">（12月〜6月）約180日</text>
+        <text x="505" y="210" font-family="'Noto Serif JP',serif" font-size="9" fill="#6b6358" text-anchor="middle">（6月〜12月）約180日</text>
+      </svg>
+      <figcaption>陽遁・陰遁の切り替わり——冬至・夏至に最も近い丙午（干支42番）の日が起点</figcaption>
+    </div>
+
+    <div class="section-sub">丙午の日とは</div>
+    <p>干支（かんし）とは十干（甲・乙・丙…）と十二支（子・丑・寅…）を組み合わせた60日周期の表記法です。「丙午」はその42番目にあたり、約60日ごとに巡ってきます。陽遁・陰遁の切り替えは冬至・夏至の当日ではなく、「冬至・夏至に最も近い丙午の日」から始まります。</p>
+
+    <div class="box-indigo">
+      <div class="box-label">暦日大鑑に基づく実例</div>
+      <div class="box-main">
+        2025年の陰遁開始：<strong>6月24日（丙午）</strong>　2025年の陽遁開始：<strong>12月21日（丙午）</strong><br>
+        2026年の陰遁開始：<strong>6月19日（丙午）</strong>　2026年の陽遁開始：<strong>12月16日（丙午）</strong>
+      </div>
+    </div>
+
+    <p>この規則は1873年（明治6年）から2100年以上にわたって一貫しており、暦日大鑑（西澤宥綜編著・新人物往来社）との完全な一致が確認されています。</p>
+
+  </section>
+
+  <!-- 第四節 -->
+  <section class="section" id="s4">
+    <div class="section-header">
+      <span class="section-num">四</span>
+      <span class="section-title">節入りと月盤の切り替わり</span>
+    </div>
+
+    <p>月盤が変わるのは「暦の月初め（1日）」ではなく、「節入り日」です。節入りとは二十四節気のうち「節」にあたる日——立春・啓蟄・清明・立夏・芒種・小暑・立秋・白露・寒露・立冬・大雪・小寒——の12節が月の変わり目となります。</p>
+
+    <table>
+      <tr><th>月</th><th>節入り</th><th>おおよその日</th><th>2026年の月盤</th></tr>
+      <tr><td>1月</td><td>小寒</td><td>1月5〜6日頃</td><td>六白金星</td></tr>
+      <tr><td>2月</td><td>立春</td><td>2月4〜5日頃</td><td>八白土星</td></tr>
+      <tr><td>3月</td><td>啓蟄</td><td>3月5〜6日頃</td><td>七赤金星</td></tr>
+      <tr><td>4月</td><td>清明</td><td>4月4〜5日頃</td><td>六白金星</td></tr>
+      <tr><td>5月</td><td>立夏</td><td>5月5〜6日頃</td><td>五黄土星</td></tr>
+      <tr><td>6月</td><td>芒種</td><td>6月5〜6日頃</td><td>四緑木星</td></tr>
+      <tr><td>7月</td><td>小暑</td><td>7月7〜8日頃</td><td>三碧木星</td></tr>
+      <tr><td>8月</td><td>立秋</td><td>8月7〜8日頃</td><td>二黒土星</td></tr>
+      <tr><td>9月</td><td>白露</td><td>9月7〜8日頃</td><td>一白水星</td></tr>
+      <tr><td>10月</td><td>寒露</td><td>10月7〜8日頃</td><td>九紫火星</td></tr>
+      <tr><td>11月</td><td>立冬</td><td>11月7〜8日頃</td><td>八白土星</td></tr>
+      <tr><td>12月</td><td>大雪</td><td>12月6〜7日頃</td><td>七赤金星</td></tr>
+    </table>
+
+    <div class="box-gold">
+      <div class="box-label">注意</div>
+      <div class="box-main">節入り前（月初め〜節入り前日）は前月の月盤が適用されます。例えば2026年3月1〜5日頃（啓蟄前）は、前月（2月）の八白土星が月盤となります。</div>
+    </div>
+
+  </section>
+
+  <!-- 実践篇 -->
+  <div class="divider"><span>実 践 篇</span></div>
+
+  <!-- 第五節 -->
+  <section class="section" id="s5">
+    <div class="section-header">
+      <span class="section-num">五</span>
+      <span class="section-title">吉方位の考え方</span>
+    </div>
+
+    <p>方位の吉凶は、本命星・月命星・日盤の三星が、八方位（北・北東・東・東南・南・南西・西・北西）それぞれの気とどのような関係にあるかで決まります。</p>
+
+    <div class="section-sub">目的による三盤の使い分け</div>
+
+    <ul class="point-list">
+      <li><strong>日盤のみ</strong>——外出・買い物・日常の訪問など、当日限りの行動</li>
+      <li><strong>月盤＋日盤</strong>——転職活動・引越先の下見など、数週間〜1ヶ月の決断</li>
+      <li><strong>年盤＋月盤＋日盤</strong>——引越・結婚・独立・建築など、一生に関わる重大事</li>
+    </ul>
+
+    <div class="section-sub">吉凶の主な種類</div>
+
+    <div class="card">
+      <div class="card-title">吉の主な種類</div>
+      <ul class="point-list">
+        <li><strong>生気</strong>——最高の吉。本命星が旺盛に働く方位</li>
+        <li><strong>天乙</strong>——天の恵みを受ける吉方位</li>
+        <li><strong>延年</strong>——長期的な運気上昇をもたらす方位</li>
+        <li><strong>伏位</strong>——現状維持・安定の方位</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-title">凶の主な種類</div>
+      <ul class="point-list">
+        <li><strong>暗剣殺</strong>——五黄土星の対冲にあたる方位。他星の影響による凶</li>
+        <li><strong>五黄殺</strong>——五黄土星が回座する方位。最も強い凶</li>
+        <li><strong>本命殺・本命的殺</strong>——本命星の位置およびその対冲</li>
+        <li><strong>月破</strong>——月盤における破壊の方位</li>
+      </ul>
+    </div>
+
+    <div class="box-indigo">
+      <div class="box-label">重要な原則</div>
+      <div class="box-main">三盤すべてで吉の一致する方位が「最大吉方」です。一方、いずれか一盤でも五黄殺・暗剣殺に当たる方位への重大な行動（引越・長旅など）は避けることが原則とされています。</div>
+    </div>
+
+  </section>
+
+  <!-- 第六節 -->
+  <section class="section" id="s6">
+    <div class="section-header">
+      <span class="section-num">六</span>
+      <span class="section-title">方位学ツールの使い方</span>
+    </div>
+
+    <p>方位学サイト（<a href="houigaku.html" style="color:var(--indigo);">houigaku.html</a>）では、以下の手順で吉方位を判定できます。</p>
+
+    <div class="card">
+      <div class="card-title">基本的な使い方</div>
+      <ol style="padding-left:1.2rem;font-size:.88rem;line-height:2.4;">
+        <li>生年月日を入力——本命星・月命星が自動計算されます</li>
+        <li>判定日を入力——年盤・月盤・日盤が自動表示されます</li>
+        <li>目的を選択——日盤・月盤・年盤のどの三盤を使うか決まります</li>
+        <li>「方位を判定する」を押す——八方位のスコアと吉凶が表示されます</li>
+        <li>吉方位カレンダーで今月の吉日・吉方を確認できます</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <div class="card-title">三盤検証パネルの使い方</div>
+      <p style="font-size:.85rem;margin-bottom:.5rem;">ツール内の「三盤検証パネル」では、任意の日付の年盤・月盤・日盤（陽遁・陰遁も表示）を確認し、暦の鏡と照合した結果を記録することができます。</p>
+      <ul class="point-list">
+        <li>日付を入力して「✦ 計算」を押すと三盤が即座に表示されます</li>
+        <li>「✓ 一致／✗ 違う」で照合結果を記録できます</li>
+        <li>照合ログはブラウザに保存され、次回も参照できます</li>
+      </ul>
+    </div>
+
+    <div class="box-gold">
+      <div class="box-label">計算の根拠</div>
+      <div class="box-main">本ツールの計算は「暦日大鑑」（西澤宥綜編著・新人物往来社）との完全照合を確認しています。陽遁・陰遁の切り替え日（冬至・夏至近傍の丙午日）も同書に基づいています。</div>
+    </div>
+
+  </section>
+
+</main>
+
+<footer>
+  <p>九星暦解説篇 ｜ 暦日大鑑（西澤宥綜編著・新人物往来社）に基づく独自解説</p>
+  <p style="margin-top:.4rem;"><a href="houigaku.html" style="color:var(--gold-light);text-decoration:none;">← 方位学ツールへ戻る</a></p>
+</footer>
+
+</body>
+</html>
