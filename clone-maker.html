@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MyClone Maker — 自分の分身AIを5分で作る</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;700&family=Zen+Old+Mincho:wght@400;700&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #1a1208;
+  --paper: #f5f0e8;
+  --gold: #b8960c;
+  --gold-light: #e8d48a;
+  --gold-dim: #7a6308;
+  --vermillion: #c0392b;
+  --indigo: #1a3a5c;
+  --jade: #2d6a4f;
+  --smoke: #8a8478;
+  --border: rgba(26,18,8,0.13);
+  --border-gold: rgba(184,150,12,0.25);
+  --step-active: #7a6308;
+  --step-done: #2d6a4f;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Noto Serif JP', serif;
+  min-height: 100vh;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(26,18,8,0.01) 2px, rgba(26,18,8,0.01) 4px),
+    repeating-linear-gradient(90deg, transparent, transparent 3px, rgba(26,18,8,0.007) 3px, rgba(26,18,8,0.007) 6px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── ヘッダー ── */
+header {
+  position: relative;
+  z-index: 10;
+  border-bottom: 1px solid var(--border-gold);
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(245,240,232,0.97);
+}
+
+.logo-main { font-family: 'Zen Old Mincho', serif; font-size: 1.3rem; color: var(--gold-dim); letter-spacing: 0.06em; }
+.logo-sub  { font-size: 0.7rem; color: var(--smoke); font-family: 'JetBrains Mono', monospace; margin-left: 8px; }
+
+.free-badge {
+  font-size: 0.68rem;
+  font-family: 'JetBrains Mono', monospace;
+  background: rgba(45,106,79,0.1);
+  color: var(--jade);
+  border: 0.5px solid var(--jade);
+  border-radius: 20px;
+  padding: 3px 10px;
+}
+
+/* ── ステッパー ── */
+.stepper {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.8rem 2rem 1rem;
+  gap: 0;
+}
+
+.step-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+}
+
+.step-circle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-gold);
+  background: rgba(245,240,232,0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--smoke);
+  transition: all 0.3s;
+}
+
+.step-circle.active {
+  border-color: var(--gold);
+  background: var(--gold-dim);
+  color: var(--paper);
+  font-weight: 700;
+}
+
+.step-circle.done {
+  border-color: var(--jade);
+  background: var(--jade);
+  color: #fff;
+}
+
+.step-label {
+  font-size: 0.65rem;
+  color: var(--smoke);
+  font-family: 'JetBrains Mono', monospace;
+  white-space: nowrap;
+  transition: color 0.3s;
+}
+
+.step-label.active { color: var(--gold-dim); font-weight: 500; }
+.step-label.done   { color: var(--jade); }
+
+.step-line {
+  width: 80px;
+  height: 1px;
+  background: var(--border-gold);
+  margin-bottom: 20px;
+  transition: background 0.3s;
+}
+
+.step-line.done { background: var(--jade); }
+
+/* ── メインコンテンツ ── */
+.main {
+  position: relative;
+  z-index: 1;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 0 1.5rem 4rem;
+}
+
+/* ── パネル共通 ── */
+.panel { display: none; }
+.panel.active { display: block; animation: slideIn 0.35s ease; }
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.panel-title {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: 1.3rem;
+  color: var(--gold-dim);
+  margin-bottom: 0.3rem;
+  letter-spacing: 0.04em;
+}
+
+.panel-sub {
+  font-size: 0.8rem;
+  color: var(--smoke);
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+/* ── フォームグループ ── */
+.form-group { margin-bottom: 1.1rem; }
+
+.form-label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--smoke);
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 5px;
+  letter-spacing: 0.04em;
+}
+
+.form-label span { color: var(--vermillion); margin-left: 2px; }
+
+input[type="text"],
+input[type="email"],
+textarea,
+select {
+  width: 100%;
+  background: rgba(26,18,8,0.03);
+  border: 0.5px solid var(--border-gold);
+  border-radius: 6px;
+  padding: 0.6rem 0.85rem;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.85rem;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+textarea:focus,
+select:focus { border-color: var(--gold); }
+
+input::placeholder,
+textarea::placeholder { color: var(--smoke); opacity: 0.7; }
+
+textarea { resize: vertical; min-height: 70px; line-height: 1.6; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.form-hint {
+  font-size: 0.68rem;
+  color: var(--smoke);
+  margin-top: 4px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ── ルールリスト ── */
+.rule-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+
+.rule-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(26,18,8,0.03);
+  border: 0.5px solid var(--border);
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-size: 0.82rem;
+}
+
+.rule-item.danger { border-color: rgba(192,57,43,0.25); background: rgba(192,57,43,0.04); }
+
+.rule-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.rule-dot.ok     { background: var(--jade); }
+.rule-dot.danger { background: var(--vermillion); }
+
+.rule-text { flex: 1; color: var(--ink); }
+
+.rule-del {
+  background: none;
+  border: none;
+  color: var(--smoke);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0 2px;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.rule-del:hover { opacity: 1; color: var(--vermillion); }
+
+.add-rule-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.add-rule-input {
+  flex: 1;
+  background: rgba(26,18,8,0.03);
+  border: 0.5px dashed var(--border-gold);
+  border-radius: 6px;
+  padding: 0.5rem 0.8rem;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.82rem;
+  color: var(--ink);
+  outline: none;
+}
+
+.add-rule-input:focus { border-style: solid; border-color: var(--gold); }
+.add-rule-input::placeholder { color: var(--smoke); opacity: 0.6; }
+
+.add-btn {
+  background: none;
+  border: 0.5px solid var(--border-gold);
+  border-radius: 6px;
+  padding: 0.5rem 0.9rem;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.75rem;
+  color: var(--gold-dim);
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.add-btn:hover { background: rgba(184,150,12,0.08); }
+
+/* ── セクション区切り ── */
+.section-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 1.4rem 0 1rem;
+}
+
+.section-divider span {
+  font-size: 0.68rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--smoke);
+  white-space: nowrap;
+  letter-spacing: 0.06em;
+}
+
+.section-divider::before,
+.section-divider::after {
+  content: '';
+  flex: 1;
+  height: 0.5px;
+  background: var(--border-gold);
+}
+
+/* ── プレビューエリア ── */
+.prompt-preview {
+  background: rgba(26,18,8,0.04);
+  border: 0.5px solid var(--border-gold);
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--ink);
+  white-space: pre-wrap;
+  line-height: 1.7;
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+}
+
+/* ── 完成カード ── */
+.complete-card {
+  border: 1px solid var(--border-gold);
+  border-radius: 10px;
+  padding: 1.5rem;
+  text-align: center;
+  background: rgba(184,150,12,0.04);
+  margin-bottom: 1.5rem;
+}
+
+.complete-title {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: 1.1rem;
+  color: var(--gold-dim);
+  margin-bottom: 0.5rem;
+}
+
+.complete-sub { font-size: 0.8rem; color: var(--smoke); line-height: 1.7; }
+
+/* ── ナビゲーションボタン ── */
+.nav-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+  padding-top: 1.2rem;
+  border-top: 0.5px solid var(--border);
+}
+
+.btn-back {
+  background: none;
+  border: 0.5px solid var(--border);
+  border-radius: 6px;
+  padding: 0.6rem 1.2rem;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.82rem;
+  color: var(--smoke);
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.btn-back:hover { border-color: var(--gold-dim); color: var(--ink); }
+
+.btn-next {
+  background: var(--gold-dim);
+  border: none;
+  border-radius: 6px;
+  padding: 0.65rem 1.8rem;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.85rem;
+  color: var(--paper);
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.btn-next:hover  { background: var(--gold); }
+.btn-next:active { transform: scale(0.98); }
+
+.btn-dl {
+  background: var(--jade);
+  border: none;
+  border-radius: 6px;
+  padding: 0.7rem 2rem;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.88rem;
+  color: #fff;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: background 0.2s, transform 0.1s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-dl:hover  { background: #245940; }
+.btn-dl:active { transform: scale(0.98); }
+
+.btn-copy {
+  background: none;
+  border: 0.5px solid var(--border-gold);
+  border-radius: 6px;
+  padding: 0.6rem 1.2rem;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.8rem;
+  color: var(--gold-dim);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-copy:hover { background: rgba(184,150,12,0.08); }
+
+/* ── 使い方ガイド ── */
+.guide-steps { display: flex; flex-direction: column; gap: 10px; margin-top: 1rem; }
+
+.guide-step {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 0.7rem 1rem;
+  background: rgba(26,18,8,0.03);
+  border-radius: 6px;
+  border: 0.5px solid var(--border);
+}
+
+.guide-num {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--indigo);
+  color: #fff;
+  font-size: 0.68rem;
+  font-family: 'JetBrains Mono', monospace;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.guide-text { font-size: 0.8rem; line-height: 1.65; color: var(--ink); }
+.guide-text code { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; background: rgba(26,18,8,0.07); padding: 1px 5px; border-radius: 3px; }
+
+/* エラー */
+.err-msg { font-size: 0.72rem; color: var(--vermillion); margin-top: 4px; display: none; font-family: 'JetBrains Mono', monospace; }
+.err-msg.show { display: block; }
+</style>
+</head>
+<body>
+
+<!-- ヘッダー -->
+<header>
+  <div>
+    <span class="logo-main">MyClone Maker</span>
+    <span class="logo-sub">β — 自分の分身AIを5分で作る</span>
+  </div>
+  <div class="free-badge">完全無料</div>
+</header>
+
+<!-- ステッパー -->
+<div class="stepper">
+  <div class="step-item">
+    <div class="step-circle active" id="sc1">1</div>
+    <div class="step-label active" id="sl1">あなたの情報</div>
+  </div>
+  <div class="step-line" id="line1"></div>
+  <div class="step-item">
+    <div class="step-circle" id="sc2">2</div>
+    <div class="step-label" id="sl2">判断ルール</div>
+  </div>
+  <div class="step-line" id="line2"></div>
+  <div class="step-item">
+    <div class="step-circle" id="sc3">3</div>
+    <div class="step-label" id="sl3">完成・DL</div>
+  </div>
+</div>
+
+<!-- メイン -->
+<div class="main">
+
+  <!-- ステップ1: 基本情報 -->
+  <div class="panel active" id="panel1">
+    <div class="panel-title">あなたの情報を入力してください</div>
+    <div class="panel-sub">クローンが「あなたとして」動くための基本情報です。</div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">氏名<span>*</span></label>
+        <input type="text" id="f-name" placeholder="山田 太郎">
+        <div class="err-msg" id="err-name">氏名を入力してください</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">読み仮名</label>
+        <input type="text" id="f-kana" placeholder="やまだ たろう">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">職業・肩書き<span>*</span></label>
+      <input type="text" id="f-role" placeholder="例: 税理士 / フリーランスエンジニア / 株式会社〇〇 代表取締役">
+      <div class="err-msg" id="err-role">職業・肩書きを入力してください</div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">連絡先メール</label>
+        <input type="email" id="f-email" placeholder="your@email.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">GitHubユーザー名</label>
+        <input type="text" id="f-github" placeholder="例: your-username">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">自己紹介スタイル（クローンが使う呼称）</label>
+      <select id="f-style">
+        <option value="">-- 選択してください --</option>
+        <option value="制作者">制作者</option>
+        <option value="著者">著者</option>
+        <option value="代表">代表</option>
+        <option value="オーナー">オーナー</option>
+        <option value="研究者">研究者</option>
+        <option value="専門家">専門家</option>
+      </select>
+    </div>
+
+    <div class="section-divider"><span>プロジェクト情報</span></div>
+
+    <div class="form-group">
+      <label class="form-label">主なプロジェクト・業務内容</label>
+      <textarea id="f-projects" placeholder="例:
+・Webサービス「〇〇」の開発・運営
+・税務相談・記帳代行
+・著書「〇〇」の執筆中" rows="4"></textarea>
+      <div class="form-hint">クローンが把握しておくべき仕事の全体像を書いてください</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">作業スタイル・こだわり</label>
+      <textarea id="f-style2" placeholder="例:
+・コードのコメントはすべて日本語
+・一度に一つの作業に集中する
+・デモには仮名（山田太郎・佐藤花子）を使用" rows="3"></textarea>
+    </div>
+
+    <div class="nav-row">
+      <div></div>
+      <button class="btn-next" onclick="goStep(2)">次へ — 判断ルールを設定 →</button>
+    </div>
+  </div>
+
+  <!-- ステップ2: 判断ルール -->
+  <div class="panel" id="panel2">
+    <div class="panel-title">クローンの判断ルールを設定</div>
+    <div class="panel-sub">クローンが「自律でやること」と「必ず本人に確認すること」を分けます。</div>
+
+    <div class="section-divider"><span>自律でやってよい作業</span></div>
+    <div class="form-hint" style="margin-bottom:8px">クローンが判断なしに進められる作業を追加してください</div>
+    <div class="rule-list" id="auto-list"></div>
+    <div class="add-rule-row">
+      <input class="add-rule-input" id="auto-input" placeholder="例: 文章の日本語校正・整形" onkeydown="if(event.key==='Enter'){addRule('auto')}">
+      <button class="add-btn" onclick="addRule('auto')">＋ 追加</button>
+    </div>
+
+    <div class="section-divider" style="margin-top:1.8rem"><span>必ず本人に確認する事項</span></div>
+    <div class="form-hint" style="margin-bottom:8px">これに該当したらクローンは止まり、あなたに通知します</div>
+    <div class="rule-list" id="escalate-list"></div>
+    <div class="add-rule-row">
+      <input class="add-rule-input" id="escalate-input" placeholder="例: 新しいページの公開" onkeydown="if(event.key==='Enter'){addRule('escalate')}">
+      <button class="add-btn" onclick="addRule('escalate')">＋ 追加</button>
+    </div>
+
+    <div class="section-divider" style="margin-top:1.8rem"><span>エスカレーション通知先</span></div>
+    <div class="form-group">
+      <label class="form-label">確認が必要な時に通知するメールアドレス</label>
+      <input type="email" id="f-notify" placeholder="your@email.com">
+      <div class="form-hint">クローンが止まった時、このアドレスへの連絡を促します</div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-back" onclick="goStep(1)">← 戻る</button>
+      <button class="btn-next" onclick="goStep(3)">次へ — プレビューと完成 →</button>
+    </div>
+  </div>
+
+  <!-- ステップ3: 完成・ダウンロード -->
+  <div class="panel" id="panel3">
+    <div class="panel-title">完成しました</div>
+    <div class="panel-sub">生成されたシステムプロンプトを確認して、HTMLファイルをダウンロードしてください。</div>
+
+    <div class="complete-card">
+      <div class="complete-title" id="complete-name">あなたのクローン</div>
+      <div class="complete-sub" id="complete-role">があなたの代わりに働きます。</div>
+    </div>
+
+    <div class="section-divider"><span>システムプロンプト（プレビュー）</span></div>
+    <div class="prompt-preview" id="prompt-preview"></div>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:1.5rem">
+      <button class="btn-dl" onclick="downloadHTML()" id="dl-btn">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v8M4 6l3 3 3-3M2 11h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        クローンBotをダウンロード（HTML）
+      </button>
+      <button class="btn-copy" onclick="copyPrompt()">プロンプトだけコピー</button>
+    </div>
+
+    <div class="section-divider"><span>ダウンロード後の使い方</span></div>
+    <div class="guide-steps">
+      <div class="guide-step">
+        <div class="guide-num">1</div>
+        <div class="guide-text">ダウンロードした <code>my-clone.html</code> をブラウザで開く</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-num">2</div>
+        <div class="guide-text">上部の「Anthropic API Key」欄に <code>sk-ant-api03-...</code> を入力して保存<br>
+        APIキーは <a href="https://console.anthropic.com" style="color:var(--gold-dim)">console.anthropic.com</a> で取得できます（従量課金・月1,000円未満が目安）</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-num">3</div>
+        <div class="guide-text">チャット欄に作業指示を入力するだけ。クローンが判断して動きます</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-num">4</div>
+        <div class="guide-text">GitHub Pagesに置けば、どのPCからでも同じクローンにアクセスできます<br>
+        ファイルを <code>GitHubリポジトリ / Settings / Pages</code> で公開するだけ</div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-back" onclick="goStep(2)">← 戻る・修正する</button>
+      <button class="btn-next" onclick="resetAll()">新しいクローンを作る</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── 状態管理 ──
+let autoRules     = [];
+let escalateRules = [];
+let currentStep   = 1;
+
+// ── ステップ移動 ──
+function goStep(n) {
+  if (n === 2 && !validateStep1()) return;
+  if (n === 3) buildPreview();
+
+  document.getElementById('panel' + currentStep).classList.remove('active');
+  document.getElementById('panel' + n).classList.add('active');
+
+  // ステッパー更新
+  for (let i = 1; i <= 3; i++) {
+    const sc = document.getElementById('sc' + i);
+    const sl = document.getElementById('sl' + i);
+    sc.className = 'step-circle' + (i < n ? ' done' : i === n ? ' active' : '');
+    sl.className = 'step-label'  + (i < n ? ' done' : i === n ? ' active' : '');
+    if (i < n) sc.textContent = '✓';
+    else sc.textContent = i;
+  }
+  for (let i = 1; i <= 2; i++) {
+    const ln = document.getElementById('line' + i);
+    ln.className = 'step-line' + (i < n ? ' done' : '');
+  }
+
+  currentStep = n;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── バリデーション ──
+function validateStep1() {
+  let ok = true;
+  const name = document.getElementById('f-name').value.trim();
+  const role = document.getElementById('f-role').value.trim();
+  const en = document.getElementById('err-name');
+  const er = document.getElementById('err-role');
+  if (!name) { en.classList.add('show'); ok = false; } else { en.classList.remove('show'); }
+  if (!role) { er.classList.add('show'); ok = false; } else { er.classList.remove('show'); }
+  return ok;
+}
+
+// ── ルール追加 ──
+function addRule(type) {
+  const inputId = type === 'auto' ? 'auto-input' : 'escalate-input';
+  const listId  = type === 'auto' ? 'auto-list'  : 'escalate-list';
+  const arr     = type === 'auto' ? autoRules     : escalateRules;
+  const input   = document.getElementById(inputId);
+  const text    = input.value.trim();
+  if (!text) return;
+
+  arr.push(text);
+  input.value = '';
+  renderRules(type);
+}
+
+function removeRule(type, idx) {
+  if (type === 'auto') autoRules.splice(idx, 1);
+  else escalateRules.splice(idx, 1);
+  renderRules(type);
+}
+
+function renderRules(type) {
+  const listId = type === 'auto' ? 'auto-list' : 'escalate-list';
+  const arr    = type === 'auto' ? autoRules   : escalateRules;
+  const list   = document.getElementById(listId);
+  list.innerHTML = '';
+  arr.forEach((text, i) => {
+    const div = document.createElement('div');
+    div.className = 'rule-item' + (type === 'escalate' ? ' danger' : '');
+    div.innerHTML = `
+      <div class="rule-dot ${type === 'auto' ? 'ok' : 'danger'}"></div>
+      <span class="rule-text">${text}</span>
+      <button class="rule-del" onclick="removeRule('${type}',${i})">×</button>
+    `;
+    list.appendChild(div);
+  });
+}
+
+// ── システムプロンプト生成 ──
+function buildSystemPrompt() {
+  const name     = document.getElementById('f-name').value.trim();
+  const kana     = document.getElementById('f-kana').value.trim();
+  const role     = document.getElementById('f-role').value.trim();
+  const email    = document.getElementById('f-email').value.trim();
+  const github   = document.getElementById('f-github').value.trim();
+  const style    = document.getElementById('f-style').value;
+  const projects = document.getElementById('f-projects').value.trim();
+  const style2   = document.getElementById('f-style2').value.trim();
+  const notify   = document.getElementById('f-notify').value.trim();
+
+  let prompt = `あなたは${name}の代理AIアシスタント「分身」です。\n以下のルールに従って、${name}の代わりにプロジェクトを進めてください。\n\n`;
+
+  prompt += `## 基本情報\n`;
+  prompt += `- 氏名: ${name}${kana ? `（${kana}）` : ''}\n`;
+  prompt += `- 職業・肩書き: ${role}\n`;
+  if (email)  prompt += `- メール: ${email}\n`;
+  if (github) prompt += `- GitHub: ${github}\n`;
+  if (style)  prompt += `- 自己紹介の呼称: 「${style}」を使用\n`;
+  prompt += `- 言語: すべての回答・コメントを日本語で行う\n\n`;
+
+  if (projects) {
+    prompt += `## プロジェクト・業務内容\n${projects}\n\n`;
+  }
+
+  if (style2) {
+    prompt += `## 作業スタイル・こだわり\n${style2}\n\n`;
+  }
+
+  if (autoRules.length > 0) {
+    prompt += `## 自律判断してよい作業\n以下は${name}の確認なしに進めてよい:\n`;
+    autoRules.forEach(r => { prompt += `- ${r}\n`; });
+    prompt += '\n';
+  }
+
+  if (escalateRules.length > 0) {
+    prompt += `## 必ず本人に確認する事項\n以下に該当する場合は作業を止め、その旨を明示すること:\n`;
+    escalateRules.forEach(r => { prompt += `- ${r}\n`; });
+    prompt += '\n';
+  }
+
+  if (notify || email) {
+    const notifyAddr = notify || email;
+    prompt += `## エスカレーション時の対応\n`;
+    prompt += `判断が必要な場合は以下の形式で出力し、${notifyAddr} への連絡を促すこと:\n`;
+    prompt += `【要確認】\n理由: （なぜ止まるか）\n選択肢A: （案A）\n選択肢B: （案B）\n推奨: （クローンの判断・理由）\n\n`;
+  }
+
+  return prompt;
+}
+
+// ── プレビュー構築 ──
+function buildPreview() {
+  const name = document.getElementById('f-name').value.trim();
+  const role = document.getElementById('f-role').value.trim();
+  document.getElementById('complete-name').textContent = name + ' のクローン';
+  document.getElementById('complete-role').textContent = '「' + role + '」として動く分身AIです。';
+  document.getElementById('prompt-preview').textContent = buildSystemPrompt();
+}
+
+// ── HTMLダウンロード生成 ──
+function downloadHTML() {
+  const name     = document.getElementById('f-name').value.trim();
+  const role     = document.getElementById('f-role').value.trim();
+  const prompt   = buildSystemPrompt();
+  const filename = 'my-clone.html';
+
+  const html = `<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${name} のクローンBot</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;700&family=Zen+Old+Mincho:wght@400;700&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1a1208;--paper:#f5f0e8;--gold:#b8960c;--gold-dim:#7a6308;--vermillion:#c0392b;--indigo:#1a3a5c;--jade:#2d6a4f;--smoke:#8a8478;--border:rgba(26,18,8,0.13);--border-gold:rgba(184,150,12,0.25);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--paper);color:var(--ink);font-family:'Noto Serif JP',serif;min-height:100vh;display:flex;flex-direction:column;}
+body::before{content:'';position:fixed;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(26,18,8,0.01) 2px,rgba(26,18,8,0.01) 4px),repeating-linear-gradient(90deg,transparent,transparent 3px,rgba(26,18,8,0.007) 3px,rgba(26,18,8,0.007) 6px);pointer-events:none;z-index:0;}
+header{position:relative;z-index:10;border-bottom:1px solid var(--border-gold);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;background:rgba(245,240,232,0.97);}
+.logo-main{font-family:'Zen Old Mincho',serif;font-size:1.2rem;color:var(--gold-dim);letter-spacing:0.06em;}
+.logo-sub{font-size:0.68rem;color:var(--smoke);font-family:'JetBrains Mono',monospace;margin-left:8px;}
+.status-pill{display:flex;align-items:center;gap:6px;font-size:0.68rem;color:var(--jade);font-family:'JetBrains Mono',monospace;border:0.5px solid var(--jade);border-radius:20px;padding:3px 10px;}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--jade);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.api-bar{border-bottom:1px solid var(--border);padding:0.6rem 1.5rem;display:flex;align-items:center;gap:8px;font-size:0.7rem;font-family:'JetBrains Mono',monospace;}
+.api-label{color:var(--smoke);white-space:nowrap;}
+.api-input{flex:1;background:rgba(26,18,8,0.04);border:0.5px solid var(--border);border-radius:4px;padding:3px 8px;font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--ink);outline:none;}
+.api-input:focus{border-color:var(--gold);}
+.api-save{background:none;border:0.5px solid var(--gold-dim);border-radius:4px;padding:2px 8px;font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--gold-dim);cursor:pointer;white-space:nowrap;}
+.api-save:hover{background:rgba(184,150,12,0.1);}
+.api-status{color:var(--jade);}
+.api-status.err{color:var(--vermillion);}
+.main{position:relative;z-index:1;display:flex;flex:1;max-width:900px;margin:0 auto;width:100%;gap:0;}
+.sidebar{width:210px;flex-shrink:0;border-right:1px solid var(--border);padding:1.2rem 0.9rem;display:flex;flex-direction:column;gap:1.2rem;}
+.sidebar-section-title{font-size:0.6rem;letter-spacing:0.12em;color:var(--smoke);font-family:'JetBrains Mono',monospace;margin-bottom:0.4rem;}
+.owner-card{background:rgba(26,18,8,0.04);border:0.5px solid var(--border-gold);border-radius:6px;padding:0.65rem;}
+.owner-name{font-family:'Zen Old Mincho',serif;font-size:0.9rem;font-weight:700;color:var(--gold-dim);margin-bottom:2px;}
+.owner-role{font-size:0.62rem;color:var(--smoke);line-height:1.5;}
+.escalate-item{font-size:0.65rem;color:var(--smoke);line-height:1.5;padding-left:0.5rem;border-left:2px solid var(--border-gold);margin-bottom:3px;}
+.escalate-item.danger{border-left-color:var(--vermillion);color:var(--vermillion);}
+.chat-area{flex:1;display:flex;flex-direction:column;}
+.messages{flex:1;padding:1.2rem 1.2rem 0;display:flex;flex-direction:column;gap:1rem;overflow-y:auto;max-height:calc(100vh - 210px);min-height:300px;}
+.msg{display:flex;gap:10px;animation:fadeIn 0.3s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{flex-direction:row-reverse;}
+.avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.62rem;font-weight:700;flex-shrink:0;font-family:'JetBrains Mono',monospace;}
+.avatar.clone{background:var(--gold-dim);color:var(--paper);border:1px solid var(--gold);}
+.avatar.user{background:var(--indigo);color:#fff;}
+.bubble{max-width:72%;padding:0.65rem 0.9rem;border-radius:8px;font-size:0.85rem;line-height:1.75;}
+.bubble.clone{background:rgba(26,18,8,0.05);border:0.5px solid var(--border-gold);color:var(--ink);}
+.bubble.user{background:var(--indigo);color:#e8eef5;}
+.escalate-banner{margin:0.4rem 0;padding:0.6rem 0.9rem;background:rgba(192,57,43,0.08);border:1px solid rgba(192,57,43,0.3);border-radius:6px;font-size:0.78rem;color:var(--vermillion);display:flex;align-items:flex-start;gap:8px;line-height:1.6;}
+.typing{display:flex;align-items:center;gap:4px;padding:0.5rem 0.7rem;}
+.typing span{width:5px;height:5px;border-radius:50%;background:var(--gold-dim);animation:bounce 1.2s infinite;}
+.typing span:nth-child(2){animation-delay:0.2s;}
+.typing span:nth-child(3){animation-delay:0.4s;}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+.input-area{border-top:1px solid var(--border);padding:0.9rem 1.2rem 1rem;background:rgba(245,240,232,0.97);}
+.input-row{display:flex;gap:8px;align-items:flex-end;}
+textarea{flex:1;background:rgba(26,18,8,0.04);border:0.5px solid var(--border-gold);border-radius:6px;padding:0.6rem 0.85rem;font-family:'Noto Serif JP',serif;font-size:0.83rem;color:var(--ink);resize:none;outline:none;line-height:1.6;min-height:40px;max-height:120px;}
+textarea:focus{border-color:var(--gold);}
+textarea::placeholder{color:var(--smoke);}
+.send-btn{background:var(--gold-dim);color:var(--paper);border:none;border-radius:6px;padding:0.58rem 1rem;font-family:'Noto Serif JP',serif;font-size:0.78rem;cursor:pointer;transition:background 0.2s,transform 0.1s;white-space:nowrap;}
+.send-btn:hover{background:var(--gold);}
+.send-btn:active{transform:scale(0.97);}
+.send-btn:disabled{background:var(--smoke);cursor:not-allowed;}
+.input-hint{font-size:0.62rem;color:var(--smoke);margin-top:5px;font-family:'JetBrains Mono',monospace;}
+.footer-note{text-align:center;font-size:0.6rem;color:var(--smoke);padding:0.5rem;font-family:'JetBrains Mono',monospace;border-top:1px solid var(--border);position:relative;z-index:1;}
+</style>
+</head>
+<body>
+<header>
+  <div><span class="logo-main">${name} のクローン</span><span class="logo-sub">MyClone — ${role}</span></div>
+  <div class="status-pill"><div class="status-dot"></div><span>クローン稼働中</span></div>
+</header>
+<div class="api-bar">
+  <span class="api-label">Anthropic API Key:</span>
+  <input class="api-input" type="password" id="apiKeyInput" placeholder="sk-ant-api03-..." autocomplete="off">
+  <button class="api-save" onclick="saveApiKey()">保存</button>
+  <span class="api-status" id="apiStatus"></span>
+</div>
+<div class="main">
+  <div class="sidebar">
+    <div>
+      <div class="sidebar-section-title">クローンの持ち主</div>
+      <div class="owner-card">
+        <div class="owner-name">${name}</div>
+        <div class="owner-role">${role}</div>
+      </div>
+    </div>
+    ${autoRules.length > 0 ? `<div>
+      <div class="sidebar-section-title">自律判断できる作業</div>
+      ${autoRules.map(r => `<div class="escalate-item">${r}</div>`).join('')}
+    </div>` : ''}
+    ${escalateRules.length > 0 ? `<div>
+      <div class="sidebar-section-title">要確認（エスカレーション）</div>
+      ${escalateRules.map(r => `<div class="escalate-item danger">${r}</div>`).join('')}
+    </div>` : ''}
+  </div>
+  <div class="chat-area">
+    <div class="messages" id="messages">
+      <div class="msg">
+        <div class="avatar clone">分身</div>
+        <div class="bubble clone">
+          こんにちは。${name}の分身AIです。<br>
+          ${role}として、代わりに作業を進めます。<br><br>
+          指示をどうぞ。判断が必要な事項については確認を求めます。
+        </div>
+      </div>
+    </div>
+    <div class="input-area">
+      <div class="input-row">
+        <textarea id="userInput" placeholder="作業の指示を入力してください…" rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">送信</button>
+      </div>
+      <div class="input-hint">Shift+Enter で改行 / Enter で送信</div>
+    </div>
+  </div>
+</div>
+<div class="footer-note">MyClone — ${name}専用クローンBot — Claude API使用</div>
+<script>
+const SYSTEM_PROMPT = ${JSON.stringify(prompt)};
+let apiKey = localStorage.getItem('myCloneApiKey_${name.replace(/\s/g,'')}') || '';
+let conversationHistory = [];
+let isLoading = false;
+window.onload = function() {
+  if (apiKey) { document.getElementById('apiKeyInput').value = apiKey; document.getElementById('apiStatus').textContent = '✓ 設定済み'; }
+};
+function saveApiKey() {
+  const val = document.getElementById('apiKeyInput').value.trim();
+  if (!val.startsWith('sk-ant-')) { const s = document.getElementById('apiStatus'); s.textContent = '形式が不正'; s.className = 'api-status err'; return; }
+  apiKey = val;
+  localStorage.setItem('myCloneApiKey_${name.replace(/\s/g,'')}', val);
+  const s = document.getElementById('apiStatus'); s.textContent = '✓ 保存'; s.className = 'api-status';
+  setTimeout(() => { s.textContent = '✓ 設定済み'; }, 2000);
+}
+function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; }
+function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
+async function sendMessage() {
+  if (isLoading) return;
+  const input = document.getElementById('userInput');
+  const text = input.value.trim();
+  if (!text) return;
+  if (!apiKey) { addMessage('clone', '⚠ APIキーが設定されていません。上部に入力してください。'); return; }
+  addMessage('user', text);
+  conversationHistory.push({ role: 'user', content: text });
+  input.value = ''; input.style.height = 'auto';
+  isLoading = true; document.getElementById('sendBtn').disabled = true;
+  const typingEl = addTyping();
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1500, system: SYSTEM_PROMPT, messages: conversationHistory })
+    });
+    const data = await res.json();
+    typingEl.remove();
+    if (data.error) { addMessage('clone', '⚠ APIエラー: ' + data.error.message); }
+    else {
+      const reply = data.content?.[0]?.text || '（応答なし）';
+      conversationHistory.push({ role: 'assistant', content: reply });
+      if (reply.includes('【要確認】')) { addMessage('clone', reply); addEscalateBanner(); }
+      else { addMessage('clone', reply); }
+    }
+  } catch (err) { typingEl.remove(); addMessage('clone', '⚠ 通信エラー。APIキーとネットワークを確認してください。'); }
+  isLoading = false; document.getElementById('sendBtn').disabled = false;
+}
+function addMessage(role, text) {
+  const container = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg' + (role === 'user' ? ' user' : '');
+  const avatar = document.createElement('div'); avatar.className = 'avatar ' + role; avatar.textContent = role === 'user' ? 'あなた' : '分身';
+  const bubble = document.createElement('div'); bubble.className = 'bubble ' + role; bubble.innerHTML = text.replace(/\\n/g, '<br>');
+  div.appendChild(avatar); div.appendChild(bubble); container.appendChild(div); container.scrollTop = container.scrollHeight;
+  return div;
+}
+function addEscalateBanner() {
+  const container = document.getElementById('messages');
+  const banner = document.createElement('div'); banner.className = 'escalate-banner';
+  banner.innerHTML = '⚠ この判断は本人の確認が必要です。';
+  container.appendChild(banner); container.scrollTop = container.scrollHeight;
+}
+function addTyping() {
+  const container = document.getElementById('messages');
+  const div = document.createElement('div'); div.className = 'msg';
+  div.innerHTML = '<div class="avatar clone">分身</div><div class="bubble clone"><div class="typing"><span></span><span></span><span></span></div></div>';
+  container.appendChild(div); container.scrollTop = container.scrollHeight; return div;
+}
+<\/script>
+</body>
+</html>`;
+
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── プロンプトコピー ──
+function copyPrompt() {
+  const text = buildSystemPrompt();
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.btn-copy');
+    btn.textContent = 'コピー完了！';
+    setTimeout(() => { btn.textContent = 'プロンプトだけコピー'; }, 2000);
+  });
+}
+
+// ── リセット ──
+function resetAll() {
+  ['f-name','f-kana','f-role','f-email','f-github','f-projects','f-style2','f-notify'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('f-style').selectedIndex = 0;
+  autoRules = []; escalateRules = [];
+  renderRules('auto'); renderRules('escalate');
+  goStep(1);
+}
+</script>
+</body>
+</html>
