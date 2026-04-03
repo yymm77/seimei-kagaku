@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MyCloneを始める前に — 3分で読めます</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;700&family=Zen+Old+Mincho:wght@400;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #1a1208;
+  --paper: #f5f0e8;
+  --gold: #b8960c;
+  --gold-dim: #7a6308;
+  --gold-light: #f0e0a0;
+  --jade: #2d6a4f;
+  --smoke: #8a8478;
+  --indigo: #1a3a5c;
+  --vermillion: #c0392b;
+  --border: rgba(26,18,8,0.12);
+  --border-gold: rgba(184,150,12,0.25);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Noto Serif JP', serif;
+  min-height: 100vh;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(26,18,8,0.01) 2px, rgba(26,18,8,0.01) 4px),
+    repeating-linear-gradient(90deg, transparent, transparent 3px, rgba(26,18,8,0.007) 3px, rgba(26,18,8,0.007) 6px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+header {
+  position: relative;
+  z-index: 10;
+  border-bottom: 1px solid var(--border-gold);
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(245,240,232,0.97);
+}
+
+.logo { font-family: 'Zen Old Mincho', serif; font-size: 1.2rem; color: var(--gold-dim); letter-spacing: 0.06em; }
+.logo span { font-size: 0.68rem; color: var(--smoke); font-family: 'JetBrains Mono', monospace; margin-left: 8px; }
+
+.wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 5rem;
+}
+
+/* ── ヒーロー ── */
+.hero {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.hero-title {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: 1.6rem;
+  color: var(--gold-dim);
+  letter-spacing: 0.05em;
+  line-height: 1.5;
+  margin-bottom: 0.8rem;
+}
+
+.hero-sub {
+  font-size: 0.88rem;
+  color: var(--smoke);
+  line-height: 1.8;
+}
+
+.hero-time {
+  display: inline-block;
+  margin-top: 0.8rem;
+  font-size: 0.72rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--jade);
+  border: 0.5px solid var(--jade);
+  border-radius: 20px;
+  padding: 3px 12px;
+}
+
+/* ── Q&Aブロック ── */
+.qa-block {
+  margin-bottom: 1.5rem;
+  border: 0.5px solid var(--border-gold);
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(245,240,232,0.6);
+}
+
+.qa-num {
+  background: var(--gold-dim);
+  color: var(--paper);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  padding: 6px 14px;
+  letter-spacing: 0.08em;
+}
+
+.qa-q {
+  font-size: 1.05rem;
+  font-weight: 500;
+  padding: 1rem 1.2rem 0.5rem;
+  color: var(--ink);
+  line-height: 1.6;
+}
+
+.qa-a {
+  padding: 0 1.2rem 1.2rem;
+  font-size: 0.88rem;
+  line-height: 1.85;
+  color: var(--ink);
+}
+
+.qa-a p { margin-bottom: 0.6rem; }
+.qa-a p:last-child { margin-bottom: 0; }
+
+/* ── 例えボックス ── */
+.analogy {
+  background: rgba(184,150,12,0.07);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 8px 8px 0;
+  padding: 0.8rem 1rem;
+  margin: 0.7rem 0;
+  font-size: 0.85rem;
+  line-height: 1.75;
+  color: var(--ink);
+}
+
+.analogy strong {
+  display: block;
+  font-size: 0.7rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--gold-dim);
+  margin-bottom: 4px;
+  letter-spacing: 0.06em;
+}
+
+/* ── ステップ図 ── */
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0.8rem 0;
+}
+
+.step {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 0.65rem 0.9rem;
+  background: rgba(26,18,8,0.03);
+  border-radius: 8px;
+  border: 0.5px solid var(--border);
+}
+
+.step-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--indigo);
+  color: #fff;
+  font-size: 0.68rem;
+  font-family: 'JetBrains Mono', monospace;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.step-text {
+  font-size: 0.85rem;
+  line-height: 1.65;
+  color: var(--ink);
+}
+
+.step-text a {
+  color: var(--gold-dim);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ── 安心バッジ ── */
+.safe-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0.8rem 0;
+}
+
+.safe-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 0.85rem;
+  line-height: 1.65;
+}
+
+.safe-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(45,106,79,0.15);
+  color: var(--jade);
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+  font-weight: 700;
+}
+
+/* ── 仮名OK バナー ── */
+.alias-banner {
+  background: rgba(45,106,79,0.08);
+  border: 1px solid rgba(45,106,79,0.25);
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.8;
+  color: var(--ink);
+}
+
+.alias-banner strong {
+  display: block;
+  font-size: 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--jade);
+  margin-bottom: 6px;
+  letter-spacing: 0.06em;
+}
+
+/* ── 費用表 ── */
+.cost-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.8rem 0;
+  font-size: 0.83rem;
+}
+
+.cost-table th {
+  background: rgba(26,18,8,0.06);
+  padding: 6px 12px;
+  text-align: left;
+  font-weight: 500;
+  font-size: 0.72rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--smoke);
+  letter-spacing: 0.04em;
+  border-bottom: 0.5px solid var(--border);
+}
+
+.cost-table td {
+  padding: 8px 12px;
+  border-bottom: 0.5px solid var(--border);
+  line-height: 1.5;
+  vertical-align: top;
+}
+
+.cost-table tr:last-child td { border-bottom: none; }
+
+.cost-free { color: var(--jade); font-weight: 500; }
+.cost-paid { color: var(--gold-dim); font-weight: 500; }
+
+/* ── CTAボタン ── */
+.cta-wrap {
+  text-align: center;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-gold);
+}
+
+.cta-pre {
+  font-size: 0.8rem;
+  color: var(--smoke);
+  margin-bottom: 1rem;
+  line-height: 1.7;
+}
+
+.btn-start {
+  display: inline-block;
+  background: var(--gold-dim);
+  color: var(--paper);
+  text-decoration: none;
+  padding: 0.9rem 2.5rem;
+  border-radius: 8px;
+  font-family: 'Zen Old Mincho', serif;
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.btn-start:hover  { background: var(--gold); }
+.btn-start:active { transform: scale(0.98); }
+
+.btn-demo {
+  display: inline-block;
+  margin-top: 0.8rem;
+  color: var(--gold-dim);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.btn-demo a { color: inherit; text-decoration: inherit; }
+
+/* ── フッター ── */
+footer {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  font-size: 0.62rem;
+  color: var(--smoke);
+  padding: 1rem;
+  border-top: 1px solid var(--border);
+  font-family: 'JetBrains Mono', monospace;
+  line-height: 1.8;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">MyClone<span>— 自分の分身AIを作る</span></div>
+</header>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="hero-title">使い始める前に<br>3つだけ読んでください</div>
+    <div class="hero-sub">難しいことは何もありません。<br>3分で読めます。</div>
+    <div class="hero-time">読了目安：3分</div>
+  </div>
+
+  <!-- Q1: 入場券 -->
+  <div class="qa-block">
+    <div class="qa-num">Q 1 ／ 3　　AIと話すための「入場券」とは？</div>
+    <div class="qa-q">「入場券を入力してください」と出てきますが、これは何ですか？</div>
+    <div class="qa-a">
+      <p>MyCloneはClaudeというAIと会話しながら動いています。そのAIに話しかけるためには、「あなたが正規のユーザーです」と証明する入場券が必要です。</p>
+
+      <div class="analogy">
+        <strong>たとえるなら</strong>
+        コンサート会場に入るためのチケットのようなものです。チケットがないと中に入れない。入場券（APIキー）があれば、AIがあなたの言葉を聞いてくれます。
+      </div>
+
+      <p>入場券は長い英数字の文字列です。例えばこんな形をしています：</p>
+      <p style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;background:rgba(26,18,8,0.05);padding:6px 10px;border-radius:4px;margin:6px 0;color:var(--smoke)">sk-ant-api03-xxxxxxxxxxxxxxxxxxxxxxxx...</p>
+      <p>難しそうに見えますが、コピーして貼り付けるだけです。入力に手間はかかりません。</p>
+    </div>
+  </div>
+
+  <!-- Q2: 入手方法 -->
+  <div class="qa-block">
+    <div class="qa-num">Q 2 ／ 3　　入場券はどこで手に入りますか？費用は？</div>
+    <div class="qa-q">入場券の入手方法と、費用を教えてください。</div>
+    <div class="qa-a">
+      <p>Anthropicという会社のサイトで取得します。手順はこの4ステップだけです。</p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-text">
+            <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> を開く
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-text">メールアドレスで無料登録する</div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-text">クレジットカードを登録する（この時点では課金されません）</div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-text">「APIキーを作成」ボタンを押す → 入場券が発行される</div>
+        </div>
+      </div>
+
+      <p>費用については、使った分だけ後払いです。</p>
+
+      <table class="cost-table">
+        <tr>
+          <th>使い方</th>
+          <th>目安の費用</th>
+        </tr>
+        <tr>
+          <td>少し試してみる</td>
+          <td class="cost-free">ほぼ無料（数円〜数十円）</td>
+        </tr>
+        <tr>
+          <td>毎日使う</td>
+          <td class="cost-paid">月500円〜1,000円程度</td>
+        </tr>
+        <tr>
+          <td>使わない月</td>
+          <td class="cost-free">0円</td>
+        </tr>
+      </table>
+
+      <p style="font-size:0.78rem;color:var(--smoke);margin-top:6px">※ 上限金額を設定できます。「月1,000円を超えたら止める」という設定が可能です。</p>
+    </div>
+  </div>
+
+  <!-- Q3: プライバシー -->
+  <div class="qa-block">
+    <div class="qa-num">Q 3 ／ 3　　入力した情報はどこに行きますか？</div>
+    <div class="qa-q">名前や仕事の内容を入力しますが、誰かに見られませんか？</div>
+    <div class="qa-a">
+
+      <div class="safe-list">
+        <div class="safe-item">
+          <div class="safe-icon">✓</div>
+          <div>入力した情報はあなたのパソコンの中だけに保存されます。外部のサーバーには送られません。</div>
+        </div>
+        <div class="safe-item">
+          <div class="safe-icon">✓</div>
+          <div>AIとの会話内容はAnthropicのサーバーを経由しますが、第三者が閲覧することはありません。</div>
+        </div>
+        <div class="safe-item">
+          <div class="safe-icon">✓</div>
+          <div>MyCloneの制作者（このサイト）は、あなたの入力内容を一切見ることができません。</div>
+        </div>
+      </div>
+
+      <div class="alias-banner">
+        <strong>仮名・ニックネームで作っても大丈夫です</strong>
+        本名を入力する必要はありません。「田中太郎」でも「山の職人」でも、クローンは正しく動きます。まずは仮名で試してみてください。慣れてから本名に変えることもできます。
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-wrap">
+    <div class="cta-pre">
+      3つ読んでいただけましたか？<br>
+      準備ができたら、クローンを作り始めましょう。<br>
+      所要時間は5分です。
+    </div>
+    <a class="btn-start" href="clone-maker.html">分身AIを作り始める →</a>
+    <div class="btn-demo">
+      <a href="clone-bot.html">まずデモを体験してみる</a>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  MyClone — 生かされて今を存在する<br>
+  入力した情報はお使いのブラウザ内にのみ保存されます
+</footer>
+
+</body>
+</html>
