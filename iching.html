@@ -1718,6 +1718,15 @@ function buildYaoSection(honKua, zhiKua, lines, changingLines, mode) {
     zhikua_only:    '動爻6つ：之卦の卦辞で判断',
   };
   html += `<div style="font-size:0.72rem;letter-spacing:0.2em;color:var(--gold);margin-bottom:10px;opacity:0.8;">【判断方式】${modeLabels[mode]||''}</div>`;
+
+  // Murphy大意本文（h[7]）を冒頭に表示
+  if (honKua[7]) {
+    html += `<div style="margin-bottom:14px;padding:12px 14px;background:rgba(45,90,61,0.06);border:1px solid rgba(45,90,61,0.25);border-radius:2px;">
+      <div style="font-size:0.7rem;letter-spacing:0.3em;color:var(--jade);margin-bottom:6px;opacity:0.85;">◈ Murphy博士の大意</div>
+      <div style="font-size:0.83rem;line-height:2.1;color:var(--ink);">${honKua[7]}</div>
+      <div style="font-size:0.68rem;color:var(--ink-light);opacity:0.5;margin-top:6px;text-align:right;">出典：Dr. Joseph Murphy「マーフィーの易占い」</div>
+    </div>`;
+  }
   if (mode === 'zhikua_only' && zhiKua) {
     html += yaoBlock('之卦の卦辞で判断', zhiKua[5], zhiKua[6], true, null);
   } else if (mode === 'zhikua_honkua' && zhiKua) {
@@ -1780,6 +1789,14 @@ function displayResult(honKua, zhiKua, lines, changingLines) {
       <div style="color:var(--vermillion);margin-bottom:4px;">${honKua[5]}</div>
       <div style="color:var(--ink-light);">${honKua[6]}</div>
     </div>`;
+    // 変爻なしでも大意本文を表示
+    if (honKua[7]) {
+      html += `<div style="margin-top:10px;padding:12px 14px;background:rgba(45,90,61,0.06);border:1px solid rgba(45,90,61,0.25);border-radius:2px;">
+        <div style="font-size:0.7rem;letter-spacing:0.3em;color:var(--jade);margin-bottom:6px;opacity:0.85;">◈ Murphy博士の大意</div>
+        <div style="font-size:0.83rem;line-height:2.1;color:var(--ink);">${honKua[7]}</div>
+        <div style="font-size:0.68rem;color:var(--ink-light);opacity:0.5;margin-top:6px;text-align:right;">出典：Dr. Joseph Murphy「マーフィーの易占い」</div>
+      </div>`;
+    }
   }
 
   html += `</div>`;
