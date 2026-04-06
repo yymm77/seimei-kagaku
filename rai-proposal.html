@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAIを国策にせよ──鉄腕アトムの予言を、今こそ現実に | 政策提言</title>
+<meta name="description" content="移民より、RAI。鉄腕アトムを生んだ日本が、製造・災害・介護・防衛の四段階でRAI（洗練された自律知性）を国策として開発すべき理由を提言する。">
+<meta property="og:title" content="RAIを国策にせよ──鉄腕アトムの予言を今こそ現実に">
+<meta property="og:description" content="移民より、RAI。日本にしか作れない洗練された自律知性の国家開発戦略を提唱する。">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Noto+Sans+JP:wght@400;500;700&display=swap');
+
+:root {
+  --ink: #0f0f0f;
+  --bg: #f7f4ef;
+  --red: #b5192a;
+  --navy: #1a2640;
+  --gold: #c9a84c;
+  --pale: #ede9e0;
+  --rule: #ccc8be;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Noto Serif JP', serif;
+  font-size: 16px;
+  line-height: 2;
+}
+
+/* ヘッダー */
+.hero {
+  background: var(--navy);
+  color: #fff;
+  padding: 80px 24px 60px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 30% 60%, rgba(181,25,42,0.25) 0%, transparent 60%),
+              radial-gradient(ellipse at 70% 20%, rgba(201,168,76,0.1) 0%, transparent 50%);
+}
+.hero-inner { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; }
+
+.hero-label {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.3em;
+  color: var(--gold);
+  margin-bottom: 20px;
+}
+.hero h1 {
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  font-weight: 900;
+  line-height: 1.45;
+  margin-bottom: 20px;
+  letter-spacing: 0.03em;
+}
+.hero h1 em {
+  font-style: normal;
+  color: var(--gold);
+}
+.hero-sub {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.65);
+  margin-bottom: 32px;
+}
+.hero-cta {
+  display: inline-block;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  padding: 10px 28px;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.1em;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.hero-cta:hover { background: var(--gold); color: var(--navy); }
+
+/* ナビ */
+.toc {
+  background: var(--navy);
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding: 16px 24px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.toc a {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.65);
+  text-decoration: none;
+  padding: 5px 14px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 20px;
+  transition: all 0.2s;
+}
+.toc a:hover { color: #fff; border-color: var(--gold); }
+
+/* メインコンテンツ */
+.main { max-width: 760px; margin: 0 auto; padding: 0 24px; }
+
+/* セクション */
+.section { padding: 60px 0 40px; border-bottom: 1px solid var(--rule); }
+.section:last-of-type { border-bottom: none; }
+
+.section-label {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  color: var(--red);
+  margin-bottom: 12px;
+}
+.section h2 {
+  font-size: clamp(1.2rem, 3vw, 1.65rem);
+  font-weight: 900;
+  line-height: 1.5;
+  color: var(--navy);
+  margin-bottom: 28px;
+}
+.section h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin: 2.2em 0 0.8em;
+  padding-left: 14px;
+  border-left: 3px solid var(--red);
+}
+.section p { margin-bottom: 1.5em; }
+
+/* 引用 */
+.pullquote {
+  border-left: 4px solid var(--gold);
+  padding: 16px 24px;
+  margin: 2em 0;
+  background: var(--pale);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--navy);
+  line-height: 1.9;
+}
+
+/* テーブル */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.85rem;
+  margin: 1.5em 0 2em;
+}
+.data-table th {
+  background: var(--navy);
+  color: #fff;
+  padding: 10px 14px;
+  text-align: left;
+  font-weight: 700;
+}
+.data-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+  line-height: 1.7;
+}
+.data-table tr:nth-child(even) td { background: var(--pale); }
+
+/* 系譜タイムライン */
+.timeline { margin: 2em 0; }
+.tl-item {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 24px;
+  align-items: flex-start;
+}
+.tl-year {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--red);
+  min-width: 60px;
+  padding-top: 3px;
+}
+.tl-body {
+  border-left: 2px solid var(--rule);
+  padding-left: 20px;
+  flex: 1;
+}
+.tl-title {
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 4px;
+}
+.tl-desc {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.85rem;
+  color: #555;
+  line-height: 1.7;
+}
+
+/* ロードマップ */
+.roadmap {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin: 2em 0;
+}
+.rm-card {
+  background: var(--navy);
+  color: #fff;
+  padding: 20px 16px;
+  border-radius: 4px;
+  border-top: 3px solid var(--gold);
+}
+.rm-stage {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.7rem;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+.rm-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.rm-desc {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.6;
+}
+.rm-period {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.72rem;
+  color: var(--gold);
+  margin-top: 10px;
+}
+
+/* 結び */
+.finale {
+  background: var(--navy);
+  color: #fff;
+  padding: 60px 24px;
+  text-align: center;
+  margin-top: 60px;
+}
+.finale-inner { max-width: 600px; margin: 0 auto; }
+.finale p {
+  line-height: 2.1;
+  margin-bottom: 1.5em;
+  color: rgba(255,255,255,0.85);
+}
+.finale .big {
+  font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.8;
+  margin: 2em 0;
+}
+.finale .gold { color: var(--gold); }
+
+/* 送付先 */
+.submit-section {
+  background: var(--pale);
+  border: 1px solid var(--rule);
+  padding: 32px 28px;
+  margin: 40px 0;
+  border-radius: 4px;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+.submit-section h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 16px;
+}
+.submit-section ul {
+  list-style: none;
+  margin-bottom: 16px;
+}
+.submit-section li {
+  margin-bottom: 8px;
+  font-size: 0.88rem;
+}
+.submit-section a {
+  color: var(--red);
+  word-break: break-all;
+}
+.submit-note {
+  font-size: 0.8rem;
+  color: #777;
+  margin-top: 12px;
+}
+
+/* フッター */
+footer {
+  background: #0a0f1a;
+  color: rgba(255,255,255,0.45);
+  text-align: center;
+  padding: 32px 24px;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.8rem;
+  line-height: 2;
+}
+footer a { color: var(--gold); text-decoration: none; }
+
+/* タグ */
+.tags { margin-top: 2em; font-family: 'Noto Sans JP', sans-serif; font-size: 0.8rem; color: #888; }
+.tags span { margin-right: 8px; }
+
+/* 区切り線 */
+hr.rule { border: none; border-top: 1px solid var(--rule); margin: 2em 0; }
+
+@media (max-width: 600px) {
+  .roadmap { grid-template-columns: 1fr 1fr; }
+  .hero { padding: 60px 16px 40px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ヒーロー -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-label">民間政策提言 ／ 2026年4月</div>
+    <h1>RAIを国策にせよ。<br><em>鉄腕アトムの予言を、今こそ現実にする時だ。</em></h1>
+    <div class="hero-sub">移民より、FAI。FAIより、RAI。日本にしか作れないものがある。</div>
+    <a href="#section1" class="hero-cta">提言を読む</a>
+  </div>
+</div>
+
+<div class="toc">
+  <a href="#section1">予言の系譜</a>
+  <a href="#section2">RAIとは何か</a>
+  <a href="#section3">製造現場</a>
+  <a href="#section4">災害現場</a>
+  <a href="#section5">介護現場</a>
+  <a href="#section6">防衛・安全保障</a>
+  <a href="#section7">提言と送付先</a>
+</div>
+
+<div class="main">
+
+<!-- 第1節 -->
+<div class="section" id="section1">
+  <div class="section-label">第一節</div>
+  <h2>予言の系譜──アトムからASIMOへ、そしてRAIへ</h2>
+
+  <p>1952年、手塚治虫は一人の少年ロボットを描いた。人間と共に笑い、共に悲しみ、正義のために戦う──鉄腕アトム。あの物語を読んで育った日本人は、すでに70年以上、心の奥深くに「人型AIと共存する未来」を刻んでいる。あれは空想ではなかった。<strong>予言だった。</strong></p>
+
+  <p>そして今、その予言が現実になろうとしている。中国のAgiBot社は2025年末までに5,000台以上のヒューマノイドを出荷し、世界市場を席巻しつつある。日本は問われている。<strong>買う側に回るのか。それとも、アトムの国として、世界に本物を送り出すのか。</strong></p>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-year">1952年</div>
+      <div class="tl-body">
+        <div class="tl-title">手塚治虫「鉄腕アトム」連載開始</div>
+        <div class="tl-desc">人型AIとの共存という「予言」。日本人の文化的土壌を70年かけて形成する</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">1986年</div>
+      <div class="tl-body">
+        <div class="tl-title">ホンダ、二足歩行ロボット研究を極秘開始</div>
+        <div class="tl-desc">アトムを読んだ世代のエンジニアが夢を形にし始める。本田宗一郎の哲学が背景に</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">2000年</div>
+      <div class="tl-body">
+        <div class="tl-title">ASIMO（アシモ）発表。世界を驚嘆させる</div>
+        <div class="tl-desc">日本が人型ロボット開発で世界の先頭に立つ宣言。技術と哲学の結晶</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">2022年</div>
+      <div class="tl-body">
+        <div class="tl-title">ASIMO開発一区切り。ホンダは研究継続</div>
+        <div class="tl-desc">技術・哲学は次世代へ継承される。本田宗一郎なら「ここからが本番だろう」と言っただろう</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">2026年〜</div>
+      <div class="tl-body">
+        <div class="tl-title" style="color:var(--red)">RAI国家戦略の提唱（本提言）</div>
+        <div class="tl-desc">アトムの予言をRAIとして完成させる。これが日本の使命だ</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 第2節 -->
+<div class="section" id="section2">
+  <div class="section-label">第二節</div>
+  <h2>RAIとは何か──FAIを超える、日本固有の概念</h2>
+
+  <table class="data-table">
+    <tr>
+      <th>概念</th><th>定義</th><th>目指すもの</th><th>代表国</th>
+    </tr>
+    <tr>
+      <td><strong>FAI</strong><br>Fully Autonomous Intelligence</td>
+      <td>完全自律知性</td>
+      <td>「できること」の極限。速さ・量・汎用性</td>
+      <td>中国・米国</td>
+    </tr>
+    <tr>
+      <td><strong>RAI</strong><br>Refined Autonomous Intelligence</td>
+      <td>洗練された自律知性</td>
+      <td>「どのようにできるか」の質。礼・間・信頼・美</td>
+      <td><strong>日本（提唱）</strong></td>
+    </tr>
+  </table>
+
+  <p>RAIが体現するのは、日本が数百年かけて培った文化的資産だ。</p>
+
+  <p><strong>「礼」：</strong>人に近づくとき、一歩止まる。目線を合わせる。<br>
+  <strong>「間」：</strong>動作と動作の間に、わずかな「ため」を入れ、人間のリズムに合わせる。<br>
+  <strong>「配慮」：</strong>老人の歩幅に速度を合わせ、子どもが近づいたら静止する。<br>
+  <strong>「美」：</strong>無駄のない動き。職人の手仕事のような、見ていて気持ちのいい所作。</p>
+
+  <div class="pullquote">これらは数値化しにくい。<br>だからこそ、中国企業が真似できない。<br>日本の参入障壁は「精神性」にある。</div>
+</div>
+
+<!-- 第3節 -->
+<div class="section" id="section3">
+  <div class="section-label">第三節・第一段階</div>
+  <h2>製造現場──職人の暗黙知をRAIに宿す</h2>
+
+  <p>日本のものづくりの強さは、マニュアルに書けない「暗黙知」にある。熟練工が手の感触で判断する締め付けトルク。塗装職人が目で見極める膜厚。長年の経験が生んだ「勘」の世界だ。</p>
+
+  <p>トヨタのカイゼン哲学は、人間の動作を極限まで精緻化した思想体系だ。これはRAI開発において世界最高の「教師データ」となる。熟練工の動作をセンサーで記録し、力加減・速度・角度を蓄積する。引退しても、その技はRAIの中に生き続ける。</p>
+
+  <div class="pullquote">中国のロボットは「速く動く」。<br>日本のRAIは「正しく動く」。<br>トヨタのカイゼンを体に宿したRAIに、中国は勝てない。</div>
+
+  <p>これは省力化ではない。日本の製造ノウハウを永続させ、次世代に伝える「デジタル職人」の創出だ。</p>
+</div>
+
+<!-- 第4節 -->
+<div class="section" id="section4">
+  <div class="section-label">第四節・第二段階</div>
+  <h2>工事・災害現場──命がけの現場こそ、RAIの出番</h2>
+
+  <p>阪神淡路大震災、東日本大震災、能登半島地震。そのたびに「もっとロボットがあれば」という声が上がった。がれきの中、倒壊した建物、放射線量の高い原子炉建屋──人間が入れない場所にこそ、RAIの出番がある。</p>
+
+  <p>毎年数百人にのぼる建設業の死亡事故。日本の建設業界が持つ世界屈指の安全管理文化をRAIの行動規範に組み込むことで、<strong>災害対応ロボットの国際標準を日本が握る</strong>ことができる。</p>
+
+  <table class="data-table">
+    <tr><th>現場</th><th>RAIの役割</th><th>日本の強み</th></tr>
+    <tr><td>災害救助</td><td>要救助者の探索・がれき除去</td><td>大規模災害対応の豊富な経験</td></tr>
+    <tr><td>原子力施設</td><td>放射線環境下での点検・除染</td><td>福島での実績・耐放射線技術</td></tr>
+    <tr><td>建設・土木</td><td>高所作業・橋梁点検</td><td>世界最高水準の安全管理文化</td></tr>
+    <tr><td>海中・地下</td><td>インフラ点検・埋設管探査</td><td>精密センサー・制御技術</td></tr>
+  </table>
+</div>
+
+<!-- 第5節 -->
+<div class="section" id="section5">
+  <div class="section-label">第五節・第三段階</div>
+  <h2>高齢者福祉・介護現場──人間的つながりをRAIに教える</h2>
+
+  <p>ここが最も重要な段階だ。そして最も日本にしかできない段階だ。</p>
+
+  <p>日本の介護現場には、世界に誇れる財産がある。それは「技術」ではなく「人間性」だ。認知症の高齢者の手を握りながら話しかける介護士の言葉。食事の介助をしながら「今日は天気がいいですね」と窓の外を指差す、その自然な「間」。夜中に目が覚めた入居者に、叱らず、急かさず、寄り添う姿勢。</p>
+
+  <div class="pullquote">介護士の優しさを、データにする。<br>データを、RAIに宿す。<br>RAIが、一人の老人に寄り添う。<br>これが、日本にしかできないRAIだ。</div>
+
+  <p>2040年、日本の高齢者は全人口の約35%に達する。RAIがその空白を埋めるとき、それは単なる労働力補充ではなく、<strong>日本の福祉文化の継承と世界への輸出</strong>になる。</p>
+</div>
+
+<!-- 第6節 -->
+<div class="section" id="section6">
+  <div class="section-label">第六節・第四段階</div>
+  <h2>防衛・安全保障──非殺傷型の抑止力として</h2>
+
+  <p>製造・災害・介護の三段階でRAIが成熟したとき、その技術は自然に防衛分野へ転用される。RAIの防衛転用が意味するのは殺傷ロボットではない。<strong>日本人の命を守るための技術</strong>だ。</p>
+
+  <p>国境離島の無人監視。海上・空中での哨戒活動。自衛隊員が危険にさらされる状況へのRAI先行投入。平和憲法の精神と国民の安全を守る責任──この両立を可能にするのが、「礼と配慮」を持つRAIという発想だ。</p>
+
+  <p>アトムは戦うために生まれたのではなかった。だが、人類を守るために必要とあらば、自ら命を投じた。<strong>その精神こそが、RAIの防衛哲学の根拠だ。</strong></p>
+
+  <h3>四段階ロードマップ</h3>
+  <div class="roadmap">
+    <div class="rm-card">
+      <div class="rm-stage">第一段階</div>
+      <div class="rm-title">製造現場</div>
+      <div class="rm-desc">職人の暗黙知・カイゼン哲学をRAIに学習させる</div>
+      <div class="rm-period">2026〜2028年</div>
+    </div>
+    <div class="rm-card">
+      <div class="rm-stage">第二段階</div>
+      <div class="rm-title">工事・災害現場</div>
+      <div class="rm-desc">安全文化・極限環境での判断力を習得</div>
+      <div class="rm-period">2027〜2029年</div>
+    </div>
+    <div class="rm-card">
+      <div class="rm-stage">第三段階</div>
+      <div class="rm-title">高齢者福祉・介護</div>
+      <div class="rm-desc">人間的つながり・尊厳への配慮を体得</div>
+      <div class="rm-period">2028〜2031年</div>
+    </div>
+    <div class="rm-card">
+      <div class="rm-stage">第四段階</div>
+      <div class="rm-title">防衛・安全保障</div>
+      <div class="rm-desc">三段階の統合。非殺傷型防衛支援・国境監視</div>
+      <div class="rm-period">2030〜2035年</div>
+    </div>
+  </div>
+</div>
+
+<!-- 第7節：提言と送付先 -->
+<div class="section" id="section7">
+  <div class="section-label">第七節・行動</div>
+  <h2>この提言を、政策立案者へ届けよ</h2>
+
+  <p>日本政府はいま、少子化対策として移民政策を議論している。だが人を増やすだけでは、製造現場の暗黙知は消え、災害現場の危険は減らず、介護の人手不足は解消されない。<strong>方向を見誤るな。</strong></p>
+
+  <p>AgiBotはすでに5,000台を出荷している。同じ土俵で戦っても勝てない。だからこそ土俵を変える。「速さ」ではなく「信頼」。「量」ではなく「品格」。これがRAI戦略の本質だ。</p>
+
+  <div class="submit-section">
+    <h4>📮 この提言の送付先（政府意見フォーム）</h4>
+    <ul>
+      <li>🏛 <strong>首相官邸（内閣官房）</strong><br>
+        <a href="https://www.kantei.go.jp/jp/forms/goiken_ssl.html" target="_blank">https://www.kantei.go.jp/jp/forms/goiken_ssl.html</a>
+      </li>
+      <li>🏭 <strong>経済産業省</strong><br>
+        <a href="https://mm-enquete-cnt.meti.go.jp/form/pub/honsyo03/meti_toiawase" target="_blank">https://mm-enquete-cnt.meti.go.jp/form/pub/honsyo03/meti_toiawase</a>
+      </li>
+      <li>🔬 <strong>内閣府・科学技術政策</strong><br>
+        <a href="https://www8.cao.go.jp/cstp/goiken.html" target="_blank">https://www8.cao.go.jp/cstp/goiken.html</a>
+      </li>
+    </ul>
+    <div class="submit-note">※ 本提言のURLを添えて送付することを推奨します。あなたの声が政策を動かします。</div>
+  </div>
+
+  <div class="tags">
+    <span>#RAI</span><span>#FAI</span><span>#鉄腕アトム</span><span>#ASIMO</span><span>#本田宗一郎</span><span>#国家戦略</span><span>#製造業</span><span>#災害対応</span><span>#介護ロボット</span><span>#防衛</span><span>#日本の未来</span><span>#政策提言</span>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<!-- 結び -->
+<div class="finale">
+  <div class="finale-inner">
+    <p>鉄腕アトムは最後、地球に迫る巨大な隕石を止めるために、自ら飛び込んでいった。誰に命じられるでもなく。人類を救うために。</p>
+    <p>その最後のページを読んだ日本の子どもたちは、声を上げて泣いた。なぜ泣いたのか。アトムが「機械」だったからではない。アトムが「命を持つ存在」だったからだ。</p>
+    <p>自分より大切なものがあるとき、命を投げ出すことを厭わない──その精神は武士道であり、この国が幾度もの危機を乗り越えてきた魂の核心だ。</p>
+    <div class="big">RAIにその精神を宿すことができるなら、<br>それはもはや機械ではない。<br>日本が世界に送り出す、<span class="gold">新しい命だ。</span></div>
+    <p>手塚治虫がアトムを描いてから70年。本田宗一郎がASIMOの夢を託してから半世紀。中国が量産ロボットで世界を席巻しようとしている今──すべての線が、この瞬間に交わっている。</p>
+    <div class="big"><span class="gold">移民より、RAI。</span><br>日本にはこの答えがある。</div>
+  </div>
+</div>
+
+<footer>
+  <div style="margin-bottom:12px;">
+    <a href="https://yymm77.github.io/seimei-kagaku/">予測技術ポータル</a>　|　
+    <a href="https://yymm77.github.io/seimei-kagaku/namemaster_v5.html">姓名科学</a>　|　
+    <a href="https://yymm77.github.io/seimei-kagaku/houigaku.html">方位学</a>
+  </div>
+  <div>© 2026 日昇リサーチ株式会社　制作者：三原嘉明</div>
+  <div>本提言の転載・引用は出典を明記の上、自由に行っていただけます。</div>
+</footer>
+
+</body>
+</html>
