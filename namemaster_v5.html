@@ -2109,32 +2109,80 @@ function analyzeCompat() {
     nameB = compatKabuB==='ko' ? upper+(legal||'') : (legal||'')+upper;
   }
 
-  // org_compat.htmlの相性ロジックと同じ計算式でスコア算出
-  const MAIN_KEYS = ['I5','C9','K3','I9','K9','D20','I13','A9'];
-  const PNAMES_MAP = {I5:'健康・愛情',C9:'蓄財',K3:'社交',I9:'幸福',K9:'所得',D20:'職業',I13:'技能',A9:'能力'};
+  // ★ 原典（牧正人史「結婚姓名占術」p.100-102）準拠の相性採点ロジック
+  // 採点対象: 配置図の各ポイント（I5はⓈとⓃの2か所に登場するため2回カウント）
+  // 完全相性: 同一画数 → +3点
+  // 準相性:   片方が相手の2倍または4倍 → +2点
+  // 補佐相性: 末尾（一の位）が同じ かつ 偶数を含む → +1点
+  // 同一キー同士（ⓂとⓂ）は採点対象外
 
-  let totalScore = 0, maxScore = 0;
-  const rows = MAIN_KEYS.map(k=>{
-    const pv = ptsA[k]||1, ov = ptsB[k]||1;
-    const pScore = suugi(pv).点数, oScore = suugi(ov).点数;
-    const diff = Math.abs(pScore-oScore);
-    let harmony;
-    if(pv===ov) harmony=1.0;
-    else if(pv%ov===0||ov%pv===0) harmony=0.8;
-    else if(diff<=5) harmony=0.7;
-    else if(diff<=10) harmony=0.55;
-    else if(diff<=20) harmony=0.4;
-    else harmony=0.25;
-    const avg=(pScore+oScore)/2;
-    const bonus=avg>=40?1.15:avg>=30?1.05:1.0;
-    const pairScore=Math.round(harmony*bonus*100);
-    totalScore+=pairScore; maxScore+=100;
-    const harmonyLabel=pv===ov?'✦完全':diff<=5?'○良':diff<=15?'△普':'✗差';
-    return {k, pv, ov, pScore, oScore, pairScore, harmonyLabel};
-  });
-  const finalScore = Math.round(totalScore/maxScore*100);
-  const grade = finalScore>=80?'最良の相性':finalScore>=65?'良い相性':finalScore>=50?'普通の相性':finalScore>=35?'要調整':'困難な相性';
-  const gradeColor = finalScore>=65?'var(--jade)':finalScore>=45?'var(--indigo)':'var(--vermillion)';
+  function getCompatVals(pts) {
+    return {
+      'S_I5':  pts.I5  || 0,
+      'T_C9':  pts.C9  || 0,
+      'N_I5':  pts.I5  || 0,  // I5は図に2か所登場
+      'O_I9':  pts.I9  || 0,
+      'R_K9':  pts.K9  || 0,
+      'Q_K3':  pts.K3  || 0,
+      'W_F20': pts.F20 || 0,
+      'X_F24': pts.F24 || 0,
+      'P_A9':  pts.A9  || 0,
+      'K15':   pts.K15 || 0,
+    };
+  }
+
+  const COMPAT_LABEL = {
+    'S_I5':'健康・愛情(Ⓢ)', 'T_C9':'蓄財(Ⓣ)', 'N_I5':'健康(Ⓝ)',
+    'O_I9':'幸福(Ⓞ)', 'R_K9':'所得(Ⓡ)', 'Q_K3':'社交(Ⓠ)',
+    'W_F20':'社交環境(Ⓦ)', 'X_F24':'所得環境(Ⓧ)', 'P_A9':'能力(Ⓟ)', 'K15':'補助(K15)'
+  };
+
+  const vA = getCompatVals(ptsA);
+  const vB = getCompatVals(ptsB);
+
+  let totalScore = 0;
+  const rows = [];
+
+  const aEntries = Object.entries(vA);
+  const bEntries = Object.entries(vB);
+
+  for (const [ak, av] of aEntries) {
+    for (const [bk, bv] of bEntries) {
+      if (!av || !bv) continue;
+      if (ak === bk) continue; // 同一キー同士は除外（ⓂとⓂルール）
+
+      let pt = 0, label = '';
+      if (av === bv) {
+        pt = 3; label = '✦完全相性';
+      } else if ((av !== 0 && bv % av === 0 && (bv/av === 2 || bv/av === 4)) ||
+                 (bv !== 0 && av % bv === 0 && (av/bv === 2 || av/bv === 4))) {
+        pt = 2; label = '○準相性';
+      } else if (av % 10 === bv % 10 && (av % 2 === 0 || bv % 2 === 0)) {
+        pt = 1; label = '△補佐相性';
+      }
+
+      if (pt > 0) {
+        totalScore += pt;
+        rows.push({
+          ak, bk, av, bv, pt, label,
+          aLabel: COMPAT_LABEL[ak] || ak,
+          bLabel: COMPAT_LABEL[bk] || bk,
+        });
+      }
+    }
+  }
+
+  // 共昇期スコア（相性数）と反発期スコア（反相性数）を算出
+  const kyoshoScore = totalScore;  // 共昇期（相性数）
+  // 反相性 = 反発力（原典: 共昇期の相性数から反相性数を引いた値）
+  // 簡易版: totalScoreをそのまま共昇期スコアとして使用
+  const finalScore = Math.min(totalScore, 120); // 上限120点
+
+  const grade = finalScore>=80?'最良の相性（夫婦円満）':
+                finalScore>=60?'良い相性（共昇期安定）':
+                finalScore>=40?'普通の相性（職場・友人）':
+                finalScore>=20?'要注意（調整が必要）':'困難な相性（反相性強）';
+  const gradeColor = finalScore>=60?'var(--jade)':finalScore>=35?'var(--indigo)':'var(--vermillion)';
 
   // 結果を結果エリアに表示
   renderCompatResult(ptsA, ptsB, nameA, nameB, finalScore, grade, gradeColor, rows);
@@ -2157,30 +2205,36 @@ function renderCompatResult(ptsA, ptsB, nameA, nameB, score, grade, gradeColor, 
   const scoreCard = document.createElement('div');
   scoreCard.className = 'domain-card';
   scoreCard.style.cssText = 'grid-column:1/-1;text-align:center;padding:24px';
-  scoreCard.innerHTML = '<div style="font-size:10px;letter-spacing:.4em;color:var(--mist);margin-bottom:8px">相　性　ス　コ　ア</div>'
+  scoreCard.innerHTML = '<div style="font-size:10px;letter-spacing:.4em;color:var(--mist);margin-bottom:8px">共　昇　期　相　性　点</div>'
     + '<div style="font-size:48px;font-weight:700;font-family:\'Zen Old Mincho\',serif;color:'+gradeColor+'">'+score+'</div>'
     + '<div style="font-size:14px;color:'+gradeColor+';margin-top:6px;letter-spacing:.4em">'+grade+'</div>';
   grid.appendChild(scoreCard);
 
-  // ポイント比較表
+  // 原典準拠の相性一覧表
   const pb = document.getElementById('p-body');
   pb.innerHTML = '';
-  rows.forEach(row=>{
-    const tr = document.createElement('tr');
-    const pA = suugi(row.pv), pB = suugi(row.ov);
-    const clA = scl(row.pScore), clB = scl(row.oScore);
-    const hColor = row.harmonyLabel.startsWith('✦')?'var(--gold)':row.harmonyLabel.startsWith('○')?'var(--jade)':row.harmonyLabel.startsWith('△')?'var(--indigo)':'var(--vermillion)';
-    const fontStyle = 'font-family:\'Zen Old Mincho\',serif;font-size:15px';
-    tr.innerHTML = '<td style="font-size:11px;color:var(--mist)">'+(PNAMES_MAP[row.k]||row.k)+'</td>'
-      + '<td style="text-align:center"><span style="'+fontStyle+'">'+row.pv+'画</span><br><span class="badge '+clA+'">'+row.pScore+'</span><br><span style="font-size:10px;color:var(--mist)">'+pA.数意+'</span></td>'
-      + '<td style="text-align:center;font-size:14px;font-weight:700;color:'+hColor+'">'+row.harmonyLabel+'</td>'
-      + '<td style="text-align:center"><span style="'+fontStyle+'">'+row.ov+'画</span><br><span class="badge '+clB+'">'+row.oScore+'</span><br><span style="font-size:10px;color:var(--mist)">'+pB.数意+'</span></td>';
-    pb.appendChild(tr);
+  // 完全→準→補佐の順で表示
+  [3,2,1].forEach(pt=>{
+    const ptColor = pt===3?'var(--jade)':pt===2?'var(--gold)':'var(--indigo)';
+    const ptLabel = pt===3?'✦完全相性':pt===2?'○準相性':'△補佐相性';
+    rows.filter(r=>r.pt===pt).forEach(row=>{
+      const tr = document.createElement('tr');
+      const fontStyle = 'font-family:\'Zen Old Mincho\',serif;font-size:14px';
+      tr.innerHTML =
+        '<td style="font-size:10px;color:'+ptColor+';letter-spacing:.1em">'+ptLabel+'</td>'
+        + '<td style="text-align:center;font-size:10px;color:var(--mist)">'+row.aLabel+'</td>'
+        + '<td style="text-align:center"><span style="'+fontStyle+'">'+row.av+'画</span></td>'
+        + '<td style="text-align:center;color:'+ptColor+';font-weight:700">＝</td>'
+        + '<td style="text-align:center;font-size:10px;color:var(--mist)">'+row.bLabel+'</td>'
+        + '<td style="text-align:center"><span style="'+fontStyle+'">'+row.bv+'画</span></td>'
+        + '<td style="text-align:right;color:'+ptColor+';font-weight:700">+'+row.pt+'</td>';
+      pb.appendChild(tr);
+    });
   });
 
   // p-tableのヘッダーを相性用に変更
   const thead = document.querySelector('#p-table thead tr');
-  if(thead) thead.innerHTML = '<th>分野</th><th style="color:var(--gold)">'+nameA.substring(0,8)+'</th><th>相性</th><th style="color:var(--indigo)">'+nameB.substring(0,8)+'</th>';
+  if(thead) thead.innerHTML = '<th>相性種別</th><th style="color:var(--gold)">'+nameA.substring(0,6)+'</th><th>ポイント</th><th style="color:var(--indigo)">'+nameB.substring(0,6)+'</th><th></th><th></th><th>点</th>';
 
   // ── 相性の観点別アドバイスを表示 ──
   renderCompatAdvice(ptsA, ptsB, nameA, nameB, score, grade, gradeColor);
