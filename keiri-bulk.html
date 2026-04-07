@@ -414,8 +414,8 @@ async function startAnalysis(){
   document.getElementById('progress-wrap').style.display = '';
   setStep(2);
 
-  const CHUNK = 20; // 50→20件に削減（レート制限対策）
-  const WAIT_MS = 15000; // バッチ間15秒待機
+  const CHUNK = 30; // Tier1対応で増量
+  const WAIT_MS = 3000; // 待機時間を3秒に短縮
   const chunks = [];
   for(let i=0; i<rawData.length; i+=CHUNK) chunks.push(rawData.slice(i,i+CHUNK).map((r,j)=>({_idx:i+j,...r})));
 
@@ -463,8 +463,13 @@ async function startAnalysis(){
       const chunk = chunks[ci];
       const prompt = `以下のデータを仕分けしてください。JSONのみで返答してください。\n\n${JSON.stringify(chunk)}`;
       const data = await callGAS({model:'claude-sonnet-4-20250514', max_tokens:4000, system:buildSYS_BULK(), messages:[{role:'user',content:prompt}]});
-      const raw = (data.content?.map(b=>b.text||'').join('')||'').replace(/```json|```/g,'').trim();
-      const result = JSON.parse(raw);
+      const rawText = (data.content?.map(b=>b.text||'').join('')||'').replace(/```json|```/g,'').trim();
+      if (!rawText) {
+        console.warn(`バッチ${ci+1}の返答が空でした。スキップします。`);
+        updateProgress(ci + 1);
+        continue;
+      }
+      const result = JSON.parse(rawText);
       finalEntries.push(...(result.auto_classified||[]));
       pendingQuestions.push(...(result.need_questions||[]));
       updateProgress(ci + 1);
