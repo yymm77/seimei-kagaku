@@ -412,7 +412,7 @@ _cntBanner(); cntVisit();
     </div>
     <div class="reg-group">
       <label class="reg-label" for="reg-name">お名前（任意）</label>
-      <input class="reg-input" id="reg-name" type="text" placeholder="例：山田 太郎">
+      <input class="reg-input" id="reg-name" type="text" placeholder="例：山川 太郎">
     </div>
     <div class="reg-row">
       <div class="reg-group">
@@ -472,22 +472,7 @@ _cntBanner(); cntVisit();
     <div class="reg-err" id="reg-err">メールアドレスをご入力ください</div>
     <span class="guest-link" onclick="guestEnter()">登録せずにゲストとして利用する</span>
 
-    <div style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(184,150,12,.2);text-align:center;">
-      <div style="font-size:10px;letter-spacing:.4em;color:var(--gold);margin-bottom:10px;">プレミアム会員</div>
-      <div style="font-size:12px;color:var(--mist);line-height:1.9;margin-bottom:12px;">
-        月額<strong style="color:var(--ink);font-size:15px;">￥580</strong> で全ツール使い放題<br>
-        姓名科学・方位学・吉日・易経・AI経理アシスタント
-      </div>
-      <button onclick="window.open('https://buy.stripe.com/3cI00ldw980I9zl7fkbEA01','_blank')"
-        style="background:var(--indigo);color:var(--gold);border:1px solid var(--gold);
-        padding:10px 28px;font-family:'Zen Old Mincho',serif;font-size:13px;
-        letter-spacing:.3em;cursor:pointer;width:100%;">
-        Stripe でプレミアム登録
-      </button>
-      <div style="font-size:10px;color:var(--mist);margin-top:8px;line-height:1.8;">
-        クレジットカード決済（Stripe）　いつでも解約可能
-      </div>
-    </div>
+
   </div>
 </div>
 
@@ -503,20 +488,16 @@ _cntBanner(); cntVisit();
       </span>
     </div>
 
-    <!-- ══ プレミアムバナー ══ -->
-    <div style="margin-top:18px;border:1px solid rgba(184,150,12,.5);padding:14px 20px;max-width:480px;margin-left:auto;margin-right:auto;text-align:center;">
-      <div style="font-size:10px;letter-spacing:.5em;color:#b8960c;margin-bottom:6px;">ご利用案内</div>
-      <div style="font-size:12px;color:#1a1208;line-height:2;letter-spacing:.05em;">
-        <span style="color:#2d6a4f;font-weight:700;">無料</span>：解析3回まで体験いただけます<br>
-        <span style="color:#1a3a5c;font-weight:700;">プレミアム会員</span>：月額 <strong>¥580</strong> で全ツール使い放題<br>
-        <span style="font-size:10px;color:#888;">姓名科学・方位学・吉日・易経・AI相談　いつでも解約可能</span>
+    <!-- ══ ご利用案内バナー ══ -->
+    <div style="margin-top:18px;border:1px solid rgba(45,106,79,.4);padding:14px 20px;max-width:480px;margin-left:auto;margin-right:auto;text-align:center;background:rgba(45,106,79,.05);">
+      <div style="font-size:10px;letter-spacing:.5em;color:#2d6a4f;margin-bottom:8px;">ご利用案内</div>
+      <div style="font-size:13px;color:#1a1208;line-height:2;letter-spacing:.05em;">
+        <span style="color:#2d6a4f;font-weight:700;font-size:15px;">完全無料</span>　どなたでも何回でもお使いいただけます<br>
+        <span style="font-size:10px;color:#888;">姓名科学・方位学・易経・吉日　すべて無料公開中</span>
       </div>
-      <button onclick="window.open('https://buy.stripe.com/3cI00ldw980I9zl7fkbEA01','_blank')"
-        style="margin-top:12px;background:#1a3a5c;color:#b8960c;border:1px solid #b8960c;
-        padding:9px 32px;font-family:'Zen Old Mincho',serif;font-size:12px;
-        letter-spacing:.4em;cursor:pointer;">
-        Stripe でプレミアム登録
-      </button>
+      <div style="margin-top:8px;font-size:10px;color:#888;line-height:1.8;">
+        ご感想・ご体験談をお寄せいただけると励みになります
+      </div>
     </div>
   </header>
 
@@ -534,13 +515,13 @@ _cntBanner(); cntVisit();
       <div class="name-row">
         <div class="name-group">
           <label>姓（せい）</label>
-          <input type="text" class="name-text-input" id="sei-input" placeholder="例：田中" maxlength="8" oninput="onNameInput()" onkeydown="if(event.key==='Enter')document.getElementById('mei-input').focus()">
+          <input type="text" class="name-text-input" id="sei-input" placeholder="例：山川" maxlength="8" oninput="onNameInput()" onkeydown="if(event.key==='Enter')document.getElementById('mei-input').focus()">
           <div class="stroke-preview" id="sei-preview"></div>
           <div class="unknown-char" id="sei-unk"></div>
         </div>
         <div class="name-group">
           <label>名（めい）</label>
-          <input type="text" class="name-text-input" id="mei-input" placeholder="例：花子" maxlength="8" oninput="onNameInput()" onkeydown="if(event.key==='Enter')analyze()">
+          <input type="text" class="name-text-input" id="mei-input" placeholder="例：一美" maxlength="8" oninput="onNameInput()" onkeydown="if(event.key==='Enter')analyze()">
           <div class="stroke-preview" id="mei-preview"></div>
           <div class="unknown-char" id="mei-unk"></div>
         </div>
@@ -624,12 +605,12 @@ _cntBanner(); cntVisit();
           <div class="name-row">
             <div class="name-group">
               <label>姓</label>
-              <input type="text" class="name-text-input" id="ca-sei" maxlength="8" placeholder="例：田中" oninput="onCompatInput()">
+              <input type="text" class="name-text-input" id="ca-sei" maxlength="8" placeholder="例：山川" oninput="onCompatInput()">
               <div class="stroke-preview" id="ca-sei-prev"></div>
             </div>
             <div class="name-group">
               <label>名</label>
-              <input type="text" class="name-text-input" id="ca-mei" maxlength="6" placeholder="例：一郎" oninput="onCompatInput()">
+              <input type="text" class="name-text-input" id="ca-mei" maxlength="6" placeholder="例：誠一" oninput="onCompatInput()">
               <div class="stroke-preview" id="ca-mei-prev"></div>
             </div>
           </div>
@@ -642,7 +623,7 @@ _cntBanner(); cntVisit();
           <div class="name-row">
             <div class="name-group">
               <label id="ca-upper-lbl">社名本体（上段）</label>
-              <input type="text" class="name-text-input" id="ca-upper" maxlength="20" placeholder="例：日昇リサーチ" oninput="onCompatInput()">
+              <input type="text" class="name-text-input" id="ca-upper" maxlength="20" placeholder="例：山川商事" oninput="onCompatInput()">
               <div class="stroke-preview" id="ca-upper-prev"></div>
             </div>
             <div class="name-group">
@@ -667,12 +648,12 @@ _cntBanner(); cntVisit();
           <div class="name-row">
             <div class="name-group">
               <label>姓</label>
-              <input type="text" class="name-text-input" id="cb-sei" maxlength="8" placeholder="例：鈴木" oninput="onCompatInput()">
+              <input type="text" class="name-text-input" id="cb-sei" maxlength="8" placeholder="例：松本" oninput="onCompatInput()">
               <div class="stroke-preview" id="cb-sei-prev"></div>
             </div>
             <div class="name-group">
               <label>名</label>
-              <input type="text" class="name-text-input" id="cb-mei" maxlength="6" placeholder="例：花子" oninput="onCompatInput()">
+              <input type="text" class="name-text-input" id="cb-mei" maxlength="6" placeholder="例：和子" oninput="onCompatInput()">
               <div class="stroke-preview" id="cb-mei-prev"></div>
             </div>
           </div>
@@ -685,7 +666,7 @@ _cntBanner(); cntVisit();
           <div class="name-row">
             <div class="name-group">
               <label id="cb-upper-lbl">社名本体（上段）</label>
-              <input type="text" class="name-text-input" id="cb-upper" maxlength="20" placeholder="例：東芝" oninput="onCompatInput()">
+              <input type="text" class="name-text-input" id="cb-upper" maxlength="20" placeholder="例：松本工業" oninput="onCompatInput()">
               <div class="stroke-preview" id="cb-upper-prev"></div>
             </div>
             <div class="name-group">
@@ -2350,6 +2331,18 @@ function setMode(mode) {
   document.getElementById('err').style.display = 'none';
   const labels = {person:'解　　析', company:'企　業　名　解　析', compat:'相　性　を　判　定'};
   document.getElementById('analyze-btn').textContent = labels[mode];
+
+  // ★ 相性タブに切り替えたとき、Aの欄に自分の名前を自動コピー
+  if (mode === 'compat') {
+    const seiVal = document.getElementById('sei-input') ? document.getElementById('sei-input').value.trim() : '';
+    const meiVal = document.getElementById('mei-input') ? document.getElementById('mei-input').value.trim() : '';
+    const caSei = document.getElementById('ca-sei');
+    const caMei = document.getElementById('ca-mei');
+    // すでに入力されている場合は上書きしない
+    if (caSei && !caSei.value && seiVal) caSei.value = seiVal;
+    if (caMei && !caMei.value && meiVal) caMei.value = meiVal;
+    if ((seiVal || meiVal) && typeof onCompatInput === 'function') onCompatInput();
+  }
 }
 
 function dispatchAnalyze() {
