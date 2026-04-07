@@ -2173,15 +2173,20 @@ function analyzeCompat() {
   }
 
   // 共昇期スコア（相性数）と反発期スコア（反相性数）を算出
-  const kyoshoScore = totalScore;  // 共昇期（相性数）
-  // 反相性 = 反発力（原典: 共昇期の相性数から反相性数を引いた値）
-  // 簡易版: totalScoreをそのまま共昇期スコアとして使用
-  const finalScore = Math.min(totalScore, 120); // 上限120点
+  // 原典p.103の採点指標に基づく判定
+  // 共昇期（相性数）= 完全相性×3 + 準相性×2 + 補佐相性×1 の合計
+  // 反発期（反相性数）= 同じ式で算出したものをマイナス（今回は共昇期のみ実装）
+  const finalScore = totalScore; // 上限なし・そのまま表示
 
-  const grade = finalScore>=80?'最良の相性（夫婦円満）':
-                finalScore>=60?'良い相性（共昇期安定）':
-                finalScore>=40?'普通の相性（職場・友人）':
-                finalScore>=20?'要注意（調整が必要）':'困難な相性（反相性強）';
+  // 原典基準（p.103）:
+  // ★60点以上 → 夫婦円満・口論せず心通い合う仲
+  // ★40〜60点 → 職場での相性度：良い協力者や支援者の関係
+  // ★20〜40点 → 友人間の相性：悩みを打ち明け合える間柄
+  // ★0〜20点  → 相性度最悪の状態（反相性強）
+  const grade = finalScore>=60 ? '★夫婦・恋人に最良の相性' :
+                finalScore>=40 ? '★職場・事業パートナーに良い相性' :
+                finalScore>=20 ? '★友人・知人として良い相性' :
+                                 '要注意（反相性が強い）';
   const gradeColor = finalScore>=60?'var(--jade)':finalScore>=35?'var(--indigo)':'var(--vermillion)';
 
   // 結果を結果エリアに表示
