@@ -1579,24 +1579,35 @@ footer ul li a:hover{opacity:1;color:var(--gold-light);}
       <button onclick="forceInitMap()" style="margin-left:auto;padding:.4rem 1rem;background:var(--indigo);color:var(--gold);border:none;border-radius:3px;font-size:.78rem;cursor:pointer;font-family:'Noto Serif JP',serif;white-space:nowrap;">🗺 地図を表示</button>
     </div>
     <div class="card" style="padding:0;overflow:hidden;">
-      <div id="mapInstructions">
-        <div class="map-step"><div class="sn">1</div>現在地をクリック</div>
-        <div class="map-step"><div class="sn">2</div>目的地をクリック</div>
-        <div class="map-step"><div class="sn">3</div>方位・吉凶を自動表示</div>
-        <span style="font-size:.7rem;opacity:.5;margin-left:auto;">※判定には上の生年月日入力が必要です</span>
-      </div>
-      <!-- 方位線コントロール（メイン地図） -->
-      <div id="dirLineCtrlMain" style="display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:.5rem;align-items:center;padding:.3rem 0;">
-        <span style="font-size:.75rem;color:#8a7f6e;letter-spacing:.05em;">方位線：</span>
-        <label style="font-size:.78rem;cursor:pointer;"><input type="radio" name="mainDivMode" value="3060" checked onchange="redrawMainLines()"> 30-60度分割（高木式）</label>
-        <label style="font-size:.78rem;cursor:pointer;"><input type="radio" name="mainDivMode" value="45" onchange="redrawMainLines()"> 45度分割</label>
-        <label style="font-size:.78rem;cursor:pointer;"><input type="radio" name="mainDivMode" value="none" onchange="redrawMainLines()"> なし</label>
-        <span style="margin-left:.5rem;font-size:.75rem;color:#8a7f6e;">北：</span>
-        <label style="font-size:.78rem;cursor:pointer;"><input type="checkbox" id="mainShowTrue" onchange="redrawMainLines()"> 真北</label>
-        <label style="font-size:.78rem;cursor:pointer;"><input type="checkbox" id="mainShowMag" onchange="redrawMainLines()"> 磁北</label>
-        <span id="magDeclInfo" style="font-size:.72rem;color:#e67e22;margin-left:.3rem;"></span>
-      </div>
-      <div id="mapContainer"></div>
+
+        <!-- ★ 改善：現在地・目的地登録パネル -->
+        <div id="mapLocPanel">
+          <div class="map-loc-status" id="fromStatus">
+            <span class="dot"></span>
+            <span id="fromStatusText">📍 現在地：未設定　①まずここをクリック</span>
+          </div>
+          <button class="map-swap-btn" onclick="swapFromTo()" title="現在地と目的地をワンタッチで入れ替え">⇄ 入替</button>
+          <div class="map-loc-status" id="toStatus">
+            <span class="dot"></span>
+            <span id="toStatusText">🎯 目的地：未設定　②次にここをクリック</span>
+          </div>
+          <button class="map-gps-btn" onclick="getGPSLocation()">📡 GPSで現在地取得</button>
+          <div class="map-step-hint" id="mapStepHint">① 地図をクリックして現在地を指定してください</div>
+        </div>
+
+        <!-- 方位線コントロール -->
+        <div id="dirLineCtrlMain" style="display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;padding:.55rem 1rem;background:#f5f0e8;border-bottom:1px solid rgba(160,124,32,.15);">
+          <span style="font-size:.75rem;color:#8a7f6e;letter-spacing:.05em;">方位線：</span>
+          <label style="font-size:.78rem;cursor:pointer;"><input type="radio" name="mainDivMode" value="3060" checked onchange="redrawMainLines()"> 30-60度（高木式）</label>
+          <label style="font-size:.78rem;cursor:pointer;"><input type="radio" name="mainDivMode" value="45" onchange="redrawMainLines()"> 45度均等</label>
+          <label style="font-size:.78rem;cursor:pointer;"><input type="radio" name="mainDivMode" value="none" onchange="redrawMainLines()"> なし</label>
+          <span style="margin-left:.5rem;font-size:.75rem;color:#8a7f6e;">北：</span>
+          <label style="font-size:.78rem;cursor:pointer;"><input type="checkbox" id="mainShowTrue" onchange="redrawMainLines()"> 真北</label>
+          <label style="font-size:.78rem;cursor:pointer;"><input type="checkbox" id="mainShowMag" onchange="redrawMainLines()"> 磁北</label>
+          <span id="magDeclInfo" style="font-size:.72rem;color:#e67e22;margin-left:.3rem;"></span>
+        </div>
+
+        <div id="mapContainer"></div>
       <div id="mapResult">
         <div class="map-result-item">
           <span class="mri-label">方 位 角</span>
@@ -5139,23 +5150,24 @@ function initMap() {
 
 function onMapClick(e) {
   if (_mapStep === 1) {
-    // 現在地セット
     if (_fromMarker) _map.removeLayer(_fromMarker);
     _fromMarker = L.marker(e.latlng, { icon: getFromIcon() })
-      .addTo(_map)
-      .bindPopup('<b>現在地</b>').openPopup();
+      .addTo(_map).bindPopup('<b>📍 現在地</b>').openPopup();
     _mapStep = 2;
-    document.getElementById('mapInstructions').querySelector('.map-step:nth-child(2)').style.borderColor = '#c9a84c';
+    var fc = document.getElementById('iFromCoord');
+    if (fc) fc.value = e.latlng.lat.toFixed(4) + ', ' + e.latlng.lng.toFixed(4);
     updateMagDeclDisplay(e.latlng.lat, e.latlng.lng);
     redrawMainLines();
+    updateMapStatus();
+    updateArrow();
   } else if (_mapStep === 2) {
-    // 目的地セット
-    if (_toMarker) _map.removeLayer(_toMarker);
-    _toMarker = L.marker(e.latlng, { icon: getToIcon() })
-      .addTo(_map)
-      .bindPopup('<b>目的地</b>').openPopup();
+    createDraggableToMarker(e.latlng);
+    var tc = document.getElementById('iToCoord');
+    if (tc) tc.value = e.latlng.lat.toFixed(4) + ', ' + e.latlng.lng.toFixed(4);
     _mapStep = 3;
     runMapJudge();
+    updateMapStatus();
+    updateArrow();
   }
 }
 
@@ -5385,10 +5397,13 @@ function resetMap() {
   if (_fromMarker) { _map.removeLayer(_fromMarker); _fromMarker = null; }
   if (_toMarker)   { _map.removeLayer(_toMarker);   _toMarker   = null; }
   if (_lineLayer)  { _map.removeLayer(_lineLayer);   _lineLayer  = null; }
+  if (typeof _arrowLineLayer  !== 'undefined' && _arrowLineLayer)  { try{_map.removeLayer(_arrowLineLayer);}catch(e){}  _arrowLineLayer  = null; }
+  if (typeof _arrowHeadMarker !== 'undefined' && _arrowHeadMarker) { try{_map.removeLayer(_arrowHeadMarker);}catch(e){} _arrowHeadMarker = null; }
   _sectorLayers.forEach(l => _map.removeLayer(l));
   _sectorLayers = [];
   _mapStep = 1;
   document.getElementById('mapResult').classList.remove('show');
+  updateMapStatus();
 }
 
 // 地図初期化：DOMContentLoaded後にIntersectionObserver、フォールバックあり
@@ -6849,6 +6864,53 @@ header,footer,#fc-footer,.btn-print,.print-btn-row,#savedPlacePanel,
 border-bottom:1px solid #b8960c;padding-bottom:6px;margin-bottom:12px;
 display:flex;justify-content:space-between;}
 .pd{font-size:9pt;color:#6b5c45;}
+
+/* ===== 改善：現在地・目的地登録パネル ===== */
+#mapLocPanel {
+  display: flex; flex-wrap: wrap; gap: .6rem;
+  padding: .8rem 1.2rem;
+  background: linear-gradient(135deg, #0c1428, #1a2f5a);
+  border-bottom: 1px solid rgba(201,168,76,.25);
+  align-items: center;
+}
+.map-loc-status {
+  display: flex; align-items: center; gap: .5rem;
+  padding: .45rem 1rem; border-radius: 3px;
+  font-size: .8rem; font-family: 'Noto Serif JP', serif;
+  border: 1px solid rgba(201,168,76,.3);
+  background: rgba(255,255,255,.05);
+  color: rgba(255,255,255,.45);
+  flex: 1; min-width: 170px; transition: .25s;
+}
+.map-loc-status.set { color: #c9a84c; border-color: rgba(201,168,76,.65); background: rgba(201,168,76,.09); }
+.map-loc-status.set-dest { color: #f0a090; border-color: rgba(220,80,60,.55); background: rgba(200,60,40,.09); }
+.map-loc-status .dot { width: 9px; height: 9px; border-radius: 50%; background: #444; flex-shrink: 0; transition: .3s; }
+.map-loc-status.set .dot { background: #10a368; box-shadow: 0 0 6px #10a368; }
+.map-loc-status.set-dest .dot { background: #c0392b; box-shadow: 0 0 6px #c0392b; }
+.map-gps-btn {
+  padding: .45rem 1.1rem; background: var(--gold); color: var(--indigo);
+  border: none; border-radius: 3px;
+  font-family: 'Zen Old Mincho', serif; font-size: .8rem;
+  letter-spacing: .1em; cursor: pointer; font-weight: 700;
+  white-space: nowrap; transition: .2s; box-shadow: 0 2px 8px rgba(160,124,32,.3);
+}
+.map-gps-btn:hover { background: var(--gold-light); box-shadow: 0 4px 14px rgba(160,124,32,.4); }
+.map-swap-btn {
+  padding: .45rem 1.1rem; font-size: 1rem; cursor: pointer;
+  background: rgba(201,168,76,.12); color: var(--gold-light);
+  border: 1px solid rgba(201,168,76,.4); border-radius: 3px;
+  transition: transform .35s ease, background .2s;
+  white-space: nowrap; font-family: 'Noto Serif JP', serif;
+}
+.map-swap-btn:hover { background: rgba(201,168,76,.28); transform: rotate(180deg); }
+.map-step-hint {
+  padding: .3rem .8rem; font-size: .72rem;
+  color: rgba(201,168,76,.85); letter-spacing: .08em;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(201,168,76,.2); border-radius: 3px;
+  animation: hint-pulse 2.2s ease-in-out infinite;
+}
+@keyframes hint-pulse { 0%,100%{opacity:.65} 50%{opacity:1} }
 </style></head><body>
 <div class="ph"><span>◈ 方位学 — ${title}</span><span class="pd">${ds} 印刷</span></div>
 ${el.outerHTML}
@@ -7028,4 +7090,177 @@ async function geocodeAddrTo() {
   if (!addr) { document.getElementById('iToResult').textContent = '住所を入力してください'; return; }
   await geocodeAddr(addr, 'iToResult', 'iToCoord');
 }
+
+// =====================================================
+// ★ 改善：地図UI強化関数群
+// =====================================================
+
+/* ステータスパネル更新 */
+function updateMapStatus() {
+  var fromEl   = document.getElementById('fromStatus');
+  var fromText = document.getElementById('fromStatusText');
+  var toEl     = document.getElementById('toStatus');
+  var toText   = document.getElementById('toStatusText');
+  var hint     = document.getElementById('mapStepHint');
+  if (!fromEl) return;
+  if (_fromMarker) {
+    var ll = _fromMarker.getLatLng();
+    fromEl.className = 'map-loc-status set';
+    fromText.textContent = '📍 現在地：' + ll.lat.toFixed(3) + ', ' + ll.lng.toFixed(3);
+  } else {
+    fromEl.className = 'map-loc-status';
+    fromText.textContent = '📍 現在地：未設定　①まずここをクリック';
+  }
+  if (_toMarker) {
+    var ll2 = _toMarker.getLatLng();
+    toEl.className = 'map-loc-status set-dest';
+    toText.textContent = '🎯 目的地：' + ll2.lat.toFixed(3) + ', ' + ll2.lng.toFixed(3);
+  } else {
+    toEl.className = 'map-loc-status';
+    toText.textContent = '🎯 目的地：未設定　②次にここをクリック';
+  }
+  if (hint) {
+    if (!_fromMarker) {
+      hint.textContent = '① 地図をクリックして現在地を指定してください';
+    } else if (!_toMarker) {
+      hint.textContent = '② 次に目的地をクリック　※マーカーはドラッグで移動できます';
+    } else {
+      hint.textContent = '✦ 判定完了　🎯マーカーをドラッグして目的地を微調整できます';
+    }
+  }
+}
+
+/* ドラッグ可能な目的地マーカー作成 */
+function createDraggableToMarker(latlng) {
+  if (_toMarker) _map.removeLayer(_toMarker);
+  _toMarker = L.marker(latlng, {
+    icon: getToIcon(),
+    draggable: true,
+    autoPan: true
+  }).addTo(_map).bindPopup('<b>🎯 目的地</b><br><small>ドラッグして移動できます</small>');
+  _toMarker.on('dragend', function(e) {
+    var ll = e.target.getLatLng();
+    var tc = document.getElementById('iToCoord');
+    if (tc) tc.value = ll.lat.toFixed(4) + ', ' + ll.lng.toFixed(4);
+    runMapJudge();
+    updateMapStatus();
+    updateArrow();
+  });
+  _toMarker.on('drag', function() { updateArrow(); });
+}
+
+/* 現在地↔目的地 ワンタッチ入れ替え */
+function swapFromTo() {
+  if (!_fromMarker || !_toMarker) {
+    spToast('現在地と目的地の両方を設定してからお使いください');
+    return;
+  }
+  var fromLL = _fromMarker.getLatLng();
+  var toLL   = _toMarker.getLatLng();
+  _map.removeLayer(_fromMarker);
+  _map.removeLayer(_toMarker);
+  _fromMarker = L.marker(toLL, { icon: getFromIcon() })
+    .addTo(_map).bindPopup('<b>📍 現在地</b>（入替後）');
+  createDraggableToMarker(fromLL);
+  var fc = document.getElementById('iFromCoord');
+  var tc = document.getElementById('iToCoord');
+  if (fc) fc.value = toLL.lat.toFixed(4) + ', ' + toLL.lng.toFixed(4);
+  if (tc) tc.value = fromLL.lat.toFixed(4) + ', ' + fromLL.lng.toFixed(4);
+  updateMagDeclDisplay(toLL.lat, toLL.lng);
+  redrawMainLines();
+  runMapJudge();
+  updateMapStatus();
+  updateArrow();
+  spToast('🔄 現在地と目的地を入れ替えました');
+}
+
+/* GPS現在地取得 */
+function getGPSLocation() {
+  if (!navigator.geolocation) {
+    spToast('このブラウザはGPS位置情報に対応していません');
+    return;
+  }
+  spToast('📡 GPS位置情報を取得中...');
+  navigator.geolocation.getCurrentPosition(
+    function(pos) {
+      var lat = pos.coords.latitude;
+      var lng = pos.coords.longitude;
+      initMap();
+      if (_fromMarker) _map.removeLayer(_fromMarker);
+      _fromMarker = L.marker([lat, lng], { icon: getFromIcon() })
+        .addTo(_map).bindPopup('<b>📡 GPS取得：現在地</b>').openPopup();
+      _mapStep = 2;
+      _map.setView([lat, lng], 12);
+      var fc = document.getElementById('iFromCoord');
+      if (fc) fc.value = lat.toFixed(5) + ', ' + lng.toFixed(5);
+      updateMagDeclDisplay(lat, lng);
+      redrawMainLines();
+      updateMapStatus();
+      updateArrow();
+      spToast('✅ GPS現在地を取得しました');
+    },
+    function(err) {
+      var msg = err.code === 1 ? '位置情報の使用が許可されていません' :
+                err.code === 2 ? '位置情報を取得できませんでした' : 'タイムアウトしました';
+      spToast('❌ GPS取得失敗：' + msg);
+    },
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
+}
+
+/* 矢印付き経路線（現在地→目的地） */
+var _arrowLineLayer  = null;
+var _arrowHeadMarker = null;
+
+function updateArrow() {
+  if (_arrowLineLayer)  { try { _map.removeLayer(_arrowLineLayer);  } catch(e){} _arrowLineLayer  = null; }
+  if (_arrowHeadMarker) { try { _map.removeLayer(_arrowHeadMarker); } catch(e){} _arrowHeadMarker = null; }
+  if (!_fromMarker || !_toMarker || !_map) return;
+
+  var from = _fromMarker.getLatLng();
+  var to   = _toMarker.getLatLng();
+
+  // 方位角計算
+  var dLng = (to.lng - from.lng) * Math.PI / 180;
+  var lat1 = from.lat * Math.PI / 180;
+  var lat2 = to.lat   * Math.PI / 180;
+  var sinB = Math.sin(dLng) * Math.cos(lat2);
+  var cosB = Math.cos(lat1)*Math.sin(lat2) - Math.sin(lat1)*Math.cos(lat2)*Math.cos(dLng);
+  var bearing = (Math.atan2(sinB, cosB) * 180 / Math.PI + 360) % 360;
+
+  // 吉凶スコアで線色を決定
+  var birthVal  = (typeof getBirthVal  === 'function') ? getBirthVal()  : '';
+  var targetVal = document.getElementById('iTarget') ? document.getElementById('iTarget').value : '';
+  var hon = 5, niss = 5;
+  if (birthVal)  { var p=birthVal.split('-').map(Number);  hon  = (typeof honmeisei==='function') ? honmeisei(p[0],p[1],p[2])  : 5; }
+  if (targetVal) { var q=targetVal.split('-').map(Number); niss = (typeof nisseiFor==='function') ? nisseiFor(q[0],q[1],q[2]) : 5; }
+  var BKEYS = ['N','NE','E','SE','S','SW','W','NW'];
+  var dirKey = BKEYS[Math.round(bearing/45)%8];
+  var sc = (typeof calcScore==='function') ? (calcScore(hon, 0, niss, dirKey) || 50) : 50;
+  var lineColor = sc>=80?'#10a368':sc>=50?'#6478a0':sc>=35?'#e6a01e':sc>=20?'#dc3c3c':'#880000';
+  var dash = (sc >= 50) ? null : '10,6';
+
+  // 経路線
+  _arrowLineLayer = L.polyline([from, to], {
+    color: lineColor, weight: 4.5, opacity: 0.88, dashArray: dash
+  }).addTo(_map);
+
+  // 目的地側に矢印（SVG・方位角で回転）
+  var arrowSvg =
+    '<svg width="42" height="42" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg"' +
+    ' style="transform:rotate(' + bearing + 'deg);transform-origin:center;' +
+    'filter:drop-shadow(0 2px 6px rgba(0,0,0,.55));">' +
+    '<polygon points="21,3 31,34 21,26 11,34"' +
+    ' fill="' + lineColor + '" stroke="white" stroke-width="2.5" stroke-linejoin="round"/>' +
+    '</svg>';
+
+  _arrowHeadMarker = L.marker([to.lat, to.lng], {
+    icon: L.divIcon({
+      className: '', html: arrowSvg,
+      iconSize: [42,42], iconAnchor: [21,21]
+    }),
+    interactive: false, zIndexOffset: 600
+  }).addTo(_map);
+}
+
 </script>
