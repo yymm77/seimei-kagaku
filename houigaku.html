@@ -1918,51 +1918,70 @@ footer ul li a:hover{opacity:1;color:var(--gold-light);}
 
 <!-- ===== リアルタイム方位ナビパネル ===== -->
 <div id="naviPanel">
+
+  <!-- ヘッダー行 -->
   <div class="navi-top">
     <span class="navi-badge">🧭 リアルタイム方位ナビ</span>
-    <span id="naviGpsStatus" style="font-size:.7rem;color:rgba(201,168,76,.6);">GPS待機中...</span>
+    <span id="naviGpsStatus" style="font-size:.72rem;color:rgba(201,168,76,.65);">GPS待機中...</span>
+    <span class="navi-wakelock inactive" id="naviWakeLock">
+      <span class="wl-dot"></span><span id="naviWakeLockText">画面：通常</span>
+    </span>
     <button class="navi-close" onclick="toggleNavi()">✕ 終了</button>
   </div>
 
+  <!-- コンパスサイズ調整スライダー -->
+  <div class="navi-size-row">
+    <span>🔭 コンパス</span>
+    <input type="range" id="naviSizeSlider" min="100" max="320" value="180" step="10"
+      oninput="resizeNaviCompass(this.value)">
+    <span id="naviSizeLabel">180px</span>
+  </div>
+
+  <!-- メインエリア（コンパス＋情報） -->
   <div class="navi-compass-wrap">
-    <!-- コンパス -->
-    <div class="navi-compass">
+
+    <!-- コンパス（サイズ可変） -->
+    <div id="naviCompassOuter" style="width:180px;height:180px;">
       <svg id="naviCompassSvg" viewBox="0 0 110 110" xmlns="http://www.w3.org/2000/svg">
-        <!-- 外枠 -->
-        <circle cx="55" cy="55" r="52" fill="rgba(8,12,28,.9)" stroke="rgba(201,168,76,.4)" stroke-width="1.5"/>
+        <circle cx="55" cy="55" r="52" fill="rgba(8,12,28,.92)" stroke="rgba(201,168,76,.45)" stroke-width="1.5"/>
         <circle cx="55" cy="55" r="44" fill="none" stroke="rgba(201,168,76,.15)" stroke-width=".5"/>
-        <!-- 目盛り -->
         <g id="naviTicks"></g>
-        <!-- 方位文字（固定） -->
-        <text x="55" y="10" text-anchor="middle" fill="#c9a84c" font-size="9" font-family="serif" font-weight="bold">北</text>
-        <text x="100" y="58" text-anchor="middle" fill="#c9a84c" font-size="9" font-family="serif">東</text>
-        <text x="55" y="104" text-anchor="middle" fill="#c9a84c" font-size="9" font-family="serif">南</text>
-        <text x="10" y="58" text-anchor="middle" fill="#c9a84c" font-size="9" font-family="serif">西</text>
-        <!-- 進行方向矢印（回転する） -->
+        <!-- 方位文字 -->
+        <text x="55" y="10" text-anchor="middle" fill="#ff6060" font-size="9" font-family="serif" font-weight="bold">北</text>
+        <text x="100" y="58" text-anchor="middle" fill="#c9a84c" font-size="8" font-family="serif">東</text>
+        <text x="55" y="104" text-anchor="middle" fill="#c9a84c" font-size="8" font-family="serif">南</text>
+        <text x="10" y="58" text-anchor="middle" fill="#c9a84c" font-size="8" font-family="serif">西</text>
+        <!-- 斜め方位 -->
+        <text x="18" y="22" text-anchor="middle" fill="#c9a84c" font-size="5.5" font-family="serif" opacity=".7">北西</text>
+        <text x="92" y="22" text-anchor="middle" fill="#c9a84c" font-size="5.5" font-family="serif" opacity=".7">北東</text>
+        <text x="18" y="92" text-anchor="middle" fill="#c9a84c" font-size="5.5" font-family="serif" opacity=".7">南西</text>
+        <text x="92" y="92" text-anchor="middle" fill="#c9a84c" font-size="5.5" font-family="serif" opacity=".7">南東</text>
+        <!-- 進行方向矢印（大きく・目立つ） -->
         <g id="naviArrowGroup" transform="rotate(0,55,55)">
-          <polygon points="55,16 50,55 55,46 60,55" fill="#10a368" opacity=".95"/>
-          <polygon points="55,94 50,55 55,64 60,55" fill="rgba(201,168,76,.5)"/>
+          <polygon points="55,12 49,52 55,42 61,52" fill="#10a368" opacity=".95"/>
+          <polygon points="55,98 49,58 55,68 61,58" fill="rgba(201,168,76,.4)"/>
         </g>
-        <!-- 目的地方向矢印 -->
+        <!-- 目的地方向矢印（赤） -->
         <g id="naviDestArrow" transform="rotate(0,55,55)" opacity="0">
-          <polygon points="55,20 52,50 55,44 58,50" fill="#c0392b" opacity=".85"/>
-          <circle cx="55" cy="18" r="3" fill="#c0392b"/>
+          <polygon points="55,16 52,46 55,40 58,46" fill="#c0392b" opacity=".9"/>
+          <circle cx="55" cy="13" r="4" fill="#c0392b"/>
         </g>
         <!-- 中心 -->
-        <circle cx="55" cy="55" r="5" fill="rgba(201,168,76,.9)"/>
-        <circle cx="55" cy="55" r="2.5" fill="#0c1428"/>
+        <circle cx="55" cy="55" r="6" fill="rgba(201,168,76,.9)"/>
+        <circle cx="55" cy="55" r="3" fill="#0c1428"/>
       </svg>
     </div>
 
-    <!-- 情報表示 -->
+    <!-- 情報テキスト（大型表示） -->
     <div class="navi-info">
       <div class="navi-dir-label" id="naviDirLabel" style="color:#c9a84c;">─</div>
       <div class="navi-kichi-label k-futsu" id="naviKichiLabel">GPS取得中...</div>
       <div class="navi-sub" id="naviSubLabel">
-        進行方位角：<span id="naviBearing">─</span>°　
+        方位角：<span id="naviBearing">─</span>°　
         速度：<span id="naviSpeed">─</span> km/h　
-        精度：<span id="naviAccuracy">─</span> m
+        精度：±<span id="naviAccuracy">─</span> m
       </div>
+
       <!-- 目的地情報 -->
       <div class="navi-dest-info" id="naviDestInfo" style="display:none;">
         <div class="navi-dest-item">
@@ -1970,15 +1989,11 @@ footer ul li a:hover{opacity:1;color:var(--gold-light);}
           <span class="di-val" id="naviDistToDest">─</span>
         </div>
         <div class="navi-dest-item">
-          <span class="di-label">目的地の方位</span>
+          <span class="di-label">目的地の方位・吉凶</span>
           <span class="di-val" id="naviDestDir">─</span>
         </div>
         <div class="navi-dest-item">
-          <span class="di-label">目的地の吉凶</span>
-          <span class="di-val" id="naviDestKichi">─</span>
-        </div>
-        <div class="navi-dest-item">
-          <span class="di-label">推奨方位</span>
+          <span class="di-label">本日の推奨方位</span>
           <span class="di-val" id="naviRecommend">─</span>
         </div>
       </div>
@@ -7479,6 +7494,52 @@ function toggleNavi() {
   }
 }
 
+var _wakeLock = null;
+
+async function acquireWakeLock() {
+  try {
+    if ('wakeLock' in navigator) {
+      _wakeLock = await navigator.wakeLock.request('screen');
+      _wakeLock.addEventListener('release', function() {
+        updateWakeLockUI(false);
+      });
+      updateWakeLockUI(true);
+    } else {
+      updateWakeLockUI(false);
+    }
+  } catch(e) {
+    updateWakeLockUI(false);
+  }
+}
+
+function releaseWakeLock() {
+  if (_wakeLock) {
+    _wakeLock.release().catch(function(){});
+    _wakeLock = null;
+  }
+  updateWakeLockUI(false);
+}
+
+function updateWakeLockUI(active) {
+  var el = document.getElementById('naviWakeLock');
+  var txt = document.getElementById('naviWakeLockText');
+  if (!el || !txt) return;
+  if (active) {
+    el.className = 'navi-wakelock active';
+    txt.textContent = '画面：常時点灯';
+  } else {
+    el.className = 'navi-wakelock inactive';
+    txt.textContent = '画面：通常';
+  }
+}
+
+// ページ表示復帰時にWake Lockを再取得
+document.addEventListener('visibilitychange', function() {
+  if (document.visibilityState === 'visible' && _naviActive && !_wakeLock) {
+    acquireWakeLock();
+  }
+});
+
 function startNavi() {
   if (!navigator.geolocation) {
     spToast('このブラウザはGPS位置情報に対応していません');
@@ -7496,6 +7557,9 @@ function startNavi() {
 
   // 地図を初期化
   if (!_map) initMap();
+
+  // Wake Lock（画面スリープ防止）
+  acquireWakeLock();
 
   // GPS監視開始
   _naviWatchId = navigator.geolocation.watchPosition(
@@ -7520,6 +7584,9 @@ function stopNavi() {
     navigator.geolocation.clearWatch(_naviWatchId);
     _naviWatchId = null;
   }
+  // Wake Lock解除
+  releaseWakeLock();
+
   var btn = document.getElementById('naviStartBtn');
   if (btn) { btn.classList.remove('active'); btn.textContent = '🧭 リアルナビ 開始'; }
   var panel = document.getElementById('naviPanel');
@@ -7529,7 +7596,7 @@ function stopNavi() {
   if (_naviMarker && _map) { try{_map.removeLayer(_naviMarker);}catch(e){} _naviMarker = null; }
   if (_naviCircle && _map) { try{_map.removeLayer(_naviCircle);}catch(e){} _naviCircle = null; }
 
-  spToast('ナビを終了しました');
+  spToast('ナビを終了しました（画面スリープ防止を解除）');
 }
 
 /* ── GPS位置更新コールバック ── */
@@ -7692,10 +7759,8 @@ function updateNaviDestInfo(lat, lng) {
 
   var distEl = document.getElementById('naviDistToDest');
   var dirEl  = document.getElementById('naviDestDir');
-  var kichiEl= document.getElementById('naviDestKichi');
-  if (distEl)  distEl.textContent  = distStr;
-  if (dirEl)   dirEl.textContent   = DIR8_NAMES[idx] + ' (' + Math.round(bearing) + '°)';
-  if (kichiEl) kichiEl.textContent = kichiStr + ' (' + sc + '点)';
+  if (distEl) distEl.textContent = distStr;
+  if (dirEl)  dirEl.textContent  = DIR8_NAMES[idx] + '　' + kichiStr + '（' + sc + '点）';
 
   // 到着判定（50m以内）
   if (dist < 0.05) {
@@ -7779,6 +7844,15 @@ function drawCompassTicks() {
     line.setAttribute('stroke-width', isMajor ? '1.5' : '0.8');
     g.appendChild(line);
   }
+}
+
+
+/* コンパスサイズ変更 */
+function resizeNaviCompass(size) {
+  var outer = document.getElementById('naviCompassOuter');
+  var label = document.getElementById('naviSizeLabel');
+  if (outer) { outer.style.width = size + 'px'; outer.style.height = size + 'px'; }
+  if (label) label.textContent = size + 'px';
 }
 
 </script>
