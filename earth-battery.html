@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>忘れられた知恵 ― アース・バッテリーと虫の謎 | 予測技術ポータル</title>
+<meta name="description" content="1747年パリから270年。銅と亜鉛を土に埋めるだけで虫を遠ざける可能性がある「アース・バッテリー」の歴史と現代科学的根拠を3回連載で解説。">
+<style>
+:root {
+  --bg:       #0f1117;
+  --bg2:      #181c27;
+  --bg3:      #1e2333;
+  --border:   #2a2f42;
+  --accent:   #c8a96e;
+  --accent2:  #7eb8d4;
+  --text:     #d4d0c8;
+  --text-sub: #8a8780;
+  --text-dim: #555260;
+  --green:    #5a9e6f;
+  --red:      #c46060;
+  --yellow:   #c8a040;
+  --radius:   8px;
+  --radius-lg:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;
+  font-size:15px;
+  line-height:1.85;
+  min-height:100vh;
+}
+
+/* ヘッダー */
+header{
+  border-bottom:1px solid var(--border);
+  padding:1rem 1.5rem;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  position:sticky;top:0;
+  background:rgba(15,17,23,0.95);
+  backdrop-filter:blur(8px);
+  z-index:100;
+}
+.site-name{
+  font-size:13px;
+  color:var(--accent);
+  letter-spacing:.06em;
+  text-decoration:none;
+}
+.site-name:hover{opacity:.8}
+nav{display:flex;gap:1.5rem}
+nav a{font-size:12px;color:var(--text-sub);text-decoration:none;letter-spacing:.04em}
+nav a:hover{color:var(--accent)}
+
+/* ヒーロー */
+.hero{
+  border-bottom:1px solid var(--border);
+  padding:3.5rem 1.5rem 2.5rem;
+  max-width:760px;
+  margin:0 auto;
+}
+.kicker{
+  font-size:11px;
+  letter-spacing:.12em;
+  color:var(--accent);
+  text-transform:uppercase;
+  margin-bottom:.75rem;
+}
+.hero h1{
+  font-size:clamp(22px,4vw,32px);
+  font-weight:700;
+  line-height:1.35;
+  color:#eae8e0;
+  margin-bottom:1rem;
+}
+.hero-sub{
+  font-size:14px;
+  color:var(--text-sub);
+  line-height:1.7;
+  max-width:600px;
+  margin-bottom:1.5rem;
+}
+.series-badge{
+  display:inline-flex;gap:6px;flex-wrap:wrap;
+}
+.badge{
+  font-size:11px;
+  padding:3px 10px;
+  border-radius:20px;
+  border:1px solid var(--border);
+  color:var(--text-sub);
+  background:var(--bg3);
+}
+
+/* タブナビ */
+.tab-nav{
+  display:flex;
+  border-bottom:1px solid var(--border);
+  max-width:760px;
+  margin:0 auto;
+  overflow-x:auto;
+}
+.tab-btn{
+  padding:.75rem 1.25rem;
+  font-size:13px;
+  color:var(--text-sub);
+  background:none;
+  border:none;
+  cursor:pointer;
+  border-bottom:2px solid transparent;
+  transition:all .2s;
+  white-space:nowrap;
+  letter-spacing:.03em;
+}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{
+  color:var(--accent);
+  border-bottom-color:var(--accent);
+}
+
+/* メインコンテンツ */
+main{max-width:760px;margin:0 auto;padding:2rem 1.5rem 4rem;}
+.article{display:none}
+.article.active{display:block}
+
+/* 記事ヘッダ */
+.art-kicker{
+  font-size:11px;
+  letter-spacing:.1em;
+  color:var(--accent);
+  text-transform:uppercase;
+  margin-bottom:.5rem;
+}
+.art-title{
+  font-size:clamp(18px,3vw,24px);
+  font-weight:700;
+  color:#eae8e0;
+  line-height:1.4;
+  margin-bottom:.5rem;
+}
+.art-byline{
+  font-size:12px;
+  color:var(--text-dim);
+  padding-bottom:1.25rem;
+  border-bottom:1px solid var(--border);
+  margin-bottom:1.75rem;
+}
+
+/* 本文 */
+.body p{margin-bottom:1.1rem;color:var(--text)}
+.body h2{
+  font-size:17px;
+  font-weight:700;
+  color:#eae8e0;
+  margin:2rem 0 .75rem;
+  padding-left:.75rem;
+  border-left:3px solid var(--accent);
+}
+
+/* インライン引用リンク */
+.cite{
+  display:inline-flex;align-items:center;gap:3px;
+  font-size:11px;padding:1px 7px;
+  border-radius:4px;
+  background:#1a2030;
+  color:var(--accent2);
+  text-decoration:none;
+  border:1px solid #2a3550;
+  vertical-align:middle;
+  margin:0 2px;
+  white-space:nowrap;
+}
+.cite:hover{background:#1e2840;border-color:var(--accent2)}
+
+/* プルクオート */
+.pullquote{
+  border-left:3px solid var(--accent);
+  padding:.85rem 1.1rem;
+  margin:1.5rem 0;
+  background:var(--bg2);
+  border-radius:0 var(--radius) var(--radius) 0;
+  font-size:14px;
+  color:#c8c4b8;
+  line-height:1.75;
+  font-style:italic;
+}
+
+/* 事実確認ボックス */
+.factbox{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  padding:1.1rem 1.25rem;
+  margin:1.75rem 0;
+}
+.factbox-title{
+  font-size:12px;
+  font-weight:700;
+  color:var(--text-sub);
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  margin-bottom:.75rem;
+}
+.fact-row{
+  display:flex;gap:8px;
+  margin-bottom:.4rem;
+  font-size:13px;
+  align-items:flex-start;
+}
+.fbadge{
+  font-size:10px;padding:2px 7px;
+  border-radius:10px;font-weight:700;
+  flex-shrink:0;margin-top:2px;
+  letter-spacing:.03em;
+}
+.fbadge.ok{background:#1a3025;color:#5a9e6f;border:1px solid #2a4535}
+.fbadge.warn{background:#2a2010;color:#c8a040;border:1px solid #3a3015}
+.fbadge.no{background:#2a1515;color:#c46060;border:1px solid #3a2020}
+
+/* 図版カード */
+.fig-card{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  padding:1.25rem 1rem 1rem;
+  margin:1.75rem 0;
+}
+.fig-caption{
+  font-size:11px;
+  color:var(--text-dim);
+  text-align:center;
+  margin-top:.75rem;
+  letter-spacing:.03em;
+}
+
+/* 実験ボックス */
+.exp-box{
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  padding:1.25rem;
+  margin:1.75rem 0;
+  background:var(--bg2);
+}
+.exp-title{
+  font-size:15px;font-weight:700;
+  color:#eae8e0;
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:1rem;
+}
+.exp-badge{
+  font-size:10px;padding:2px 8px;
+  border-radius:10px;font-weight:700;
+  background:#1a3025;color:#5a9e6f;
+  border:1px solid #2a4535;
+}
+.exp-badge.partial{
+  background:#2a2010;color:#c8a040;
+  border:1px solid #3a3015;
+}
+.parts-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:.75rem 0;
+}
+.part-item{
+  background:var(--bg3);
+  border-radius:var(--radius);
+  padding:.5rem .75rem;
+  font-size:13px;
+  border:1px solid var(--border);
+}
+.part-label{color:var(--text-dim);font-size:11px;margin-bottom:2px}
+.part-val{color:var(--text)}
+.step-list{counter-reset:s;list-style:none;padding:0}
+.step-list li{
+  counter-increment:s;
+  display:flex;gap:10px;
+  margin-bottom:.5rem;
+  font-size:14px;
+  align-items:flex-start;
+  color:var(--text);
+}
+.step-list li::before{
+  content:counter(s);
+  background:var(--accent);
+  color:#0f1117;
+  border-radius:50%;
+  width:20px;height:20px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;
+  flex-shrink:0;margin-top:2px;
+}
+.warn-note{
+  font-size:12px;color:var(--text-sub);
+  border-top:1px solid var(--border);
+  margin-top:.85rem;padding-top:.75rem;
+}
+
+/* 参考文献 */
+.refs{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  padding:1.1rem 1.25rem;
+  margin:2rem 0;
+}
+.refs-title{
+  font-size:12px;font-weight:700;
+  color:var(--text-sub);letter-spacing:.06em;
+  text-transform:uppercase;margin-bottom:.75rem;
+}
+.refs-links{display:flex;flex-wrap:wrap;gap:6px}
+
+/* フッター */
+footer{
+  border-top:1px solid var(--border);
+  padding:1.5rem;
+  text-align:center;
+  font-size:12px;
+  color:var(--text-dim);
+}
+footer a{color:var(--accent);text-decoration:none}
+footer a:hover{opacity:.8}
+
+/* SVG共通 */
+svg text{font-family:'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif}
+
+@media(max-width:600px){
+  .parts-grid{grid-template-columns:1fr}
+  header{padding:.75rem 1rem}
+  main{padding:1.5rem 1rem 3rem}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="site-name" href="https://yymm77.github.io/seimei-kagaku/">◈ 予測技術ポータル</a>
+  <nav>
+    <a href="https://yymm77.github.io/seimei-kagaku/">ホーム</a>
+    <a href="https://yymm77.github.io/seimei-kagaku/houigaku.html">方位学</a>
+    <a href="https://yymm77.github.io/seimei-kagaku/namemaster_v5.html">姓名科学</a>
+  </nav>
+</header>
+
+<div class="hero">
+  <div class="kicker">忘れられた知恵 ― 3回連載</div>
+  <h1>銅と亜鉛を土に埋めるだけで<br>虫を遠ざけることができるのか</h1>
+  <p class="hero-sub">1747年パリの実験室から270年。歴史の中に静かに眠っていた「アース・バッテリー」という発見と、2015年の査読済み論文が示す現代科学的根拠を丁寧に辿る。</p>
+  <div class="series-badge">
+    <span class="badge">全3回</span>
+    <span class="badge">事実確認済み</span>
+    <span class="badge">実験装置付き</span>
+    <span class="badge">参考文献リンク付き</span>
+  </div>
+</div>
+
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="show(0)">第1回　1747年の発見</button>
+  <button class="tab-btn" onclick="show(1)">第2回　忘れられた理由</button>
+  <button class="tab-btn" onclick="show(2)">第3回　現代科学と実験</button>
+</div>
+
+<main>
+
+<!-- ===== 第1回 ===== -->
+<div class="article active" id="a0">
+  <div class="art-kicker">第1回</div>
+  <div class="art-title">1747年パリ、虫が近づかなかった植木鉢</div>
+  <div class="art-byline">ノレの観察 → ベインのアース・バッテリー ― 94年を隔てた二つの発見</div>
+
+  <div class="body">
+    <p>1747年、パリ。ヨーロッパ中が「電気」という目に見えない力に熱狂していた時代のことだ。フランス国王の専属物理学者ジャン＝アントワーヌ・ノレ（Abbé Nollet）は、修道士200人以上を一列に並べてライデン瓶の電気を通すという壮大なデモンストレーションを国王の前で披露したこともある人物だった。<a class="cite" href="https://en.wikipedia.org/wiki/Jean-Antoine_Nollet" target="_blank">🔗 Wikipedia</a> そのノレが問うたのは「電気は植物の成長に影響するか」という素朴な疑問だった。</p>
+
+    <p>実験はシンプルだった。同じ土・同じ種（マスタード）・同じ光・同じ温度。異なるのは一点だけ。一方の容器には電流を流し続ける。3日後、電気を与えた種はすでに発芽していた。電気なしの種はまだ殻すら割れていなかった。ノレはこの結果を1749年に論文として発表した。<a class="cite" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12331079/" target="_blank">🔗 PMC論文</a> <a class="cite" href="https://www.lindahall.org/about/news/scientist-of-the-day/jean-antoine-nollet/" target="_blank">🔗 Linda Hall Library</a></p>
+
+    <div class="pullquote">「電気を帯びた容器の周囲では、小さな虫が一定の距離で止まり、まるで見えない壁に触れたかのように引き返していく」― ノレ（1749年）</div>
+
+    <p>科学界はこの発表で植物の成長に関する部分を高く評価した。しかし「虫が近づかない」という観察はほとんど注目されないまま、記録は静かに眠りについた。</p>
+
+    <p>それから94年後、舞台はスコットランドのエディンバラへ移る。1841年、発明家アレクサンダー・ベイン（Alexander Bain）は電池に頼らず時計を動かすための安価な電力を求めて、銅と亜鉛の板を湿った地中に約1メートル間隔で埋めた。測定された電圧は約1ボルト。電池も発電機も不要。湿った土そのものが電解質として働いたのだ。<a class="cite" href="https://en.wikipedia.org/wiki/Earth_battery" target="_blank">🔗 Earth Battery – Wikipedia</a></p>
+
+    <p>ベインはこれを「アース・バッテリー（Earth Battery）」と名付けた。時計は数ヶ月にわたって動き続けた。そして彼は、金属を埋めた周囲の土で特定の種のハエが姿を消すことにも気づいていた。発明家だった彼はそれ以上深くは追わなかった。しかしこの観察が、別の人物の目に留まることになる。</p>
+
+    <!-- 図1 -->
+    <div class="fig-card">
+      <svg width="100%" viewBox="0 0 680 200" role="img">
+        <title>ノレの実験：電気あり・なしの比較</title>
+        <desc>左：電気なし容器（幼虫多数）、右：電気あり容器（虫が近づかない）</desc>
+        <!-- 左コンテナ（対照） -->
+        <rect x="60" y="30" width="220" height="140" rx="10" fill="#1e2333" stroke="#2a2f42" stroke-width="1"/>
+        <rect x="61" y="100" width="218" height="68" rx="0" fill="#1a3050" opacity="0.5"/>
+        <text x="170" y="70" text-anchor="middle" fill="#8a8780" font-size="13">電気なし（対照群）</text>
+        <text x="170" y="87" text-anchor="middle" fill="#555260" font-size="11">普通の土・種</text>
+        <!-- 幼虫（赤点） -->
+        <circle cx="120" cy="128" r="4" fill="#c46060" opacity="0.8"/>
+        <circle cx="145" cy="140" r="4" fill="#c46060" opacity="0.8"/>
+        <circle cx="170" cy="122" r="4" fill="#c46060" opacity="0.8"/>
+        <circle cx="200" cy="135" r="4" fill="#c46060" opacity="0.8"/>
+        <circle cx="225" cy="125" r="4" fill="#c46060" opacity="0.8"/>
+        <circle cx="135" cy="152" r="4" fill="#c46060" opacity="0.8"/>
+        <circle cx="190" cy="155" r="4" fill="#c46060" opacity="0.7"/>
+        <text x="170" y="178" text-anchor="middle" fill="#c46060" font-size="12">虫が集まる</text>
+        <!-- 右コンテナ（電気あり） -->
+        <rect x="400" y="30" width="220" height="140" rx="10" fill="#1e2333" stroke="#c8a96e" stroke-width="1.2"/>
+        <rect x="401" y="100" width="218" height="68" rx="0" fill="#1a3050" opacity="0.5"/>
+        <text x="510" y="70" text-anchor="middle" fill="#c8a96e" font-size="13">電気あり（実験群）</text>
+        <text x="510" y="87" text-anchor="middle" fill="#555260" font-size="11">電流を流した土・種</text>
+        <!-- 見えない壁の点線 -->
+        <line x1="400" y1="100" x2="400" y2="168" stroke="#c8a96e" stroke-width="1" stroke-dasharray="4 3" opacity="0.5"/>
+        <text x="510" y="145" text-anchor="middle" fill="#5a9e6f" font-size="12">虫が近づかない</text>
+        <text x="510" y="162" text-anchor="middle" fill="#555260" font-size="11">「見えない壁」</text>
+        <!-- vs -->
+        <text x="340" y="108" text-anchor="middle" fill="#555260" font-size="15" font-weight="700">vs</text>
+      </svg>
+      <div class="fig-caption">図1. ノレの実験概念図（1747年）。電気を与えた容器の周囲では虫が引き返した</div>
+    </div>
+
+    <div class="factbox">
+      <div class="factbox-title">第1回 ― 事実確認</div>
+      <div class="fact-row"><span class="fbadge ok">確認済</span> <span>ノレが電気と植物の実験を行い1749年に発表（複数の学術文献が引用）</span></div>
+      <div class="fact-row"><span class="fbadge ok">確認済</span> <span>ベインが1841年に銅・亜鉛・湿土で約1Vを発生させ時計を動かした</span></div>
+      <div class="fact-row"><span class="fbadge warn">要注意</span> <span>ノレが「虫の忌避」を明記した原文は二次引用が多く、一次資料の直接確認が困難</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 第2回 ===== -->
+<div class="article" id="a1">
+  <div class="art-kicker">第2回</div>
+  <div class="art-title">農薬なしで外虫が消えた畑――技術が「忘れられた」本当の理由</div>
+  <div class="art-byline">爆薬産業が農薬産業へ転換した歴史的構造を読む</div>
+
+  <div class="body">
+    <p>1844年、スコットランドの地主ノーバート・ホスターはベインのアース・バッテリーの話を聞きつけ、大麦畑に銅と亜鉛の板を広範囲にネットワーク状に設置した。翌1845年の農業専門誌「ブリティッシュ・カルティベーター」によれば、外虫被害はほぼゼロにまで減少。夕暮れ時のハエの群れも「畑の境界で引き返した」と報告された。この記録は王立協会にも届いた。<a class="cite" href="https://www.richardalanmiller.com/papers/the-earth-battery-galvanic-corrosion-process" target="_blank">🔗 Earth Battery解説</a></p>
+
+    <p>1920年代、フランスの技術者が「電磁場アンテナ」型の装置を開発し、欧州各地の農家へ普及させたとされる。化学肥料も農薬も使わずに作物の成育を改善する「電気農業（エレクトロカルチャー）」はこの時代に最も注目を集めた。<a class="cite" href="https://thrivegarden.com/pages/the-science-behind-electroculture-and-enhanced-plant-growth" target="_blank">🔗 Electroculture解説</a> <a class="cite" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12331079/" target="_blank">🔗 PMC学術論文</a></p>
+
+    <div class="pullquote">「アース・バッテリーが捨てられたのは、効果がなかったからではない。あまりにも効果があり、あまりにも安く、あまりにも長く使えたからだ」</div>
+
+    <p>1914年、第一次世界大戦が始まる。農地は戦場と化し農業インフラは破壊された。しかし同時に、爆薬を大量生産していた化学工場が「新たな市場」を必要とした。硝酸アンモニウムは窒素肥料へ、有機リン化合物（神経ガス研究の産物）は殺虫剤へと転用された。敵を倒すための化学が、虫を排除するための化学へと衣替えしたのだ。</p>
+
+    <p>第二次世界大戦後、DDTが開発・普及し、日本を含む世界中の家庭に浸透した。現在の世界の虫除け市場はおよそ8000億円規模とも言われるが、その産業の根幹は「繰り返し購入してもらうこと」にある。一度設置すれば長期間機能し、補充もブランドも不要なアース・バッテリーは、市場の論理の外に置かれた。</p>
+
+    <!-- 図2：歴史タイムライン -->
+    <div class="fig-card">
+      <svg width="100%" viewBox="0 0 680 220" role="img">
+        <title>アース・バッテリーの歴史タイムライン</title>
+        <desc>1747年ノレ〜1920年代エレクトロカルチャー〜第一次世界大戦〜現在の流れ</desc>
+        <!-- 軸線 -->
+        <line x1="60" y1="100" x2="620" y2="100" stroke="#2a2f42" stroke-width="1.5"/>
+        <!-- 1747 -->
+        <circle cx="80" cy="100" r="7" fill="#c8a96e"/>
+        <text x="80" y="83" text-anchor="middle" fill="#c8a96e" font-size="11" font-weight="700">1747</text>
+        <text x="80" y="122" text-anchor="middle" fill="#8a8780" font-size="10">ノレの実験</text>
+        <text x="80" y="134" text-anchor="middle" fill="#555260" font-size="10">（パリ）</text>
+        <!-- 1841 -->
+        <circle cx="210" cy="100" r="7" fill="#c8a96e"/>
+        <text x="210" y="83" text-anchor="middle" fill="#c8a96e" font-size="11" font-weight="700">1841</text>
+        <text x="210" y="122" text-anchor="middle" fill="#8a8780" font-size="10">ベインの</text>
+        <text x="210" y="134" text-anchor="middle" fill="#8a8780" font-size="10">アース・バッテリー</text>
+        <!-- 1845 -->
+        <circle cx="290" cy="100" r="7" fill="#c8a96e"/>
+        <text x="290" y="83" text-anchor="middle" fill="#c8a96e" font-size="11" font-weight="700">1845</text>
+        <text x="290" y="122" text-anchor="middle" fill="#8a8780" font-size="10">ホスターの</text>
+        <text x="290" y="134" text-anchor="middle" fill="#8a8780" font-size="10">農地実験</text>
+        <!-- 1914 -->
+        <circle cx="420" cy="100" r="7" fill="#c46060"/>
+        <text x="420" y="83" text-anchor="middle" fill="#c46060" font-size="11" font-weight="700">1914〜</text>
+        <text x="420" y="122" text-anchor="middle" fill="#8a8780" font-size="10">第一次大戦</text>
+        <text x="420" y="134" text-anchor="middle" fill="#8a8780" font-size="10">化学産業台頭</text>
+        <!-- 1920s -->
+        <circle cx="340" cy="100" r="7" fill="#c8a96e"/>
+        <text x="340" y="65" text-anchor="middle" fill="#c8a96e" font-size="11" font-weight="700">1920年代</text>
+        <text x="340" y="55" text-anchor="middle" fill="#8a8780" font-size="10">電気農業ブーム</text>
+        <line x1="340" y1="93" x2="340" y2="70" stroke="#c8a96e" stroke-width="0.8" stroke-dasharray="3 2"/>
+        <!-- 2015 -->
+        <circle cx="580" cy="100" r="7" fill="#7eb8d4"/>
+        <text x="580" y="83" text-anchor="middle" fill="#7eb8d4" font-size="11" font-weight="700">2015</text>
+        <text x="580" y="122" text-anchor="middle" fill="#8a8780" font-size="10">ベッカー博士</text>
+        <text x="580" y="134" text-anchor="middle" fill="#8a8780" font-size="10">論文発表</text>
+        <!-- 矢印 -->
+        <polygon points="625,100 612,95 612,105" fill="#2a2f42"/>
+        <text x="640" y="104" fill="#555260" font-size="10">現在</text>
+        <!-- 区切り注記 -->
+        <rect x="405" y="140" width="185" height="1" fill="#c46060" opacity="0.3"/>
+        <text x="497" y="158" text-anchor="middle" fill="#c46060" font-size="10" opacity="0.7">戦争と化学産業の転換期</text>
+      </svg>
+      <div class="fig-caption">図2. アース・バッテリーをめぐる歴史タイムライン</div>
+    </div>
+
+    <div class="factbox">
+      <div class="factbox-title">第2回 ― 事実確認</div>
+      <div class="fact-row"><span class="fbadge ok">確認済</span> <span>爆薬製造工場が戦後に化学肥料・殺虫剤産業へ転換した歴史は複数の史料で確認</span></div>
+      <div class="fact-row"><span class="fbadge ok">確認済</span> <span>エレクトロカルチャー（電気農業）は19〜20世紀初頭に盛んに研究された <a class="cite" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12331079/" target="_blank">🔗 PMC</a></span></div>
+      <div class="fact-row"><span class="fbadge warn">要注意</span> <span>「15万台販売」などの具体的な数字は一次資料での検証が困難</span></div>
+      <div class="fact-row"><span class="fbadge warn">要注意</span> <span>ホスターの実験報告は農業雑誌の記録だが現代での独立検証なし</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 第3回 ===== -->
+<div class="article" id="a2">
+  <div class="art-kicker">第3回</div>
+  <div class="art-title">現代科学が示すこと、そして今夜から試せること</div>
+  <div class="art-byline">査読済み論文に基づく事実整理と、二種類の自作実験装置</div>
+
+  <div class="body">
+    <p>2015年、ドイツの蚊防除研究機関（KABS）とハイデルベルク大学のノルベルト・ベッカー博士チームが、学術誌「Parasites &amp; Vectors」に論文を発表した。<a class="cite" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4640347/" target="_blank">🔗 PMC全文</a> <a class="cite" href="https://link.springer.com/article/10.1186/s13071-015-1180-z" target="_blank">🔗 Springer原文</a> <a class="cite" href="https://doaj.org/article/cd76f51c1d554bc6b5dcdda110f6cf38" target="_blank">🔗 DOAJ要旨</a></p>
+
+    <p>500ppb（10億分の500）未満という極めて低い銅イオン濃度でも、実験した全種の蚊の幼虫が100%死亡。容器内壁に銅スプレーを施すだけで、最大3ヶ月間にわたって幼虫の発生を抑制できた。WHO飲料水の銅の安全基準（2ppm）の1000分の1以下の濃度での効果であり、人体への安全性と昆虫への致死性が両立する。</p>
+
+    <div class="pullquote">土中で銅と亜鉛が反応するという電気化学の事実は変わらない。銅イオンが蚊の幼虫に致死的であるという生物学の事実も変わらない。足りないのは、それらを結びつけた体系的な検証だけだ。</div>
+
+    <div class="factbox">
+      <div class="factbox-title">第3回 ― 事実確認サマリー</div>
+      <div class="fact-row"><span class="fbadge ok">科学的確認</span> <span>銅イオンが水中の蚊の幼虫を死滅させる（査読済み論文・複数種で検証）</span></div>
+      <div class="fact-row"><span class="fbadge ok">科学的確認</span> <span>アース・バッテリーの電気化学原理（ガルバニック電池）は確立された基礎科学</span></div>
+      <div class="fact-row"><span class="fbadge warn">未検証</span> <span>成虫の飛ぶ虫を広範囲で遠ざけるという主張は現代の厳密なRCTで未検証</span></div>
+      <div class="fact-row"><span class="fbadge no">注意</span> <span>家庭用銅ロッドの収量改善効果は不確認との研究も存在 <a class="cite" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12331079/" target="_blank">🔗 PMC</a></span></div>
+    </div>
+
+    <h2>実験A ― 銅の蚊トラップ（科学的根拠が最も明確）</h2>
+
+    <div class="fig-card">
+      <svg width="100%" viewBox="0 0 680 220" role="img">
+        <title>実験A：銅の蚊トラップ設計図</title>
+        <desc>対照群（銅なし）と実験群（銅線入り）を並べて幼虫発生数を比較する装置図</desc>
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+        <!-- 左：対照 -->
+        <rect x="55" y="40" width="220" height="155" rx="10" fill="#1e2333" stroke="#2a2f42" stroke-width="1"/>
+        <rect x="56" y="115" width="218" height="78" rx="0" fill="#1a3050" opacity="0.45"/>
+        <text x="165" y="78" text-anchor="middle" fill="#8a8780" font-size="13">対照群（銅なし）</text>
+        <text x="165" y="94" text-anchor="middle" fill="#555260" font-size="11">普通の水のみ</text>
+        <circle cx="115" cy="145" r="4" fill="#c46060" opacity="0.8"/>
+        <circle cx="140" cy="158" r="4" fill="#c46060" opacity="0.8"/>
+        <circle cx="168" cy="138" r="4" fill="#c46060" opacity="0.8"/>
+        <circle cx="198" cy="152" r="4" fill="#c46060" opacity="0.8"/>
+        <circle cx="222" cy="143" r="4" fill="#c46060" opacity="0.8"/>
+        <circle cx="130" cy="168" r="4" fill="#c46060" opacity="0.7"/>
+        <circle cx="185" cy="170" r="4" fill="#c46060" opacity="0.7"/>
+        <text x="165" y="200" text-anchor="middle" fill="#c46060" font-size="12">幼虫多数発生</text>
+        <!-- vs -->
+        <text x="340" y="128" text-anchor="middle" fill="#555260" font-size="16" font-weight="700">vs</text>
+        <!-- 右：実験群 -->
+        <rect x="405" y="40" width="220" height="155" rx="10" fill="#1e2333" stroke="#c8a96e" stroke-width="1.2"/>
+        <rect x="406" y="115" width="218" height="78" rx="0" fill="#1a3050" opacity="0.45"/>
+        <text x="515" y="78" text-anchor="middle" fill="#c8a96e" font-size="13">実験群（銅あり）</text>
+        <text x="515" y="94" text-anchor="middle" fill="#555260" font-size="11">銅線コイルを沈める</text>
+        <!-- 銅コイル -->
+        <ellipse cx="515" cy="155" rx="40" ry="13" fill="none" stroke="#c8a96e" stroke-width="2.2"/>
+        <ellipse cx="515" cy="164" rx="40" ry="13" fill="none" stroke="#c8a96e" stroke-width="2.2"/>
+        <ellipse cx="515" cy="173" rx="40" ry="13" fill="none" stroke="#c8a96e" stroke-width="2.2"/>
+        <text x="515" y="200" text-anchor="middle" fill="#5a9e6f" font-size="12">幼虫発生なし〜激減</text>
+        <!-- 銅線ラベル -->
+        <line x1="556" y1="162" x2="595" y2="145" stroke="#2a2f42" stroke-width="0.8" stroke-dasharray="3 3"/>
+        <text x="600" y="140" fill="#555260" font-size="10">銅線（φ2mm）</text>
+      </svg>
+      <div class="fig-caption">図3. 実験A「銅の蚊トラップ」設計図。同条件・同場所に設置し1〜2週間後に幼虫数を比較</div>
+    </div>
+
+    <div class="exp-box">
+      <div class="exp-title">実験A <span class="exp-badge">科学的根拠あり</span></div>
+      <div class="parts-grid">
+        <div class="part-item"><div class="part-label">容器</div><div class="part-val">植木鉢受け皿・バケツ×2個</div></div>
+        <div class="part-item"><div class="part-label">銅線</div><div class="part-val">裸銅線 φ1〜2mm（または5円玉×5枚）</div></div>
+        <div class="part-item"><div class="part-label">費用目安</div><div class="part-val">数百円〜</div></div>
+        <div class="part-item"><div class="part-label">効果確認</div><div class="part-val">1〜2週間後に比較</div></div>
+      </div>
+      <ol class="step-list">
+        <li>容器2つに同量の水を入れる</li>
+        <li>片方にのみ銅線をコイル状にして沈める</li>
+        <li>同じ場所・同じ日射条件で並べて放置</li>
+        <li>1〜2週間後に幼虫の発生数を写真で記録・比較</li>
+      </ol>
+      <div class="warn-note">注意：銅イオンは観賞魚・金魚には有害です。水槽には使用しないこと。</div>
+    </div>
+
+    <h2>実験B ― アース・バッテリー型忌避装置（歴史的観察の再現）</h2>
+
+    <div class="fig-card">
+      <svg width="100%" viewBox="0 0 680 300" role="img">
+        <title>実験B：アース・バッテリー型忌避装置の断面図</title>
+        <desc>銅線と亜鉛メッキ線を竹串に巻きつけ地中に15〜30cm埋める装置の断面図</desc>
+        <defs>
+          <marker id="arr2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+        <!-- 地中ゾーン -->
+        <rect x="40" y="145" width="600" height="120" rx="8" fill="#1a2515" opacity="0.6"/>
+        <line x1="40" y1="145" x2="640" y2="145" stroke="#5a9e6f" stroke-width="1" stroke-dasharray="6 4" opacity="0.5"/>
+        <text x="56" y="140" fill="#5a9e6f" font-size="11" opacity="0.7">地表面</text>
+        <text x="56" y="200" fill="#27500A" font-size="11" opacity="0.6">湿った土（電解質）</text>
+        <!-- 銅線側（左） -->
+        <rect x="210" y="60" width="10" height="200" rx="4" fill="#c8a96e" opacity="0.7"/>
+        <path d="M203 150 Q221 158 203 166 Q221 174 203 182 Q221 190 203 198 Q221 206 203 214 Q221 222 203 230 Q221 238 203 246" fill="none" stroke="#c8a96e" stroke-width="2"/>
+        <text x="215" y="52" text-anchor="middle" fill="#c8a96e" font-size="12" font-weight="700">銅線側（陰極）</text>
+        <!-- 亜鉛線側（右） -->
+        <rect x="450" y="60" width="10" height="200" rx="4" fill="#8a8780" opacity="0.6"/>
+        <path d="M443 150 Q461 158 443 166 Q461 174 443 182 Q461 190 443 198 Q461 206 443 214 Q461 222 443 230 Q461 238 443 246" fill="none" stroke="#8a8780" stroke-width="2" opacity="0.7"/>
+        <text x="455" y="52" text-anchor="middle" fill="#8a8780" font-size="12" font-weight="700">亜鉛メッキ線（陽極）</text>
+        <!-- 間隔 -->
+        <line x1="220" y1="110" x2="450" y2="110" stroke="#2a2f42" stroke-width="0.8" stroke-dasharray="4 3"/>
+        <text x="335" y="106" text-anchor="middle" fill="#555260" font-size="11">15〜30cm 離す（地上では直接触れない）</text>
+        <!-- 電子移動 -->
+        <line x1="450" y1="190" x2="225" y2="190" stroke="#7eb8d4" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arr2)"/>
+        <text x="335" y="184" text-anchor="middle" fill="#7eb8d4" font-size="11">電子の流れ（亜鉛 → 銅）</text>
+        <!-- イオン -->
+        <circle cx="295" cy="230" r="5" fill="#c8a96e" opacity="0.35"/>
+        <circle cx="265" cy="248" r="4" fill="#c8a96e" opacity="0.25"/>
+        <circle cx="355" cy="242" r="5" fill="#8a8780" opacity="0.3"/>
+        <circle cx="325" cy="258" r="3" fill="#8a8780" opacity="0.22"/>
+        <text x="335" y="278" text-anchor="middle" fill="#555260" font-size="11">銅・亜鉛イオンが土壌へにじみ出す（昆虫が嫌う）</text>
+        <!-- 埋め深さ -->
+        <line x1="500" y1="145" x2="500" y2="260" stroke="#2a2f42" stroke-width="0.8"/>
+        <line x1="492" y1="145" x2="508" y2="145" stroke="#2a2f42" stroke-width="0.8"/>
+        <line x1="492" y1="260" x2="508" y2="260" stroke="#2a2f42" stroke-width="0.8"/>
+        <text x="518" y="207" fill="#555260" font-size="11">30cm以上</text>
+      </svg>
+      <div class="fig-caption">図4. 実験B「アース・バッテリー型忌避装置」断面図。地中で銅と亜鉛が反応し電流・イオンを発生</div>
+    </div>
+
+    <div class="fig-card">
+      <svg width="100%" viewBox="0 0 680 240" role="img">
+        <title>三角配置の設置例</title>
+        <desc>3本をA・B・C三角形に配置しテント・調理場・焚き火周囲をカバーする俯瞰図</desc>
+        <!-- 背景 -->
+        <rect x="40" y="20" width="600" height="200" rx="12" fill="#151f10" opacity="0.5"/>
+        <!-- 効果範囲 -->
+        <ellipse cx="340" cy="125" rx="195" ry="100" fill="none" stroke="#5a9e6f" stroke-width="1" stroke-dasharray="6 4" opacity="0.4"/>
+        <text x="525" y="75" fill="#5a9e6f" font-size="11" opacity="0.6">効果範囲（目安）</text>
+        <!-- 頂点A -->
+        <circle cx="340" cy="40" r="13" fill="#c8a96e"/>
+        <text x="340" y="45" text-anchor="middle" fill="#0f1117" font-size="12" font-weight="700">A</text>
+        <text x="340" y="28" text-anchor="middle" fill="#8a8780" font-size="10">テント付近</text>
+        <!-- 頂点B -->
+        <circle cx="175" cy="210" r="13" fill="#c8a96e"/>
+        <text x="175" y="215" text-anchor="middle" fill="#0f1117" font-size="12" font-weight="700">B</text>
+        <text x="175" y="232" text-anchor="middle" fill="#8a8780" font-size="10">調理場</text>
+        <!-- 頂点C -->
+        <circle cx="505" cy="210" r="13" fill="#c8a96e"/>
+        <text x="505" y="215" text-anchor="middle" fill="#0f1117" font-size="12" font-weight="700">C</text>
+        <text x="505" y="232" text-anchor="middle" fill="#8a8780" font-size="10">焚き火周囲</text>
+        <!-- 辺 -->
+        <line x1="340" y1="53" x2="187" y2="198" stroke="#c8a96e" stroke-width="1.2" stroke-dasharray="5 4" opacity="0.5"/>
+        <line x1="340" y1="53" x2="493" y2="198" stroke="#c8a96e" stroke-width="1.2" stroke-dasharray="5 4" opacity="0.5"/>
+        <line x1="188" y1="210" x2="492" y2="210" stroke="#c8a96e" stroke-width="1.2" stroke-dasharray="5 4" opacity="0.5"/>
+        <!-- 中央 -->
+        <text x="340" y="128" text-anchor="middle" fill="#555260" font-size="12">生活・食事スペース</text>
+        <!-- 距離ラベル -->
+        <text x="235" y="138" text-anchor="middle" fill="#5a9e6f" font-size="11" opacity="0.7">5〜7m</text>
+      </svg>
+      <div class="fig-caption">図5. 三角配置の設置例（キャンプ・庭）。A・B・C各頂点に装置を1本ずつ設置</div>
+    </div>
+
+    <div class="exp-box">
+      <div class="exp-title">実験B <span class="exp-badge partial">歴史的観察の再現・現代未検証</span></div>
+      <div class="parts-grid">
+        <div class="part-item"><div class="part-label">銅線（裸）</div><div class="part-val">φ2mm × 90cm × 2本</div></div>
+        <div class="part-item"><div class="part-label">亜鉛メッキ線</div><div class="part-val">φ2mm × 90cm × 2本</div></div>
+        <div class="part-item"><div class="part-label">支持材</div><div class="part-val">竹串・木の杭（90cm程度）</div></div>
+        <div class="part-item"><div class="part-label">費用目安</div><div class="part-val">200〜500円</div></div>
+      </div>
+      <ol class="step-list">
+        <li>銅線を竹串の下半分（45cm）にらせん状に巻く。亜鉛線も別の杭に同様に</li>
+        <li>2本を15〜30cm間隔で地面に打ち込む（30cm以上埋める）</li>
+        <li>地中では両金属が同じ土に触れ、地上では直接触れないようにする</li>
+        <li>土が乾いていれば水を与えてから設置する</li>
+        <li>テスターで電圧確認（0.3〜1V出れば反応中）</li>
+        <li>設置前後の虫の種類・数を2週間写真記録し比較する</li>
+      </ol>
+      <div class="warn-note">これは個人レベルの観察記録であり科学的証明ではありません。記録を積み重ねることに意義があります。</div>
+    </div>
+
+    <div class="refs">
+      <div class="refs-title">参考文献・検証リンク</div>
+      <div class="refs-links">
+        <a class="cite" href="https://en.wikipedia.org/wiki/Jean-Antoine_Nollet" target="_blank">🔗 ノレ（Wikipedia）</a>
+        <a class="cite" href="https://en.wikipedia.org/wiki/Earth_battery" target="_blank">🔗 Earth Battery（Wikipedia）</a>
+        <a class="cite" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4640347/" target="_blank">🔗 Becker 2015論文（PMC全文）</a>
+        <a class="cite" href="https://link.springer.com/article/10.1186/s13071-015-1180-z" target="_blank">🔗 Parasites &amp; Vectors（Springer）</a>
+        <a class="cite" href="https://doaj.org/article/cd76f51c1d554bc6b5dcdda110f6cf38" target="_blank">🔗 DOAJ要旨</a>
+        <a class="cite" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12331079/" target="_blank">🔗 Electroculture論文（PMC）</a>
+        <a class="cite" href="https://thrivegarden.com/pages/the-science-behind-electroculture-and-enhanced-plant-growth" target="_blank">🔗 Electroculture解説</a>
+        <a class="cite" href="https://www.lindahall.org/about/news/scientist-of-the-day/jean-antoine-nollet/" target="_blank">🔗 Linda Hall Library</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  <p><a href="https://yymm77.github.io/seimei-kagaku/">◈ 予測技術ポータル</a> ｜
+  <a href="https://yymm77.github.io/seimei-kagaku/namemaster_v5.html">姓名科学</a> ｜
+  <a href="https://yymm77.github.io/seimei-kagaku/houigaku.html">方位学</a></p>
+  <p style="margin-top:.5rem">制作者の記録 ― 忘れられた知恵を、現代に問い直す</p>
+</footer>
+
+<script>
+function show(i){
+  document.querySelectorAll('.tab-btn').forEach((b,j)=>b.classList.toggle('active',i===j));
+  document.querySelectorAll('.article').forEach((a,j)=>a.classList.toggle('active',i===j));
+}
+</script>
+</body>
+</html>
