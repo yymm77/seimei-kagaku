@@ -559,7 +559,7 @@ footer a {
           この解釈はプレミアム機能の一部です。<br>
           月額 <strong>¥580</strong> で、いつでも・何度でも・相性解析もご利用いただけます。
         </p>
-        <a href="https://yymm77.github.io/seimei-kagaku/" class="btn-premium">
+        <a href="https://yymm77.github.io/seimei-kagaku/namemaster_v5.html" class="btn-premium">
           プレミアム会員になる
         </a>
       </div>
@@ -1007,7 +1007,7 @@ async function callAnthropicAPI(sei, mei, seiKana, meiKana, gender, scores) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-6',
       max_tokens: 1000,
       messages: [{ role: 'user', content: prompt }]
     })
