@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI姓名解釈 無料体験｜姓名科学の殿堂</title>
+<meta name="description" content="牧正人史先生が発見した姓名科学をAIが解釈。会員登録で1回限り、あなたの姓名を深く読み解くAI解釈を無料体験できます。">
+<meta name="keywords" content="姓名科学,姓名判断,占い,易,名前,運命,AI解釈,無料体験">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;700&family=Shippori+Mincho:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --ink: #1a1208;
+  --gold: #b8932a;
+  --gold-light: #e8c96a;
+  --cream: #f5f0e8;
+  --paper: #faf7f0;
+  --red: #8b1a1a;
+  --shadow: rgba(26,18,8,0.15);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Noto Serif JP', serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* 背景テクスチャ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(ellipse at 20% 20%, rgba(184,147,42,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 80%, rgba(139,26,26,0.04) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ヘッダー */
+header {
+  position: relative;
+  text-align: center;
+  padding: 60px 20px 40px;
+  z-index: 1;
+}
+
+.site-badge {
+  display: inline-block;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  padding: 4px 16px;
+  margin-bottom: 24px;
+}
+
+header h1 {
+  font-family: 'Shippori Mincho', serif;
+  font-size: clamp(28px, 5vw, 48px);
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--ink);
+  margin-bottom: 12px;
+}
+
+header h1 span {
+  color: var(--gold);
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #6b5a3e;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+
+/* 区切り線 */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  max-width: 400px;
+  margin: 32px auto;
+}
+.divider::before, .divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--gold), transparent);
+}
+.divider-symbol {
+  color: var(--gold);
+  font-size: 18px;
+}
+
+/* メインコンテンツ */
+main {
+  position: relative;
+  z-index: 1;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 0 20px 80px;
+}
+
+/* 説明カード */
+.intro-card {
+  background: white;
+  border: 1px solid rgba(184,147,42,0.2);
+  border-radius: 2px;
+  padding: 32px;
+  margin-bottom: 32px;
+  box-shadow: 0 2px 20px var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.intro-card::before {
+  content: '姓名科学';
+  position: absolute;
+  top: -10px;
+  right: 20px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 80px;
+  color: rgba(184,147,42,0.06);
+  letter-spacing: -0.05em;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.intro-card h2 {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 20px;
+  color: var(--gold);
+  margin-bottom: 16px;
+  letter-spacing: 0.1em;
+}
+
+.intro-card p {
+  font-size: 14px;
+  line-height: 2;
+  color: #4a3f2e;
+}
+
+.trial-badge {
+  display: inline-block;
+  background: var(--red);
+  color: white;
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 2px;
+  margin-bottom: 16px;
+  letter-spacing: 0.1em;
+}
+
+/* フォーム */
+.form-card {
+  background: white;
+  border: 1px solid rgba(184,147,42,0.2);
+  border-radius: 2px;
+  padding: 40px 32px;
+  box-shadow: 0 4px 30px var(--shadow);
+}
+
+.form-card h2 {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 22px;
+  text-align: center;
+  margin-bottom: 32px;
+  color: var(--ink);
+}
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+label {
+  display: block;
+  font-size: 13px;
+  color: #6b5a3e;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+
+label .required {
+  color: var(--red);
+  margin-left: 4px;
+}
+
+input[type="text"],
+input[type="email"] {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid rgba(184,147,42,0.4);
+  background: transparent;
+  padding: 10px 4px;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 16px;
+  color: var(--ink);
+  transition: border-color 0.3s;
+  outline: none;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus {
+  border-bottom-color: var(--gold);
+}
+
+.name-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-note {
+  font-size: 11px;
+  color: #9a8a72;
+  margin-top: 6px;
+}
+
+/* 送信ボタン */
+.btn-submit {
+  width: 100%;
+  background: linear-gradient(135deg, #c4a030, #8b6914);
+  color: white;
+  border: none;
+  padding: 18px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 16px;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-top: 32px;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-submit::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.btn-submit:hover::after { opacity: 1; }
+.btn-submit:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(184,147,42,0.4); }
+.btn-submit:active { transform: translateY(0); }
+.btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* 結果エリア */
+#result-area {
+  display: none;
+  margin-top: 40px;
+}
+
+.result-card {
+  background: white;
+  border: 1px solid rgba(184,147,42,0.3);
+  border-top: 3px solid var(--gold);
+  border-radius: 2px;
+  padding: 40px 32px;
+  box-shadow: 0 4px 30px var(--shadow);
+}
+
+.result-name {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.result-name .kanji {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 36px;
+  color: var(--ink);
+  letter-spacing: 0.3em;
+}
+
+.result-name .reading {
+  font-size: 13px;
+  color: #9a8a72;
+  letter-spacing: 0.3em;
+  margin-top: 8px;
+}
+
+.scores-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.score-item {
+  text-align: center;
+  padding: 12px 4px;
+  background: var(--cream);
+  border: 1px solid rgba(184,147,42,0.15);
+}
+
+.score-label {
+  font-size: 11px;
+  color: #9a8a72;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.score-value {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 22px;
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.ai-interpretation {
+  border-top: 1px solid rgba(184,147,42,0.2);
+  padding-top: 28px;
+}
+
+.ai-interpretation h3 {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 16px;
+  color: var(--gold);
+  letter-spacing: 0.15em;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ai-interpretation h3::before {
+  content: '✦';
+  font-size: 12px;
+}
+
+.ai-text {
+  font-size: 14px;
+  line-height: 2.2;
+  color: #3a2e1e;
+  white-space: pre-wrap;
+}
+
+/* ローディング */
+.loading-spinner {
+  text-align: center;
+  padding: 40px;
+  display: none;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 2px solid rgba(184,147,42,0.2);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-text {
+  font-size: 13px;
+  color: #9a8a72;
+  letter-spacing: 0.2em;
+}
+
+/* CTA（体験後） */
+.cta-after {
+  margin-top: 32px;
+  padding: 24px;
+  background: linear-gradient(135deg, #fdf8ee, #faf3e0);
+  border: 1px solid rgba(184,147,42,0.3);
+  text-align: center;
+}
+
+.cta-after p {
+  font-size: 13px;
+  color: #6b5a3e;
+  line-height: 1.8;
+  margin-bottom: 16px;
+}
+
+.btn-premium {
+  display: inline-block;
+  background: var(--red);
+  color: white;
+  padding: 12px 32px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 14px;
+  letter-spacing: 0.2em;
+  text-decoration: none;
+  transition: all 0.3s;
+}
+
+.btn-premium:hover {
+  background: #6b1414;
+  transform: translateY(-1px);
+}
+
+/* エラー */
+.error-msg {
+  color: var(--red);
+  font-size: 12px;
+  margin-top: 8px;
+  display: none;
+}
+
+/* フッター */
+footer {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 32px 20px;
+  border-top: 1px solid rgba(184,147,42,0.15);
+  font-size: 12px;
+  color: #9a8a72;
+  letter-spacing: 0.1em;
+}
+
+footer a {
+  color: var(--gold);
+  text-decoration: none;
+}
+
+/* アニメーション */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+/* レスポンシブ */
+@media (max-width: 480px) {
+  .name-row { grid-template-columns: 1fr; }
+  .scores-grid { grid-template-columns: repeat(3, 1fr); }
+  .form-card { padding: 28px 20px; }
+  .result-card { padding: 28px 20px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="site-badge">姓名科学の殿堂</div>
+  <h1>あなたの名前を、<br><span>AIが深く読み解く</span></h1>
+  <p class="subtitle">牧正人史先生（昭和33年）発見の姓名科学 × 人工知能</p>
+</header>
+
+<div class="divider"><span class="divider-symbol">◈</span></div>
+
+<main>
+
+  <!-- 説明 -->
+  <div class="intro-card">
+    <div class="trial-badge">期間限定・無料体験</div>
+    <h2>会員登録で1回限り、AI解釈を体験</h2>
+    <p>
+      姓名科学は、名前に宿る数理的エネルギーを解析する学問です。<br>
+      通常、AI解釈機能はプレミアム会員専用ですが、<br>
+      新規ご登録の方に限り、<strong>1回だけ無料</strong>でお試しいただけます。<br><br>
+      あなたの姓名から算出される5つの数値（I5・C9・K3・I9・K9）を、
+      AIが総合的に読み解き、あなただけの解釈文をお届けします。
+    </p>
+  </div>
+
+  <!-- 入力フォーム -->
+  <div class="form-card" id="form-section">
+    <h2>姓名を入力してください</h2>
+
+    <div class="form-group">
+      <label>お名前（漢字）<span class="required">*</span></label>
+      <div class="name-row">
+        <div>
+          <input type="text" id="sei" placeholder="例：山田" maxlength="4">
+          <div class="form-note">姓（苗字）</div>
+        </div>
+        <div>
+          <input type="text" id="mei" placeholder="例：太郎" maxlength="4">
+          <div class="form-note">名（名前）</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>お名前（読み仮名）<span class="required">*</span></label>
+      <div class="name-row">
+        <div>
+          <input type="text" id="sei-kana" placeholder="例：やまだ" maxlength="10">
+          <div class="form-note">姓の読み</div>
+        </div>
+        <div>
+          <input type="text" id="mei-kana" placeholder="例：たろう" maxlength="10">
+          <div class="form-note">名の読み</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>メールアドレス<span class="required">*</span></label>
+      <input type="email" id="email" placeholder="例：taro@example.com">
+      <div class="form-note">登録確認のため、有効なアドレスをご入力ください</div>
+      <div class="error-msg" id="email-error">メールアドレスの形式が正しくありません</div>
+    </div>
+
+    <div class="form-group">
+      <label>性別</label>
+      <div style="display:flex; gap:24px; margin-top:8px;">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;color:var(--ink);">
+          <input type="radio" name="gender" value="male" checked> 男性
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;color:var(--ink);">
+          <input type="radio" name="gender" value="female"> 女性
+        </label>
+      </div>
+    </div>
+
+    <button class="btn-submit" id="submit-btn" onclick="submitTrial()">
+      AI姓名解釈を体験する　→
+    </button>
+
+    <p style="font-size:11px;color:#9a8a72;text-align:center;margin-top:16px;line-height:1.8;">
+      ご登録いただいた情報は姓名科学サービスの提供のみに使用します。<br>
+      第三者への提供・販売は一切行いません。
+    </p>
+  </div>
+
+  <!-- ローディング -->
+  <div class="loading-spinner" id="loading">
+    <div class="spinner"></div>
+    <div class="loading-text">AIが姓名を読み解いています…</div>
+  </div>
+
+  <!-- 結果エリア -->
+  <div id="result-area">
+    <div class="result-card fade-in">
+      <div class="result-name">
+        <div class="kanji" id="result-kanji"></div>
+        <div class="reading" id="result-reading"></div>
+      </div>
+
+      <div class="scores-grid" id="scores-grid"></div>
+
+      <div class="ai-interpretation">
+        <h3>AI姓名解釈</h3>
+        <div class="ai-text" id="ai-text"></div>
+      </div>
+
+      <div class="cta-after">
+        <p>
+          この解釈はプレミアム機能の一部です。<br>
+          月額 <strong>¥580</strong> で、いつでも・何度でも・相性解析もご利用いただけます。
+        </p>
+        <a href="https://yymm77.github.io/seimei-kagaku/" class="btn-premium">
+          プレミアム会員になる
+        </a>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <a href="https://yymm77.github.io/seimei-kagaku/">姓名科学の殿堂 トップへ戻る</a>
+  &nbsp;|&nbsp;
+  <a href="https://yymm77.github.io/seimei-kagaku/namemaster_v5.html">姓名診断アプリ</a>
+  &nbsp;|&nbsp;
+  <a href="https://yymm77.github.io/seimei-kagaku/compatibility_v2.html">相性解析</a>
+  <br><br>
+  © 姓名科学の殿堂｜牧正人史先生の姓名科学を後世に伝える
+</footer>
+
+<script>
+// ========== 字画表（NAMEMASTER.xls準拠・1993文字）==========
+const KAKUSU = {
+  "・":1,"〆":2,"ア":2,"あ":4,"イ":2,"い":2,"ウ":3,"う":2,"エ":3,"え":3,
+  "オ":3,"お":4,"カ":2,"か":3,"キ":3,"き":4,"ク":2,"く":1,"ケ":3,"け":3,
+  "コ":2,"こ":2,"サ":3,"さ":3,"シ":3,"し":1,"ス":2,"す":3,"セ":2,"せ":3,
+  "ソ":2,"そ":4,"タ":3,"た":4,"チ":3,"ち":3,"ツ":3,"つ":1,"テ":3,"て":2,
+  "ト":2,"と":2,"ナ":2,"な":4,"ニ":2,"に":3,"ヌ":2,"ぬ":3,"ネ":4,"ね":3,
+  "ノ":1,"の":2,"ハ":2,"は":3,"ヒ":2,"ひ":3,"フ":1,"ふ":4,"ヘ":1,"へ":1,
+  "ホ":4,"ほ":4,"マ":2,"ま":3,"ミ":3,"み":3,"ム":2,"む":4,"メ":2,"め":3,
+  "モ":3,"も":3,"ヤ":2,"や":3,"ユ":2,"ゆ":3,"ヨ":3,"よ":2,"ラ":2,"ら":3,
+  "リ":2,"り":2,"ル":2,"る":3,"レ":1,"れ":3,"ロ":3,"ろ":3,"ワ":2,"わ":3,
+  "ヰ":4,"ゐ":2,"ヱ":3,"ゑ":5,"ヲ":3,"を":4,"ン":2,"ん":2,"亜":8,"阿":8,
+  "愛":13,"逢":11,"葵":13,"茜":10,"旭":6,"渥":12,"葦":13,"芦":20,"梓":11,"圧":17,
+  "絢":12,"飴":14,"綾":14,"鮎":16,"安":6,"庵":11,"案":10,"杏":7,"以":5,"伊":6,
+  "依":8,"夷":7,"威":9,"惟":11,"意":13,"易":8,"為":12,"移":11,"維":14,"衣":6,
+  "遺":16,"医":18,"井":4,"亥":6,"育":8,"郁":9,"一":1,"磯":17,"溢":13,"壱":12,
+  "逸":12,"稲":15,"芋":7,"茨":10,"允":4,"印":6,"員":10,"引":4,"蔭":15,"胤":9,
+  "院":10,"陰":11,"隠":17,"右":5,"宇":6,"烏":10,"羽":6,"雨":8,"卯":5,"鵜":18,
+  "丑":4,"碓":13,"臼":6,"唄":10,"浦":10,"瓜":5,"雲":12,"運":13,"荏":10,"営":17,
+  "影":15,"映":9,"永":5,"栄":14,"泳":8,"瑛":13,"頴":16,"衛":16,"英":9,"詠":12,
+  "鋭":15,"駅":23,"益":10,"悦":10,"越":12,"閲":15,"榎":14,"円":13,"園":13,"延":7,
+  "宴":10,"沿":8,"援":12,"炎":8,"煙":13,"猿":13,"燕":16,"縁":15,"艶":24,"鉛":13,
+  "遠":14,"塩":24,"鴛":16,"於":8,"央":5,"奥":13,"往":8,"応":17,"旺":8,"押":8,
+  "横":16,"王":4,"翁":10,"鴬":21,"鴎":21,"岡":8,"黄":12,"沖":7,"荻":11,"屋":9,
+  "億":15,"憶":16,"臆":17,"桶":11,"乙":1,"恩":10,"温":13,"穏":19,"音":9,"下":3,
+  "化":4,"何":7,"佳":8,"加":5,"可":5,"夏":10,"嘉":14,"家":10,"嫁":13,"科":9,
+  "果":8,"歌":14,"火":4,"河":8,"珂":9,"禾":5,"稼":15,"花":8,"荷":11,"華":12,
+  "菓":12,"貨":11,"霞":17,"我":7,"峨":10,"芽":8,"賀":12,"雅":12,"介":4,"駕":15,
+  "会":13,"解":13,"回":6,"廻":9,"快":7,"戒":7,"改":7,"海":10,"械":11,"灰":6,
+  "界":9,"絵":19,"皆":9,"芥":8,"開":12,"階":12,"貝":7,"凱":12,"外":5,"碍":13,
+  "街":12,"馨":20,"垣":9,"蛙":12,"各":6,"拡":18,"格":10,"殻":12,"獲":17,"確":15,
+  "穫":19,"覚":20,"角":7,"郭":11,"閣":14,"革":9,"学":16,"楽":15,"岳":17,"額":18,
+  "笠":11,"掛":11,"樫":15,"橿":17,"梶":11,"鰍":20,"割":12,"潟":15,"活":9,"滑":13,
+  "葛":13,"叶":5,"樺":16,"株":10,"兜":11,"釜":10,"蒲":14,"鎌":18,"鴨":16,"茅":9,
+  "萱":13,"刈":4,"瓦":5,"乾":11,"冠":9,"寒":12,"勘":11,"巻":8,"勧":20,"完":7,
+  "官":8,"寛":15,"幹":13,"感":13,"慣":14,"敢":12,"漢":14,"環":17,"甘":5,"監":15,
+  "看":9,"管":14,"缶":24,"肝":7,"莞":11,"諌":16,"観":25,"貫":11,"間":12,"鑑":22,
+  "閑":12,"関":19,"韓":17,"館":17,"舘":17,"丸":3,"巌":23,"岸":8,"岩":8,"眼":11,
+  "雁":12,"企":6,"伎":6,"喜":12,"器":17,"基":11,"奇":8,"岐":7,"寄":11,"幾":12,
+  "希":7,"揮":12,"旗":14,"机":6,"機":16,"帰":18,"気":10,"毅":15,"汽":7,"畿":15,
+  "祈":9,"季":8,"紀":9,"稀":12,"規":11,"記":10,"貴":12,"起":10,"輝":15,"鬼":10,
+  "騎":18,"亀":16,"儀":15,"宜":8,"技":7,"祇":10,"義":13,"菊":12,"吉":6,"鞠":17,
+  "橘":16,"砧":10,"杵":8,"客":9,"丘":5,"久":3,"及":4,"休":6,"宮":10,"急":9,
+  "弓":3,"救":11,"求":7,"究":7,"球":11,"級":9,"給":12,"牛":4,"居":8,"巨":5,
+  "挙":18,"許":11,"鋸":16,"漁":14,"魚":11,"亨":7,"享":8,"京":8,"供":8,"侠":9,
+  "共":6,"競":20,"協":8,"匡":6,"喬":12,"境":14,"強":12,"恭":10,"教":11,"橋":16,
+  "狭":10,"胸":10,"興":16,"鏡":19,"郷":13,"響":22,"仰":6,"尭":12,"暁":16,"業":13,
+  "曲":6,"玉":5,"極":13,"桐":10,"勤":13,"巾":3,"均":7,"斤":4,"錦":16,"欣":8,
+  "欽":12,"琴":12,"禁":13,"筋":12,"緊":15,"芹":8,"衿":9,"襟":18,"謹":18,"金":8,
+  "近":8,"吟":7,"銀":14,"九":2,"倶":10,"区":4,"句":5,"玖":7,"狗":8,"矩":10,
+  "駒":15,"具":8,"空":8,"串":7,"隅":12,"釧":11,"櫛":19,"窪":14,"隈":12,"熊":14,
+  "栗":12,"粂":9,"桑":10,"勲":16,"鍬":17,"薫":18,"君":7,"訓":10,"群":13,"軍":9,
+  "郡":10,"卦":8,"刑":6,"兄":5,"啓":11,"圭":6,"型":9,"契":9,"形":7,"径":10,
+  "恵":12,"慶":15,"慧":15,"景":12,"敬":13,"桂":10,"渓":13,"畦":11,"稽":15,"経":13,
+  "系":7,"継":20,"茎":11,"蛍":16,"計":9,"詣":13,"軽":14,"迎":8,"芸":19,"劇":15,
+  "鯨":19,"傑":13,"決":7,"穴":5,"潔":15,"血":6,"結":12,"月":4,"倹":15,"健":11,
+  "兼":10,"剣":15,"堅":11,"建":9,"憲":16,"懸":20,"拳":10,"検":17,"権":22,"犬":4,
+  "研":11,"献":20,"絹":13,"硯":12,"県":16,"肩":8,"謙":17,"見":7,"賢":15,"軒":10,
+  "鍵":17,"遣":14,"険":16,"顕":23,"験":23,"鹸":24,"元":4,"原":10,"厳":20,"幻":4,
+  "弦":8,"玄":5,"源":13,"現":11,"言":7,"乎":5,"古":5,"固":8,"孤":8,"庫":10,
+  "戸":4,"湖":12,"狐":8,"股":8,"袴":11,"胡":9,"虎":8,"誇":13,"五":4,"鼓":13,
+  "互":4,"伍":6,"呉":7,"午":4,"吾":7,"後":9,"御":11,"悟":10,"護":21,"醐":16,
+  "交":6,"鯉":18,"侯":9,"倖":10,"候":10,"公":4,"光":6,"功":5,"厚":9,"口":3,
+  "向":6,"后":6,"孔":4,"好":6,"孝":7,"宏":7,"工":3,"巧":5,"幸":8,"庚":8,
+  "広":15,"弘":5,"康":11,"恒":9,"攻":7,"晃":10,"更":7,"校":10,"梗":11,"江":6,
+  "洪":9,"浩":10,"港":12,"溝":13,"甲":5,"皇":9,"硬":12,"紅":9,"糠":17,"紘":10,
+  "耕":10,"綱":14,"考":6,"航":10,"膏":14,"荒":10,"行":6,"衡":16,"講":17,"貢":10,
+  "酵":14,"砿":20,"鉱":23,"鋼":16,"香":9,"高":10,"剛":10,"鴻":17,"号":13,"合":6,
+  "豪":14,"轟":21,"克":7,"告":7,"国":11,"穀":15,"黒":12,"骨":10,"込":6,"狛":8,
+  "此":6,"今":4,"坤":8,"昆":8,"根":10,"混":11,"紺":11,"魂":14,"佐":7,"左":5,
+  "嵯":13,"査":9,"差":10,"沙":7,"砂":9,"鎖":18,"坐":7,"座":10,"再":6,"最":12,
+  "哉":9,"妻":8,"彩":11,"宰":10,"才":3,"歳":13,"災":7,"済":17,"采":8,"犀":12,
+  "斎":17,"祭":11,"細":10,"菜":12,"裁":12,"載":13,"際":14,"剤":14,"在":6,"材":7,
+  "財":10,"坂":7,"阪":7,"堺":12,"榊":14,"崎":11,"咲":9,"埼":10,"作":7,"鷺":24,
+  "削":9,"朔":10,"策":12,"索":10,"桜":21,"笹":10,"刷":8,"札":5,"薩":18,"雑":18,
+  "三":3,"傘":12,"参":10,"山":3,"産":11,"賛":19,"仕":5,"伺":7,"使":8,"司":5,
+  "史":5,"嗣":13,"士":3,"四":5,"姉":8,"子":3,"姿":9,"市":5,"志":7,"師":10,
+  "思":9,"指":9,"支":4,"斯":12,"施":9,"枝":8,"旨":6,"止":4,"氏":4,"獅":13,
+  "私":7,"糸":6,"紙":10,"紫":11,"至":6,"詞":12,"視":12,"詩":13,"誌":14,"資":13,
+  "賜":15,"飼":14,"事":8,"侍":8,"児":8,"字":6,"寺":6,"慈":14,"時":10,"持":9,
+  "次":6,"滋":13,"治":8,"爾":14,"示":5,"磁":15,"而":6,"耳":6,"自":6,"蒔":14,
+  "汐":6,"辞":13,"式":6,"鹿":11,"識":19,"竺":8,"宍":7,"雫":11,"七":2,"執":11,
+  "室":9,"漆":14,"疾":10,"実":14,"質":15,"篠":14,"柴":9,"偲":11,"芝":7,"縞":16,
+  "舎":8,"写":15,"射":10,"捨":11,"斜":11,"社":8,"紗":10,"者":9,"謝":17,"車":7,
+  "若":9,"弱":10,"主":5,"取":8,"守":6,"手":4,"朱":6,"殊":10,"狩":9,"珠":10,
+  "種":14,"趣":15,"酒":10,"首":9,"儒":16,"受":8,"寿":14,"授":11,"樹":16,"収":6,
+  "周":8,"宗":8,"就":12,"修":10,"州":6,"拾":9,"秀":7,"洲":9,"秋":9,"終":11,
+  "習":11,"舟":6,"衆":12,"酋":9,"集":12,"什":4,"充":5,"住":7,"十":2,"柔":9,
+  "渋":15,"縦":17,"重":9,"叔":8,"宿":11,"淑":11,"祝":10,"出":5,"熟":15,"術":11,
+  "俊":9,"峻":9,"春":9,"舜":12,"駿":17,"殉":10,"楯":13,"淳":11,"準":13,"潤":15,
+  "盾":9,"純":10,"醇":15,"処":11,"順":12,"初":7,"所":8,"暑":13,"曙":18,"庶":11,
+  "渚":12,"緒":15,"書":10,"諸":16,"助":7,"叙":9,"女":3,"徐":10,"勝":12,"匠":6,
+  "升":4,"召":5,"商":11,"唱":11,"小":3,"将":11,"尚":8,"庄":6,"床":7,"彰":14,
+  "承":8,"招":8,"掌":12,"捷":11,"昇":8,"昭":9,"昌":8,"晶":12,"松":8,"樟":15,
+  "梢":11,"沼":8,"渉":10,"湘":12,"焼":16,"照":13,"省":9,"硝":12,"祥":11,"章":11,
+  "笑":10,"粧":12,"紹":11,"肖":7,"菖":12,"詔":12,"賞":15,"象":12,"醤":18,"鐘":20,
+  "上":3,"丈":3,"丞":6,"乗":10,"城":10,"場":12,"情":11,"常":11,"条":11,"浄":11,
+  "杖":7,"譲":24,"錠":16,"飾":14,"植":12,"織":18,"色":6,"食":9,"尻":5,"伸":7,
+  "信":9,"寝":14,"心":4,"振":10,"慎":13,"新":13,"森":12,"榛":14,"深":11,"申":5,
+  "神":10,"真":10,"秦":10,"紳":11,"臣":6,"親":16,"身":7,"進":12,"針":10,"人":2,
+  "仁":4,"尋":12,"甚":9,"尽":14,"陣":10,"須":12,"諏":15,"図":14,"吹":7,"垂":8,
+  "帥":9,"水":4,"粋":14,"翠":14,"酔":15,"瑞":13,"随":16,"崇":11,"数":15,"雛":18,
+  "杉":7,"菅":12,"雀":11,"裾":13,"澄":15,"寸":3,"世":5,"畝":10,"瀬":19,"是":9,
+  "勢":13,"姓":8,"征":8,"成":7,"性":8,"政":8,"整":16,"星":9,"晴":12,"栖":10,
+  "清":11,"正":5,"生":5,"盛":12,"精":14,"声":17,"聖":13,"西":6,"製":14,"誠":14,
+  "誓":14,"青":8,"静":16,"斉":14,"税":12,"席":10,"戚":11,"昔":8,"石":5,"積":16,
+  "績":17,"赤":7,"跡":13,"切":4,"折":7,"摂":21,"設":11,"説":14,"節":15,"雪":11,
+  "絶":12,"仙":5,"先":6,"占":5,"千":3,"宣":8,"専":11,"川":3,"扇":10,"戦":16,
+  "栓":10,"泉":9,"洗":9,"浅":11,"染":10,"潜":15,"旋":11,"線":15,"繊":23,"船":11,
+  "選":16,"銭":16,"銑":14,"前":9,"鮮":17,"善":12,"全":6,"然":12,"禅":17,"膳":16,
+  "曾":12,"疎":12,"祖":10,"組":11,"素":10,"蘇":20,"双":4,"創":12,"倉":10,"壮":7,
+  "奏":9,"宋":7,"惣":12,"想":13,"操":16,"早":6,"曹":11,"巣":11,"槍":14,"争":8,
+  "相":9,"窓":11,"綜":14,"総":17,"草":10,"聡":17,"荘":11,"蒼":14,"装":13,"送":10,
+  "霜":17,"像":14,"増":15,"蔵":18,"臓":22,"造":11,"側":11,"促":9,"則":9,"束":7,
+  "足":7,"速":11,"俗":9,"属":21,"族":11,"続":21,"卒":8,"其":8,"袖":10,"存":6,
+  "孫":10,"尊":12,"村":7,"他":5,"多":6,"太":4,"汰":7,"打":5,"陀":8,"駄":14,
+  "騨":22,"体":23,"対":14,"耐":9,"帯":11,"待":9,"態":14,"替":12,"泰":10,"滞":14,
+  "苔":9,"袋":11,"退":10,"隊":12,"鯛":18,"黛":17,"代":5,"台":5,"大":3,"第":11,
+  "醍":16,"滝":18,"鷹":24,"卓":8,"瀧":18,"宅":6,"沢":14,"拓":8,"琢":12,"託":10,
+  "只":5,"但":7,"辰":7,"達":13,"巽":12,"棚":12,"谷":7,"狸":10,"樽":16,"丹":4,
+  "旦":5,"探":11,"淡":11,"炭":9,"湛":12,"短":12,"端":14,"胆":9,"誕":14,"団":13,
+  "鍛":17,"弾":15,"暖":13,"段":9,"檀":17,"男":7,"談":15,"知":8,"地":6,"智":12,
+  "池":6,"置":13,"稚":13,"致":9,"畜":10,"築":16,"竹":6,"筑":12,"秩":10,"窒":11,
+  "茶":10,"嫡":14,"中":4,"着":12,"仲":6,"宙":8,"忠":8,"昼":11,"注":8,"虫":6,
+  "鋳":22,"樗":15,"猪":16,"貯":12,"丁":2,"兆":6,"帖":8,"彫":11,"張":11,"暢":14,
+  "朝":12,"潮":15,"町":7,"眺":11,"蝶":15,"調":15,"跳":13,"銚":14,"長":8,"頂":11,
+  "鳥":10,"直":8,"珍":9,"陳":11,"鎮":18,"津":9,"椎":12,"追":10,"通":11,"栂":9,
+  "塚":10,"槻":15,"佃":7,"辻":6,"蔦":15,"椿":13,"鍔":17,"坪":8,"壷":12,"爪":4,
+  "紬":11,"釣":11,"鶴":21,"亭":9,"停":11,"偵":10,"貞":9,"定":8,"堤":12,"帝":9,
+  "廷":7,"庭":10,"弟":7,"悌":10,"梯":11,"汀":5,"碇":13,"程":12,"禎":14,"締":15,
+  "蹄":16,"邸":8,"摘":14,"的":8,"滴":14,"笛":11,"哲":10,"徹":15,"鉄":21,"典":8,
+  "天":4,"展":10,"添":11,"店":8,"転":18,"点":17,"伝":13,"殿":13,"田":5,"電":13,
+  "兎":8,"吐":6,"塗":13,"徒":10,"斗":4,"杜":7,"渡":12,"登":12,"都":12,"途":11,
+  "砥":10,"努":7,"土":3,"度":9,"倒":10,"党":20,"冬":5,"凍":10,"刀":2,"唐":10,
+  "塔":13,"島":10,"嶋":14,"東":8,"桃":10,"棟":12,"湯":12,"灯":16,"当":13,"燈":16,
+  "等":12,"答":11,"筒":12,"糖":16,"到":8,"統":12,"董":13,"討":10,"藤":19,"豆":7,
+  "透":11,"陶":11,"頭":16,"騰":20,"動":11,"同":6,"堂":11,"憧":15,"導":16,"洞":9,
+  "童":12,"瞳":17,"胴":10,"道":13,"銅":14,"峠":9,"得":11,"徳":15,"特":10,"督":13,
+  "篤":16,"独":16,"栃":9,"読":22,"突":9,"鳶":14,"苫":9,"酉":7,"瀞":19,"惇":11,
+  "敦":12,"頓":13,"曇":16,"奈":8,"内":4,"那":7,"薙":17,"灘":22,"楢":13,"鍋":17,
+  "縄":19,"南":9,"楠":13,"尼":5,"二":2,"弐":12,"虹":9,"肉":6,"日":4,"入":2,
+  "乳":8,"如":6,"任":6,"韮":13,"忍":7,"認":14,"祢":19,"禰":19,"寧":14,"熱":15,
+  "猫":16,"年":6,"念":8,"燃":16,"乃":2,"之":3,"納":10,"濃":16,"能":10,"農":13,
+  "把":7,"巴":4,"播":15,"覇":21,"波":8,"琶":12,"破":10,"馬":10,"俳":10,"敗":11,
+  "背":9,"倍":10,"配":10,"培":11,"梅":11,"煤":13,"売":15,"買":12,"秤":10,"伯":7,
+  "萩":13,"博":12,"柏":9,"白":5,"泊":8,"粕":11,"薄":17,"舶":11,"迫":9,"縛":16,
+  "麦":11,"函":8,"箱":15,"肇":14,"幡":15,"肌":6,"畑":9,"八":2,"畠":10,"鉢":13,
+  "発":12,"抜":8,"鳩":13,"塙":13,"隼":10,"伴":7,"半":5,"判":7,"反":4,"搬":13,
+  "帆":6,"板":8,"畔":10,"班":10,"繁":16,"般":10,"販":11,"範":15,"飯":13,"晩":11,
+  "番":12,"磐":15,"蕃":16,"妃":6,"彼":8,"批":7,"斐":12,"比":4,"皮":5,"碑":13,
+  "秘":10,"緋":14,"肥":8,"飛":9,"樋":15,"尾":7,"備":12,"美":9,"柊":9,"匹":4,
+  "稗":13,"疋":5,"彦":9,"菱":12,"筆":12,"桧":17,"姫":10,"百":6,"俵":10,"彪":11,
+  "標":15,"氷":5,"表":8,"苗":9,"蛭":12,"品":9,"浜":17,"敏":11,"不":4,"瓶":11,
+  "付":5,"埠":11,"夫":4,"富":12,"布":5,"府":8,"扶":7,"斧":8,"敷":15,"浮":10,
+  "普":10,"父":4,"芙":8,"譜":19,"阜":8,"赴":9,"武":8,"舞":14,"部":11,"楓":13,
+  "風":9,"伏":6,"蕗":16,"副":11,"服":8,"腹":13,"福":14,"淵":12,"仏":7,"物":8,
+  "分":4,"文":4,"聞":14,"丙":5,"兵":7,"平":5,"柄":9,"並":10,"米":6,"壁":16,
+  "碧":14,"別":7,"片":4,"変":23,"編":15,"返":8,"辺":19,"便":9,"勉":9,"弁":5,
+  "保":9,"舗":15,"歩":8,"捕":10,"甫":7,"輔":14,"穂":17,"戊":5,"暮":15,"母":5,
+  "菩":12,"包":5,"奉":8,"報":12,"宝":20,"峰":10,"放":8,"方":4,"朋":8,"泡":8,
+  "法":8,"縫":17,"芳":8,"邦":7,"豊":18,"鵬":19,"亡":3,"坊":7,"忘":7,"帽":12,
+  "房":8,"望":11,"紡":10,"貿":12,"防":7,"北":5,"卜":2,"墨":15,"牧":8,"睦":13,
+  "堀":11,"幌":13,"本":5,"翻":18,"凡":3,"摩":15,"磨":16,"魔":21,"麻":11,"妹":8,
+  "枚":8,"毎":7,"槙":14,"枕":8,"又":2,"俣":9,"末":5,"万":13,"麿":18,"満":14,
+  "蔓":15,"味":8,"未":5,"巳":3,"箕":14,"密":11,"湊":12,"稔":13,"妙":7,"民":5,
+  "務":11,"夢":14,"牟":6,"無":12,"霧":19,"名":6,"明":8,"命":8,"盟":13,"鳴":14,
+  "銘":14,"免":7,"棉":12,"綿":14,"面":9,"茂":9,"模":15,"孟":8,"毛":4,"猛":11,
+  "網":14,"木":4,"目":5,"杢":7,"問":11,"紋":10,"門":8,"也":3,"冶":7,"爺":13,
+  "夜":8,"野":11,"耶":9,"矢":5,"弥":17,"役":7,"薬":19,"訳":20,"靖":13,"柳":9,
+  "薮":19,"愉":12,"油":8,"諭":14,"輸":16,"佑":7,"勇":9,"優":17,"友":4,"揖":12,
+  "有":6,"柚":9,"涌":10,"湧":12,"由":5,"裕":12,"雄":12,"夕":3,"融":16,"余":16,
+  "予":16,"誉":21,"与":14,"預":13,"容":10,"揚":12,"擁":16,"曜":18,"楊":13,"洋":9,
+  "様":15,"溶":13,"用":5,"窯":15,"耀":20,"羊":6,"葉":13,"蓉":14,"要":9,"陽":12,
+  "養":15,"浴":10,"翼":17,"淀":11,"来":8,"裸":13,"頼":16,"嵐":12,"利":7,"吏":6,
+  "梨":11,"李":7,"理":11,"璃":15,"裏":13,"里":7,"陸":11,"律":9,"立":5,"葎":13,
+  "略":11,"流":9,"劉":15,"留":10,"硫":12,"隆":12,"粒":11,"竜":16,"龍":16,"侶":9,
+  "旅":10,"亮":9,"了":2,"両":8,"梁":11,"料":10,"涼":11,"稜":13,"糧":18,"良":7,
+  "諒":15,"遼":16,"量":12,"陵":11,"領":14,"力":2,"緑":14,"倫":10,"林":8,"燐":16,
+  "輪":15,"臨":18,"麟":23,"瑠":14,"類":19,"令":5,"伶":7,"冷":7,"嶺":17,"励":17,
+  "怜":8,"玲":9,"礼":18,"鈴":13,"麗":19,"暦":16,"列":6,"廉":13,"恋":23,"練":15,
+  "聯":17,"連":11,"蓮":15,"錬":17,"呂":7,"魯":15,"炉":20,"路":13,"露":20,"労":12,
+  "廊":13,"朗":11,"楼":15,"浪":10,"老":6,"郎":10,"蝋":21,"六":4,"禄":13,"論":16,
+  "録":16,"和":8,"話":13,"脇":10,"鷲":23,"亘":6,"鰐":20,"藁":18,"湾":26,"豫":16,
+  "亶":13,"侑":8,"會":13,"傳":13,"儉":15,"兌":7,"兩":8,"冲":6,"凰":11,"劍":15,
+  "劒":15,"辨":16,"勞":12,"勸":20,"勵":17,"咏":8,"哥":10,"營":17,"圀":9,"國":11,
+  "圓":13,"圖":14,"坩":8,"壹":12,"壽":14,"學":16,"寢":14,"實":14,"寶":20,"對":14,
+  "崑":11,"嶽":17,"巖":23,"廣":15,"彌":17,"彗":11,"徂":8,"徘":11,"恍":9,"恂":9,
+  "憬":15,"應":17,"戀":23,"戌":6,"揆":12,"搏":13,"擧":18,"擴":18,"數":15,"變":23,
+  "旻":8,"昴":8,"晝":11,"晧":12,"晨":11,"晰":11,"暉":13,"檜":17,"栞":10,"桎":10,
+  "梵":11,"棹":12,"楫":13,"楡":13,"榮":14,"樂":15,"權":22,"檢":17,"櫻":21,"歡":20,
+  "歸":18,"毬":11,"氣":10,"洸":9,"洵":9,"浚":10,"渾":12,"滿":14,"澤":16,"澪":16,
+  "濱":17,"灣":26,"炳":9,"煕":13,"熹":16,"燒":16,"爐":20,"獨":16,"獻":20,"琥":12,
+  "當":13,"癸":9,"發":12,"皎":11,"皓":12,"盡":14,"眸":11,"礦":20,"祠":10,"祀":8,
+  "禮":18,"笙":11,"筧":13,"箏":14,"篁":15,"簑":14,"簣":18,"紂":9,"絲":12,"經":13,
+  "縣":16,"繪":19,"繼":20,"罐":24,"耿":10,"聲":17,"聰":17,"肚":7,"脩":11,"與":14,
+  "范":9,"茉":9,"莖":11,"莉":11,"萠":12,"萬":13,"蓼":15,"藪":19,"薹":14,"藝":19,
+  "藥":19,"號":13,"蛛":12,"螢":16,"蟲":18,"袢":10,"裔":13,"褄":13,"襄":17,"覺":20,
+  "觀":25,"詢":13,"誦":14,"諄":15,"諫":16,"證":19,"譯":20,"譽":21,"讀":22,"豐":18,
+  "貳":12,"賣":15,"赳":9,"躰":12,"輕":14,"輛":15,"輌":15,"轉":18,"辯":21,"迪":9,
+  "逞":10,"邊":19,"邱":8,"鈑":12,"鐡":21,"閔":12,"關":19,"險":16,"隱":19,"顯":23,
+  "餘":16,"驗":23,"體":23,"魄":15,"魏":18,"鶯":21,"鹽":24,"麒":19,"麥":11,"黎":15,
+  "點":17,"黨":20,"龜":16
+};
+
+// ========== 数意表（1〜60）==========
+const SUII = {
+  1:"創意希望の運",
+  2:"岐路選択の運",
+  3:"結集組立の運",
+  4:"重責鍛練の運",
+  5:"克服達成の運",
+  6:"天恵完成の運",
+  7:"一念堅持の運",
+  8:"鉄壁弧城の運",
+  9:"瓦解防御の運",
+  10:"暗中模索の運",
+  11:"再生中興の運",
+  12:"変転流動の運",
+  13:"才気活発の運",
+  14:"足踏修正の運",
+  15:"理想進展の運",
+  16:"機略縦横の運",
+  17:"片面勝利の運",
+  18:"敢闘猛進の運",
+  19:"混乱整理の運",
+  20:"悲願未熟の運",
+  21:"率先指揮の運",
+  22:"唯我独尊の運",
+  23:"快速向上の運",
+  24:"初志貫徹の運",
+  25:"自立自営の運",
+  26:"実地体験の運",
+  27:"仲介斡旋の運",
+  28:"難題処理の運",
+  29:"進退加護の運",
+  30:"高速横転の運",
+  31:"志節温厚の運",
+  32:"博愛献身の運",
+  33:"快刀乱麻の運",
+  34:"先鋭後折の運",
+  35:"良妻賢母の運",
+  36:"没我仁侠の運",
+  37:"大器晩成の運",
+  38:"大志空転の運",
+  39:"万難制覇の運",
+  40:"野心独走の運",
+  41:"衆望包括の運",
+  42:"多種多芸の運",
+  43:"豪華内憂の運",
+  44:"喧騒収拾の運",
+  45:"高層建築の運",
+  46:"楽観悲哀の運",
+  47:"貸道具屋の運",
+  48:"均衡調和の運",
+  49:"連鎖反応の運",
+  50:"竜頭蛇尾の運",
+  51:"新地開拓の運",
+  52:"先駆勝利の運",
+  53:"平穏退屈の運",
+  54:"砂上走行の運",
+  55:"斜陽耐久の運",
+  56:"傍観後手の運",
+  57:"単騎功名の運",
+  58:"乞食大将の運",
+  59:"決戦放棄の運",
+  60:"動揺効果の運"
+};
+
+function getKakusu(char) {
+  const v = KAKUSU[char];
+  if (v === undefined) {
+    console.warn('字画未収録: ' + char);
+    return 0; // 未収録は0（計算に影響しないよう警告表示）
+  }
+  return v;
+}
+
+function getSuii(num) {
+  const clamped = Math.min(Math.max(Math.round(num), 1), 60);
+  return SUII[clamped] || '—';
+}
+
+function calcScores(sei, mei) {
+  const s1 = sei[0] ? getKakusu(sei[0]) : 0;
+  const s2 = sei[1] ? getKakusu(sei[1]) : 0;
+  const m1 = mei[0] ? getKakusu(mei[0]) : 0;
+  const m2 = mei[1] ? getKakusu(mei[1]) : 0;
+
+  const seiSum = s1 + (s2 || 0);
+  const meiSum = m1 + (m2 || 0);
+
+  const I9 = seiSum + meiSum;
+  let I5, C9, K3, K9;
+
+  if (sei.length === 1) {
+    // X-XXXテンプレ（1字姓）
+    const H3 = 3;
+    I5 = H3 + s1;
+    C9 = s1 + m1;
+    K3 = I9 + H3;
+    K9 = I5 + C9;
+  } else {
+    // XX-XXテンプレ（標準）
+    const G3 = 2;
+    I5 = G3 + s1 + s2;
+    C9 = m1 + s2;
+    K3 = I9 + G3;
+    K9 = I5 + C9;
+  }
+
+  const clamp = v => Math.min(v, 60);
+
+  return {
+    I5: clamp(I5),
+    C9: clamp(C9),
+    K3: clamp(K3),
+    I9: clamp(I9),
+    K9: clamp(K9)
+  };
+}
+
+// ========== バリデーション ==========
+function validateEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+// ========== GAS登録＆AI呼び出し ==========
+const GAS_URL = ''; // デプロイ後に入力
+
+async function submitTrial() {
+  const sei = document.getElementById('sei').value.trim();
+  const mei = document.getElementById('mei').value.trim();
+  const seiKana = document.getElementById('sei-kana').value.trim();
+  const meiKana = document.getElementById('mei-kana').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const gender = document.querySelector('input[name="gender"]:checked').value;
+
+  // バリデーション
+  if (!sei || !mei || !seiKana || !meiKana) {
+    alert('姓名（漢字・読み仮名）を入力してください');
+    return;
+  }
+  if (!email) {
+    alert('メールアドレスを入力してください');
+    return;
+  }
+  if (!validateEmail(email)) {
+    document.getElementById('email-error').style.display = 'block';
+    return;
+  }
+  document.getElementById('email-error').style.display = 'none';
+
+  // UI更新
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = '解析中...';
+
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('result-area').style.display = 'none';
+
+  // 字画スコア計算
+  const scores = calcScores(sei, mei);
+
+  try {
+    // GASへ登録（URLが設定されている場合のみ）
+    if (GAS_URL) {
+      await fetch(GAS_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'trial',
+          sei, mei, seiKana, meiKana, email, gender,
+          scores,
+          timestamp: new Date().toISOString()
+        })
+      });
+    }
+
+    // Anthropic API呼び出し
+    const aiText = await callAnthropicAPI(sei, mei, seiKana, meiKana, gender, scores);
+
+    // 結果表示
+    showResult(sei, mei, seiKana, meiKana, scores, aiText);
+
+  } catch (err) {
+    console.error(err);
+    alert('解析中にエラーが発生しました。しばらくしてから再度お試しください。');
+    btn.disabled = false;
+    btn.textContent = 'AI姓名解釈を体験する　→';
+  }
+
+  document.getElementById('loading').style.display = 'none';
+}
+
+async function callAnthropicAPI(sei, mei, seiKana, meiKana, gender, scores) {
+  const fullName = sei + '　' + mei;
+  const fullKana = seiKana + '　' + meiKana;
+  const genderText = gender === 'male' ? '男性' : '女性';
+
+  const prompt = `あなたは昭和33年に牧正人史先生が発見した「姓名科学」の専門家です。
+姓名科学とは、名前の各漢字の画数から5つの数値（I5・C9・K3・I9・K9）を算出し、
+それぞれが持つ意味（数意）から人の運命・性格・才能・対人関係を読み解く学問です。
+
+以下の方の姓名を解釈してください。
+
+【氏名】${fullName}（${fullKana}）
+【性別】${genderText}
+【算出数値】
+- I5（基本数）: ${scores.I5}
+- C9（対人数）: ${scores.C9}
+- K3（発展数）: ${scores.K3}
+- I9（総合数）: ${scores.I9}
+- K9（完成数）: ${scores.K9}
+
+以下の観点から、600〜800文字程度で深く丁寧に解釈してください：
+1. この方の本質的な性格・気質
+2. 対人関係・社会での立ち位置
+3. 才能・適職の方向性
+4. 人生の流れ・転換点の傾向
+5. 総評（この名前が持つ全体的なエネルギー）
+
+温かみのある文体で、具体的かつ詩的に表現してください。`;
+
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+
+  const data = await response.json();
+  if (data.content && data.content[0]) {
+    return data.content[0].text;
+  }
+  throw new Error('AI応答の取得に失敗しました');
+}
+
+function showResult(sei, mei, seiKana, meiKana, scores, aiText) {
+  // 名前表示
+  document.getElementById('result-kanji').textContent = sei + '　' + mei;
+  document.getElementById('result-reading').textContent = seiKana + '　' + meiKana;
+
+  // スコア表示
+  const scoreLabels = ['I5（基本）', 'C9（対人）', 'K3（発展）', 'I9（総合）', 'K9（完成）'];
+  const scoreKeys = ['I5', 'C9', 'K3', 'I9', 'K9'];
+  const grid = document.getElementById('scores-grid');
+  grid.innerHTML = scoreKeys.map((key, i) => `
+    <div class="score-item">
+      <div class="score-label">${scoreLabels[i]}</div>
+      <div class="score-value">${scores[key]}</div>
+    </div>
+  `).join('');
+
+  // AI解釈表示
+  document.getElementById('ai-text').textContent = aiText;
+
+  // 表示
+  const resultArea = document.getElementById('result-area');
+  resultArea.style.display = 'block';
+  resultArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // フォームを非表示
+  document.getElementById('form-section').style.display = 'none';
+}
+</script>
+</body>
+</html>
