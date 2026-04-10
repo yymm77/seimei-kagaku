@@ -906,7 +906,8 @@ function validateEmail(email) {
 }
 
 // ========== GAS登録＆AI呼び出し ==========
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbx961xS1hUx8N_09-60hMEK0kQBaQ5WuKjn-ZjQROQk81WRgk9_8yXCp7NQ7FLY0VU-bg/exec'; // デプロイ後に入力
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbx961xS1hUx8N_09-60hMEK0kQBaQ5WuKjn-ZjQROQk81WRgk9_8yXCp7NQ7FLY0VU-bg/exec';
+const API_KEY = ''; // APIキーはGAS経由で管理（HTMLには記載しない）
 
 async function submitTrial() {
   const sei = document.getElementById('sei').value.trim();
@@ -942,22 +943,22 @@ async function submitTrial() {
   // 字画スコア計算
   const scores = calcScores(sei, mei);
 
-  try {
-    // GASへ登録（URLが設定されている場合のみ）
-    if (GAS_URL) {
-      await fetch(GAS_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: 'trial',
-          sei, mei, seiKana, meiKana, email, gender,
-          scores,
-          timestamp: new Date().toISOString()
-        })
-      });
-    }
+  // GASへ登録（エラーが出ても無視してAI処理を続行）
+  if (GAS_URL) {
+    fetch(GAS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'trial',
+        sei, mei, seiKana, meiKana, email, gender,
+        scores,
+        timestamp: new Date().toISOString()
+      })
+    }).catch(e => console.warn('GAS送信エラー（無視）:', e));
+  }
 
+  try {
     // Anthropic API呼び出し
     const aiText = await callAnthropicAPI(sei, mei, seiKana, meiKana, gender, scores);
 
@@ -1005,7 +1006,12 @@ async function callAnthropicAPI(sei, mei, seiKana, meiKana, gender, scores) {
 
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': API_KEY,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
     body: JSON.stringify({
       model: 'claude-sonnet-4-6',
       max_tokens: 1000,
