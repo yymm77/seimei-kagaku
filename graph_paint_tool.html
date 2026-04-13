@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>姓名科学グラフ読み取りツール</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+  background: #1a1a2e;
+  color: #e0e0e0;
+  min-height: 100vh;
+}
+header {
+  background: #16213e;
+  border-bottom: 2px solid #0f3460;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+header h1 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #e94560;
+  letter-spacing: 0.05em;
+}
+header span {
+  font-size: 12px;
+  color: #888;
+}
+.main {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  height: calc(100vh - 50px);
+  gap: 0;
+}
+.left {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #0f3460;
+  overflow: hidden;
+}
+.toolbar {
+  background: #16213e;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid #0f3460;
+  flex-wrap: wrap;
+}
+.toolbar label {
+  font-size: 12px;
+  color: #aaa;
+}
+.btn {
+  padding: 6px 14px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+  font-weight: 600;
+  transition: all 0.15s;
+}
+.btn-primary { background: #e94560; color: #fff; }
+.btn-primary:hover { background: #c73652; }
+.btn-secondary { background: #0f3460; color: #ddd; }
+.btn-secondary:hover { background: #1a4a80; }
+.btn-success { background: #1a7a4a; color: #fff; }
+.btn-success:hover { background: #228b5a; }
+.btn-warn { background: #7a5a1a; color: #fff; }
+.btn-warn:hover { background: #9a7a2a; }
+.btn.active { outline: 2px solid #e94560; }
+.canvas-wrap {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+  background: #111;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+#imageCanvas {
+  cursor: crosshair;
+  display: block;
+  image-rendering: pixelated;
+}
+.right {
+  display: flex;
+  flex-direction: column;
+  background: #16213e;
+  overflow: hidden;
+}
+.right-top {
+  padding: 14px 16px;
+  border-bottom: 1px solid #0f3460;
+}
+.right-top h2 {
+  font-size: 13px;
+  color: #e94560;
+  margin-bottom: 10px;
+  letter-spacing: 0.05em;
+}
+.axis-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+.axis-row label { color: #aaa; width: 80px; flex-shrink: 0; }
+.axis-row input[type=number] {
+  width: 70px;
+  background: #0f3460;
+  border: 1px solid #1a4a80;
+  color: #ddd;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: inherit;
+}
+.axis-indicator {
+  width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0;
+}
+.step-guide {
+  padding: 12px 16px;
+  border-bottom: 1px solid #0f3460;
+  font-size: 11px;
+  color: #888;
+  line-height: 1.8;
+}
+.step-guide strong { color: #e94560; }
+.graph-wrap {
+  flex: 1;
+  padding: 12px 16px;
+  overflow: auto;
+}
+.graph-wrap h2 {
+  font-size: 13px;
+  color: #e94560;
+  margin-bottom: 10px;
+  letter-spacing: 0.05em;
+}
+#outputCanvas {
+  width: 100%;
+  border: 1px solid #0f3460;
+  border-radius: 4px;
+  background: #fff;
+}
+.data-table {
+  margin-top: 10px;
+  font-size: 10px;
+  color: #888;
+  max-height: 180px;
+  overflow-y: auto;
+}
+.data-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.data-table td, .data-table th {
+  padding: 2px 6px;
+  border-bottom: 1px solid #0f3460;
+  text-align: center;
+}
+.data-table th { color: #e94560; position: sticky; top: 0; background: #16213e; }
+.status-bar {
+  padding: 6px 16px;
+  background: #0f1923;
+  font-size: 11px;
+  color: #666;
+  border-top: 1px solid #0f3460;
+}
+.mode-indicator {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: 8px;
+}
+.mode-paint { background: #e94560; color: #fff; }
+.mode-erase { background: #7a5a1a; color: #fff; }
+.mode-axis { background: #1a7a4a; color: #fff; }
+input[type=file] { display: none; }
+#graphNumInput {
+  width: 60px;
+  background: #0f3460;
+  border: 1px solid #1a4a80;
+  color: #ddd;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: inherit;
+}
+.zoom-wrap { display: flex; align-items: center; gap: 6px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>姓名科学グラフ読み取りツール</h1>
+  <span>書物のグラフ画像を貼り付け → 棒をペイント → 自動数値化</span>
+</header>
+
+<div class="main">
+  <div class="left">
+    <div class="toolbar">
+      <label for="fileInput">
+        <span class="btn btn-primary" onclick="document.getElementById('fileInput').click()">画像を開く</span>
+      </label>
+      <input type="file" id="fileInput" accept="image/*,.pdf">
+
+      <div style="width:1px;height:24px;background:#0f3460;"></div>
+
+      <button class="btn btn-secondary active" id="btnPaint" onclick="setMode('paint')">🖊 ペイント</button>
+      <button class="btn btn-warn" id="btnErase" onclick="setMode('erase')">消しゴム</button>
+
+      <div style="width:1px;height:24px;background:#0f3460;"></div>
+
+      <button class="btn btn-secondary" id="btnTop" onclick="setMode('top')">上端(100点)指定</button>
+      <button class="btn btn-secondary" id="btnCenter" onclick="setMode('center')">中心線(50点)指定</button>
+      <button class="btn btn-secondary" id="btnBottom" onclick="setMode('bottom')">下端(0点)指定</button>
+
+      <div style="width:1px;height:24px;background:#0f3460;"></div>
+
+      <div class="zoom-wrap">
+        <label>拡大:</label>
+        <button class="btn btn-secondary" onclick="changeZoom(-0.5)">－</button>
+        <span id="zoomLabel" style="font-size:12px;min-width:36px;text-align:center;">1.0x</span>
+        <button class="btn btn-secondary" onclick="changeZoom(0.5)">＋</button>
+      </div>
+
+      <label>No.</label>
+      <input type="number" id="graphNumInput" value="97" min="1" max="660">
+
+      <button class="btn btn-success" onclick="readAndDraw()">読み取り＆描画</button>
+      <button class="btn btn-secondary" onclick="clearPaint()">ペイント消去</button>
+      <button class="btn btn-secondary" onclick="exportCSV()">CSV出力</button>
+    </div>
+
+    <div class="canvas-wrap" id="canvasWrap">
+      <canvas id="imageCanvas"></canvas>
+    </div>
+
+    <div class="status-bar" id="statusBar">
+      画像を開いてください　→　軸を指定　→　棒をペイント　→　読み取り＆描画
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="right-top">
+      <h2>軸の設定</h2>
+      <div class="axis-row">
+        <div class="axis-indicator" style="background:#ff4444;"></div>
+        <label>上端(100点) Y:</label>
+        <input type="number" id="topY" value="0" readonly>
+        <span style="font-size:11px;color:#888;">クリックで指定</span>
+      </div>
+      <div class="axis-row">
+        <div class="axis-indicator" style="background:#44ff44;"></div>
+        <label>中心線(50点) Y:</label>
+        <input type="number" id="centerY" value="0" readonly>
+        <span style="font-size:11px;color:#888;">クリックで指定</span>
+      </div>
+      <div class="axis-row">
+        <div class="axis-indicator" style="background:#4444ff;"></div>
+        <label>下端(0点) Y:</label>
+        <input type="number" id="bottomY" value="0" readonly>
+        <span style="font-size:11px;color:#888;">クリックで指定</span>
+      </div>
+      <div class="axis-row">
+        <div class="axis-indicator" style="background:#ffaa44;"></div>
+        <label>左端(15歳) X:</label>
+        <input type="number" id="leftX" value="0" readonly>
+      </div>
+      <div class="axis-row">
+        <div class="axis-indicator" style="background:#aa44ff;"></div>
+        <label>右端(55歳) X:</label>
+        <input type="number" id="rightX" value="0" readonly>
+      </div>
+      <div style="margin-top:8px;display:flex;gap:8px;">
+        <button class="btn btn-secondary" onclick="setMode('left')" style="font-size:11px;">左端指定</button>
+        <button class="btn btn-secondary" onclick="setMode('right')" style="font-size:11px;">右端指定</button>
+        <button class="btn btn-secondary" onclick="autoDetectAxis()" style="font-size:11px;">軸を自動検出</button>
+      </div>
+    </div>
+
+    <div class="step-guide">
+      <strong>手順：</strong><br>
+      ① 画像を開く（スキャンしたグラフ画像）<br>
+      ② 「上端」「中心線」「下端」をクリック指定<br>
+      ③ 「左端」「右端」をクリック指定<br>
+      ④ ペイントモードで棒を赤く塗る<br>
+      ⑤ 「読み取り＆描画」で完成
+    </div>
+
+    <div class="graph-wrap">
+      <h2>読み取り結果グラフ</h2>
+      <canvas id="outputCanvas" height="200"></canvas>
+      <div class="data-table" id="dataTable"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const ic = document.getElementById('imageCanvas');
+const ctx = ic.getContext('2d');
+const oc = document.getElementById('outputCanvas');
+const octx = oc.getContext('2d');
+
+let img = null;
+let zoom = 1.0;
+let mode = 'paint';
+let painting = false;
+let brushSize = 8;
+
+let axisTop = 0, axisCenter = 0, axisBottom = 0;
+let axisLeft = 0, axisRight = 0;
+let axisSet = { top: false, center: false, bottom: false, left: false, right: false };
+
+let paintLayer = null;
+let chartInstance = null;
+let lastResults = [];
+
+function setMode(m) {
+  mode = m;
+  ['btnPaint','btnErase','btnTop','btnCenter','btnBottom'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active');
+  });
+  const map = { paint:'btnPaint', erase:'btnErase', top:'btnTop', center:'btnCenter', bottom:'btnBottom' };
+  if (map[m]) document.getElementById(map[m])?.classList.add('active');
+
+  const labels = {
+    paint:'🖊 ペイントモード', erase:'消しゴムモード',
+    top:'上端(100点)をクリック', center:'中心線(50点)をクリック',
+    bottom:'下端(0点)をクリック', left:'左端(15歳)をクリック', right:'右端(55歳)をクリック'
+  };
+  document.getElementById('statusBar').textContent = labels[m] || m;
+}
+
+function changeZoom(delta) {
+  zoom = Math.max(0.5, Math.min(4.0, zoom + delta));
+  document.getElementById('zoomLabel').textContent = zoom.toFixed(1) + 'x';
+  if (img) renderImage();
+}
+
+document.getElementById('fileInput').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  const image = new Image();
+  image.onload = () => {
+    img = image;
+    paintLayer = null;
+    renderImage();
+    autoDetectAxis();
+  };
+  image.src = url;
+});
+
+function renderImage() {
+  if (!img) return;
+  const w = Math.round(img.width * zoom);
+  const h = Math.round(img.height * zoom);
+  ic.width = w;
+  ic.height = h;
+
+  if (!paintLayer || paintLayer.width !== img.width || paintLayer.height !== img.height) {
+    paintLayer = document.createElement('canvas');
+    paintLayer.width = img.width;
+    paintLayer.height = img.height;
+  }
+
+  ctx.clearRect(0, 0, w, h);
+  ctx.drawImage(img, 0, 0, w, h);
+
+  // ペイントレイヤーを重ねる
+  ctx.globalAlpha = 0.55;
+  ctx.drawImage(paintLayer, 0, 0, w, h);
+  ctx.globalAlpha = 1.0;
+
+  // 軸線を描画
+  if (axisSet.top) drawHLine(axisTop * zoom, '#ff4444');
+  if (axisSet.center) drawHLine(axisCenter * zoom, '#44ff44');
+  if (axisSet.bottom) drawHLine(axisBottom * zoom, '#4444ff');
+  if (axisSet.left) drawVLine(axisLeft * zoom, '#ffaa44');
+  if (axisSet.right) drawVLine(axisRight * zoom, '#aa44ff');
+}
+
+function drawHLine(y, color) {
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([6, 4]);
+  ctx.beginPath();
+  ctx.moveTo(0, y);
+  ctx.lineTo(ic.width, y);
+  ctx.stroke();
+  ctx.restore();
+}
+function drawVLine(x, color) {
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([6, 4]);
+  ctx.beginPath();
+  ctx.moveTo(x, 0);
+  ctx.lineTo(x, ic.height);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function getImgXY(e) {
+  const rect = ic.getBoundingClientRect();
+  const cx = (e.clientX - rect.left);
+  const cy = (e.clientY - rect.top);
+  return { x: Math.round(cx / zoom), y: Math.round(cy / zoom) };
+}
+
+ic.addEventListener('mousedown', e => {
+  const { x, y } = getImgXY(e);
+
+  if (mode === 'top') { axisTop = y; axisSet.top = true; document.getElementById('topY').value = y; renderImage(); return; }
+  if (mode === 'center') { axisCenter = y; axisSet.center = true; document.getElementById('centerY').value = y; renderImage(); return; }
+  if (mode === 'bottom') { axisBottom = y; axisSet.bottom = true; document.getElementById('bottomY').value = y; renderImage(); return; }
+  if (mode === 'left') { axisLeft = x; axisSet.left = true; document.getElementById('leftX').value = x; renderImage(); return; }
+  if (mode === 'right') { axisRight = x; axisSet.right = true; document.getElementById('rightX').value = x; renderImage(); return; }
+
+  painting = true;
+  doPaint(x, y);
+});
+
+ic.addEventListener('mousemove', e => {
+  if (!painting) return;
+  const { x, y } = getImgXY(e);
+  doPaint(x, y);
+});
+
+ic.addEventListener('mouseup', () => { painting = false; });
+ic.addEventListener('mouseleave', () => { painting = false; });
+
+function doPaint(x, y) {
+  if (!paintLayer) return;
+  const pc = paintLayer.getContext('2d');
+  if (mode === 'paint') {
+    pc.fillStyle = 'rgba(255,50,50,1)';
+    pc.beginPath();
+    pc.arc(x, y, brushSize / zoom, 0, Math.PI * 2);
+    pc.fill();
+  } else if (mode === 'erase') {
+    pc.clearRect(x - brushSize / zoom, y - brushSize / zoom, brushSize * 2 / zoom, brushSize * 2 / zoom);
+  }
+  renderImage();
+}
+
+function clearPaint() {
+  if (!paintLayer) return;
+  const pc = paintLayer.getContext('2d');
+  pc.clearRect(0, 0, paintLayer.width, paintLayer.height);
+  renderImage();
+}
+
+function autoDetectAxis() {
+  if (!img) return;
+  const tmp = document.createElement('canvas');
+  tmp.width = img.width;
+  tmp.height = img.height;
+  const tc = tmp.getContext('2d');
+  tc.drawImage(img, 0, 0);
+  const pdata = tc.getImageData(0, 0, img.width, img.height).data;
+  const w = img.width, h = img.height;
+
+  // 横方向に暗いピクセルが多い行 = 横罫線
+  const darkRows = [];
+  for (let y = 0; y < h; y++) {
+    let dark = 0;
+    for (let x = 0; x < w; x++) {
+      const i = (y * w + x) * 4;
+      const brightness = (pdata[i] + pdata[i+1] + pdata[i+2]) / 3;
+      if (brightness < 80) dark++;
+    }
+    if (dark > w * 0.15) darkRows.push(y);
+  }
+
+  // グループ化
+  const groups = [];
+  if (darkRows.length > 0) {
+    let g = [darkRows[0]];
+    for (let i = 1; i < darkRows.length; i++) {
+      if (darkRows[i] - g[g.length-1] <= 5) g.push(darkRows[i]);
+      else { groups.push(Math.round(g.reduce((a,b)=>a+b)/g.length)); g = [darkRows[i]]; }
+    }
+    groups.push(Math.round(g.reduce((a,b)=>a+b)/g.length));
+  }
+
+  if (groups.length >= 2) {
+    axisTop = groups[0]; axisSet.top = true; document.getElementById('topY').value = axisTop;
+    axisBottom = groups[groups.length-1]; axisSet.bottom = true; document.getElementById('bottomY').value = axisBottom;
+    axisCenter = Math.round((axisTop + axisBottom) / 2); axisSet.center = true; document.getElementById('centerY').value = axisCenter;
+  }
+
+  // 縦方向 左右端
+  const darkCols = [];
+  for (let x = 0; x < w; x++) {
+    let dark = 0;
+    for (let y = 0; y < h; y++) {
+      const i = (y * w + x) * 4;
+      if ((pdata[i]+pdata[i+1]+pdata[i+2])/3 < 80) dark++;
+    }
+    if (dark > h * 0.1) darkCols.push(x);
+  }
+  if (darkCols.length >= 2) {
+    axisLeft = darkCols[0]; axisSet.left = true; document.getElementById('leftX').value = axisLeft;
+    axisRight = darkCols[darkCols.length-1]; axisSet.right = true; document.getElementById('rightX').value = axisRight;
+  }
+
+  renderImage();
+  document.getElementById('statusBar').textContent = '軸を自動検出しました。ずれている場合は手動でクリックして修正してください。';
+}
+
+function readAndDraw() {
+  if (!paintLayer || !axisSet.top || !axisSet.center || !axisSet.bottom || !axisSet.left || !axisSet.right) {
+    alert('軸（上端・中心線・下端・左端・右端）をすべて設定してください');
+    return;
+  }
+
+  const pc = paintLayer.getContext('2d');
+  const pdata = pc.getImageData(0, 0, paintLayer.width, paintLayer.height).data;
+  const w = paintLayer.width;
+
+  const ages = Array.from({length:41}, (_,i) => 15+i);
+  const results = [];
+
+  const pxPerPt = (axisCenter - axisTop) / 50;
+
+  for (let i = 0; i < 41; i++) {
+    const age = 15 + i;
+    const colCenter = Math.round(axisLeft + (axisRight - axisLeft) * i / 40);
+    const colL = Math.max(colCenter - 6, 0);
+    const colR = Math.min(colCenter + 6, w - 1);
+
+    let minY = -1, maxY = -1;
+
+    for (let y = axisTop; y <= axisBottom; y++) {
+      for (let x = colL; x <= colR; x++) {
+        const idx = (y * w + x) * 4;
+        const r = pdata[idx], g = pdata[idx+1], b = pdata[idx+2], a = pdata[idx+3];
+        if (a > 100 && r > 150 && g < 100 && b < 100) {
+          if (minY < 0) minY = y;
+          maxY = y;
+        }
+      }
+    }
+
+    let start = 50, end = 50;
+    if (minY >= 0 && maxY >= 0) {
+      const scoreTop = Math.round((axisCenter - minY) / pxPerPt + 50);
+      const scoreBot = Math.round((axisCenter - maxY) / pxPerPt + 50);
+      start = Math.max(0, Math.min(100, Math.min(scoreTop, scoreBot)));
+      end   = Math.max(0, Math.min(100, Math.max(scoreTop, scoreBot)));
+    }
+
+    results.push({ age, start, end });
+  }
+
+  lastResults = results;
+  drawOutputChart(results);
+  showDataTable(results);
+  document.getElementById('statusBar').textContent = `グラフNo.${document.getElementById('graphNumInput').value} 読み取り完了！`;
+}
+
+function drawOutputChart(results) {
+  const labels = results.map(r => r.age + '歳');
+  const starts = results.map(r => r.start);
+  const lengths = results.map(r => r.end - r.start);
+
+  if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+
+  const clPlugin = {
+    id: 'cl',
+    afterDraw(chart) {
+      const c = chart.ctx, y = chart.scales.y.getPixelForValue(50);
+      c.save(); c.beginPath();
+      c.moveTo(chart.scales.x.left, y); c.lineTo(chart.scales.x.right, y);
+      c.strokeStyle = 'rgba(180,0,0,0.7)'; c.lineWidth = 1.5;
+      c.setLineDash([6,4]); c.stroke(); c.restore();
+    }
+  };
+
+  chartInstance = new Chart(oc, {
+    type: 'bar',
+    plugins: [clPlugin],
+    data: {
+      labels,
+      datasets: [
+        { data: starts, backgroundColor: 'rgba(0,0,0,0)', borderWidth: 0, barPercentage: 0.75, categoryPercentage: 0.9 },
+        { data: lengths, backgroundColor: 'rgba(24,95,165,0.85)', borderWidth: 0, barPercentage: 0.75, categoryPercentage: 0.9 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          filter: i => i.datasetIndex === 1,
+          callbacks: {
+            title: i => i[0].label,
+            label: i => { const n=i.dataIndex; return `始点:${starts[n]} 終点:${starts[n]+lengths[n]}`; }
+          }
+        }
+      },
+      scales: {
+        x: { stacked: true, ticks: { font:{size:8}, maxRotation:90, minRotation:90, autoSkip:false }, grid:{display:false} },
+        y: { stacked: true, min:0, max:100, ticks:{stepSize:10,font:{size:9}}, grid:{color:'rgba(0,0,0,0.1)'} }
+      }
+    }
+  });
+}
+
+function showDataTable(results) {
+  const div = document.getElementById('dataTable');
+  let html = '<table><tr><th>年齢</th><th>始点</th><th>終点</th></tr>';
+  results.forEach(r => {
+    html += `<tr><td>${r.age}</td><td>${r.start}</td><td>${r.end}</td></tr>`;
+  });
+  html += '</table>';
+  div.innerHTML = html;
+}
+
+function exportCSV() {
+  if (!lastResults.length) { alert('先に読み取りを実行してください'); return; }
+  const num = document.getElementById('graphNumInput').value;
+  let csv = `グラフ番号,${num}\n年齢,始点,終点\n`;
+  lastResults.forEach(r => { csv += `${r.age},${r.start},${r.end}\n`; });
+  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `graph_${num}.csv`;
+  a.click();
+}
+
+// タッチ対応
+ic.addEventListener('touchstart', e => { e.preventDefault(); const t=e.touches[0]; const {x,y}=getImgXY(t); painting=true; doPaint(x,y); }, {passive:false});
+ic.addEventListener('touchmove', e => { e.preventDefault(); const t=e.touches[0]; const {x,y}=getImgXY(t); doPaint(x,y); }, {passive:false});
+ic.addEventListener('touchend', () => { painting=false; });
+
+setMode('paint');
+</script>
+</body>
+</html>
