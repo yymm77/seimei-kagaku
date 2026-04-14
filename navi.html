@@ -409,7 +409,15 @@ select option{background:#1a2f5a;color:#e8e0cc;}
       <!-- 生年月日入力（自動計算） -->
       <div class="setup-row">
         <span class="setup-label">生年月日</span>
-        <input type="date" id="birthDate" onchange="calcStarsFromBirth()" style="flex:1;">
+        <input type="number" id="birthY" placeholder="西暦年" min="1900" max="2099"
+          style="width:80px;flex:none;" onchange="calcStarsFromBirth()">
+        <span style="font-size:.8rem;color:rgba(201,168,76,.5);">年</span>
+        <input type="number" id="birthM" placeholder="月" min="1" max="12"
+          style="width:52px;flex:none;" onchange="calcStarsFromBirth()">
+        <span style="font-size:.8rem;color:rgba(201,168,76,.5);">月</span>
+        <input type="number" id="birthD" placeholder="日" min="1" max="31"
+          style="width:52px;flex:none;" onchange="calcStarsFromBirth()">
+        <span style="font-size:.8rem;color:rgba(201,168,76,.5);">日</span>
       </div>
 
       <!-- 自動計算結果 -->
@@ -523,8 +531,16 @@ window.addEventListener('load',function(){
   // 生年月日を復元して自動計算
   var savedBirth=localStorage.getItem('houigaku_birth');
   if(savedBirth){
-    var birthEl=document.getElementById('birthDate');
-    if(birthEl){ birthEl.value=savedBirth; calcStarsFromBirth(); }
+    var parts=savedBirth.split('-').map(Number);
+    if(parts.length===3){
+      var yEl=document.getElementById('birthY');
+      var mEl=document.getElementById('birthM');
+      var dEl=document.getElementById('birthD');
+      if(yEl) yEl.value=parts[0];
+      if(mEl) mEl.value=parts[1];
+      if(dEl) dEl.value=parts[2];
+      calcStarsFromBirth();
+    }
   }
 
   // 今日の日付をセット
@@ -567,18 +583,14 @@ function clearBirth(){
 }
 
 function calcStarsFromBirth(){
-  var birthVal=document.getElementById('birthDate').value;
-  if(!birthVal)return;
-  var parts=birthVal.split('-').map(Number);
-  var by=parts[0], bm=parts[1], bd=parts[2];
+  var by=parseInt(document.getElementById('birthY').value||'0');
+  var bm=parseInt(document.getElementById('birthM').value||'0');
+  var bd=parseInt(document.getElementById('birthD').value||'0');
+  if(!by||!bm||!bd)return;
 
-  // 本命星：生まれ年の年盤九星
-  // 節分（2月4日頃）前は前年として計算
-  var calcYear = by;
-  if(bm===1||(bm===2&&bd<=3)) calcYear = by-1;
+  // 本命星：節分（2月4日頃）前は前年として計算
+  var calcYear = (bm===1||(bm===2&&bd<=3)) ? by-1 : by;
   var hon = nenseiFor(calcYear);
-
-  // 月命星：生まれ月の月盤九星
   var get = getseiFor(calcYear, bm);
 
   // セレクトボックスに反映
@@ -598,7 +610,7 @@ function calcStarsFromBirth(){
   }
 
   // localStorageに保存
-  localStorage.setItem('houigaku_birth', birthVal);
+  localStorage.setItem('houigaku_birth', by+'-'+String(bm).padStart(2,'0')+'-'+String(bd).padStart(2,'0'));
 }
 
 function scrollToSetup(){
