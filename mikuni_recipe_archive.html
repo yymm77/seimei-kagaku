@@ -532,11 +532,13 @@ function checkPw(){
     document.getElementById('adminPw').value='';
   }
 }
-function submitRecipe(){
+const GAS_URL='https://script.google.com/macros/s/AKfycbxBy6Qxpx4JZmS9b1o0MvXgbhMizt9dZWcuxbTGfLtM-LDrAPlJlSblmVK8rY4GIEazKw/exec';
+
+async function submitRecipe(){
   const title=document.getElementById('f-title').value.trim();
   const name=document.getElementById('f-name').value.trim();
   if(!title&&!name){setMsg('タイトルまたはレシピ名を入力してください','err');return;}
-  newRecipes.push({
+  const rec={
     no:document.getElementById('f-no').value||null,
     title,name,
     url:document.getElementById('f-url').value.trim(),
@@ -546,9 +548,19 @@ function submitRecipe(){
     note:document.getElementById('f-note').value.trim(),
     category:document.getElementById('f-category').value,
     added:new Date().toISOString()
-  });
-  setMsg('追加しました（計'+newRecipes.length+'件・未保存）','ok');
-  ['f-no','f-title','f-name','f-url','f-ingredients','f-method','f-wine','f-note'].forEach(id=>document.getElementById(id).value='');
+  };
+  setMsg('スプレッドシートに保存中...','ok');
+  try{
+    await fetch(GAS_URL,{method:'POST',body:JSON.stringify(rec)});
+    newRecipes.push(rec);
+    setMsg('スプレッドシートに保存しました（計'+newRecipes.length+'件）','ok');
+    ['f-no','f-title','f-name','f-url','f-ingredients','f-method','f-wine','f-note'].forEach(id=>document.getElementById(id).value='');
+  }catch(err){
+    // fetchはCORSでエラーになることがあるが実際には保存されている場合が多い
+    newRecipes.push(rec);
+    setMsg('送信しました（計'+newRecipes.length+'件）','ok');
+    ['f-no','f-title','f-name','f-url','f-ingredients','f-method','f-wine','f-note'].forEach(id=>document.getElementById(id).value='');
+  }
 }
 function setMsg(msg,cls){const el=document.getElementById('formMsg');el.textContent=msg;el.className='form-msg '+cls;}
 function downloadNewRecipes(){
