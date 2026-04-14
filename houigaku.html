@@ -1099,22 +1099,19 @@ footer ul li a:hover{opacity:1;color:var(--gold-light);}
 
     <!-- ===== 基点・行先登録パネル ===== -->
     <div id="savedPlacePanel">
-      <h5>📌 基点・行先の登録</h5>
+      <h5>📌 出発拠点の登録（4件）</h5>
+      <p style="font-size:.72rem;color:#8a7f6e;margin:0 0 10px;line-height:1.7;">自宅・職場など、よく使う出発地を最大4件登録できます。<br>登録後は「出発地に反映」ボタンで地図の出発地に即セットされます。</p>
 
-      <!-- 基点（自宅） -->
-      <div class="sp-row">
-        <span class="sp-label">🏠 自宅</span>
-        <input type="text" class="sp-input" id="sp-home-addr" placeholder="例：東京都府中市">
-        <button class="sp-btn sp-btn-save" onclick="saveHome()">登録</button>
-        <button class="sp-btn sp-btn-load" onclick="loadHome()" id="sp-home-load" style="display:none">↩ 入力に反映</button>
-        <span class="sp-saved-badge" id="sp-home-badge" style="display:none">✅ 登録済み</span>
+      <!-- 拠点4件 -->
+      <div id="baseSpotList">
+        <!-- JS で renderBaseSpots() が描画 -->
       </div>
 
       <!-- 行先リスト -->
-      <div class="sp-row" style="align-items:flex-start;flex-direction:column;gap:6px;">
+      <div class="sp-row" style="align-items:flex-start;flex-direction:column;gap:6px;margin-top:10px;">
         <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;width:100%;">
           <span class="sp-label">🎯 行先</span>
-          <input type="text" class="sp-input" id="sp-dest-name" placeholder="名前（例：会社）" style="max-width:100px;">
+          <input type="text" class="sp-input" id="sp-dest-name" placeholder="名前（例：病院）" style="max-width:100px;">
           <input type="text" class="sp-input" id="sp-dest-addr" placeholder="住所（例：東京都千代田区）">
           <button class="sp-btn sp-btn-add" onclick="addDest()">＋ 追加</button>
         </div>
@@ -6862,34 +6859,100 @@ function forceInitMap() {
 
 <!-- ======== 基点・行先登録 ＋ 印刷機能 ======== -->
 <script>
-const SP_HOME_KEY = 'houigaku_home';
+const SP_HOME_KEY = 'houigaku_home';   // 後方互換のため残す
 const SP_DEST_KEY = 'houigaku_dests';
+const SP_BASES_KEY = 'houigaku_bases'; // 新：4拠点
 
-// ── 自宅（基点）──
-function saveHome() {
-  const addr = document.getElementById('sp-home-addr').value.trim();
+// ── デフォルト4拠点定義 ──
+const BASE_DEFAULTS = [
+  { icon:'🏠', label:'自宅',  addr:'', editable:false },
+  { icon:'🏢', label:'職場',  addr:'', editable:false },
+  { icon:'⭐', label:'拠点3', addr:'', editable:true  },
+  { icon:'⭐', label:'拠点4', addr:'', editable:true  },
+];
+
+function _loadBases() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(SP_BASES_KEY) || 'null');
+    if (saved && saved.length === 4) return saved;
+    // 旧データ（自宅のみ）があれば移行
+    const oldHome = JSON.parse(localStorage.getItem(SP_HOME_KEY) || 'null');
+    const bases = BASE_DEFAULTS.map((b,i) => ({...b}));
+    if (oldHome && oldHome.addr) bases[0].addr = oldHome.addr;
+    return bases;
+  } catch(e) { return BASE_DEFAULTS.map(b=>({...b})); }
+}
+function _saveBases(bases) {
+  localStorage.setItem(SP_BASES_KEY, JSON.stringify(bases));
+  // 後方互換：自宅を旧キーにも保存
+  if (bases[0].addr) localStorage.setItem(SP_HOME_KEY, JSON.stringify({ addr: bases[0].addr }));
+}
+
+function renderBaseSpots() {
+  const list = document.getElementById('baseSpotList');
+  if (!list) return;
+  const bases = _loadBases();
+  list.innerHTML = bases.map((b, i) => `
+    <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:7px 4px;border-bottom:1px solid rgba(160,124,32,.12);">
+      <span style="font-size:1rem;">${b.icon}</span>
+      ${b.editable
+        ? `<input type="text" class="sp-input" value="${b.label}" id="base-label-${i}" placeholder="名前" style="max-width:70px;" onchange="updateBaseLabel(${i})">`
+        : `<span class="sp-label" style="min-width:48px;">${b.label}</span>`
+      }
+      <input type="text" class="sp-input" id="base-addr-${i}" value="${b.addr}" placeholder="住所（例：東京都多摩市連光寺）" style="flex:1;min-width:140px;">
+      <button class="sp-btn sp-btn-save" onclick="saveBase(${i})">登録</button>
+      ${b.addr ? `<button class="sp-btn sp-btn-load" onclick="applyBase(${i})">↩ 出発地に反映</button>` : ''}
+      ${b.addr ? `<span class="sp-saved-badge">✅ 登録済み</span>` : ''}
+    </div>
+  `).join('');
+}
+
+function saveBase(i) {
+  const addrEl = document.getElementById('base-addr-'+i);
+  const addr = addrEl ? addrEl.value.trim() : '';
   if (!addr) { spToast('住所を入力してください'); return; }
-  localStorage.setItem(SP_HOME_KEY, JSON.stringify({ addr }));
-  updateHomeBadge(addr);
+  const bases = _loadBases();
+  bases[i].addr = addr;
+  _saveBases(bases);
+  renderBaseSpots();
+  spToast('✅「'+bases[i].label+'」を登録しました');
+}
+
+function updateBaseLabel(i) {
+  const labelEl = document.getElementById('base-label-'+i);
+  if (!labelEl) return;
+  const bases = _loadBases();
+  bases[i].label = labelEl.value.trim() || BASE_DEFAULTS[i].label;
+  _saveBases(bases);
+}
+
+function applyBase(i) {
+  const bases = _loadBases();
+  const addr = bases[i].addr;
+  if (!addr) { spToast('先に住所を登録してください'); return; }
   const iFrom = document.getElementById('iFrom');
-  if (iFrom) iFrom.value = addr;
+  if (iFrom) { iFrom.value = addr; iFrom.dispatchEvent(new Event('input')); }
+  spToast('↩「'+bases[i].label+'」を出発地に反映しました');
+}
+
+// 後方互換用（旧コードが呼んでも動くように）
+function saveHome() {
+  const el = document.getElementById('sp-home-addr') || document.getElementById('base-addr-0');
+  if (!el) return;
+  const addr = el.value.trim();
+  if (!addr) { spToast('住所を入力してください'); return; }
+  const bases = _loadBases();
+  bases[0].addr = addr;
+  _saveBases(bases);
+  renderBaseSpots();
   spToast('✅ 自宅を登録しました');
 }
 function loadHome() {
-  const data = JSON.parse(localStorage.getItem(SP_HOME_KEY) || 'null');
-  if (!data) { spToast('自宅が登録されていません'); return; }
-  const iFrom = document.getElementById('iFrom');
-  if (iFrom) iFrom.value = data.addr;
-  spToast('↩ 自宅を入力欄に反映しました');
+  const bases = _loadBases();
+  if (!bases[0].addr) { spToast('自宅が登録されていません'); return; }
+  applyBase(0);
 }
-function updateHomeBadge(addr) {
-  const badge  = document.getElementById('sp-home-badge');
-  const loadBtn= document.getElementById('sp-home-load');
-  const input  = document.getElementById('sp-home-addr');
-  if (badge)   badge.style.display = 'inline';
-  if (loadBtn) loadBtn.style.display = 'inline-block';
-  if (input && addr) input.value = addr;
-}
+function updateHomeBadge(addr) { renderBaseSpots(); }
 
 // ── 行先リスト ──
 function _loadDests() {
@@ -6902,7 +6965,7 @@ function addDest() {
   const addr = document.getElementById('sp-dest-addr').value.trim();
   if (!name || !addr) { spToast('名前と住所を入力してください'); return; }
   const dests = _loadDests();
-  if (dests.length >= 10) { spToast('行先は最大10件まです'); return; }
+  if (dests.length >= 10) { spToast('行先は最大10件までです'); return; }
   if (dests.find(d => d.name === name)) { spToast('同じ名前が登録済みです'); return; }
   dests.push({ name, addr });
   _saveDests(dests);
@@ -7169,6 +7232,7 @@ function spToast(msg) {
     setTimeout(() => clearInterval(tid), 4000);
   }
   renderDestList();
+  renderBaseSpots();
 })();
 </script>
 <script>
