@@ -247,6 +247,52 @@ select option{background:#1a2f5a;color:#e8e0cc;}
 }
 #modeBadge.move{background:rgba(16,163,104,.2);color:#10a368;}
 #modeBadge.stay{background:rgba(201,168,76,.2);color:var(--gold);}
+
+/* ── トライアル登録フォーム ── */
+#trialPanel{
+  background:rgba(16,163,104,.06);
+  border:1px solid rgba(16,163,104,.3);
+  border-radius:8px;padding:1rem 1.1rem;
+  margin-bottom:.8rem;
+}
+#trialPanel h2{
+  font-size:.82rem;letter-spacing:.15em;
+  color:#10a368;margin-bottom:.3rem;
+}
+#trialPanel .tp-sub{
+  font-size:.72rem;color:rgba(16,163,104,.7);
+  line-height:1.8;margin-bottom:.8rem;
+}
+#trialPanel .tp-row{
+  display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;
+}
+#trialEmail{
+  flex:1;min-width:180px;
+  font-size:.85rem;padding:.4rem .6rem;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(16,163,104,.4);
+  border-radius:4px;color:#e8e0cc;font-family:inherit;
+}
+#trialBtn{
+  padding:.4rem 1rem;font-size:.82rem;
+  background:#10a368;border:none;
+  color:#fff;border-radius:4px;cursor:pointer;
+  font-family:inherit;letter-spacing:.1em;white-space:nowrap;
+}
+#trialBtn:active{opacity:.7;}
+#trialBtn:disabled{opacity:.4;cursor:default;}
+#trialStatus{
+  font-size:.75rem;margin-top:.5rem;
+  line-height:1.8;min-height:1.2rem;
+}
+#trialStatus.ok{color:#10a368;}
+#trialStatus.err{color:#ff6060;}
+#trialDone{
+  display:none;
+  background:rgba(16,163,104,.1);border:1px solid rgba(16,163,104,.4);
+  border-radius:6px;padding:.7rem .9rem;margin-bottom:.8rem;
+  font-size:.78rem;color:#10a368;line-height:1.9;
+}
 </style>
 </head>
 <body>
@@ -396,6 +442,27 @@ select option{background:#1a2f5a;color:#e8e0cc;}
       <button id="applyBtn" onclick="applySettings()">この設定で判定する</button>
     </div>
 
+    <!-- 登録済みバッジ -->
+    <div id="trialDone">
+      ✅ トライアル登録済み<br>
+      <span id="trialDoneInfo"></span><br>
+      30日間の無料トライアル期間中です。期間終了後にご案内メールをお送りします。
+    </div>
+
+    <!-- トライアル登録フォーム -->
+    <div id="trialPanel">
+      <h2>✦ 30日間 無料トライアル登録</h2>
+      <div class="tp-sub">
+        メールアドレスを登録するだけで、30日間すべての機能を無料でお使いいただけます。<br>
+        期間終了7日前にご案内メールをお送りします。（月額 ¥580）
+      </div>
+      <div class="tp-row">
+        <input type="email" id="trialEmail" placeholder="メールアドレスを入力">
+        <button id="trialBtn" onclick="registerTrial()">無料で始める</button>
+      </div>
+      <div id="trialStatus"></div>
+    </div>
+
   </div><!-- /scrollArea -->
 </div><!-- /app -->
 
@@ -459,6 +526,7 @@ window.addEventListener('load',function(){
   }
 
   // 拠点・行先を描画
+  checkTrialStatus();
   renderBases();
   renderDests();
 
@@ -765,6 +833,83 @@ function updateDestDir(){
     _destName+'：'+dirName+' '+label+'（'+distStr+'）';
 }
 
+
+// ========== トライアル登録 ==========
+const NAVI_GAS_URL = ''; // ← GASデプロイ後にURLを貼る
+const TRIAL_KEY = 'navi_trial';
+
+function checkTrialStatus(){
+  var data = null;
+  try{ data = JSON.parse(localStorage.getItem(TRIAL_KEY)||'null'); }catch(e){}
+  if(!data) return;
+
+  // 登録済みの場合はフォームを隠して登録済みバッジを表示
+  var panel = document.getElementById('trialPanel');
+  var done  = document.getElementById('trialDone');
+  var info  = document.getElementById('trialDoneInfo');
+  if(panel) panel.style.display='none';
+  if(done)  done.style.display='block';
+
+  var start = new Date(data.startDate);
+  var end   = new Date(start); end.setDate(end.getDate()+30);
+  var now   = new Date();
+  var remain = Math.ceil((end - now) / 86400000);
+
+  if(info){
+    if(remain > 0){
+      info.textContent = '登録メール：'+data.email+'　残り'+remain+'日';
+    } else {
+      info.textContent = '登録メール：'+data.email+'　トライアル期間終了';
+      if(done) done.style.background='rgba(201,168,76,.08)';
+      if(done) done.style.borderColor='rgba(201,168,76,.3)';
+      if(done) done.style.color='var(--gold)';
+      done.innerHTML = '⭐ トライアル期間が終了しました。<br>引き続きご利用いただくには月額プランへのご登録をお願いします。<br><a href="https://buy.stripe.com/3cI00ldw980I9zl7fkbEA01" style="color:var(--gold);font-weight:700;">プレミアム登録 ¥580/月 →</a>';
+    }
+  }
+}
+
+async function registerTrial(){
+  var emailEl = document.getElementById('trialEmail');
+  var btn     = document.getElementById('trialBtn');
+  var status  = document.getElementById('trialStatus');
+  var email   = emailEl ? emailEl.value.trim() : '';
+
+  if(!email || !email.includes('@')){
+    status.className='trialStatus err';
+    status.textContent='正しいメールアドレスを入力してください';
+    return;
+  }
+
+  btn.disabled = true;
+  status.className='trialStatus';
+  status.textContent='登録中...';
+
+  var startDate = new Date().toISOString();
+  var payload = {
+    type: 'navi_trial',
+    email: email,
+    startDate: startDate,
+    ua: navigator.userAgent.substring(0,80)
+  };
+
+  // localStorageに保存（GAS未設定でも動く）
+  localStorage.setItem(TRIAL_KEY, JSON.stringify({email:email, startDate:startDate}));
+
+  // GASに送信（設定済みの場合）
+  if(NAVI_GAS_URL){
+    try{
+      await fetch(NAVI_GAS_URL, {
+        method:'POST', mode:'no-cors',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
+      });
+    }catch(e){ console.warn('GAS送信エラー:', e); }
+  }
+
+  status.className='trialStatus ok';
+  status.textContent='✅ 登録完了！30日間のトライアルを開始しました。';
+  setTimeout(function(){ checkTrialStatus(); }, 1500);
+}
 // ========== コンパス計算 ==========
 function calcBearing(lat1,lng1,lat2,lng2){
   var R=Math.PI/180;
