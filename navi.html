@@ -405,36 +405,45 @@ select option{background:#1a2f5a;color:#e8e0cc;}
     <!-- 設定パネル -->
     <div id="setupPanel">
       <h2>設　定</h2>
+
+      <!-- 生年月日入力（自動計算） -->
       <div class="setup-row">
-        <span class="setup-label">本命星</span>
-        <select id="honSel">
-          <option value="">選択してください</option>
-          <option value="1">一白水星</option>
-          <option value="2">二黒土星</option>
-          <option value="3">三碧木星</option>
-          <option value="4">四緑木星</option>
-          <option value="5">五黄土星</option>
-          <option value="6">六白金星</option>
-          <option value="7">七赤金星</option>
-          <option value="8">八白土星</option>
-          <option value="9">九紫火星</option>
-        </select>
+        <span class="setup-label">生年月日</span>
+        <input type="date" id="birthDate" onchange="calcStarsFromBirth()" style="flex:1;">
       </div>
-      <div class="setup-row">
-        <span class="setup-label">月命星</span>
-        <select id="getSel">
-          <option value="">選択してください</option>
-          <option value="1">一白水星</option>
-          <option value="2">二黒土星</option>
-          <option value="3">三碧木星</option>
-          <option value="4">四緑木星</option>
-          <option value="5">五黄土星</option>
-          <option value="6">六白金星</option>
-          <option value="7">七赤金星</option>
-          <option value="8">八白土星</option>
-          <option value="9">九紫火星</option>
-        </select>
+
+      <!-- 自動計算結果 -->
+      <div id="birthResult" style="display:none;font-size:.75rem;color:rgba(201,168,76,.8);padding:.3rem .5rem;background:rgba(201,168,76,.08);border-radius:3px;margin-bottom:.4rem;line-height:1.9;"></div>
+
+      <!-- 手動選択（折りたたみ） -->
+      <div style="margin-bottom:.5rem;">
+        <span onclick="toggleManual()" style="font-size:.72rem;color:rgba(201,168,76,.5);cursor:pointer;letter-spacing:.05em;">▸ 手動で星を選ぶ（上級者向け）</span>
       </div>
+      <div id="manualSel" style="display:none;">
+        <div class="setup-row">
+          <span class="setup-label">本命星</span>
+          <select id="honSel" onchange="clearBirth()">
+            <option value="">選択してください</option>
+            <option value="1">一白水星</option><option value="2">二黒土星</option>
+            <option value="3">三碧木星</option><option value="4">四緑木星</option>
+            <option value="5">五黄土星</option><option value="6">六白金星</option>
+            <option value="7">七赤金星</option><option value="8">八白土星</option>
+            <option value="9">九紫火星</option>
+          </select>
+        </div>
+        <div class="setup-row">
+          <span class="setup-label">月命星</span>
+          <select id="getSel" onchange="clearBirth()">
+            <option value="">選択してください</option>
+            <option value="1">一白水星</option><option value="2">二黒土星</option>
+            <option value="3">三碧木星</option><option value="4">四緑木星</option>
+            <option value="5">五黄土星</option><option value="6">六白金星</option>
+            <option value="7">七赤金星</option><option value="8">八白土星</option>
+            <option value="9">九紫火星</option>
+          </select>
+        </div>
+      </div>
+
       <div class="setup-row">
         <span class="setup-label">判定日</span>
         <input type="date" id="targetDate">
@@ -511,6 +520,13 @@ window.addEventListener('load',function(){
   if(hon){document.getElementById('honSel').value=hon;}
   if(get){document.getElementById('getSel').value=get;}
 
+  // 生年月日を復元して自動計算
+  var savedBirth=localStorage.getItem('houigaku_birth');
+  if(savedBirth){
+    var birthEl=document.getElementById('birthDate');
+    if(birthEl){ birthEl.value=savedBirth; calcStarsFromBirth(); }
+  }
+
   // 今日の日付をセット
   const t=new Date();
   const mm=String(t.getMonth()+1).padStart(2,'0');
@@ -536,6 +552,54 @@ window.addEventListener('load',function(){
   // GPS開始
   startGPS();
 });
+
+function toggleManual(){
+  var el=document.getElementById('manualSel');
+  if(!el)return;
+  el.style.display=el.style.display==='none'?'block':'none';
+}
+
+function clearBirth(){
+  var el=document.getElementById('birthDate');
+  if(el) el.value='';
+  var res=document.getElementById('birthResult');
+  if(res) res.style.display='none';
+}
+
+function calcStarsFromBirth(){
+  var birthVal=document.getElementById('birthDate').value;
+  if(!birthVal)return;
+  var parts=birthVal.split('-').map(Number);
+  var by=parts[0], bm=parts[1], bd=parts[2];
+
+  // 本命星：生まれ年の年盤九星
+  // 節分（2月4日頃）前は前年として計算
+  var calcYear = by;
+  if(bm===1||(bm===2&&bd<=3)) calcYear = by-1;
+  var hon = nenseiFor(calcYear);
+
+  // 月命星：生まれ月の月盤九星
+  var get = getseiFor(calcYear, bm);
+
+  // セレクトボックスに反映
+  var honSel=document.getElementById('honSel');
+  var getSel=document.getElementById('getSel');
+  if(honSel) honSel.value=hon;
+  if(getSel) getSel.value=get;
+
+  // 結果表示
+  var NAMES=['','一白水星','二黒土星','三碧木星','四緑木星','五黄土星','六白金星','七赤金星','八白土星','九紫火星'];
+  var res=document.getElementById('birthResult');
+  if(res){
+    res.style.display='block';
+    res.innerHTML=
+      '本命星：<b>'+NAMES[hon]+'</b>　月命星：<b>'+NAMES[get]+'</b><br>'+
+      '<span style="font-size:.68rem;opacity:.7;">※ 節分（2/4頃）前生まれは前年の星で計算</span>';
+  }
+
+  // localStorageに保存
+  localStorage.setItem('houigaku_birth', birthVal);
+}
 
 function scrollToSetup(){
   document.getElementById('setupPanel').scrollIntoView({behavior:'smooth',block:'start'});
