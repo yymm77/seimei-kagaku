@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI革命の夜明け｜第1回：10兆パラメーターの衝撃</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0f0f0f;
+    --paper: #f7f3ee;
+    --accent: #c0392b;
+    --muted: #6b6359;
+    --rule: #d4cec7;
+    --highlight: #fff3cd;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 300;
+    line-height: 1.9;
+    font-size: 17px;
+  }
+
+  /* ── ヘッダー ── */
+  header {
+    border-bottom: 3px double var(--ink);
+    padding: 24px 0 16px;
+    text-align: center;
+  }
+  .series-badge {
+    display: inline-block;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Noto Serif JP', serif;
+    font-size: 11px;
+    letter-spacing: .2em;
+    padding: 4px 14px;
+    margin-bottom: 14px;
+  }
+  .series-title {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 300;
+    font-size: 12px;
+    letter-spacing: .3em;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  /* ── メインレイアウト ── */
+  main {
+    max-width: 740px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  /* ── アイキャッチ ── */
+  .eyecatch {
+    margin: 48px 0 40px;
+    text-align: center;
+  }
+  .episode-num {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 11px;
+    letter-spacing: .3em;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 18px;
+  }
+  h1 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: clamp(26px, 5vw, 40px);
+    font-weight: 900;
+    line-height: 1.45;
+    letter-spacing: .04em;
+    margin-bottom: 20px;
+  }
+  .lead {
+    font-size: 15px;
+    color: var(--muted);
+    max-width: 520px;
+    margin: 0 auto;
+    line-height: 1.85;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--rule);
+    margin: 36px 0;
+  }
+
+  /* ── 本文 ── */
+  h2 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 22px;
+    font-weight: 700;
+    margin: 52px 0 20px;
+    padding-left: 16px;
+    border-left: 4px solid var(--accent);
+    line-height: 1.5;
+  }
+
+  p { margin-bottom: 22px; }
+
+  /* ── 強調ボックス ── */
+  .callout {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 28px 32px;
+    margin: 36px 0;
+    position: relative;
+  }
+  .callout::before {
+    content: '"';
+    font-family: 'Noto Serif JP', serif;
+    font-size: 80px;
+    color: var(--accent);
+    position: absolute;
+    top: -12px;
+    left: 20px;
+    line-height: 1;
+  }
+  .callout p {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 19px;
+    line-height: 1.8;
+    margin: 0;
+    padding-top: 16px;
+  }
+
+  /* ── 数字ハイライト ── */
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin: 40px 0;
+  }
+  .stat-cell {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 24px 16px;
+    text-align: center;
+  }
+  .stat-cell:nth-child(even) { background: var(--accent); }
+  .stat-num {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 28px;
+    font-weight: 900;
+    display: block;
+    margin-bottom: 6px;
+  }
+  .stat-label {
+    font-size: 11px;
+    letter-spacing: .1em;
+    opacity: .85;
+  }
+
+  /* ── インフォリスト ── */
+  .info-list {
+    list-style: none;
+    margin: 28px 0;
+  }
+  .info-list li {
+    padding: 14px 0 14px 24px;
+    border-bottom: 1px solid var(--rule);
+    position: relative;
+    font-size: 16px;
+  }
+  .info-list li::before {
+    content: '▶';
+    color: var(--accent);
+    font-size: 10px;
+    position: absolute;
+    left: 0;
+    top: 17px;
+  }
+
+  /* ── ナビゲーション ── */
+  .series-nav {
+    margin-top: 64px;
+    border-top: 3px double var(--ink);
+    padding-top: 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .nav-next {
+    display: inline-block;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 10px 20px;
+    font-size: 13px;
+    letter-spacing: .05em;
+    text-decoration: none;
+    transition: background .2s;
+  }
+
+  .meta {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: .08em;
+    text-align: center;
+    margin-top: 8px;
+  }
+
+  .highlight-text {
+    background: linear-gradient(transparent 60%, var(--highlight) 60%);
+    font-weight: 700;
+  }
+
+  @media (max-width: 600px) {
+    .stat-row { grid-template-columns: 1fr 1fr; }
+    .stat-row .stat-cell:last-child { grid-column: span 2; }
+    .series-nav { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="series-badge">連載：AI革命と仕事の未来</div>
+  <div class="series-title">全5回｜テクノロジー最前線レポート 2026</div>
+</header>
+
+<main>
+
+  <div class="eyecatch">
+    <span class="episode-num">第 1 回</span>
+    <h1>10兆パラメーターの衝撃<br>—— もう、止められない</h1>
+    <p class="lead">AI業界の重鎮たちが同じ結論に達した瞬間がある。クロード・ミトスの登場が意味するものとは何か。</p>
+  </div>
+
+  <p class="meta">2026年4月｜AI最前線レポート</p>
+  <hr class="divider">
+
+  <p>「パラメーターが10兆を超えた瞬間、AI業界の重鎮たちが全員同じ結論に達した」——その結論とは、「もう止められない」というものだ。</p>
+
+  <p>あなたは今、どんな仕事をしているだろうか。デスクで書類を処理しているか、クライアントと戦略を議論しているか、コードを書いているか、あるいは誰かに何かを教えているか。どんな仕事であれ、この記事を読み終えたとき、その仕事についてこれまでとは全く違う目で見ることになるかもしれない。</p>
+
+  <h2>クロード・ミトスとは何者か</h2>
+
+  <p>2026年4月、Anthropicという企業がある発表をした。10兆パラメーターという、人類がこれまで作り上げたどんな人工知能とも比べ物にならない規模のAIモデルがすでに動いているというのだ。そのモデルの名前は「クロード・ミトス」。開発コストは推定1000億ドル（約15兆円）。年間収益の予測はすでに300億ドルを超えている。</p>
+
+  <div class="stat-row">
+    <div class="stat-cell">
+      <span class="stat-num">10兆</span>
+      <span class="stat-label">パラメーター数</span>
+    </div>
+    <div class="stat-cell">
+      <span class="stat-num">約15兆円</span>
+      <span class="stat-label">推定開発コスト</span>
+    </div>
+    <div class="stat-cell">
+      <span class="stat-num">300億$超</span>
+      <span class="stat-label">年間収益予測</span>
+    </div>
+  </div>
+
+  <p>数字だけ聞いてもピンとこないかもしれない。10兆パラメーターとはどれほどの規模なのか。それを理解するために、少し遠回りして人間の脳の話をしなければならない。</p>
+
+  <h2>人間の脳と「パラメーター」の関係</h2>
+
+  <p>人間の脳には約1000億個の神経細胞がある。そしてそれらが繋がり合って形成するシナプス、つまり神経の接続数は約100兆とされている。AIのパラメーター数というのは、ざっくり言えばこのシナプスの数に似た概念だ。AIが学習する際の接続の重みの総数であり、パラメーターが多ければ多いほど、より複雑なパターンを認識し、より深く考えることができるとされている。</p>
+
+  <p>この成長速度が凄まじい。</p>
+
+  <ul class="info-list">
+    <li><strong>2020年</strong>：GPT-3のパラメーター数は1750億。当時、業界を震撼させた数字だった。</li>
+    <li><strong>2023年頃</strong>：GPT-4が登場し、推定1兆パラメーターを超えると報告される。</li>
+    <li><strong>2026年4月</strong>：クロード・ミトスが10兆パラメーターに到達。人間の脳のシナプス数100兆の、1/10に達した。</li>
+  </ul>
+
+  <p>わずか数年で、<span class="highlight-text">1750億から10兆へ——実に57倍以上の成長</span>だ。この速度が続くとしたら、人間の脳のシナプス総数に匹敵するパラメーターを持つAIが登場するまで、あと何年かかるだろうか。多くの専門家は「もはや数十年後ではない」と言い始めている。</p>
+
+  <div class="callout">
+    <p>人類は今、自分たちが作り出したものの力を持て余し始めている。それが今回の出来事の本質だ。</p>
+  </div>
+
+  <h2>強力すぎて「公開できない」という事態</h2>
+
+  <p>2026年3月26日、奇妙なことが起きた。Anthropicのコンテンツ管理システムの設定ミスにより、約3000件に上る内部資料が誤って外部に公開されてしまったのだ。ドラフトのブログ記事、内部説明資料、開発中のモデルに関する文書。その中にクロード・ミトスの存在が記されていた。</p>
+
+  <p>4月7日、Anthropicは「プロジェクト・グラスウイング」を正式発表した。グラスウイングとは透明な羽を持つ蝶の名前だ。パートナーとして名を連ねたのは、Microsoft、Amazon Web Services、Apple、JPモルガンチェース、Linux Foundation、NVIDIAなど、世界のテクノロジー・金融・セキュリティ分野の巨人たちだ。</p>
+
+  <p>なぜ一般公開ではなく限定公開なのか。Anthropic自身が語った理由は率直なものだった。</p>
+
+  <p>「このモデルは、セキュリティ訓練を受けていないエンジニアであっても、一夜にして完全に動作するエクスプロイト（システムへの不正アクセスを行うプログラム）を発見できるほどの能力を持っている」——20年間発見されなかったLinuxの脆弱性をわずか90分で発見したという報告もある。</p>
+
+  <p><span class="highlight-text">あるツールが強力すぎるがゆえに、作った会社自身がその公開を恐れる</span>——AIの歴史において、これは初めての出来事だ。</p>
+
+  <hr class="divider">
+
+  <p>この第1回では、クロード・ミトスが何者であるかを見てきた。次回は、このモデルの登場がなぜ「最初に消える職業」の議論と直結するのか、AIがこれまで越えられなかった「壁」とは何かを掘り下げていく。</p>
+
+  <div class="series-nav">
+    <span>第1回｜全5回連載</span>
+    <span class="nav-next">次回：AIが越えた二つの壁 →</span>
+  </div>
+
+</main>
+
+</body>
+</html>

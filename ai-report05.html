@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI革命の夜明け｜第5回（最終回）：人間にしかできない問いを立てる</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0f0f0f;
+    --paper: #f7f3ee;
+    --accent: #c0392b;
+    --muted: #6b6359;
+    --rule: #d4cec7;
+    --highlight: #fff3cd;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--paper); color: var(--ink); font-family: 'Noto Sans JP', sans-serif; font-weight: 300; line-height: 1.9; font-size: 17px; }
+  header { border-bottom: 3px double var(--ink); padding: 24px 0 16px; text-align: center; }
+  .series-badge { display: inline-block; background: var(--ink); color: var(--paper); font-family: 'Noto Serif JP', serif; font-size: 11px; letter-spacing: .2em; padding: 4px 14px; margin-bottom: 14px; }
+  .series-title { font-weight: 300; font-size: 12px; letter-spacing: .3em; color: var(--muted); }
+  main { max-width: 740px; margin: 0 auto; padding: 0 24px 80px; }
+  .eyecatch { margin: 48px 0 40px; text-align: center; }
+  .episode-num { font-family: 'Noto Serif JP', serif; font-size: 11px; letter-spacing: .3em; color: var(--accent); display: block; margin-bottom: 18px; }
+  h1 { font-family: 'Noto Serif JP', serif; font-size: clamp(26px, 5vw, 40px); font-weight: 900; line-height: 1.45; letter-spacing: .04em; margin-bottom: 20px; }
+  .lead { font-size: 15px; color: var(--muted); max-width: 520px; margin: 0 auto; line-height: 1.85; }
+  .divider { border: none; border-top: 1px solid var(--rule); margin: 36px 0; }
+  h2 { font-family: 'Noto Serif JP', serif; font-size: 22px; font-weight: 700; margin: 52px 0 20px; padding-left: 16px; border-left: 4px solid var(--accent); line-height: 1.5; }
+  p { margin-bottom: 22px; }
+  .meta { font-size: 12px; color: var(--muted); letter-spacing: .08em; text-align: center; margin-top: 8px; }
+  .highlight-text { background: linear-gradient(transparent 60%, var(--highlight) 60%); font-weight: 700; }
+
+  .callout { background: var(--ink); color: var(--paper); padding: 28px 32px; margin: 36px 0; position: relative; }
+  .callout::before { content: '"'; font-family: 'Noto Serif JP', serif; font-size: 80px; color: var(--accent); position: absolute; top: -12px; left: 20px; line-height: 1; }
+  .callout p { font-family: 'Noto Serif JP', serif; font-size: 18px; line-height: 1.8; margin: 0; padding-top: 16px; }
+
+  /* 歴史比較 */
+  .history-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin: 36px 0;
+  }
+  .history-cell {
+    padding: 22px 18px;
+    background: #f0ece6;
+    text-align: center;
+  }
+  .history-cell:nth-child(2) { background: var(--ink); color: var(--paper); }
+  .history-cell:nth-child(3) { background: var(--accent); color: white; }
+  .history-cell .era { font-size: 11px; letter-spacing: .15em; opacity: .7; margin-bottom: 8px; }
+  .history-cell .tech { font-family: 'Noto Serif JP', serif; font-size: 17px; font-weight: 700; margin-bottom: 10px; }
+  .history-cell .desc { font-size: 13px; line-height: 1.7; opacity: .85; }
+
+  /* スキル一覧 */
+  .skill-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 32px 0;
+  }
+  .skill-card {
+    border: 1px solid var(--rule);
+    padding: 20px;
+  }
+  .skill-card .icon { font-size: 24px; margin-bottom: 10px; }
+  .skill-card strong { display: block; font-size: 16px; margin-bottom: 8px; font-weight: 700; }
+  .skill-card p { font-size: 14px; color: var(--muted); margin: 0; }
+
+  /* 新職業リスト */
+  .new-jobs { list-style: none; margin: 24px 0; }
+  .new-jobs li {
+    padding: 14px 0 14px 28px;
+    border-bottom: 1px solid var(--rule);
+    position: relative;
+    font-size: 16px;
+  }
+  .new-jobs li::before { content: '✦'; color: var(--accent); font-size: 11px; position: absolute; left: 0; top: 18px; }
+
+  /* 最終メッセージ */
+  .final-box {
+    border: 3px double var(--ink);
+    padding: 40px 36px;
+    margin: 48px 0;
+    text-align: center;
+  }
+  .final-box h3 { font-family: 'Noto Serif JP', serif; font-size: 24px; font-weight: 900; margin-bottom: 20px; line-height: 1.5; }
+  .final-box p { font-size: 16px; color: var(--muted); max-width: 480px; margin: 0 auto; }
+
+  /* 連載まとめ */
+  .series-summary {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 32px 36px;
+    margin: 48px 0;
+  }
+  .series-summary h3 { font-family: 'Noto Serif JP', serif; font-size: 16px; letter-spacing: .15em; margin-bottom: 20px; opacity: .6; }
+  .series-summary ol { padding-left: 20px; }
+  .series-summary li { padding: 8px 0; font-size: 15px; line-height: 1.7; border-bottom: 1px solid rgba(255,255,255,.1); }
+  .series-summary li:last-child { border-bottom: none; }
+
+  .series-nav { margin-top: 64px; border-top: 3px double var(--ink); padding-top: 28px; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 13px; color: var(--muted); }
+
+  @media (max-width: 600px) {
+    .history-grid { grid-template-columns: 1fr; }
+    .skill-grid { grid-template-columns: 1fr; }
+    .series-nav { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="series-badge">連載：AI革命と仕事の未来</div>
+  <div class="series-title">全5回｜テクノロジー最前線レポート 2026（最終回）</div>
+</header>
+
+<main>
+
+  <div class="eyecatch">
+    <span class="episode-num">第 5 回（最終回）</span>
+    <h1>人間にしかできない<br>「問い」を立てること</h1>
+    <p class="lead">AIは答えを出すことが得意だ。しかし「正しい問を立てること」はまだ人間の仕事だ。この違いが、AI時代の明暗を分ける。</p>
+  </div>
+
+  <p class="meta">2026年4月｜AI最前線レポート</p>
+  <hr class="divider">
+
+  <p>印刷機が登場した時、写本職人は仕事を失った。しかし印刷機は新しい出版産業を生み出し、識字率を上げ、科学革命と産業革命の基盤を作った。蒸気機関が登場した時、多くの職人仕事が消えた。しかし蒸気機関は鉄道と工場を生み出し、人類の物質的豊かさを何十倍にも高めた。</p>
+
+  <div class="history-grid">
+    <div class="history-cell">
+      <div class="era">15〜16世紀</div>
+      <div class="tech">印刷機</div>
+      <div class="desc">写本職人が打撃を受けたが、出版産業・科学革命が生まれた</div>
+    </div>
+    <div class="history-cell">
+      <div class="era">18〜19世紀</div>
+      <div class="tech">蒸気機関</div>
+      <div class="desc">職人仕事が消えたが、鉄道・工場・物質的豊かさが生まれた</div>
+    </div>
+    <div class="history-cell">
+      <div class="era">1990年代〜</div>
+      <div class="tech">インターネット</div>
+      <div class="desc">旅行代理店・百科事典が打撃を受けたが、無数の新産業が生まれた</div>
+    </div>
+  </div>
+
+  <p>AIも同じだ。一方の扉が閉まる時、別の扉が開く。問題はどの扉が開くのかを見極め、その扉に向けて動けるかどうかだ。</p>
+
+  <h2>AIが最も苦手とすること</h2>
+
+  <p>AIは「答えを出すこと」は得意だ。しかし「正しい問を立てること」はまだ苦手とされている。どんな問いを立てるべきか、どんな問題を解くべきかを決めるのは、依然として人間の仕事だ。</p>
+
+  <p>これは全ての仕事に「問いを立てる」要素が含まれていることを意味する。どの職種でも、「私たちが今解くべきは何か」を考えることがAIにはできない人間の役割として残り続ける。</p>
+
+  <div class="callout">
+    <p>AIは情報の処理が得意で、人間は文脈の理解が得意だ。情報の処理とはデータを集めパターンを見つけ選択肢を列挙し確率を計算すること。文脈の理解とは、その情報が誰の、どんな状況の、どんな感情の、どんな価値観の問題として置かれているのかを読み取ること——この違いが、AI時代の本質的な分岐点だ。</p>
+  </div>
+
+  <h2>AI時代に価値を保つ4つのスキル</h2>
+
+  <div class="skill-grid">
+    <div class="skill-card">
+      <div class="icon">🔄</div>
+      <strong>学習の習慣化</strong>
+      <p>特定のスキルを学ぶことよりも、常に学び続ける習慣そのものが最大の武器になる。2026年時点での知識が2027年にはすでに陳腐化している可能性がある。</p>
+    </div>
+    <div class="skill-card">
+      <div class="icon">✕</div>
+      <strong>専門性の「掛け算」</strong>
+      <p>AIは広く浅い知識においてすでに多くの人間を量的に超えている。しかし「医療知識×AIエンジニアリング」「法律知識×ビジネス交渉力」といったクロスオーバーの発想はまだ人間の得意領域だ。</p>
+    </div>
+    <div class="skill-card">
+      <div class="icon">🤝</div>
+      <strong>人間ネットワークの構築</strong>
+      <p>AIが情報処理と分析を自動化するほど、「誰と働くか」「誰を信頼するか」という人間関係の価値が高まる。チームを率いる力、信頼を築く力はAI時代においてむしろ希少価値を持つようになる。</p>
+    </div>
+    <div class="skill-card">
+      <div class="icon">❓</div>
+      <strong>「問いを立てる」力</strong>
+      <p>AIが出した分析や提案に対して、「そもそもこの問いの立て方は正しいか」「この前提はどこから来たのか」「この分析が見落としているものは何か」を問い返せる力。これがAI時代に最も汎用性の高いスキルだ。</p>
+    </div>
+  </div>
+
+  <h2>今は名前もない「新しい職業」が生まれる</h2>
+
+  <p>インターネットが登場した時、ウェブサイトを作る仕事、オンラインで広告を打つ仕事、データを分析してユーザー行動を理解する仕事——これらはインターネット以前には概念すら存在しなかった。しかしインターネットが普及するにつれてそれらは巨大な産業になった。</p>
+
+  <p>AIの普及も同じプロセスを辿るとされている。すでに生まれ始めている職種として、次のようなものがある。</p>
+
+  <ul class="new-jobs">
+    <li>AIトレーナー（AIの出力を人間の価値観に合わせて調整する専門家）</li>
+    <li>プロンプトエンジニア（AIへの指示設計を専門とする職種）</li>
+    <li>AI倫理コンサルタント（AI活用における倫理的判断を担う専門家）</li>
+    <li>AIと人間のハイブリッドワークフロー設計者</li>
+    <li>AIが生み出す大量の情報から「本当に意味のある洞察」を選別する専門家</li>
+    <li>AI判断を人間の価値観でチェックする監査職</li>
+  </ul>
+
+  <p>これらはほんの始まりだ。10年後、20年後には私たちが今想像もしていない形で、人間が価値を発揮する職業が誕生しているはずだ。</p>
+
+  <h2>「5年で全ての仕事が変わる」をどう受け止めるか</h2>
+
+  <p>AnthropicのCEOダリオ・アモデイの発言を思い出してほしい。「5年で全ての仕事が変わる」——これを「5年以内に仕事がなくなる」と解釈するか、「5年以内に仕事の中身を変えるチャンスがある」と解釈するかはあなたの選択だ。</p>
+
+  <p>AIに対する姿勢として2種類の人が存在する。「AIは脅威だ」と思う人と、「AIは最強のパートナーだ」と思う人だ。前者の人はAIができることを見るたびに不安を感じ、行動が縛られる。後者の人はAIができることを見るたびに可能性を感じ、行動が解放される。</p>
+
+  <div class="final-box">
+    <h3>最初に消えるのは<br>特定の職業ではなく<br>「変化を他人ごとだと思う姿勢」かもしれない</h3>
+    <p>クロード・ミトスが10兆パラメーターの壁を超えた日は、ある意味でカウントダウンの始まりだ。何かが終わるカウントダウンではなく、何かが始まるカウントダウン。その「何か」をどう定義するかは、あなた次第だ。</p>
+  </div>
+
+  <h2>連載を終えるにあたって</h2>
+
+  <p>この5回の連載を通じて見てきたことを振り返ろう。</p>
+
+  <div class="series-summary">
+    <h3>〔連載まとめ〕AI革命と仕事の未来</h3>
+    <ol>
+      <li><strong>第1回</strong>：クロード・ミトスの登場——10兆パラメーターという前例のない規模のAIが、強力すぎて公開できないという事態を生んだ。</li>
+      <li><strong>第2回</strong>：AIが越えた三つの壁——「文脈の長期的保持」「推論の多段階性」「前例のないパターンへの対応」、これらの限界が崩れ始めている。</li>
+      <li><strong>第3回</strong>：最初に消える5つのカテゴリー——データ処理型、情報キュレーション型、標準化された専門型、量産クリエイティブ型、そしてミドルマネジメントの情報調整型。</li>
+      <li><strong>第4回</strong>：日本の49%とアクション——日本は遅れているがまだ間に合う。仕事をタスクに分解し、AIが担えない部分に集中投資することが鍵。</li>
+      <li><strong>第5回</strong>：人間の本質的な価値——「正しい問を立てる力」こそがAI時代に最も残る人間の強みであり、新しい職業機会の源泉だ。</li>
+    </ol>
+  </div>
+
+  <p>AIは確かに多くのものを変える。仕事の内容を変え、必要なスキルを変え、価値の定義を変える。しかしAIが変えられないものがある。それは「あなたがどう生きたいか」という問えの答えだ。その答えを出し、その答えに向かって行動することは、10兆パラメーターのAIにも代替できない、あなただけの能力だ。</p>
+
+  <p>恐れる必要はない。ただ目を開けて考え続けてほしい。そしてその選択権があるうちに動き始めることが、何より大切だ。</p>
+
+  <hr class="divider">
+
+  <div class="series-nav">
+    <span>← 第4回：日本の49%と個人が今すべきこと</span>
+    <span>第5回（最終回）｜全5回連載 完結</span>
+  </div>
+
+</main>
+</body>
+</html>

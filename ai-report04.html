@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI革命の夜明け｜第4回：日本の49%と、個人が今すべきこと</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0f0f0f;
+    --paper: #f7f3ee;
+    --accent: #c0392b;
+    --muted: #6b6359;
+    --rule: #d4cec7;
+    --highlight: #fff3cd;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--paper); color: var(--ink); font-family: 'Noto Sans JP', sans-serif; font-weight: 300; line-height: 1.9; font-size: 17px; }
+  header { border-bottom: 3px double var(--ink); padding: 24px 0 16px; text-align: center; }
+  .series-badge { display: inline-block; background: var(--ink); color: var(--paper); font-family: 'Noto Serif JP', serif; font-size: 11px; letter-spacing: .2em; padding: 4px 14px; margin-bottom: 14px; }
+  .series-title { font-weight: 300; font-size: 12px; letter-spacing: .3em; color: var(--muted); }
+  main { max-width: 740px; margin: 0 auto; padding: 0 24px 80px; }
+  .eyecatch { margin: 48px 0 40px; text-align: center; }
+  .episode-num { font-family: 'Noto Serif JP', serif; font-size: 11px; letter-spacing: .3em; color: var(--accent); display: block; margin-bottom: 18px; }
+  h1 { font-family: 'Noto Serif JP', serif; font-size: clamp(26px, 5vw, 40px); font-weight: 900; line-height: 1.45; letter-spacing: .04em; margin-bottom: 20px; }
+  .lead { font-size: 15px; color: var(--muted); max-width: 520px; margin: 0 auto; line-height: 1.85; }
+  .divider { border: none; border-top: 1px solid var(--rule); margin: 36px 0; }
+  h2 { font-family: 'Noto Serif JP', serif; font-size: 22px; font-weight: 700; margin: 52px 0 20px; padding-left: 16px; border-left: 4px solid var(--accent); line-height: 1.5; }
+  p { margin-bottom: 22px; }
+  .meta { font-size: 12px; color: var(--muted); letter-spacing: .08em; text-align: center; margin-top: 8px; }
+  .highlight-text { background: linear-gradient(transparent 60%, var(--highlight) 60%); font-weight: 700; }
+
+  /* 大きな数字 */
+  .big-stat {
+    text-align: center;
+    padding: 40px 20px;
+    border: 2px solid var(--ink);
+    margin: 36px 0;
+    position: relative;
+  }
+  .big-stat::before {
+    content: attr(data-label);
+    font-size: 11px;
+    letter-spacing: .3em;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 12px;
+  }
+  .big-stat .num {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 72px;
+    font-weight: 900;
+    color: var(--accent);
+    line-height: 1;
+    display: block;
+  }
+  .big-stat .sub { font-size: 14px; color: var(--muted); margin-top: 10px; display: block; }
+
+  /* 比較バー */
+  .compare-bar { margin: 32px 0; }
+  .compare-bar .label { font-size: 14px; color: var(--muted); margin-bottom: 6px; }
+  .compare-bar .bar-wrap { background: var(--rule); height: 32px; position: relative; }
+  .compare-bar .bar-fill { height: 100%; display: flex; align-items: center; padding-left: 12px; font-size: 13px; font-weight: 700; color: white; }
+  .compare-bar .bar-jp { background: var(--ink); width: 51%; }
+  .compare-bar .bar-us { background: var(--accent); width: 99%; }
+
+  /* アクションカード */
+  .action-step {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 0;
+    margin: 24px 0;
+    border: 1px solid var(--rule);
+  }
+  .action-step-num {
+    background: var(--accent);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Noto Serif JP', serif;
+    font-size: 24px;
+    font-weight: 900;
+  }
+  .action-step-body { padding: 18px 22px; }
+  .action-step-body strong { display: block; font-size: 17px; margin-bottom: 8px; }
+  .action-step-body p { font-size: 15px; color: #333; margin: 0; }
+
+  /* 弁護士例の分解表 */
+  .task-table { width: 100%; border-collapse: collapse; margin: 28px 0; font-size: 15px; }
+  .task-table th { background: var(--ink); color: var(--paper); padding: 12px 16px; text-align: left; font-weight: 400; letter-spacing: .05em; }
+  .task-table td { padding: 12px 16px; border-bottom: 1px solid var(--rule); }
+  .task-table tr:nth-child(even) td { background: rgba(0,0,0,.02); }
+  .tag-ai { background: #fdf0ef; color: var(--accent); font-size: 12px; padding: 2px 8px; border: 1px solid var(--accent); }
+  .tag-human { background: #eef4ee; color: #4a7c59; font-size: 12px; padding: 2px 8px; border: 1px solid #4a7c59; }
+
+  .callout { background: var(--ink); color: var(--paper); padding: 28px 32px; margin: 36px 0; position: relative; }
+  .callout::before { content: '"'; font-family: 'Noto Serif JP', serif; font-size: 80px; color: var(--accent); position: absolute; top: -12px; left: 20px; line-height: 1; }
+  .callout p { font-family: 'Noto Serif JP', serif; font-size: 18px; line-height: 1.8; margin: 0; padding-top: 16px; }
+
+  .series-nav { margin-top: 64px; border-top: 3px double var(--ink); padding-top: 28px; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 13px; color: var(--muted); }
+
+  @media (max-width: 600px) {
+    .big-stat .num { font-size: 56px; }
+    .series-nav { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="series-badge">連載：AI革命と仕事の未来</div>
+  <div class="series-title">全5回｜テクノロジー最前線レポート 2026</div>
+</header>
+
+<main>
+
+  <div class="eyecatch">
+    <span class="episode-num">第 4 回</span>
+    <h1>日本の49%と、<br>個人が今すべきこと</h1>
+    <p class="lead">日本は「遅れている」のか、それとも「まだ間に合う」のか。そして個人レベルで今すぐできる行動とは何か。</p>
+  </div>
+
+  <p class="meta">2026年4月｜AI最前線レポート</p>
+  <hr class="divider">
+
+  <div class="big-stat" data-label="野村総合研究所の予測">
+    <span class="num">49<small style="font-size:40px">%</small></span>
+    <span class="sub">日本の労働人口のうちAI・ロボットによって代替可能になると試算される割合</span>
+  </div>
+
+  <p>ほぼ半分だ。しかしこれは「仕事が半分消える」という話ではない。より正確に言えば、今存在する職業の半分は、AIが担える業務で構成されているということだ。</p>
+
+  <h2>日本特有の「二重の問題」</h2>
+
+  <p>この49%という数字は、日本の文脈では特に重い意味を持つ。なぜなら日本は、少子高齢化による労働力不足という別の問題を同時に抱えているからだ。</p>
+
+  <p>一方ではAIが仕事を代替しようとしている。もう一方では労働力が足りない。この2つの力が同時に働いている日本においては、AIによる仕事の置き換えは単純に「雇用の喪失」ではなく、人手不足を補う解決策としての側面も持っている。</p>
+
+  <p>しかしここに一つのパラドックスがある。AIが人手不足を補う形で導入されれば、その仕事をしていた人が別の仕事に移れるように見える。しかし現実には、移れる先の仕事もまたAIによって変化しており、スキルが変わっている。別の仕事に移るためのハードルが、かつてないほど高くなっているわけだ。</p>
+
+  <h2>日本のAI活用は米国の半分以下</h2>
+
+  <p>OECDの試算では、AI技術が普及した場合の生産性押し上げ効果は次のとおりだ。</p>
+
+  <div class="compare-bar">
+    <div class="label">AI技術による生産性向上効果（年率、今後10年間）</div>
+    <div style="margin-bottom:8px">
+      <div class="label">🇯🇵 日本 &nbsp;<strong>0.51%</strong></div>
+      <div class="bar-wrap"><div class="bar-fill bar-jp">0.51%</div></div>
+    </div>
+    <div>
+      <div class="label">🇺🇸 米国 &nbsp;<strong>0.99%</strong></div>
+      <div class="bar-wrap"><div class="bar-fill bar-us">0.99%</div></div>
+    </div>
+  </div>
+
+  <p>日本の数字は米国のほぼ半分だ。この差はなぜ生まれるのか。組織の意思決定プロセスの慎重さ、個人情報保護への強い意識、そして変化への組織的な抵抗感が導入を遅らせる要因として働いているとされている。</p>
+
+  <p>しかし裏を返せば、<span class="highlight-text">日本においてAIスキルを持つ人間は今まだ少数派であり、だからこそ希少価値がある</span>。供給が少なく需要が急増しているスキルを持つということは、経済的に見れば非常に優位な立場に立つことを意味する。</p>
+
+  <p>日本国内のデータでは、AIスキルを持つ人材は持たない人材と比較して<span class="highlight-text">平均年収が200万円以上高い</span>とされている。これが5年、10年と積み重なった時、その格差は取り返しのつかない水準に達するかもしれない。</p>
+
+  <h2>「職業名」ではなく「タスクのリスト」で考える</h2>
+
+  <p>自分の仕事をタスクのリストに分解してみると、見え方が変わる。例えば「弁護士」という職業を分解してみよう。</p>
+
+  <table class="task-table">
+    <tr>
+      <th>タスク</th>
+      <th>担い手</th>
+    </tr>
+    <tr>
+      <td>判例調査・関連条文の抽出</td>
+      <td><span class="tag-ai">AI優位</span></td>
+    </tr>
+    <tr>
+      <td>契約書のドラフト作成</td>
+      <td><span class="tag-ai">AI優位</span></td>
+    </tr>
+    <tr>
+      <td>リスクの洗い出し・列挙</td>
+      <td><span class="tag-ai">AI優位</span></td>
+    </tr>
+    <tr>
+      <td>法的意見書の定型作成</td>
+      <td><span class="tag-ai">AI優位</span></td>
+    </tr>
+    <tr>
+      <td>クライアントとの信頼構築</td>
+      <td><span class="tag-human">人間優位</span></td>
+    </tr>
+    <tr>
+      <td>裁判での弁論・交渉戦略立案</td>
+      <td><span class="tag-human">人間優位</span></td>
+    </tr>
+    <tr>
+      <td>依頼人の価値観を考慮した判断</td>
+      <td><span class="tag-human">人間優位</span></td>
+    </tr>
+  </table>
+
+  <p>同じことがどんな職種にも言える。AIに移るタスクに多くの時間を使っている人と、人間の価値が高いタスクに多くの時間を使っている人では、AI時代における価値が全く異なる。</p>
+
+  <h2>個人が今すぐできる3つのアクション</h2>
+
+  <div class="action-step">
+    <div class="action-step-num">1</div>
+    <div class="action-step-body">
+      <strong>まずAIを「使ってみる」</strong>
+      <p>理論を学ぶ前に実際に使う。ClaudeでもChatGPTでも何でも構わない。自分の仕事の一部をAIに任せてみる。実際に使った経験から得た感覚は、どんな理論や統計よりも自分の行動を変える力を持っている。</p>
+    </div>
+  </div>
+
+  <div class="action-step">
+    <div class="action-step-num">2</div>
+    <div class="action-step-body">
+      <strong>仕事を「タスクのリスト」に分解する</strong>
+      <p>仕事全体を代替するかどうかではなく、「このタスクは」「このプロセスは」「この判断は」という単位で分解して考える。仕事を細かく分解するほど、AIが担うべき部分の境界線が見えやすくなる。</p>
+    </div>
+  </div>
+
+  <div class="action-step">
+    <div class="action-step-num">3</div>
+    <div class="action-step-body">
+      <strong>AIが担った時間を「本質的な強み」に投資する</strong>
+      <p>AIが担ってくれた時間を、自分の本質的な強みをさらに深めることに使う。AIを使いこなす人が仕事を取っていく——その「使いこなす側」に早く立つことが、AI時代における最も賢い時間の使い方だ。</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <p>AIはあなたの仕事を奪うのではなく、あなたの仕事の構成を変える。かつて仕事時間の7割を占めていた作業が3割に減り、代わりに判断と助言に使う時間が増える。その変化に対応できた人が生き残る。</p>
+  </div>
+
+  <p>最終回では、AIが生み出す「新しい機会」とは何か、そしてこの時代に人間が発揮できる最も本質的な価値について考えていく。</p>
+
+  <hr class="divider">
+
+  <div class="series-nav">
+    <span>← 第3回：最初に消える5つの職業カテゴリー</span>
+    <span>第4回｜全5回連載</span>
+    <span>次回：新しい機会と人間の価値 →</span>
+  </div>
+
+</main>
+</body>
+</html>

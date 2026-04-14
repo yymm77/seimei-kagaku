@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI革命の夜明け｜第2回：AIが越えた「三つの壁」</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0f0f0f;
+    --paper: #f7f3ee;
+    --accent: #c0392b;
+    --muted: #6b6359;
+    --rule: #d4cec7;
+    --highlight: #fff3cd;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 300;
+    line-height: 1.9;
+    font-size: 17px;
+  }
+  header {
+    border-bottom: 3px double var(--ink);
+    padding: 24px 0 16px;
+    text-align: center;
+  }
+  .series-badge {
+    display: inline-block;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Noto Serif JP', serif;
+    font-size: 11px;
+    letter-spacing: .2em;
+    padding: 4px 14px;
+    margin-bottom: 14px;
+  }
+  .series-title {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 300;
+    font-size: 12px;
+    letter-spacing: .3em;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  main { max-width: 740px; margin: 0 auto; padding: 0 24px 80px; }
+  .eyecatch { margin: 48px 0 40px; text-align: center; }
+  .episode-num {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 11px;
+    letter-spacing: .3em;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 18px;
+  }
+  h1 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: clamp(26px, 5vw, 40px);
+    font-weight: 900;
+    line-height: 1.45;
+    letter-spacing: .04em;
+    margin-bottom: 20px;
+  }
+  .lead {
+    font-size: 15px;
+    color: var(--muted);
+    max-width: 520px;
+    margin: 0 auto;
+    line-height: 1.85;
+  }
+  .divider { border: none; border-top: 1px solid var(--rule); margin: 36px 0; }
+  h2 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 22px;
+    font-weight: 700;
+    margin: 52px 0 20px;
+    padding-left: 16px;
+    border-left: 4px solid var(--accent);
+    line-height: 1.5;
+  }
+  p { margin-bottom: 22px; }
+  .callout {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 28px 32px;
+    margin: 36px 0;
+    position: relative;
+  }
+  .callout::before {
+    content: '"';
+    font-family: 'Noto Serif JP', serif;
+    font-size: 80px;
+    color: var(--accent);
+    position: absolute;
+    top: -12px;
+    left: 20px;
+    line-height: 1;
+  }
+  .callout p {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 19px;
+    line-height: 1.8;
+    margin: 0;
+    padding-top: 16px;
+  }
+  .wall-card {
+    border: 2px solid var(--ink);
+    margin: 20px 0;
+    display: grid;
+    grid-template-columns: 80px 1fr;
+  }
+  .wall-num {
+    background: var(--ink);
+    color: var(--paper);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Noto Serif JP', serif;
+    font-size: 32px;
+    font-weight: 900;
+  }
+  .wall-body { padding: 20px 24px; }
+  .wall-body strong {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 8px;
+    font-weight: 700;
+  }
+  .wall-body p { margin: 0; font-size: 15px; color: var(--muted); }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    margin: 32px 0;
+  }
+  .col-box { padding: 24px 20px; }
+  .col-box.safe { background: #eef4ee; border: 2px solid #4a7c59; }
+  .col-box.danger { background: #fdf0ef; border: 2px solid var(--accent); }
+  .col-box h3 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 14px;
+    letter-spacing: .1em;
+  }
+  .col-box ul { list-style: none; }
+  .col-box ul li {
+    font-size: 14px;
+    padding: 6px 0 6px 18px;
+    position: relative;
+    border-bottom: 1px solid rgba(0,0,0,.08);
+  }
+  .danger ul li::before { content: '✕'; color: var(--accent); position: absolute; left: 0; }
+  .safe ul li::before { content: '○'; color: #4a7c59; position: absolute; left: 0; }
+
+  .meta { font-size: 12px; color: var(--muted); letter-spacing: .08em; text-align: center; margin-top: 8px; }
+  .highlight-text { background: linear-gradient(transparent 60%, var(--highlight) 60%); font-weight: 700; }
+
+  .series-nav {
+    margin-top: 64px;
+    border-top: 3px double var(--ink);
+    padding-top: 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  @media (max-width: 600px) {
+    .two-col { grid-template-columns: 1fr; }
+    .series-nav { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="series-badge">連載：AI革命と仕事の未来</div>
+  <div class="series-title">全5回｜テクノロジー最前線レポート 2026</div>
+</header>
+
+<main>
+
+  <div class="eyecatch">
+    <span class="episode-num">第 2 回</span>
+    <h1>AIが越えた「三つの壁」<br>—— 境界線は、もう動いている</h1>
+    <p class="lead">「創造性」「戦略」「文脈の理解」はAIには無理だとされてきた。その常識が、今まさに崩れつつある。</p>
+  </div>
+
+  <p class="meta">2026年4月｜AI最前線レポート</p>
+  <hr class="divider">
+
+  <p>AI研究者たちはずっとある境界線を引いてきた。その境界線の内側にある仕事は「AIで代替可能」、外側にある仕事は「しばらくは安全」というものだ。</p>
+
+  <p>内側にあったのは、データ入力、書類の仕訳、単純な翻訳、コールセンターの一次対応、製造ラインの検品作業——いずれもルールが明確で、正解が一つで、反復性が高い仕事だ。</p>
+
+  <p>では外側にあったのは何か。</p>
+
+  <div class="two-col">
+    <div class="col-box danger">
+      <h3>〔AI代替が進む領域〕</h3>
+      <ul>
+        <li>データ入力・仕訳</li>
+        <li>単純翻訳・要約</li>
+        <li>コールセンター一次対応</li>
+        <li>製造ライン検品</li>
+        <li>定型レポート作成</li>
+      </ul>
+    </div>
+    <div class="col-box safe">
+      <h3>〔これまで「安全」とされてきた領域〕</h3>
+      <ul>
+        <li>創造性・戦略立案</li>
+        <li>倫理的判断・共感</li>
+        <li>文脈の読み取り</li>
+        <li>不確実な状況での判断</li>
+        <li>複雑な法的・医療的判断</li>
+      </ul>
+    </div>
+  </div>
+
+  <p>企業の経営戦略を立てるコンサルタント、新しい製品コンセプトを生み出すデザイナー、複雑な法的問題を解釈する弁護士、長期的な投資判断をするファンドマネージャー——こういった職種はAIには難しいとされていた。</p>
+
+  <p>では、その境界線はいつ動くのか。実は、少し前からすでに動き始めていた。多くの人がその変化に気づかなかっただけだ。</p>
+
+  <h2>崩れ始めた「三つの壁」</h2>
+
+  <p>10兆パラメータークラスのモデルが登場することで、従来のAIの限界とされてきた壁が一つずつ崩れ始めている。</p>
+
+  <div class="wall-card">
+    <div class="wall-num">1</div>
+    <div class="wall-body">
+      <strong>文脈の長期的保持</strong>
+      <p>これまでのAIモデルは、一度の会話でやり取りできる情報量に限界があった。何年分もの企業の意思決定の経緯、複雑に絡み合った関係者のパワーダイナミクスを同時に考慮しながら判断することが難しかった。しかしパラメーター数の急激な増加と共に、AIが一度に処理・参照できる情報の量と質が劇的に向上した。</p>
+    </div>
+  </div>
+
+  <div class="wall-card">
+    <div class="wall-num">2</div>
+    <div class="wall-body">
+      <strong>推論の多段階性</strong>
+      <p>複雑な戦略判断というのは、いくつもの前提を同時に考慮しながら最適解を導き出す作業だ。「もし競合がこの製品を出したら」「もし規制がこう変わったら」「もし為替がこう動いたら」——複数のシナリオを同時に走らせながら、それらの相互作用を計算する能力が、大規模モデルにおいて飛躍的に向上したとされている。</p>
+    </div>
+  </div>
+
+  <div class="wall-card">
+    <div class="wall-num">3</div>
+    <div class="wall-body">
+      <strong>前例のないパターンへの対応</strong>
+      <p>AIは過去のデータからパターンを学習する。従って過去に似たような事例がない、全く新しい状況に対して判断を下すことは苦手とされていた。しかし10兆パラメーターという規模は、人間が経験できる事例の総量をはるかに超えた数の事例をモデルの中に内包している。過去に似たものがなくても、複数の遠く離れたパターンを組み合わせて推論する能力が、質的に変化し始めているとされる。</p>
+    </div>
+  </div>
+
+  <h2>「5年で全ての仕事が変わる」という発言の重み</h2>
+
+  <p>AnthropicのCEOダリオ・アモデイは2026年4月6日、衝撃的な発言をしたと報告されている。「5年で全ての仕事が変わる」という趣旨の発言だ。</p>
+
+  <div class="callout">
+    <p>この発言が重要なのは、センセーショナルな表現だからではない。自分たちが作っているものを最も深く理解している一人が言っているという点だ。</p>
+  </div>
+
+  <p>同じ時期、IMFは「新しいスキルとAIが将来の職を変える」というレポートを発表。OECDはAI技術が今後10年間で日本の生産性を年率0.51%押し上げると試算している。ただしこれは米国の同0.99%と比較して低い数値であり、日本の産業構造がAI活用において遅れを取っていることを示唆している。</p>
+
+  <p>AIの「ゴッドファーザー」とも呼ばれるジェフリー・ヒントン博士は2026年に入り「雇用なき成長が起きる」と予測する。経済は成長するが雇用は増えない——企業はAIによって生産性を上げるが、その分人間の仕事は減っていくという、経済学的にも整合性のある予測だ。</p>
+
+  <h2>「私の仕事は大丈夫」という感覚こそ危険</h2>
+
+  <p>野村総合研究所の予測では、<span class="highlight-text">日本の労働人口の49%がAIやロボットによって代替可能になる</span>とされている。ほぼ半分だ。しかしこの数字を聞いても、多くの人は「でも私の仕事は大丈夫だろう」と思う傾向がある。</p>
+
+  <p>その「大丈夫だろう」という感覚こそが、最も危険なバイアスだ。次回は、具体的にどの職業カテゴリーが最初に影響を受けるのか、そしてなぜ「安全」と思われてきた専門職にも変化の波が押し寄せるのかを見ていく。</p>
+
+  <hr class="divider">
+
+  <div class="series-nav">
+    <span>← 第1回：10兆パラメーターの衝撃</span>
+    <span>第2回｜全5回連載</span>
+    <span>次回：最初に消える職業カテゴリー →</span>
+  </div>
+
+</main>
+</body>
+</html>
