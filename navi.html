@@ -212,6 +212,41 @@ select option{background:#1a2f5a;color:#e8e0cc;}
   border-bottom:1px solid #880e4f;
 }
 #dangerBanner.show{display:block;}
+
+/* ── モード切替 ── */
+#modeBar{
+  flex:0 0 auto;
+  display:flex;align-items:center;gap:0;
+  border-bottom:1px solid var(--border);
+  background:#0e1628;
+}
+.mode-btn{
+  flex:1;padding:.5rem .3rem;text-align:center;
+  font-family:'Noto Serif JP',serif;font-size:.78rem;
+  border:none;cursor:pointer;letter-spacing:.05em;
+  background:transparent;color:rgba(201,168,76,.45);
+  border-right:1px solid var(--border);transition:.2s;
+}
+.mode-btn:last-child{border-right:none;}
+.mode-btn.active{background:rgba(26,47,90,.6);color:var(--gold);font-weight:700;}
+.mode-btn .mb-sub{font-size:.62rem;opacity:.7;display:block;margin-top:1px;}
+#stayProposal{
+  display:none;flex:0 0 auto;
+  padding:.5rem .8rem;font-size:.78rem;
+  background:rgba(201,168,76,.08);border-bottom:1px solid rgba(201,168,76,.2);
+  color:var(--gold-light);text-align:center;
+}
+#stayProposal button{
+  margin-left:.8rem;padding:2px 12px;font-size:.75rem;
+  background:rgba(201,168,76,.2);border:1px solid var(--gold);
+  color:var(--gold);border-radius:3px;cursor:pointer;font-family:inherit;
+}
+#modeBadge{
+  display:inline-block;font-size:.7rem;padding:1px 8px;border-radius:2px;
+  margin-left:.4rem;vertical-align:middle;
+}
+#modeBadge.move{background:rgba(16,163,104,.2);color:#10a368;}
+#modeBadge.stay{background:rgba(201,168,76,.2);color:var(--gold);}
 </style>
 </head>
 <body>
@@ -223,6 +258,26 @@ select option{background:#1a2f5a;color:#e8e0cc;}
     <span id="honmeiDisp">本命星：未設定</span>
     <button id="wakeLockBtn" onclick="toggleWakeLock()">画面：通常</button>
     <a id="backBtn" href="houigaku.html">← 方位学へ</a>
+  </div>
+
+
+  <!-- モード切替バー -->
+  <div id="modeBar">
+    <button class="mode-btn active" id="btnMove" onclick="setMode('move')">
+      🚗 移動モード
+      <span class="mb-sub">出発地基準</span>
+    </button>
+    <button class="mode-btn" id="btnStay" onclick="setMode('stay')">
+      📍 滞在モード
+      <span class="mb-sub">現在地基準</span>
+    </button>
+  </div>
+
+  <!-- 15分滞在提案バナー -->
+  <div id="stayProposal">
+    📍 15分以上滞在しています。滞在モードに切り替えますか？
+    <button onclick="setMode('stay')">切替</button>
+    <button onclick="dismissProposal()">このまま</button>
   </div>
 
   <!-- 危険日常時バナー -->
@@ -262,7 +317,7 @@ select option{background:#1a2f5a;color:#e8e0cc;}
       </svg>
     </div>
     <div id="dirLabel">─</div>
-    <div id="kichiLabel" class="k-futsu">GPS取得中...</div>
+    <div id="kichiLabel" class="k-futsu">GPS取得中...<span id="modeBadge" class="move">移動</span></div>
     <div id="subLabel">方位角：<span id="bearingDisp">─</span>°　速度：<span id="speedDisp">─</span> km/h</div>
   </div>
 
@@ -558,6 +613,7 @@ function onPosition(pos){
     if(dist>0.005){bearing=b;_bearing=bearing;}
   }
   _prevLat=lat;_prevLng=lng;_lat=lat;_lng=lng;
+  if(_baseLat===null){_baseLat=lat;_baseLng=lng;}
 
   var spdKmh=spd?Math.round(spd*3.6):0;
   document.getElementById('gpsStatus').textContent=
@@ -581,12 +637,82 @@ function onError(err){
 }
 
 // ========== 吉凶判定・表示 ==========
+
+// ========== モード管理 ==========
+var _mode = 'move'; // 'move' or 'stay'
+var _baseLat = null, _baseLng = null; // 出発地の座標
+var _stayStartTime = null;  // 同じ場所に留まり始めた時刻
+var _stayProposalDismissed = false;
+var _stayCheckInterval = null;
+
+function setMode(mode){
+  _mode = mode;
+  // ボタンの見た目
+  document.getElementById('btnMove').classList.toggle('active', mode==='move');
+  document.getElementById('btnStay').classList.toggle('active', mode==='stay');
+  // バッジ
+  var badge = document.getElementById('modeBadge');
+  if(badge){
+    badge.textContent = mode==='move' ? '移動' : '滞在';
+    badge.className = 'modeBadge ' + mode;
+  }
+  // 提案バナーを閉じる
+  document.getElementById('stayProposal').style.display='none';
+  _stayProposalDismissed = false;
+  // 滞在モードに切り替えたら現在地を新しい基準点にする
+  if(mode==='stay' && _lat!==null){
+    _baseLat = _lat;
+    _baseLng = _lng;
+  }
+  // 移動モードに戻したら出発地を基準点に戻す
+  if(mode==='move'){
+    _stayStartTime = null;
+  }
+  // 即時更新
+  if(_bearing !== undefined) updateKichi(_bearing);
+  updateBestDir();
+}
+
+function dismissProposal(){
+  document.getElementById('stayProposal').style.display='none';
+  _stayProposalDismissed = true;
+}
+
+// 15分滞在チェック（1分ごとに実行）
+function startStayCheck(){
+  if(_stayCheckInterval) clearInterval(_stayCheckInterval);
+  _stayCheckInterval = setInterval(function(){
+    if(_mode !== 'move') return;
+    if(_stayProposalDismissed) return;
+    if(_lat===null || _baseLat===null) return;
+    // 移動距離が50m未満なら「滞在中」とみなす
+    var dist = calcDist(_lat, _lng, _baseLat, _baseLng);
+    if(dist < 0.05){
+      if(!_stayStartTime) _stayStartTime = Date.now();
+      var elapsed = (Date.now() - _stayStartTime) / 60000; // 分
+      if(elapsed >= 15){
+        document.getElementById('stayProposal').style.display='block';
+      }
+    } else {
+      // 動いたらリセット
+      _stayStartTime = null;
+      document.getElementById('stayProposal').style.display='none';
+    }
+  }, 60000); // 1分ごと
+}
+
 function updateKichi(bearing){
   if(!_hon||!_niss)return;
   var idx=Math.round(bearing/45)%8;
   var dirName=DIR8_NAMES[idx];
   var dirKey=DIR8_KEYS[idx];
-  var sc=calcScore(_hon,_get,_niss,dirKey)||50;
+  // 滞在モードでは現在地を基準に日盤のみで判定
+  var nissei = _niss;
+  if(_mode==='stay'){
+    var now=new Date();
+    nissei=nisseiFor(now.getFullYear(),now.getMonth()+1,now.getDate());
+  }
+  var sc=calcScore(_hon,_get,nissei,dirKey)||50;
   var label=getKichiLabel(sc);
   var cls,color;
   if(sc>=80){cls='k-kichi';color='#10a368';}
