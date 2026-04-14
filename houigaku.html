@@ -1392,27 +1392,30 @@ footer ul li a:hover{opacity:1;color:var(--gold-light);}
       <!-- ステップ②：どれくらい大切か -->
       <div style="margin-bottom:1.4rem;">
         <div style="font-size:.72rem;letter-spacing:.2em;color:#8a7f6e;margin-bottom:.6rem;">STEP 2　どれくらい大切なことですか？</div>
-        <div style="display:flex;flex-wrap:wrap;gap:0;border:1px solid rgba(184,150,12,.3);border-radius:3px;overflow:hidden;" id="advLevelBtns">
-          <button class="adv-level-btn on" data-level="1" onclick="advSelectLevel(1,this)"
-            style="flex:1;padding:.65rem .5rem;border:none;cursor:pointer;font-family:'Noto Serif JP',serif;font-size:.78rem;letter-spacing:.05em;background:var(--indigo);color:var(--gold);transition:.2s;text-align:center;">
-            <div style="font-size:1rem;margin-bottom:3px;">☽</div>
-            <div>日常のこと</div>
-            <div style="font-size:.65rem;opacity:.75;margin-top:2px;">日盤のみ</div>
-          </button>
-          <button class="adv-level-btn" data-level="2" onclick="advSelectLevel(2,this)"
-            style="flex:1;padding:.65rem .5rem;border:none;border-left:1px solid rgba(184,150,12,.2);cursor:pointer;font-family:'Noto Serif JP',serif;font-size:.78rem;letter-spacing:.05em;background:rgba(26,47,90,.06);color:var(--indigo);transition:.2s;text-align:center;">
-            <div style="font-size:1rem;margin-bottom:3px;">🌙</div>
-            <div>人生の節目</div>
-            <div style="font-size:.65rem;opacity:.75;margin-top:2px;">月盤＋日盤</div>
-          </button>
-          <button class="adv-level-btn" data-level="3" onclick="advSelectLevel(3,this)"
-            style="flex:1;padding:.65rem .5rem;border:none;border-left:1px solid rgba(184,150,12,.2);cursor:pointer;font-family:'Noto Serif JP',serif;font-size:.78rem;letter-spacing:.05em;background:rgba(26,47,90,.06);color:var(--indigo);transition:.2s;text-align:center;">
-            <div style="font-size:1rem;margin-bottom:3px;">🌕</div>
-            <div>一生に関わること</div>
-            <div style="font-size:.65rem;opacity:.75;margin-top:2px;">年盤＋月盤＋日盤</div>
-          </button>
+        <!-- 盤面チェックボックス -->
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:.6rem .8rem;border:1px solid rgba(184,150,12,.3);border-radius:4px;background:rgba(26,47,90,.04);">
+          <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-family:'Noto Serif JP',serif;font-size:.85rem;color:var(--indigo);">
+            <input type="checkbox" id="ban-nen"   onchange="advUpdateBans()" style="width:16px;height:16px;accent-color:var(--indigo);cursor:pointer;">
+            <span>🌕 年盤</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-family:'Noto Serif JP',serif;font-size:.85rem;color:var(--indigo);">
+            <input type="checkbox" id="ban-tsuki" onchange="advUpdateBans()" style="width:16px;height:16px;accent-color:var(--indigo);cursor:pointer;">
+            <span>🌙 月盤</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-family:'Noto Serif JP',serif;font-size:.85rem;color:var(--indigo);">
+            <input type="checkbox" id="ban-nichi" checked onchange="advUpdateBans()" style="width:16px;height:16px;accent-color:var(--indigo);cursor:pointer;">
+            <span>☽ 日盤</span>
+          </label>
         </div>
-        <div id="advLevelNote" style="font-size:.72rem;color:var(--indigo);margin-top:.5rem;padding:.4rem .7rem;background:rgba(26,47,90,.05);border-left:3px solid var(--indigo);display:none;"></div>
+        <!-- 目安の説明 -->
+        <div style="margin-top:.5rem;font-size:.7rem;color:#8a7f6e;line-height:1.9;padding:.4rem .6rem;background:rgba(160,124,32,.05);border-left:2px solid rgba(160,124,32,.3);">
+          <span style="font-weight:700;letter-spacing:.05em;">目安</span><br>
+          散歩・昼食など近場の外出 → <b>日盤のみ</b><br>
+          買い物・日帰り旅行・定期的な外出 → <b>月盤＋日盤</b><br>
+          出張・長期滞在・転勤 → <b>年盤＋月盤＋日盤</b><br>
+          引越・転職・結婚など人生の重大決断 → <b>三盤すべてで最良の日を選ぶ</b>
+        </div>
+        <div id="advLevelNote" style="font-size:.72rem;color:var(--indigo);margin-top:.4rem;padding:.4rem .7rem;background:rgba(26,47,90,.05);border-left:3px solid var(--indigo);display:none;"></div>
       </div>
 
       <!-- ステップ③：方角（任意・上級者向け） -->
@@ -1590,7 +1593,7 @@ footer ul li a:hover{opacity:1;color:var(--gold-light);}
           </div>
           <button class="map-gps-btn" onclick="getGPSLocation()">📡 GPSで現在地取得</button>
           <div class="map-step-hint" id="mapStepHint">① 地図をクリックして現在地を指定してください</div>
-          <button id="naviStartBtn" onclick="toggleNavi()">🧭 リアルナビ 開始</button>
+          <a href="navi.html" target="_blank" id="naviStartBtn" style="display:inline-block;text-decoration:none;">🧭 リアルナビ（別画面で開く）</a>
         </div>
 
         <!-- 方位線コントロール -->
@@ -1603,6 +1606,28 @@ footer ul li a:hover{opacity:1;color:var(--gold-light);}
           <label style="font-size:.78rem;cursor:pointer;"><input type="checkbox" id="mainShowTrue" onchange="redrawMainLines()"> 真北</label>
           <label style="font-size:.78rem;cursor:pointer;"><input type="checkbox" id="mainShowMag" onchange="redrawMainLines()"> 磁北</label>
           <span id="magDeclInfo" style="font-size:.72rem;color:#e67e22;margin-left:.3rem;"></span>
+          <button onclick="toggleHouiHelp()" style="margin-left:auto;font-size:.72rem;color:var(--indigo);background:none;border:1px solid rgba(26,47,90,.3);border-radius:3px;padding:2px 8px;cursor:pointer;">？ 方位線の説明</button>
+        </div>
+
+        <!-- 方位線・北の説明パネル（折りたたみ） -->
+        <div id="houiHelpPanel" style="display:none;padding:.8rem 1rem;background:#faf8f2;border-bottom:1px solid rgba(160,124,32,.15);font-size:.75rem;line-height:1.9;color:#5a4a2a;">
+          <div style="font-weight:700;font-size:.78rem;letter-spacing:.1em;color:var(--indigo);margin-bottom:.5rem;">▍ 方位線の分割方式について</div>
+          <div style="margin-bottom:.7rem;">
+            <span style="font-weight:700;color:#8a6a00;">30-60度（高木式）</span><br>
+            高木彬光著「方位学入門」に基づく分割方式。北・南・東・西の四正方位は各<b>30度</b>、北東・南東・南西・北西の四隅方位は各<b>60度</b>と幅が異なります。四隅は影響範囲が広く、四正は狭く強いとされます。方位学の古典的な考え方に準拠した方式です。
+          </div>
+          <div style="margin-bottom:.7rem;">
+            <span style="font-weight:700;color:#8a6a00;">45度均等</span><br>
+            八方位を均等に45度ずつ分割する現代的な方式。シンプルでわかりやすく、コンパスや地図との照合がしやすい利点があります。
+          </div>
+          <div style="border-top:1px solid rgba(160,124,32,.15);padding-top:.7rem;">
+            <div style="font-weight:700;font-size:.78rem;letter-spacing:.1em;color:var(--indigo);margin-bottom:.4rem;">▍ 真北と磁北の違い</div>
+            <span style="font-weight:700;color:#8a6a00;">真北（地理的北）</span><br>
+            地球の自転軸（北極点）の方向。地図の北はすべて真北基準です。方位学の古典的な計算は真北を使います。<br><br>
+            <span style="font-weight:700;color:#8a6a00;">磁北（コンパスの北）</span><br>
+            コンパスの針が指す北。地球の磁場により真北とわずかにずれています。日本では地域により約<b>7〜9度</b>西偏します。スマートフォンのGPSや方位計は磁北を使います。<br><br>
+            <span style="font-size:.72rem;color:#a07030;">★ 精密に方位を測るときは磁北のズレ（偏角）を意識してください。このページでは両方を地図上に表示できます。</span>
+          </div>
         </div>
 
         <div id="mapContainer"></div>
@@ -2570,6 +2595,12 @@ function redrawInlineLines() {
 }
 
 // メイン地図の方位線を再描画
+function toggleHouiHelp() {
+  const p = document.getElementById('houiHelpPanel');
+  if (!p) return;
+  p.style.display = p.style.display === 'none' ? 'block' : 'none';
+}
+
 function redrawMainLines() {
   if (!_map) return;
   const from     = _fromMarker ? _fromMarker.getLatLng() : null;
@@ -2751,7 +2782,26 @@ function angleToDir(a) {
 
 // ===== 生活方位相談（新方式） =====
 let _advCat   = 'travel';
-let _advLevel = 1;
+let _advLevel = 1; // 後方互換用（未使用）
+
+// チェックボックスから使用盤を取得
+function advGetBans() {
+  const bans = [];
+  if (document.getElementById('ban-nen')   && document.getElementById('ban-nen').checked)   bans.push('nen');
+  if (document.getElementById('ban-tsuki') && document.getElementById('ban-tsuki').checked) bans.push('tsuki');
+  if (document.getElementById('ban-nichi') && document.getElementById('ban-nichi').checked) bans.push('nichi');
+  return bans.length ? bans : ['nichi']; // 最低1つ
+}
+
+function advUpdateBans() {
+  const bans = advGetBans();
+  const noteEl = document.getElementById('advLevelNote');
+  if (!noteEl) return;
+  const labels = { nen:'年盤', tsuki:'月盤', nichi:'日盤' };
+  const banStr = bans.map(b => labels[b]).join('＋');
+  noteEl.textContent = `選択中の盤：${banStr}　でスコアを算出します。`;
+  noteEl.style.display = 'block';
+}
 
 const ADV_CAT_LABEL = {
   travel:'外出・旅行', move:'引越し・転居', job:'転職・就職',
@@ -2782,26 +2832,27 @@ function advSelectCat(cat, btn) {
   _advCat = cat;
   document.querySelectorAll('.adv-cat-btn').forEach(b => b.classList.remove('on'));
   btn.classList.add('on');
-  // 推奨レベルを自動設定
+  // 推奨レベルに応じてチェックボックスを自動設定
   const lv = ADV_CAT_DEFAULT_LEVEL[cat] || 1;
-  advSelectLevel(lv, document.querySelector(`.adv-level-btn[data-level="${lv}"]`));
+  const nenEl   = document.getElementById('ban-nen');
+  const tsukiEl = document.getElementById('ban-tsuki');
+  const nichiEl = document.getElementById('ban-nichi');
+  if (nenEl)   nenEl.checked   = (lv >= 3);
+  if (tsukiEl) tsukiEl.checked = (lv >= 2);
+  if (nichiEl) nichiEl.checked = true;
+  advUpdateBans();
 }
 
 function advSelectLevel(level, btn) {
   _advLevel = level;
-  document.querySelectorAll('.adv-level-btn').forEach(b => {
-    b.style.background = 'rgba(26,47,90,.06)';
-    b.style.color = 'var(--indigo)';
-  });
-  if (btn) {
-    btn.style.background = 'var(--indigo)';
-    btn.style.color = 'var(--gold)';
-  }
-  const noteEl = document.getElementById('advLevelNote');
-  if (noteEl) {
-    noteEl.textContent = ADV_LEVEL_NOTE[level];
-    noteEl.style.display = 'block';
-  }
+  // チェックボックスに反映
+  const nenEl   = document.getElementById('ban-nen');
+  const tsukiEl = document.getElementById('ban-tsuki');
+  const nichiEl = document.getElementById('ban-nichi');
+  if (nenEl)   nenEl.checked   = (level >= 3);
+  if (tsukiEl) tsukiEl.checked = (level >= 2);
+  if (nichiEl) nichiEl.checked = true;
+  advUpdateBans();
 }
 
 function advSetToday() {
@@ -2822,7 +2873,7 @@ function runAdvice2() {
   const [y, m, d] = dateVal.split('-').map(Number);
   const hon = _calHon, get = _calGet;
   const dirKey = document.getElementById('advDirSelect').value;
-  const bans   = ADV_LEVEL_BANS[_advLevel] || ['nichi'];
+  const bans   = advGetBans();
   const BAN_LABEL = { nen:'年 盤', tsuki:'月 盤', nichi:'日 盤' };
   const BAN_DESC  = { nen:'（今年の大きな流れ）', tsuki:'（今月の流れ）', nichi:'（その日の吉凶）' };
 

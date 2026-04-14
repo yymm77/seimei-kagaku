@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>🧭 方位ナビ</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --indigo:#1a2f5a;--gold:#c9a84c;--gold-light:#e0c870;
+  --bg:#0c1020;--card:#141828;--border:rgba(201,168,76,.2);
+}
+html,body{
+  height:100%;width:100%;overflow:hidden;
+  background:var(--bg);color:#e8e0cc;
+  font-family:'Noto Serif JP','Hiragino Mincho ProN','Yu Mincho',serif;
+  touch-action:manipulation;
+}
+
+/* ── レイアウト ── */
+#app{
+  display:flex;flex-direction:column;
+  height:100dvh;width:100%;
+  overflow:hidden;
+}
+
+/* ── ヘッダー（固定） ── */
+#header{
+  flex:0 0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.5rem .8rem;
+  background:rgba(26,47,90,.95);
+  border-bottom:1px solid var(--border);
+  gap:.5rem;
+}
+#header h1{font-size:.85rem;letter-spacing:.2em;color:var(--gold);white-space:nowrap;}
+#honmeiDisp{font-size:.75rem;color:rgba(201,168,76,.7);white-space:nowrap;}
+#wakeLockBtn{
+  font-size:.72rem;padding:3px 10px;border-radius:3px;cursor:pointer;
+  background:rgba(201,168,76,.12);border:1px solid var(--border);color:var(--gold);
+  white-space:nowrap;
+}
+#wakeLockBtn.on{background:rgba(16,163,104,.2);border-color:rgba(16,163,104,.5);color:#10a368;}
+#backBtn{
+  font-size:.72rem;padding:3px 10px;border-radius:3px;cursor:pointer;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);color:#aaa;
+  text-decoration:none;white-space:nowrap;
+}
+
+/* ── コンパス（固定エリア） ── */
+#compassArea{
+  flex:0 0 auto;
+  display:flex;flex-direction:column;align-items:center;
+  padding:.6rem .5rem .4rem;
+  background:var(--card);
+  border-bottom:1px solid var(--border);
+}
+#compassWrap{position:relative;}
+#compassSvg{display:block;}
+
+#dirLabel{
+  font-size:1.6rem;font-weight:700;letter-spacing:.1em;
+  color:var(--gold);text-align:center;margin-top:.3rem;
+  min-height:2rem;
+}
+#kichiLabel{
+  font-size:1rem;letter-spacing:.1em;text-align:center;
+  min-height:1.4rem;margin-bottom:.2rem;
+}
+#subLabel{
+  font-size:.72rem;color:rgba(201,168,76,.55);text-align:center;letter-spacing:.05em;
+}
+
+/* 吉凶色 */
+.k-kichi    {color:#10a368;}
+.k-futsu    {color:#8899bb;}
+.k-syokyo   {color:#e6a01e;}
+.k-kyo      {color:#dc3c3c;}
+.k-daikyo   {color:#ff6060;}
+.k-saidaikyo{color:#ff4090;}
+
+/* ── 警告バナー ── */
+#alertBanner{
+  flex:0 0 auto;
+  font-size:.8rem;text-align:center;padding:.45rem .8rem;
+  letter-spacing:.08em;display:none;
+}
+#alertBanner.danger {display:block;background:#7b0000;color:#ffaaaa;}
+#alertBanner.warning{display:block;background:#5a3a00;color:#ffd080;}
+
+/* ── スクロールエリア ── */
+#scrollArea{
+  flex:1 1 auto;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  padding:.6rem .8rem;
+}
+
+/* ── 設定パネル ── */
+#setupPanel{
+  background:rgba(26,47,90,.4);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:.8rem;
+  margin-bottom:.7rem;
+}
+#setupPanel h2{font-size:.78rem;letter-spacing:.2em;color:var(--gold);margin-bottom:.6rem;}
+.setup-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;flex-wrap:wrap;}
+.setup-label{font-size:.75rem;color:rgba(201,168,76,.7);min-width:60px;}
+select,input[type=text],input[type=date]{
+  font-size:.8rem;padding:.3rem .5rem;
+  background:rgba(255,255,255,.06);border:1px solid var(--border);
+  border-radius:3px;color:#e8e0cc;font-family:inherit;flex:1;min-width:0;
+}
+select option{background:#1a2f5a;color:#e8e0cc;}
+#applyBtn{
+  width:100%;padding:.6rem;margin-top:.3rem;
+  background:var(--indigo);border:1px solid var(--gold);
+  color:var(--gold);font-family:inherit;font-size:.85rem;
+  letter-spacing:.2em;cursor:pointer;border-radius:4px;
+}
+#applyBtn:active{opacity:.7;}
+
+/* ── 拠点ボタン ── */
+#baseButtons{
+  display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.7rem;
+}
+.base-btn{
+  flex:1;min-width:calc(50% - .2rem);
+  padding:.5rem .4rem;text-align:center;
+  background:rgba(26,47,90,.4);border:1px solid var(--border);
+  border-radius:4px;cursor:pointer;font-family:inherit;font-size:.78rem;
+  color:#c8bfa0;line-height:1.5;
+}
+.base-btn:active{opacity:.7;}
+.base-btn.selected{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.1);}
+.base-empty{opacity:.4;cursor:default;}
+
+/* ── 目的地変更 ── */
+#destSection{
+  background:rgba(26,47,90,.3);
+  border:1px solid var(--border);border-radius:6px;
+  padding:.7rem;margin-bottom:.7rem;
+}
+#destSection h2{font-size:.75rem;letter-spacing:.15em;color:rgba(201,168,76,.7);margin-bottom:.5rem;}
+#destList{display:flex;flex-wrap:wrap;gap:.4rem;}
+.dest-btn{
+  padding:.4rem .8rem;
+  background:rgba(255,255,255,.05);border:1px solid var(--border);
+  border-radius:3px;cursor:pointer;font-family:inherit;font-size:.78rem;color:#b8a880;
+}
+.dest-btn:active{opacity:.7;}
+.dest-btn.selected{border-color:var(--gold);color:var(--gold);}
+#destNone{font-size:.75rem;color:rgba(255,255,255,.3);padding:.2rem 0;}
+
+/* ── 推奨方位 ── */
+#bestDirCard{
+  background:rgba(16,163,104,.08);
+  border:1px solid rgba(16,163,104,.3);
+  border-radius:6px;padding:.7rem .9rem;
+  margin-bottom:.7rem;
+  display:flex;align-items:center;gap:.8rem;
+}
+#bestDirCard .bd-label{font-size:.72rem;color:rgba(16,163,104,.7);letter-spacing:.1em;}
+#bestDirCard .bd-val{font-size:1.1rem;color:#10a368;font-weight:700;}
+
+/* ── GPSステータス ── */
+#gpsStatus{
+  text-align:center;font-size:.7rem;color:rgba(201,168,76,.4);
+  padding:.3rem;margin-bottom:.5rem;
+}
+
+/* ── サイズスライダー ── */
+#sizeRow{
+  display:flex;align-items:center;gap:.5rem;padding:.3rem .5rem;
+  font-size:.72rem;color:rgba(201,168,76,.5);
+}
+#sizeRow input{flex:1;accent-color:var(--gold);}
+
+/* ── 危険日モーダル ── */
+#dangerModal{
+  display:none;position:fixed;inset:0;z-index:9999;
+  background:rgba(0,0,0,.85);
+  align-items:center;justify-content:center;padding:1rem;
+}
+#dangerModal.show{display:flex;}
+#dangerBox{
+  background:#1a0a0a;border:2px solid #880e4f;border-radius:8px;
+  padding:1.5rem 1.2rem;max-width:380px;width:100%;
+  text-align:center;font-family:'Noto Serif JP',serif;
+}
+#dangerBox .dm-icon{font-size:2.5rem;margin-bottom:.5rem;}
+#dangerBox .dm-title{font-size:1.1rem;font-weight:700;color:#ff4090;letter-spacing:.15em;margin-bottom:.8rem;}
+#dangerBox .dm-body{font-size:.82rem;color:#f0c0c0;line-height:2;margin-bottom:.5rem;}
+#dangerBox .dm-dirs{font-size:.78rem;color:#ffaacc;margin-bottom:1rem;line-height:1.9;}
+#dangerBox .dm-hint{font-size:.72rem;color:rgba(255,160,160,.6);margin-bottom:1.2rem;line-height:1.8;}
+#dangerBox .dm-close{
+  display:block;width:100%;padding:.65rem;
+  background:rgba(136,14,79,.3);border:1px solid #880e4f;
+  color:#ff4090;font-family:inherit;font-size:.88rem;
+  letter-spacing:.2em;cursor:pointer;border-radius:4px;
+}
+#dangerBox .dm-close:active{opacity:.7;}
+/* 常時バナー（モーダルを閉じた後） */
+#dangerBanner{
+  display:none;flex:0 0 auto;
+  padding:.4rem .8rem;text-align:center;font-size:.78rem;
+  background:repeating-linear-gradient(135deg,#1a0010 0,#1a0010 8px,#240018 8px,#240018 16px);
+  color:#ff4090;letter-spacing:.08em;cursor:pointer;
+  border-bottom:1px solid #880e4f;
+}
+#dangerBanner.show{display:block;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ヘッダー（固定） -->
+  <div id="header">
+    <h1>🧭 方位ナビ</h1>
+    <span id="honmeiDisp">本命星：未設定</span>
+    <button id="wakeLockBtn" onclick="toggleWakeLock()">画面：通常</button>
+    <a id="backBtn" href="houigaku.html">← 方位学へ</a>
+  </div>
+
+  <!-- 危険日常時バナー -->
+  <div id="dangerBanner" onclick="showDangerModal()">☠ 本日は危険日です — タップで詳細</div>
+
+  <!-- コンパス（固定） -->
+  <div id="compassArea">
+    <div id="sizeRow">
+      🔭
+      <input type="range" id="sizeSlider" min="120" max="260" value="180" step="10"
+        oninput="resizeCompass(this.value)">
+      <span id="sizeLabel">180px</span>
+    </div>
+    <div id="compassWrap">
+      <svg id="compassSvg" width="180" height="180" viewBox="0 0 110 110" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="55" cy="55" r="52" fill="rgba(8,12,28,.95)" stroke="rgba(201,168,76,.45)" stroke-width="1.5"/>
+        <circle cx="55" cy="55" r="44" fill="none" stroke="rgba(201,168,76,.12)" stroke-width=".5"/>
+        <g id="ticks"></g>
+        <text x="55" y="10" text-anchor="middle" fill="#ff6060" font-size="9" font-family="serif" font-weight="bold">北</text>
+        <text x="100" y="58" text-anchor="middle" fill="#c9a84c" font-size="8" font-family="serif">東</text>
+        <text x="55" y="104" text-anchor="middle" fill="#c9a84c" font-size="8" font-family="serif">南</text>
+        <text x="10" y="58" text-anchor="middle" fill="#c9a84c" font-size="8" font-family="serif">西</text>
+        <text x="18" y="22" text-anchor="middle" fill="#c9a84c" font-size="5" font-family="serif" opacity=".6">北西</text>
+        <text x="92" y="22" text-anchor="middle" fill="#c9a84c" font-size="5" font-family="serif" opacity=".6">北東</text>
+        <text x="18" y="93" text-anchor="middle" fill="#c9a84c" font-size="5" font-family="serif" opacity=".6">南西</text>
+        <text x="92" y="93" text-anchor="middle" fill="#c9a84c" font-size="5" font-family="serif" opacity=".6">南東</text>
+        <g id="arrowGroup" transform="rotate(0,55,55)">
+          <polygon points="55,12 49,52 55,42 61,52" fill="#10a368" opacity=".95"/>
+          <polygon points="55,98 49,58 55,68 61,58" fill="rgba(201,168,76,.3)"/>
+        </g>
+        <g id="destArrow" transform="rotate(0,55,55)" opacity="0">
+          <polygon points="55,16 52,46 55,40 58,46" fill="#c0392b" opacity=".9"/>
+          <circle cx="55" cy="13" r="4" fill="#c0392b"/>
+        </g>
+        <circle cx="55" cy="55" r="6" fill="rgba(201,168,76,.85)"/>
+        <circle cx="55" cy="55" r="3" fill="#0c1428"/>
+      </svg>
+    </div>
+    <div id="dirLabel">─</div>
+    <div id="kichiLabel" class="k-futsu">GPS取得中...</div>
+    <div id="subLabel">方位角：<span id="bearingDisp">─</span>°　速度：<span id="speedDisp">─</span> km/h</div>
+  </div>
+
+  <!-- 警告バナー（固定） -->
+  <div id="alertBanner"></div>
+
+  <!-- スクロールエリア -->
+  <div id="scrollArea">
+
+    <div id="gpsStatus">GPS待機中...</div>
+
+    <!-- 本命星未設定バナー -->
+    <div id="setupAlert" onclick="scrollToSetup()" style="display:flex;align-items:center;justify-content:space-between;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.4);border-radius:6px;padding:.7rem 1rem;margin-bottom:.7rem;cursor:pointer;">
+      <span style="font-size:.85rem;color:var(--gold);">⚠ 本命星を設定してください</span>
+      <span style="font-size:.8rem;color:rgba(201,168,76,.6);">設定へ ▼</span>
+    </div>
+
+    <!-- 登録拠点ボタン -->
+    <div id="baseButtons"></div>
+
+    <!-- 目的地リスト -->
+    <div id="destSection">
+      <h2>目的地を選ぶ（赤矢印で方向表示）</h2>
+      <div id="destList"><span id="destNone">行先が登録されていません</span></div>
+    </div>
+
+    <!-- 推奨方位 -->
+    <div id="bestDirCard">
+      <div>
+        <div class="bd-label">本日の推奨方位</div>
+        <div class="bd-val" id="bestDirVal">─</div>
+      </div>
+      <div>
+        <div class="bd-label">目的地の方位・吉凶</div>
+        <div class="bd-val" id="destDirVal">─</div>
+      </div>
+    </div>
+
+    <!-- 設定パネル -->
+    <div id="setupPanel">
+      <h2>設　定</h2>
+      <div class="setup-row">
+        <span class="setup-label">本命星</span>
+        <select id="honSel">
+          <option value="">選択してください</option>
+          <option value="1">一白水星</option>
+          <option value="2">二黒土星</option>
+          <option value="3">三碧木星</option>
+          <option value="4">四緑木星</option>
+          <option value="5">五黄土星</option>
+          <option value="6">六白金星</option>
+          <option value="7">七赤金星</option>
+          <option value="8">八白土星</option>
+          <option value="9">九紫火星</option>
+        </select>
+      </div>
+      <div class="setup-row">
+        <span class="setup-label">月命星</span>
+        <select id="getSel">
+          <option value="">選択してください</option>
+          <option value="1">一白水星</option>
+          <option value="2">二黒土星</option>
+          <option value="3">三碧木星</option>
+          <option value="4">四緑木星</option>
+          <option value="5">五黄土星</option>
+          <option value="6">六白金星</option>
+          <option value="7">七赤金星</option>
+          <option value="8">八白土星</option>
+          <option value="9">九紫火星</option>
+        </select>
+      </div>
+      <div class="setup-row">
+        <span class="setup-label">判定日</span>
+        <input type="date" id="targetDate">
+      </div>
+      <button id="applyBtn" onclick="applySettings()">この設定で判定する</button>
+    </div>
+
+  </div><!-- /scrollArea -->
+</div><!-- /app -->
+
+<script>
+// ========== 計算関数（houigaku.htmlから移植） ==========
+function nenseiFor(y){const d=y-2024;const r=((3-d)%9+9)%9;return r===0?9:r;}
+function getseiFor(y,m){const n=nenseiFor(y);const g=((n-1)%3);const s=[[6,8,7,6,5,4,3,2,1,9,8,7],[3,2,1,9,8,7,6,5,4,3,2,1],[9,5,4,3,2,1,9,8,7,6,5,4]];return s[g][m-1];}
+function nisseiFor(y,m,d){const base=new Date(2000,0,1);const target=new Date(y,m-1,d);const diff=Math.round((target-base)/86400000);function kanshiNum(dt){const df=Math.round((dt-base)/86400000);return((df+36)%60+60)%60;}function nearestHeigo(refDate){const n=kanshiNum(refDate);const d42=((42-n)%60+60)%60;const next=new Date(refDate);next.setDate(next.getDate()+d42);const prev=new Date(refDate);prev.setDate(prev.getDate()-((60-d42)%60));if(d42===0)return new Date(refDate);return Math.abs(next-refDate)<=Math.abs(prev-refDate)?next:prev;}const indon=nearestHeigo(new Date(y,5,21));const yoton=nearestHeigo(new Date(y,11,22));let isYoton;if(target>=yoton){isYoton=true;}else if(target>=indon){isYoton=false;}else{isYoton=true;}let n;if(isYoton){n=((1+diff-1)%9+9)%9+1;}else{n=((9-diff-1)%9+9)%9+1;}return n;}
+
+const KICHI_SCORE={吉:80,普通:50,吉凶:42,小凶:35,凶:20,大凶:8,最大凶:3,超最大凶:1};
+const DIR_KEY_MAP={N:'北',NE:'北東',E:'東',SE:'南東',S:'南',SW:'南西',W:'西',NW:'北西'};
+const DIR8_NAMES=['北','北東','東','南東','南','南西','西','北西'];
+const DIR8_KEYS=['N','NE','E','SE','S','SW','W','NW'];
+
+const HOUI_TABLES={1:{1:{北:'小凶',北東:'吉',東:'普通',南東:'普通',南:'凶',南西:'吉',西:'吉',北西:'普通'},2:{北:'吉',北東:'凶',東:'普通',南東:'凶',南:'吉',南西:'大凶',西:'吉',北西:'吉凶'},3:{北:'普通',北東:'吉',東:'超最大凶',南東:'普通',南:'吉',南西:'普通',西:'最大凶',北西:'吉'},4:{北:'普通',北東:'吉凶',東:'普通',南東:'小凶',南:'普通',南西:'凶',西:'吉',北西:'凶'},5:{北:'凶',北東:'普通',東:'吉',南東:'吉',南:'凶',南西:'普通',西:'吉',北西:'吉'},6:{北:'凶',北東:'普通',東:'吉',南東:'凶',南:'凶',南西:'吉',西:'普通',北西:'小凶'},7:{北:'吉',北東:'凶',東:'凶',南東:'吉',南:'普通',南西:'吉凶',西:'大凶',北西:'普通'},8:{北:'吉',北東:'大凶',東:'吉凶',南東:'吉',南:'吉',南西:'凶',西:'凶',北西:'普通'},9:{北:'凶',北東:'吉',東:'吉',南東:'凶',南:'小凶',南西:'吉',西:'普通',北西:'凶'}},2:{1:{北:'小凶',北東:'普通',東:'吉',南東:'吉凶',南:'凶',南西:'吉',西:'普通',北西:'凶'},2:{北:'吉',北東:'凶',東:'吉',南東:'普通',南:'吉',南西:'小凶',西:'普通',北西:'普通'},3:{北:'吉',北東:'吉',東:'大凶',南東:'凶',南:'吉',南西:'吉',西:'凶',北西:'凶'},4:{北:'吉',北東:'吉',東:'凶',南東:'大凶',南:'吉',南西:'普通',西:'吉凶',北西:'凶'},5:{北:'普通',北東:'吉凶',東:'普通',南東:'普通',南:'吉',南西:'凶',西:'吉',北西:'吉'},6:{北:'凶',北東:'吉',東:'普通',南東:'凶',南:'凶',南西:'普通',西:'吉',北西:'小凶'},7:{北:'凶',北東:'普通',東:'凶',南東:'吉',南:'凶',南西:'普通',西:'小凶',北西:'吉'},8:{北:'普通',北東:'超最大凶',東:'吉',南東:'吉',南:'普通',南西:'最大凶',西:'普通',北西:'吉'},9:{北:'凶',北東:'普通',東:'吉凶',南東:'吉',南:'大凶',南西:'吉',西:'凶',北西:'普通'}},3:{1:{北:'大凶',北東:'吉',東:'凶',南東:'吉',南:'凶',南西:'普通',西:'凶',北西:'普通'},2:{北:'普通',北東:'凶',東:'吉',南東:'吉凶',南:'普通',南西:'大凶',西:'吉',北西:'凶'},3:{北:'普通',北東:'普通',東:'小凶',南東:'普通',南:'普通',南西:'吉',西:'凶',北西:'吉'},4:{北:'吉',北東:'普通',東:'普通',南東:'超最大凶',南:'普通',南西:'吉',西:'普通',北西:'最大凶'},5:{北:'吉',北東:'普通',東:'凶',南東:'吉',南:'吉',南西:'普通',西:'凶',北西:'普通'},6:{北:'普通',北東:'吉凶',東:'吉',南東:'凶',南:'吉',南西:'凶',西:'普通',北西:'大凶'},7:{北:'凶',北東:'吉',東:'凶',南東:'普通',南:'凶',南西:'吉',西:'小凶',北西:'普通'},8:{北:'吉凶',北東:'大凶',東:'普通',南東:'普通',南:'凶',南西:'凶',西:'吉',北西:'吉'},9:{北:'凶',北東:'凶',東:'普通',南東:'普通',南:'小凶',南西:'凶',西:'普通',北西:'吉'}},4:{1:{北:'大凶',北東:'凶',東:'普通',南東:'吉',南:'凶',南西:'凶',西:'吉',北西:'普通'},2:{北:'普通',北東:'凶',東:'吉凶',南東:'吉',南:'普通',南西:'大凶',西:'凶',北西:'吉'},3:{北:'普通',北東:'普通',東:'小凶',南東:'凶',南:'普通',南西:'吉',西:'凶',北西:'凶'},4:{北:'吉',北東:'普通',東:'普通',南東:'小凶',南:'普通',南西:'吉',西:'普通',北西:'凶'},5:{北:'吉',北東:'普通',東:'吉',南東:'凶',南:'吉',南西:'普通',西:'普通',北西:'凶'},6:{北:'普通',北東:'吉',東:'凶',南東:'凶',南:'吉',南西:'吉',西:'凶',北西:'大凶'},7:{北:'吉',北東:'吉凶',東:'凶',南東:'普通',南:'普通',南西:'凶',西:'小凶',北西:'普通'},8:{北:'凶',北東:'大凶',東:'普通',南東:'普通',南:'吉凶',南西:'凶',西:'吉',北西:'吉'},9:{北:'最大凶',北東:'吉',東:'普通',南東:'普通',南:'超最大凶',南西:'普通',西:'普通',北西:'吉'}},5:{1:{北:'大凶',北東:'普通',東:'吉',南東:'吉',南:'最大凶',南西:'吉',西:'普通',北西:'吉'},2:{北:'吉',北東:'最大凶',東:'吉',南東:'普通',南:'吉',南西:'大凶',西:'普通',北西:'普通'},3:{北:'吉',北東:'吉',東:'超最大凶',南東:'吉',南:'吉',南西:'吉',西:'最大凶',北西:'普通'},4:{北:'吉',北東:'吉',東:'吉',南東:'超最大凶',南:'吉',南西:'普通',西:'吉',北西:'最大凶'},5:{北:'普通',北東:'吉',東:'普通',南東:'普通',南:'吉',南西:'吉',西:'吉',北西:'吉'},6:{北:'吉',北東:'吉',東:'普通',南東:'最大凶',南:'普通',南西:'普通',西:'吉',北西:'大凶'},7:{北:'普通',北東:'普通',東:'最大凶',南東:'吉',南:'吉',南西:'普通',西:'大凶',北西:'吉'},8:{北:'普通',北東:'大凶',東:'吉',南東:'吉',南:'普通',南西:'最大凶',西:'普通',北西:'吉'},9:{北:'最大凶',北東:'普通',東:'吉',南東:'吉',南:'超最大凶',南西:'吉',西:'吉',北西:'普通'}},6:{1:{北:'超最大凶',北東:'普通',東:'吉',南東:'普通',南:'最大凶',南西:'吉',西:'普通',北西:'吉'},2:{北:'吉凶',北東:'凶',東:'普通',南東:'吉',南:'凶',南西:'小凶',西:'普通',北西:'普通'},3:{北:'吉',北東:'凶',東:'小凶',南東:'吉',南:'吉',南西:'凶',西:'凶',北西:'普通'},4:{北:'普通',北東:'吉',東:'吉凶',南東:'大凶',南:'吉',南西:'吉',西:'凶',北西:'凶'},5:{北:'吉',北東:'吉',東:'普通',南東:'凶',南:'普通',南西:'吉',西:'吉',北西:'凶'},6:{北:'吉',北東:'普通',東:'普通',南東:'凶',南:'吉',南西:'普通',西:'吉',北西:'小凶'},7:{北:'普通',北東:'吉',東:'凶',南東:'凶',南:'吉',南西:'普通',西:'大凶',北西:'吉凶'},8:{北:'普通',北東:'小凶',東:'凶',南東:'吉',南:'普通',南西:'凶',西:'吉凶',北西:'普通'},9:{北:'凶',北東:'凶',東:'吉',南東:'吉',南:'大凶',南西:'凶',西:'吉',北西:'吉'}},7:{1:{北:'小凶',北東:'凶',東:'吉',南東:'普通',南:'凶',南西:'凶',西:'普通',北西:'吉'},2:{北:'凶',北東:'凶',東:'普通',南東:'吉',南:'吉凶',南西:'小凶',西:'普通',北西:'普通'},3:{北:'吉凶',北東:'吉',東:'小凶',南東:'吉',南:'凶',南西:'普通',西:'凶',北西:'普通'},4:{北:'普通',北東:'凶',東:'吉',南東:'大凶',南:'吉',南西:'吉凶',西:'吉',北西:'凶'},5:{北:'吉',北東:'吉',東:'凶',南東:'普通',南:'普通',南西:'吉',西:'凶',北西:'吉'},6:{北:'吉',北東:'普通',東:'普通',南東:'最大凶',南:'吉',南西:'普通',西:'吉',北西:'超最大凶'},7:{北:'普通',北東:'吉',東:'凶',南東:'吉',南:'吉',南西:'普通',西:'大凶',北西:'吉'},8:{北:'普通',北東:'小凶',東:'吉',南東:'凶',南:'普通',南西:'凶',西:'吉',北西:'凶'},9:{北:'凶',北東:'普通',東:'凶',南東:'吉',南:'大凶',南西:'吉',西:'吉凶',北西:'吉'}},8:{1:{北:'小凶',北東:'普通',東:'凶',南東:'吉',南:'凶',南西:'吉',西:'凶',北西:'吉'},2:{北:'吉',北東:'最大凶',東:'吉',南東:'普通',南:'吉',南西:'超最大凶',西:'普通',北西:'普通'},3:{北:'凶',北東:'吉',東:'大凶',南東:'吉',南:'吉凶',南西:'吉',西:'凶',北西:'普通'},4:{北:'吉凶',北東:'吉',東:'吉',南東:'大凶',南:'凶',南西:'普通',西:'吉',北西:'凶'},5:{北:'普通',北東:'凶',東:'普通',南東:'普通',南:'吉',南西:'吉凶',西:'吉',北西:'吉'},6:{北:'吉',北東:'吉',東:'凶',南東:'凶',南:'普通',南西:'普通',西:'凶',北西:'小凶'},7:{北:'普通',北東:'普通',東:'凶',南東:'吉凶',南:'吉',南西:'普通',西:'小凶',北西:'凶'},8:{北:'普通',北東:'小凶',東:'吉',南東:'吉',南:'普通',南西:'凶',西:'普通',北西:'吉'},9:{北:'凶',北東:'普通',東:'吉',南東:'凶',南:'大凶',南西:'吉',西:'吉',北西:'凶'}},9:{1:{北:'大凶',北東:'吉',東:'吉',南東:'凶',南:'凶',南西:'普通',西:'吉',北西:'吉凶'},2:{北:'普通',北東:'凶',東:'凶',南東:'普通',南:'普通',南西:'小凶',西:'吉凶',北西:'吉'},3:{北:'吉',北東:'凶',東:'大凶',南東:'吉',南:'普通',南西:'凶',西:'凶',北西:'吉'},4:{北:'凶',北東:'普通',東:'吉',南東:'小凶',南:'吉凶',南西:'普通',西:'普通',北西:'凶'},5:{北:'凶',北東:'吉',東:'吉',南東:'吉',南:'凶',南西:'吉',西:'普通',北西:'普通'},6:{北:'吉',北東:'凶',東:'吉',南東:'凶',南:'普通',南西:'吉凶',西:'吉',北西:'大凶'},7:{北:'吉',北東:'普通',東:'最大凶',南東:'普通',南:'吉',南西:'吉',西:'超最大凶',北西:'吉'},8:{北:'吉',北東:'小凶',東:'普通',南東:'凶',南:'吉',南西:'凶',西:'普通',北西:'凶'},9:{北:'凶',北東:'吉',東:'普通',南東:'吉',南:'小凶',南西:'普通',西:'吉',北西:'普通'}}};
+
+function calcScore(hon,get,niss,dirKey){if(dirKey==='C')return null;const dl=DIR_KEY_MAP[dirKey];if(!dl)return 50;const t=HOUI_TABLES[hon];if(!t||!t[niss])return 50;const ks=t[niss][dl];if(!ks)return 50;return KICHI_SCORE[ks]||50;}
+function getKichiLabel(sc){if(sc===null)return'';if(sc>=80)return'吉';if(sc>=50)return'普通';if(sc>=42)return'吉凶';if(sc>=35)return'小凶';if(sc>=20)return'凶';if(sc>=8)return'大凶';if(sc>=3)return'最大凶';return'超最大凶';}
+function getBestDir(hon,niss){let best={name:'─',score:0,key:''};DIR8_KEYS.forEach((k,i)=>{const sc=calcScore(hon,0,niss,k)||0;if(sc>best.score)best={name:DIR8_NAMES[i],score:sc,key:k};});return best;}
+
+// ========== 状態変数 ==========
+var _hon=0,_get=0,_niss=0;
+var _bearing=0,_prevLat=null,_prevLng=null;
+var _lat=null,_lng=null;
+var _watchId=null;
+var _wakeLock=null;
+var _destLat=null,_destLng=null,_destName='';
+
+// ========== localStorage ==========
+const SP_BASES_KEY='houigaku_bases';
+const SP_DEST_KEY='houigaku_dests';
+const HON_KEY='houigaku_hon';
+const GET_KEY='houigaku_get';
+
+function loadBases(){
+  try{const s=JSON.parse(localStorage.getItem(SP_BASES_KEY)||'null');if(s&&s.length===4)return s;}catch(e){}
+  return [{icon:'🏠',label:'自宅',addr:''},{icon:'🏢',label:'職場',addr:''},{icon:'⭐',label:'拠点3',addr:''},{icon:'⭐',label:'拠点4',addr:''}];
+}
+function loadDests(){try{return JSON.parse(localStorage.getItem(SP_DEST_KEY)||'[]');}catch(e){return[];}}
+
+// ========== 初期化 ==========
+window.addEventListener('load',function(){
+  // 本命星・月命星を復元
+  const hon=parseInt(localStorage.getItem(HON_KEY)||'0');
+  const get=parseInt(localStorage.getItem(GET_KEY)||'0');
+  if(hon){document.getElementById('honSel').value=hon;}
+  if(get){document.getElementById('getSel').value=get;}
+
+  // 今日の日付をセット
+  const t=new Date();
+  const mm=String(t.getMonth()+1).padStart(2,'0');
+  const dd=String(t.getDate()).padStart(2,'0');
+  document.getElementById('targetDate').value=t.getFullYear()+'-'+mm+'-'+dd;
+
+  // 設定を適用
+  if(hon){
+    applySettings();
+  } else {
+    // 未設定バナーを表示（既にHTML上で表示済み）
+    document.getElementById('setupAlert').style.display='flex';
+  }
+
+  // 拠点・行先を描画
+  renderBases();
+  renderDests();
+
+  // コンパス目盛り描画
+  drawTicks();
+
+  // GPS開始
+  startGPS();
+});
+
+function scrollToSetup(){
+  document.getElementById('setupPanel').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function applySettings(){
+  const hon=parseInt(document.getElementById('honSel').value||'0');
+  const get=parseInt(document.getElementById('getSel').value||'0');
+  const dateVal=document.getElementById('targetDate').value;
+  if(!hon){alert('本命星を選択してください');return;}
+  if(!dateVal){alert('判定日を入力してください');return;}
+  const [y,m,d]=dateVal.split('-').map(Number);
+  _hon=hon; _get=get;
+  _niss=nisseiFor(y,m,d);
+  const NAMES=['','一白水星','二黒土星','三碧木星','四緑木星','五黄土星','六白金星','七赤金星','八白土星','九紫火星'];
+  document.getElementById('honmeiDisp').textContent='本命星：'+NAMES[hon];
+  var a=document.getElementById('setupAlert');
+  if(a) a.style.display='none';
+  updateBestDir();
+  checkDangerDay(hon, _niss);
+}
+
+var _dangerActive=false;
+
+function checkDangerDay(hon, niss){
+  var choMax=[], saiMax=[];
+  DIR8_KEYS.forEach(function(k,i){
+    var sc=calcScore(hon,0,niss,k)||50;
+    if(sc<=1) choMax.push(DIR8_NAMES[i]+'（超最大凶）');
+    else if(sc<=3) saiMax.push(DIR8_NAMES[i]+'（最大凶）');
+  });
+  var allDanger=choMax.concat(saiMax);
+  var banner=document.getElementById('dangerBanner');
+  if(!allDanger.length){
+    if(banner) banner.classList.remove('show');
+    _dangerActive=false;
+    return;
+  }
+  var isCho=choMax.length>0;
+  document.getElementById('dmTitle').textContent=isCho?'☠ 本日は超最大凶日':'❌ 本日は最大凶日';
+  document.getElementById('dmBody').innerHTML=isCho
+    ?'八方位のうち、<b>超最大凶</b>の方位が含まれています。<br>この日はあらゆる方向への移動・重要な決断に<br>最大限の注意が必要です。'
+    :'八方位のうち、<b>最大凶</b>の方位が含まれています。<br>外出・移動の際は方位を意識し、慎重に行動してください。';
+  document.getElementById('dmDirs').innerHTML='危険な方位：<br>'+allDanger.join('　');
+  document.getElementById('dangerModal').classList.add('show');
+  if(banner) banner.classList.add('show');
+  _dangerActive=true;
+}
+
+function showDangerModal(){
+  if(_dangerActive) document.getElementById('dangerModal').classList.add('show');
+}
+function closeDangerModal(){
+  document.getElementById('dangerModal').classList.remove('show');
+}
+
+// ========== 拠点ボタン ==========
+function renderBases(){
+  const bases=loadBases();
+  const el=document.getElementById('baseButtons');
+  el.innerHTML=bases.map((b,i)=>`
+    <button class="base-btn${b.addr?'':' base-empty'}" onclick="${b.addr?'setBase('+i+')':''}">
+      <div>${b.icon} ${b.label}</div>
+      <div style="font-size:.68rem;opacity:.6;">${b.addr||'（未登録）'}</div>
+    </button>
+  `).join('');
+}
+
+function setBase(i){
+  const bases=loadBases();
+  const b=bases[i];
+  if(!b.addr)return;
+  // 住所をジオコードして目的地に設定（簡易：住所テキストを表示するだけ）
+  _destName=b.label;
+  _destLat=null;_destLng=null; // 住所のジオコードは行先geocode
+  geocodeForNavi(b.addr, b.label, 'base');
+  document.querySelectorAll('.base-btn').forEach(btn=>btn.classList.remove('selected'));
+  document.querySelectorAll('.base-btn')[i].classList.add('selected');
+}
+
+// ========== 行先リスト ==========
+function renderDests(){
+  const dests=loadDests();
+  const el=document.getElementById('destList');
+  const none=document.getElementById('destNone');
+  if(!dests.length){if(none)none.style.display='';el.innerHTML='<span id="destNone">行先が登録されていません</span>';return;}
+  if(none)none.style.display='none';
+  el.innerHTML=dests.map((d,i)=>`
+    <button class="dest-btn" onclick="setDest(${i})">${d.name}</button>
+  `).join('');
+}
+
+function setDest(i){
+  const dests=loadDests();
+  const d=dests[i];
+  _destName=d.name;
+  _destLat=null;_destLng=null;
+  geocodeForNavi(d.addr, d.name, 'dest');
+  document.querySelectorAll('.dest-btn').forEach(btn=>btn.classList.remove('selected'));
+  document.querySelectorAll('.dest-btn')[i].classList.add('selected');
+}
+
+// ========== ジオコード（Nominatim） ==========
+function geocodeForNavi(addr, name, type){
+  fetch('https://nominatim.openstreetmap.org/search?format=json&q='+encodeURIComponent(addr)+'&limit=1&countrycodes=jp',
+    {headers:{'Accept-Language':'ja'}})
+  .then(r=>r.json())
+  .then(data=>{
+    if(data&&data.length){
+      _destLat=parseFloat(data[0].lat);
+      _destLng=parseFloat(data[0].lon);
+      _destName=name;
+      document.getElementById('destDirVal').textContent=name+'の方位を計算中...';
+      // 即座に更新
+      if(_lat!==null) updateDestDir();
+    } else {
+      document.getElementById('destDirVal').textContent='住所が見つかりません';
+    }
+  })
+  .catch(()=>{document.getElementById('destDirVal').textContent='ネットワークエラー';});
+}
+
+// ========== GPS ==========
+function startGPS(){
+  if(!navigator.geolocation){
+    document.getElementById('gpsStatus').textContent='このブラウザはGPSに対応していません';
+    return;
+  }
+  _watchId=navigator.geolocation.watchPosition(onPosition,onError,
+    {enableHighAccuracy:true,maximumAge:2000,timeout:10000});
+}
+
+function onPosition(pos){
+  var lat=pos.coords.latitude;
+  var lng=pos.coords.longitude;
+  var acc=pos.coords.accuracy;
+  var spd=pos.coords.speed;
+
+  var bearing=_bearing;
+  if(_prevLat!==null){
+    var b=calcBearing(_prevLat,_prevLng,lat,lng);
+    var dist=calcDist(_prevLat,_prevLng,lat,lng);
+    if(dist>0.005){bearing=b;_bearing=bearing;}
+  }
+  _prevLat=lat;_prevLng=lng;_lat=lat;_lng=lng;
+
+  var spdKmh=spd?Math.round(spd*3.6):0;
+  document.getElementById('gpsStatus').textContent=
+    'GPS: 精度±'+Math.round(acc)+'m　'+new Date().toLocaleTimeString('ja-JP');
+  document.getElementById('bearingDisp').textContent=Math.round(bearing);
+  document.getElementById('speedDisp').textContent=spdKmh;
+
+  // コンパス矢印回転
+  document.getElementById('arrowGroup').setAttribute('transform','rotate('+bearing+',55,55)');
+
+  // 吉凶更新
+  if(_hon) updateKichi(bearing);
+
+  // 目的地方向
+  if(_destLat!==null) updateDestDir();
+}
+
+function onError(err){
+  var msg=err.code===1?'位置情報の使用を許可してください':err.code===2?'GPS信号なし':'タイムアウト';
+  document.getElementById('gpsStatus').textContent='❌ '+msg;
+}
+
+// ========== 吉凶判定・表示 ==========
+function updateKichi(bearing){
+  if(!_hon||!_niss)return;
+  var idx=Math.round(bearing/45)%8;
+  var dirName=DIR8_NAMES[idx];
+  var dirKey=DIR8_KEYS[idx];
+  var sc=calcScore(_hon,_get,_niss,dirKey)||50;
+  var label=getKichiLabel(sc);
+  var cls,color;
+  if(sc>=80){cls='k-kichi';color='#10a368';}
+  else if(sc>=50){cls='k-futsu';color='#8899bb';}
+  else if(sc>=35){cls='k-syokyo';color='#e6a01e';}
+  else if(sc>=20){cls='k-kyo';color='#dc3c3c';}
+  else if(sc>=8){cls='k-daikyo';color='#ff6060';}
+  else{cls='k-saidaikyo';color='#ff4090';}
+
+  document.getElementById('dirLabel').textContent=dirName;
+  document.getElementById('dirLabel').style.color=color;
+  var kl=document.getElementById('kichiLabel');
+  kl.className='kichiLabel '+cls;
+  kl.textContent=label+'　'+sc+'点';
+
+  // 矢印色
+  var poly=document.querySelector('#arrowGroup polygon:first-child');
+  if(poly)poly.setAttribute('fill',color);
+
+  // 警告バナー
+  var ab=document.getElementById('alertBanner');
+  if(sc<=3){ab.className='danger';ab.textContent='☠ 超最大凶！　'+dirName+'への移動は今すぐ方向を変えてください';}
+  else if(sc<=8){ab.className='danger';ab.textContent='❌ 最大凶　'+dirName+'方向への移動は強く避けてください';}
+  else if(sc<=20){ab.className='warning';ab.textContent='⚠ 凶方位　'+dirName+'への移動は注意が必要です';}
+  else{ab.className='';ab.textContent='';}
+}
+
+function updateBestDir(){
+  if(!_hon||!_niss)return;
+  var best=getBestDir(_hon,_niss);
+  document.getElementById('bestDirVal').textContent=best.name+'（'+best.score+'点）';
+}
+
+function updateDestDir(){
+  if(!_destLat||!_lat)return;
+  var bearing=calcBearing(_lat,_lng,_destLat,_destLng);
+  var dist=calcDist(_lat,_lng,_destLat,_destLng);
+  var idx=Math.round(bearing/45)%8;
+  var dirName=DIR8_NAMES[idx];
+  var dirKey=DIR8_KEYS[idx];
+  var sc=_hon&&_niss?(calcScore(_hon,_get,_niss,dirKey)||50):50;
+  var label=getKichiLabel(sc);
+  var distStr=dist<1?Math.round(dist*1000)+'m':dist.toFixed(1)+'km';
+
+  // 赤矢印を目的地方向に向ける
+  document.getElementById('destArrow').setAttribute('transform','rotate('+bearing+',55,55)');
+  document.getElementById('destArrow').setAttribute('opacity','0.9');
+
+  document.getElementById('destDirVal').textContent=
+    _destName+'：'+dirName+' '+label+'（'+distStr+'）';
+}
+
+// ========== コンパス計算 ==========
+function calcBearing(lat1,lng1,lat2,lng2){
+  var R=Math.PI/180;
+  var dLng=(lng2-lng1)*R;
+  var y=Math.sin(dLng)*Math.cos(lat2*R);
+  var x=Math.cos(lat1*R)*Math.sin(lat2*R)-Math.sin(lat1*R)*Math.cos(lat2*R)*Math.cos(dLng);
+  return((Math.atan2(y,x)*180/Math.PI)+360)%360;
+}
+function calcDist(lat1,lng1,lat2,lng2){
+  var R=6371;var r=Math.PI/180;
+  var dLat=(lat2-lat1)*r;var dLng=(lng2-lng1)*r;
+  var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*r)*Math.cos(lat2*r)*Math.sin(dLng/2)*Math.sin(dLng/2);
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
+// ========== コンパス描画 ==========
+function drawTicks(){
+  var g=document.getElementById('ticks');
+  g.innerHTML='';
+  for(var i=0;i<72;i++){
+    var angle=i*5;var major=(i%9===0);var rad=angle*Math.PI/180;
+    var r1=major?38:41;var r2=44;
+    var x1=55+r1*Math.sin(rad);var y1=55-r1*Math.cos(rad);
+    var x2=55+r2*Math.sin(rad);var y2=55-r2*Math.cos(rad);
+    var line=document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',x1.toFixed(1));line.setAttribute('y1',y1.toFixed(1));
+    line.setAttribute('x2',x2.toFixed(1));line.setAttribute('y2',y2.toFixed(1));
+    line.setAttribute('stroke',major?'rgba(201,168,76,.7)':'rgba(201,168,76,.25)');
+    line.setAttribute('stroke-width',major?'1.2':'.5');
+    g.appendChild(line);
+  }
+}
+
+function resizeCompass(size){
+  size=parseInt(size);
+  var svg=document.getElementById('compassSvg');
+  svg.setAttribute('width',size);svg.setAttribute('height',size);
+  document.getElementById('sizeLabel').textContent=size+'px';
+}
+
+// ========== WakeLock ==========
+async function toggleWakeLock(){
+  var btn=document.getElementById('wakeLockBtn');
+  if(_wakeLock){
+    try{await _wakeLock.release();}catch(e){}
+    _wakeLock=null;
+    btn.className='';btn.textContent='画面：通常';
+  } else {
+    try{
+      if('wakeLock' in navigator){
+        _wakeLock=await navigator.wakeLock.request('screen');
+        _wakeLock.addEventListener('release',function(){_wakeLock=null;btn.className='';btn.textContent='画面：通常';});
+        btn.className='on';btn.textContent='画面：常時点灯';
+      } else {
+        alert('この端末はWakeLockに対応していません');
+      }
+    }catch(e){alert('WakeLockの取得に失敗しました');}
+  }
+}
+document.addEventListener('visibilitychange',async function(){
+  if(document.visibilityState==='visible'&&!_wakeLock){
+    // 自動再取得はしない（ユーザーが明示的にオンにした場合のみ）
+  }
+});
+</script>
+
+<!-- 危険日モーダル -->
+<div id="dangerModal">
+  <div id="dangerBox">
+    <div class="dm-icon">☠</div>
+    <div class="dm-title" id="dmTitle">本日は危険日です</div>
+    <div class="dm-body" id="dmBody"></div>
+    <div class="dm-dirs" id="dmDirs"></div>
+    <div class="dm-hint">外出・移動・重要な決断はできる限り避けてください。<br>やむを得ない場合は凶方位を意識し、慎重に行動してください。</div>
+    <button class="dm-close" onclick="closeDangerModal()">理解しました　— 閉じる</button>
+  </div>
+</div>
+</body>
+</html>
