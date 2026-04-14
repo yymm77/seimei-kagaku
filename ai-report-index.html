@@ -7,7 +7,269 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
   :root {
+    --ink: #0f0f0f;<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI革命と仕事の未来｜連載マガジン</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
     --ink: #0f0f0f;
+    --paper: #f7f3ee;
+    --accent: #c0392b;
+    --muted: #6b6359;
+    --rule: #d4cec7;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 300;
+    line-height: 1.9;
+    font-size: 16px;
+  }
+
+  /* ヘッダー */
+  header {
+    border-bottom: 3px double var(--ink);
+    padding: 32px 24px 24px;
+    text-align: center;
+  }
+  .site-link {
+    font-size: 11px;
+    letter-spacing: .25em;
+    color: var(--muted);
+    text-decoration: none;
+    display: inline-block;
+    margin-bottom: 20px;
+  }
+  .site-link:hover { color: var(--accent); }
+  .mag-label {
+    display: inline-block;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Noto Serif JP', serif;
+    font-size: 11px;
+    letter-spacing: .2em;
+    padding: 4px 16px;
+    margin-bottom: 20px;
+  }
+  header h1 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: clamp(24px, 5vw, 38px);
+    font-weight: 900;
+    line-height: 1.4;
+    letter-spacing: .04em;
+    margin-bottom: 16px;
+  }
+  header p {
+    font-size: 14px;
+    color: var(--muted);
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.85;
+  }
+
+  /* メイン */
+  main {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 56px 24px 80px;
+  }
+
+  /* 連載リード */
+  .series-intro {
+    border-left: 4px solid var(--accent);
+    padding: 20px 24px;
+    margin-bottom: 48px;
+    background: rgba(192,57,43,.04);
+  }
+  .series-intro p {
+    font-size: 15px;
+    line-height: 1.9;
+    color: #333;
+  }
+
+  /* 記事カード */
+  .article-list { list-style: none; }
+  .article-item {
+    border-bottom: 1px solid var(--rule);
+  }
+  .article-item:first-child { border-top: 1px solid var(--rule); }
+
+  .article-link {
+    display: grid;
+    grid-template-columns: 56px 1fr 32px;
+    align-items: center;
+    gap: 0 20px;
+    padding: 24px 8px;
+    text-decoration: none;
+    color: var(--ink);
+    transition: background .15s;
+  }
+  .article-link:hover { background: rgba(192,57,43,.04); }
+  .article-link:hover .arrow { color: var(--accent); }
+
+  .ep-num {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--rule);
+    text-align: center;
+    line-height: 1;
+    padding-top: 4px;
+  }
+  .article-link:hover .ep-num { color: var(--accent); }
+
+  .ep-body {}
+  .ep-label {
+    font-size: 11px;
+    letter-spacing: .2em;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 6px;
+  }
+  .ep-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.5;
+    display: block;
+    margin-bottom: 6px;
+  }
+  .ep-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .arrow {
+    font-size: 18px;
+    color: var(--rule);
+    text-align: right;
+    transition: color .15s;
+  }
+
+  /* フッター */
+  .back-link {
+    display: block;
+    text-align: center;
+    margin-top: 56px;
+    padding-top: 32px;
+    border-top: 3px double var(--ink);
+    font-size: 13px;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: .1em;
+  }
+  .back-link:hover { color: var(--accent); }
+
+  .date-note {
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: .1em;
+    margin-top: 20px;
+  }
+
+  @media (max-width: 480px) {
+    .article-link { grid-template-columns: 44px 1fr 24px; gap: 0 12px; }
+    .ep-num { font-size: 22px; }
+    .ep-title { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="site-link" href="index.html">← 姓名科学サイトへ戻る</a>
+  <div class="mag-label">連載マガジン</div>
+  <h1>AI革命と仕事の未来</h1>
+  <p>10兆パラメーターのAIが登場した今、私たちの仕事はどう変わるのか。全5回の連載レポート。</p>
+</header>
+
+<main>
+
+  <div class="series-intro">
+    <p>2026年4月、Anthropicが「クロード・ミトス」を発表した。10兆パラメーターという前例のない規模のAIは、強力すぎて一般公開が保留されるという事態を引き起こした。この連載では、その衝撃の意味と、私たちが今すべきことを5回にわたって考える。</p>
+  </div>
+
+  <ul class="article-list">
+
+    <li class="article-item">
+      <a class="article-link" href="ai-report01.html">
+        <span class="ep-num">01</span>
+        <span class="ep-body">
+          <span class="ep-label">第1回</span>
+          <span class="ep-title">10兆パラメーターの衝撃<br>—— もう、止められない</span>
+          <span class="ep-desc">クロード・ミトスとは何者か。開発規模、リーク騒動、そして「強力すぎて公開できない」という前例のない事態。</span>
+        </span>
+        <span class="arrow">›</span>
+      </a>
+    </li>
+
+    <li class="article-item">
+      <a class="article-link" href="ai-report02.html">
+        <span class="ep-num">02</span>
+        <span class="ep-body">
+          <span class="ep-label">第2回</span>
+          <span class="ep-title">AIが越えた「三つの壁」<br>—— 境界線は、もう動いている</span>
+          <span class="ep-desc">「創造性」「戦略」「文脈の理解」はAIには無理だとされてきた。その常識が今まさに崩れつつある。</span>
+        </span>
+        <span class="arrow">›</span>
+      </a>
+    </li>
+
+    <li class="article-item">
+      <a class="article-link" href="ai-report03.html">
+        <span class="ep-num">03</span>
+        <span class="ep-body">
+          <span class="ep-label">第3回</span>
+          <span class="ep-title">最初に消える5つの職業カテゴリー</span>
+          <span class="ep-desc">職業名ではなくタスクのリストで見ると、見え方が一変する。データ処理型、情報キュレーション型、専門型……</span>
+        </span>
+        <span class="arrow">›</span>
+      </a>
+    </li>
+
+    <li class="article-item">
+      <a class="article-link" href="ai-report04.html">
+        <span class="ep-num">04</span>
+        <span class="ep-body">
+          <span class="ep-label">第4回</span>
+          <span class="ep-title">日本の49%と、個人が今すべきこと</span>
+          <span class="ep-desc">日本は遅れているのか、それともまだ間に合うのか。AIスキルを持つ人材は年収が200万円以上高いという現実。</span>
+        </span>
+        <span class="arrow">›</span>
+      </a>
+    </li>
+
+    <li class="article-item">
+      <a class="article-link" href="ai-report05.html">
+        <span class="ep-num">05</span>
+        <span class="ep-body">
+          <span class="ep-label">第5回（最終回）</span>
+          <span class="ep-title">人間にしかできない「問い」を立てること</span>
+          <span class="ep-desc">AIは答えを出すことが得意だ。しかし「正しい問を立てること」はまだ人間の仕事だ。この違いが明暗を分ける。</span>
+        </span>
+        <span class="arrow">›</span>
+      </a>
+    </li>
+
+  </ul>
+
+  <p class="date-note">2026年4月｜テクノロジー最前線レポート</p>
+
+  <a class="back-link" href="index.html">← 姓名科学・予測ツールサイトへ戻る</a>
+
+</main>
+
+</body>
+</html>
+
     --paper: #f7f3ee;
     --accent: #c0392b;
     --muted: #6b6359;
