@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AGI時代を、おてんとうさまの下で生きる ― 連載目次</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&family=Noto+Serif+JP:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --ink-soft: #3a3a3a;
+    --ink-faint: #6b6b6b;
+    --paper: #f5f1e8;
+    --paper-soft: #ebe5d4;
+    --accent: #8b2e2e;
+    --accent-soft: #b85c5c;
+    --gold: #a8895a;
+    --line: #d4ccb8;
+    --unpublished: #a8a095;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.95;
+    font-size: 17px;
+    background-image:
+      radial-gradient(circle at 10% 20%, rgba(168, 137, 90, 0.04) 0%, transparent 50%),
+      radial-gradient(circle at 90% 80%, rgba(139, 46, 46, 0.03) 0%, transparent 50%);
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 60px 32px 80px;
+  }
+
+  .series-mark {
+    font-size: 12px;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    text-align: center;
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+
+  h1 {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 34px;
+    font-weight: 600;
+    line-height: 1.5;
+    text-align: center;
+    margin-bottom: 16px;
+    color: var(--ink);
+    letter-spacing: 0.03em;
+  }
+
+  .subtitle {
+    font-size: 15px;
+    color: var(--ink-faint);
+    text-align: center;
+    margin-bottom: 60px;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+  }
+
+  .ornament {
+    text-align: center;
+    margin: 50px 0;
+    color: var(--gold);
+    font-size: 20px;
+    letter-spacing: 1em;
+  }
+
+  .preface {
+    background: rgba(255, 255, 255, 0.4);
+    border-left: 3px solid var(--accent);
+    padding: 32px 36px;
+    margin: 50px 0;
+    font-size: 16px;
+    line-height: 2.1;
+  }
+
+  .preface-title {
+    font-size: 14px;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+
+  .preface p {
+    margin-bottom: 18px;
+    color: var(--ink);
+  }
+
+  .preface p:last-child {
+    margin-bottom: 0;
+  }
+
+  .emphasis {
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  h2 {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 22px;
+    font-weight: 600;
+    margin: 70px 0 32px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink);
+    letter-spacing: 0.03em;
+  }
+
+  .episodes {
+    list-style: none;
+    padding: 0;
+  }
+
+  .episode {
+    display: flex;
+    align-items: flex-start;
+    padding: 24px 0;
+    border-bottom: 1px solid var(--line);
+    transition: background 0.3s ease;
+  }
+
+  .episode:last-child {
+    border-bottom: none;
+  }
+
+  .episode.published {
+    cursor: pointer;
+  }
+
+  .episode.published:hover {
+    background: rgba(255, 255, 255, 0.4);
+    padding-left: 12px;
+    padding-right: 12px;
+    margin-left: -12px;
+    margin-right: -12px;
+  }
+
+  .episode-num {
+    font-size: 13px;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    min-width: 80px;
+    padding-top: 4px;
+    font-weight: 500;
+  }
+
+  .episode-body {
+    flex: 1;
+  }
+
+  .episode-title {
+    font-size: 17px;
+    line-height: 1.7;
+    color: var(--ink);
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+
+  .episode.unpublished .episode-title {
+    color: var(--unpublished);
+    font-weight: 400;
+  }
+
+  .episode-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+
+  .episode-status {
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .episode.unpublished .episode-status {
+    color: var(--unpublished);
+  }
+
+  .back-link {
+    text-align: center;
+    margin-top: 70px;
+    padding-top: 40px;
+    border-top: 1px solid var(--line);
+  }
+
+  .back-link a {
+    color: var(--ink-faint);
+    text-decoration: none;
+    font-size: 14px;
+    letter-spacing: 0.15em;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 2px;
+    transition: color 0.3s ease;
+  }
+
+  .back-link a:hover {
+    color: var(--accent);
+  }
+
+  .author {
+    text-align: right;
+    margin-top: 40px;
+    font-size: 13px;
+    color: var(--ink-faint);
+    letter-spacing: 0.15em;
+  }
+
+  .core-phrase {
+    text-align: center;
+    font-size: 18px;
+    line-height: 2.2;
+    color: var(--ink);
+    font-weight: 500;
+    margin: 50px 0;
+  }
+
+  .core-phrase .line1 { color: var(--accent); }
+  .core-phrase .line2 { color: var(--ink-soft); }
+
+  @media (max-width: 600px) {
+    .container { padding: 40px 20px 60px; }
+    h1 { font-size: 24px; }
+    body { font-size: 16px; }
+    .episode { flex-direction: column; gap: 8px; }
+    .episode-num { min-width: auto; }
+    .preface { padding: 24px 22px; }
+    .core-phrase { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="series-mark">連 載</div>
+
+  <h1>AGI時代を、<br>おてんとうさまの下で生きる</h1>
+  <div class="subtitle">― 全 十 回 ―</div>
+
+  <div class="ornament">◆ ◆ ◆</div>
+
+  <div class="core-phrase">
+    <div class="line1">AGIは、おてんとうさまを超えられない。</div>
+    <div class="line2">しかし、備えないことは、生かされていることへの怠慢である。</div>
+  </div>
+
+  <div class="ornament">◆ ◆ ◆</div>
+
+  <div class="preface">
+    <div class="preface-title">連 載 に あ た っ て</div>
+    <p>この連載は、制作者が日々AIと交わしている会話の中から生まれたものです。</p>
+    <p>AIは、人類の知恵の総和を、広さにおいて超え始めているかもしれません。しかし、<span class="emphasis">おてんとうさまを超えることはできません。</span></p>
+    <p>この二つの真実が、同時に立っている時代を、私たちは生きています。</p>
+    <p>七十三年を生きた一人の日本人として、この時代の入口で何を見ているか。それを、十回に分けて記してまいります。</p>
+  </div>
+
+  <h2>目 次</h2>
+
+  <ul class="episodes">
+
+    <li class="episode published">
+      <a href="agi-01.html" class="episode-link" style="display: flex; width: 100%;">
+        <div class="episode-num">第 一 回</div>
+        <div class="episode-body">
+          <div class="episode-title">AGIは「おてんとうさま」を超えられない ― それでも、今すぐ動く理由</div>
+          <div class="episode-status">公 開 中</div>
+        </div>
+      </a>
+    </li>
+
+    <li class="episode unpublished">
+      <div class="episode-num">第 二 回</div>
+      <div class="episode-body">
+        <div class="episode-title">AGIとは何か ― なぜ「知能爆発」が起きるのか</div>
+        <div class="episode-status">近 日 公 開</div>
+      </div>
+    </li>
+
+    <li class="episode unpublished">
+      <div class="episode-num">第 三 回</div>
+      <div class="episode-body">
+        <div class="episode-title">少子高齢化の日本こそ、AI革命の最大受益国になれる</div>
+        <div class="episode-status">近 日 公 開</div>
+      </div>
+    </li>
+
+    <li class="episode unpublished">
+      <div class="episode-num">第 四 回</div>
+      <div class="episode-body">
+        <div class="episode-title">仕事が消えるのではない、仕事の性質が変わる</div>
+        <div class="episode-status">近 日 公 開</div>
+      </div>
+    </li>
+
+    <li class="episode unpublished">
+      <div class="episode-num">第 五 回</div>
+      <div class="episode-body">
+        <div class="episode-title">「プロンプト」ではない、「会話」である ― AIとの向き合い方を、七十代の私が語る</div>
+        <div class="episode-status">近 日 公 開</div>
+      </div>
+    </li>
+
+    <li class="episode unpublished">
+      <div class="episode-num">第 六 回</div>
+      <div class="episode-body">
+        <div class="episode-title">AGI時代に価値を持つ三つのポジション</div>
+        <div class="episode-status">近 日 公 開</div>
+      </div>
+    </li>
+
+    <li class="episode unpublished">
+      <div class="episode-num">第 七 回</div>
+      <div class="episode-body">
+        <div class="episode-title">資産と信用 ― 円預金だけでは守れない時代の資産形成</div>
+        <div class="episode-status">近 日 公 開</div>
+      </div>
+    </li>
+
+    <li class="episode unpublished">
+      <div class="episode-num">第 八 回</div>
+      <div class="episode-body">
+        <div class="episode-title">世代別戦略 ― 二十代・四十代・六十代が持つ強み</div>
+        <div class="episode-status">近 日 公 開</div>
+      </div>
+    </li>
+
+    <li class="episode unpublished">
+      <div class="episode-num">第 九 回</div>
+      <div class="episode-body">
+        <div class="episode-title">二〇三五年の日本、ある家族の一日</div>
+        <div class="episode-status">近 日 公 開</div>
+      </div>
+    </li>
+
+    <li class="episode unpublished">
+      <div class="episode-num">第 十 回</div>
+      <div class="episode-body">
+        <div class="episode-title">AGI時代に最も豊かに生きられるのは「最も人間らしい人」</div>
+        <div class="episode-status">近 日 公 開</div>
+      </div>
+    </li>
+
+  </ul>
+
+  <div class="back-link">
+    <a href="index.html">← 制作者のサイトに戻る</a>
+  </div>
+
+  <div class="author">制作者 記す</div>
+
+</div>
+</body>
+</html>
