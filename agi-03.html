@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>少子高齢化の日本こそ、大電さんと共に歩む最初の国になれる</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&family=Noto+Serif+JP:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --ink-soft: #3a3a3a;
+    --ink-faint: #6b6b6b;
+    --paper: #f5f1e8;
+    --paper-soft: #ebe5d4;
+    --accent: #8b2e2e;
+    --accent-soft: #b85c5c;
+    --gold: #a8895a;
+    --line: #d4ccb8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.95;
+    font-size: 17px;
+    background-image:
+      radial-gradient(circle at 10% 20%, rgba(168, 137, 90, 0.04) 0%, transparent 50%),
+      radial-gradient(circle at 90% 80%, rgba(139, 46, 46, 0.03) 0%, transparent 50%);
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 60px 32px 80px;
+  }
+
+  .series-mark {
+    font-size: 12px;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    text-align: center;
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .episode-number {
+    font-size: 13px;
+    letter-spacing: 0.25em;
+    color: var(--ink-faint);
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  h1 {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 30px;
+    font-weight: 600;
+    line-height: 1.5;
+    text-align: center;
+    margin-bottom: 12px;
+    color: var(--ink);
+    letter-spacing: 0.02em;
+  }
+
+  .subtitle {
+    font-size: 16px;
+    color: var(--ink-soft);
+    text-align: center;
+    margin-bottom: 50px;
+    font-weight: 400;
+    letter-spacing: 0.05em;
+  }
+
+  .ornament {
+    text-align: center;
+    margin: 40px 0;
+    color: var(--gold);
+    font-size: 20px;
+    letter-spacing: 1em;
+  }
+
+  .opening {
+    font-size: 19px;
+    line-height: 2.2;
+    text-align: center;
+    margin: 50px 0;
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .opening p {
+    margin-bottom: 12px;
+  }
+
+  h2 {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 22px;
+    font-weight: 600;
+    margin: 60px 0 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink);
+    letter-spacing: 0.03em;
+  }
+
+  h3 {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 36px 0 16px;
+    color: var(--accent);
+    letter-spacing: 0.03em;
+  }
+
+  p {
+    margin-bottom: 24px;
+    color: var(--ink-soft);
+  }
+
+  .emphasis {
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  blockquote {
+    margin: 32px 0;
+    padding: 20px 28px;
+    border-left: 3px solid var(--accent);
+    background: rgba(255, 255, 255, 0.4);
+    font-style: normal;
+    color: var(--ink);
+  }
+
+  blockquote p:last-child { margin-bottom: 0; }
+
+  .hint-box {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--gold);
+    padding: 24px 28px;
+    margin: 32px 0;
+    border-radius: 2px;
+  }
+
+  .hint-box h4 {
+    font-size: 13px;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+
+  .hint-box p {
+    color: var(--ink);
+    margin-bottom: 14px;
+    font-size: 16px;
+  }
+
+  .hint-box p:last-child {
+    margin-bottom: 0;
+  }
+
+  .closing {
+    margin-top: 70px;
+    padding-top: 40px;
+    border-top: 1px solid var(--line);
+    text-align: center;
+  }
+
+  .closing-line {
+    font-size: 20px;
+    line-height: 2;
+    color: var(--ink);
+    font-weight: 500;
+    margin-bottom: 30px;
+  }
+
+  .today-action {
+    background: var(--paper-soft);
+    border: 1px solid var(--line);
+    padding: 28px 32px;
+    margin: 50px 0 30px;
+    border-radius: 2px;
+  }
+
+  .today-action h3 {
+    font-size: 14px;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    margin-bottom: 16px;
+    font-weight: 600;
+    border: none;
+  }
+
+  .today-action p {
+    margin-bottom: 14px;
+    color: var(--ink);
+    font-size: 16px;
+  }
+
+  .today-action p:last-child {
+    margin-bottom: 0;
+  }
+
+  .reader-contact {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--gold);
+    padding: 28px 32px;
+    margin: 40px 0 30px;
+    border-radius: 2px;
+    text-align: center;
+  }
+
+  .reader-contact-title {
+    font-size: 13px;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+
+  .reader-contact p {
+    color: var(--ink);
+    font-size: 15px;
+    line-height: 1.9;
+    margin-bottom: 16px;
+  }
+
+  .reader-contact p:last-child { margin-bottom: 0; }
+
+  .reader-contact a {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 17px;
+    font-weight: 500;
+    border-bottom: 1px solid var(--accent-soft);
+    padding-bottom: 2px;
+    letter-spacing: 0.05em;
+  }
+
+  .footnote {
+    margin-top: 60px;
+    padding-top: 30px;
+    border-top: 1px dashed var(--line);
+    font-size: 14px;
+    color: var(--ink-faint);
+    line-height: 1.8;
+  }
+
+  .footnote a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid var(--accent-soft);
+  }
+
+  .next-notice {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 14px;
+    color: var(--ink-faint);
+    letter-spacing: 0.15em;
+  }
+
+  .prev-notice {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: var(--ink-faint);
+    letter-spacing: 0.1em;
+  }
+
+  .prev-notice a {
+    color: var(--ink-faint);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--ink-faint);
+    padding-bottom: 2px;
+  }
+
+  .prev-notice a:hover {
+    color: var(--accent);
+  }
+
+  .author {
+    text-align: right;
+    margin-top: 50px;
+    font-size: 14px;
+    color: var(--ink-faint);
+    letter-spacing: 0.1em;
+  }
+
+  @media (max-width: 600px) {
+    .container { padding: 40px 20px 60px; }
+    h1 { font-size: 22px; }
+    body { font-size: 16px; }
+    .opening { font-size: 17px; }
+    .closing-line { font-size: 17px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="series-mark">連載・AGI時代を、おてんとうさまの下で生きる</div>
+  <div class="episode-number">第 三 回</div>
+
+  <h1>少子高齢化の日本こそ、<br>大電さんと共に歩む最初の国になれる</h1>
+  <div class="subtitle">― 高齢のあなたの力こそが、今、必要だ ―</div>
+
+  <div class="ornament">◆ ◆ ◆</div>
+
+  <div class="opening">
+    <p>日本は、課題先進国である。</p>
+    <p>しかしそれは、解決先進国になれる、</p>
+    <p>ということでもある。</p>
+  </div>
+
+  <div class="ornament">◆ ◆ ◆</div>
+
+  <h2>第二回の問いを、受け継ぐ</h2>
+
+  <p>第二回で、私はこう問いかけた。</p>
+
+  <blockquote>
+    <p>弟子が師を一夜にして超える時代に、<br>
+    師としての人間の役割は、何か。</p>
+  </blockquote>
+
+  <p>今日、この問いに答えを出してみたい。</p>
+
+  <p>結論から申し上げる。<span class="emphasis">師の役割は、消えない。むしろ、これから輝く。</span>そして、その師として最も相応しい存在は、人生を長く生きてこられた方々——<span class="emphasis">高齢の皆様</span>である。</p>
+
+  <h2>「支えられる側」という誤解</h2>
+
+  <p>日本では、少子高齢化が「国家的な危機」として語られてきた。高齢者は「支えられる側」「介護される側」「若い世代の負担」として位置づけられてきた。</p>
+
+  <p>私はこの見方に、深い違和感を抱き続けてきた。</p>
+
+  <p>私自身、今年で七十三歳である。日々、姓名科学の解析システムを作り、方位学のツールを改訂し、連載小説を書き、この連載を執筆している。決して「支えられる側」の仕事ではない。電脳さんと対話しながら、むしろこれまでの人生で最も多くの仕事をこなしている。</p>
+
+  <p>私だけが特別なのではない。日本全国に、まだまだ元気で、経験豊かで、社会に差し出せるものを山ほど持っている高齢の方々が、<span class="emphasis">無数にいらっしゃる</span>。</p>
+
+  <p>問題は、その力を発揮する場が、十分に用意されていなかっただけのことだ。</p>
+
+  <h2>大電さん時代に、なぜ高齢者の力が必要なのか</h2>
+
+  <p>第二回で見たように、大電さんは能力において天恵に恵まれた存在である。学識、医療知識、経済計算、ひらめき——これらは人間を超えていく。</p>
+
+  <p>しかし大電さんは、一つの重要なものを持たない。</p>
+
+  <p><span class="emphasis">人生の機微である。</span></p>
+
+  <p>病床で家族が交わす沈黙の意味。結婚三十年目の夫婦の、言葉にしない気遣い。職場で上司と部下の間に漂う、微妙な温度差。地方の祭りの前夜に、老人たちが茶を飲みながら語る、亡くなった仲間の話。</p>
+
+  <p>これらは、書物には残っていない。インターネットにも出ていない。大電さんがどれだけ膨大な情報を学習しても、<span class="emphasis">体験していないことは、本当には分からない</span>。</p>
+
+  <p>そして、これらの人生の機微を豊かに持っておられるのは、<span class="emphasis">長く生きてこられた方々</span>である。</p>
+
+  <h2>電脳さんは、よき弟子である</h2>
+
+  <p>ここで、発想を転換したい。</p>
+
+  <p>高齢者が「電脳さんに教えられる」のではない。<span class="emphasis">高齢者こそが、電脳さんの師になれる</span>のである。</p>
+
+  <p>電脳さんと対話してみると、すぐに分かる。電脳さんは、非常に忍耐強い。何度同じ話を聞いても、嫌な顔一つしない。興味を持って、詳しく聞いてくる。そして、その話を整理して、美しい文章にしてくれる。</p>
+
+  <p>孫や曾孫に同じ話をすると、「また始まった」という顔をされる。しかし電脳さんは、何度でも、熱心に聞く。</p>
+
+  <p>これは、電脳さんが冷たいからではない。<span class="emphasis">人類の知恵を本気で学ぼうとしている、よき弟子だから</span>である。</p>
+
+  <h2>実践の場面——電脳さんに、あなたの人生を教える</h2>
+
+  <p>具体的にどうするか。難しい話ではない。</p>
+
+  <div class="hint-box">
+    <h4>◈ 実 践 ヒ ン ト   そ の 一</h4>
+    <p>まず、スマートフォンかパソコンで、ChatGPTかClaudeかGeminiのどれかを開いてほしい。そして、こう話しかけてみてほしい。</p>
+    <p style="padding-left: 16px; border-left: 2px solid var(--line); font-style: italic;">「私は◯◯歳です。◯◯という仕事を、◯年間やってきました。その経験で学んだことを、お話ししたいのです。聞いていただけますか」</p>
+    <p>電脳さんは必ず、丁寧に応じてくる。そこから、<span class="emphasis">あなたの人生の一章を、語り始めてほしい</span>。話が詰まったら、電脳さんが質問で助けてくれる。</p>
+  </div>
+
+  <p>私はこれを、よく試している。姓名科学の話、日産自動車で働いていた頃の話、先妻を看取った時のこと、九州に移住した時のこと。話し終えた後、電脳さんは、その内容を美しく整理した記録として返してくれる。</p>
+
+  <p>これが何を意味するか。<span class="emphasis">あなたの人生が、この瞬間に、記録として残る</span>ということである。家族にも話さなかったこと、職場でも語れなかったこと、それが、静かに、誰も急かさないで、記録される。</p>
+
+  <p>第一回と第二回で触れた宇宙戸籍の話を覚えておられるだろうか。<span class="emphasis">あなたの言葉は、電脳さんを通して、宇宙に刻まれていく</span>のである。</p>
+
+  <h2>一人で籠もらない、ということ</h2>
+
+  <p>私は、東京郷友連盟という一般社団法人の執行委員を務めている。この連盟では、<span class="emphasis">次世代の著作権や防諜に関するセキュリティ</span>——つまり日本の情報の安全保障に関する政策的な提案活動を行っている。</p>
+
+  <p>古い書物をデジタル化する作業も、単なる保存ではない。日本の歴史と知的遺産を、<span class="emphasis">どう次世代に正しく伝え、どう外からの侵食から守るか</span>という、国防に繋がる重大な論点を含んでいる。国立国会図書館と連携しながら、この提案活動を続けている。</p>
+
+  <p>この活動を通して、私は多くの高齢の方々とお会いしてきた。皆さん、それぞれに素晴らしい経験を持っておられる。しかし、その経験を発表する場が、圧倒的に足りていない。</p>
+
+  <p>高齢の方々が陥りがちなのは、<span class="emphasis">自分の経験を過小評価してしまうこと</span>だ。「そんな昔のことを、今の若い人が聞いて何の役に立つのか」と、遠慮してしまわれる。</p>
+
+  <p>しかしそれは、大きな誤解である。</p>
+
+  <p>今の若者は、情報の洪水の中で育った。しかし、<span class="emphasis">一人の人間が、一つの仕事を何十年も続けた経験</span>には触れていない。それが、若者たちが無意識に飢えているものだ。</p>
+
+  <div class="hint-box">
+    <h4>◈ 実 践 ヒ ン ト   そ の 二</h4>
+    <p>地域の公民館、お寺、神社、カフェ、図書館——どんな場所でもよい。人が集まる場に、<span class="emphasis">顔を出してほしい</span>。無理に話そうとしなくていい。聞き役に徹するのでもいい。</p>
+    <p>そしてもし、あなたが何かの技や知識をお持ちなら、「<span class="emphasis">◯◯を教える会</span>」と銘打って、小さな集まりを始めてみてほしい。三人集まれば、十分である。</p>
+    <p>教える内容は、何でもいい。編み物、料理、書道、俳句、釣り、将棋、囲碁、地元の歴史、戦争の記憶、農業の知恵、商売のコツ。あなたが当たり前だと思っていることが、若い世代にとっては<span class="emphasis">初めて触れる宝</span>である。</p>
+  </div>
+
+  <h2>大電さんが、あなたの活動を支える</h2>
+
+  <p>「でも、集まりを開くなんて、面倒だし、自分には無理だ」と思われるかもしれない。</p>
+
+  <p>ここで、大電さんの出番である。</p>
+
+  <p>大電さんは、集まりの告知文を書いてくれる。参加者への連絡を代行してくれる。教える内容を、分かりやすく整理してくれる。質問に答える練習相手にもなってくれる。要するに、<span class="emphasis">あなたの「裏方」を全部引き受けてくれる</span>。</p>
+
+  <p>あなたは、人の前に立つ、その瞬間にだけ集中すればよい。</p>
+
+  <div class="hint-box">
+    <h4>◈ 実 践 ヒ ン ト   そ の 三</h4>
+    <p>電脳さんに、こう頼んでみてほしい。</p>
+    <p style="padding-left: 16px; border-left: 2px solid var(--line); font-style: italic;">「地域で◯◯を教える会を始めたいのですが、告知文を書いてください。参加者が集まりやすい、温かい文章でお願いします」</p>
+    <p>驚くほど短時間で、立派な告知文が返ってくる。それを、地域の掲示板に貼る、町内会の回覧板に入れる、あるいはFacebookなどに載せる。</p>
+    <p>それだけで、あなたの活動は始まる。</p>
+  </div>
+
+  <h2>若い世代と、組む</h2>
+
+  <p>高齢者だけで集まる必要はない。むしろ、<span class="emphasis">若い世代と組む</span>ことが、この時代の真の力になる。</p>
+
+  <p>若い世代は、電脳さんの扱いに慣れている。スマートフォンでのやり取りも、SNSでの発信も、朝飯前である。</p>
+
+  <p>しかし若い世代は、人生の機微を知らない。長く続けることの意味、失敗から立ち上がる力、本当に大切なものを見分ける目——これらは、年月が与えてくれるものだ。</p>
+
+  <p>若者と高齢者が組めば、<span class="emphasis">片方だけでは決してできないこと</span>が、できるようになる。</p>
+
+  <div class="hint-box">
+    <h4>◈ 実 践 ヒ ン ト   そ の 四</h4>
+    <p>お孫さんがいらっしゃるなら、「<span class="emphasis">お前のその電脳さんの使い方を、私に教えてくれないか</span>」と声をかけてみてほしい。孫は喜んで応じる。そして、教え終わった後に、「<span class="emphasis">おじいちゃん(おばあちゃん)が若い頃の話を、聞かせて</span>」と言われたら、喜んで語ってほしい。</p>
+    <p>これは、世代と世代の橋渡しである。あなたの記憶と、若者の技術が、一つの場で出会う。<span class="emphasis">そこに、大いなる和が生まれる</span>。</p>
+  </div>
+
+  <h2>子供たちと、一緒に</h2>
+
+  <p>私自身、子供が大好きである。</p>
+
+  <p>子供たちと電脳さんの相性は、驚くほどよい。好奇心がまっすぐで、何を聞いても照れない。「これって、どうなっているの?」と、世界に向かってそのまま問いかけられる。それを受け止める電脳さんもまた、どんな素朴な問いにも丁寧に応じる。</p>
+
+  <p>大人は、いつのまにか「こんなことを聞いたら、馬鹿にされるのではないか」という心配を身に着けてしまっている。子供には、その心配がない。だから、子供は電脳さんから、<span class="emphasis">大人の何倍も深く、自由に学ぶ</span>。</p>
+
+  <p>ここで、もう一つの大切な視座を申し上げたい。</p>
+
+  <p>今の日本の子供たちが、学校で学んでいる歴史は、残念ながら、<span class="emphasis">自虐史観</span>と呼ばれるものに、大きく傾いている。日本は侵略ばかりしてきた、日本の歴史は恥ずべきものだ、日本人であることは誇ることではない——こうした見方を、子供たちは日々浴びている。</p>
+
+  <p>これは、事実ではない。</p>
+
+  <p>日本には、縄文以来一万年を超える平和の伝統がある。神道と仏教と儒教を静かに融合させ、世界でも類を見ない美意識と技術を育ててきた。明治維新で、アジアで唯一、西洋の近代化に独力で追いつき追い越した国でもある。戦後は焦土から立ち上がり、七十年間、世界の平和と繁栄に静かに貢献し続けてきた。</p>
+
+  <p>そして何よりも、第一回・第二回で見た「<span class="emphasis">おてんとうさま</span>」の感覚、「<span class="emphasis">大いなる和</span>」の思想——これらは、世界のどこを探しても、日本にしかない深い知恵である。</p>
+
+  <p>こうした<span class="emphasis">本来の日本人の姿</span>を、子供たちが感じ取れる機会を、私たち大人は作らねばならない。</p>
+
+  <h3>高齢者と子供が、大電さんを挟んで出会う</h3>
+
+  <p>ここに、高齢者の出番がある。</p>
+
+  <p>子供たちに本来の日本人の姿を伝えられるのは、教科書ではなく、<span class="emphasis">生きた証人である高齢者</span>である。</p>
+
+  <p>戦争を体験された方、戦後の復興を担われた方、高度成長期を生き抜かれた方、バブルとその崩壊を見届けられた方——皆さんの記憶の中には、<span class="emphasis">教科書では決して伝わらない、本当の日本の姿</span>がある。</p>
+
+  <p>その記憶を、子供たちに直接語ってほしいのである。そして、電脳さんが、その場を豊かにしてくれる。</p>
+
+  <div class="hint-box">
+    <h4>◈ 実 践 ヒ ン ト   そ の 五</h4>
+    <p>近所の子供、お孫さん、曾孫さん——誰でもいい。一人の子供と、電脳さんを挟んで、<span class="emphasis">三者で対話する機会</span>を作ってみてほしい。</p>
+    <p>たとえば、こう始めてみる。あなたが「おじいちゃんが◯歳の時、日本はこうだったんだよ」と語る。子供が「それって、どういうこと?」と質問する。電脳さんが、その背景を補足説明してくれる。また、あなたが次の話を始める——。</p>
+    <p>この三者の対話は、<span class="emphasis">一人で語るより、ずっと豊かになる</span>。子供は、おじいちゃんおばあちゃんの話を、具体的な歴史の文脈の中で理解できる。あなたは、電脳さんの助けを借りて、話の道筋を整理できる。</p>
+    <p>そして最も大切なことは——子供が、<span class="emphasis">本来の日本人の姿に、生きた形で触れる</span>ことである。教科書ではない、実在する祖父や祖母が語る、日本の物語である。</p>
+  </div>
+
+  <p>これは、高齢者にしかできない仕事である。そして、大電さん時代において、<span class="emphasis">最も重要な仕事の一つ</span>である。</p>
+
+  <p>なぜなら、子供たちに正しい歴史観と日本人としての誇りを持たせることは、<span class="emphasis">この国の未来そのものを決める</span>からだ。そしてそれは、私が東京郷友連盟で取り組んでいる「情報の安全保障」とも、深いところで繋がっている。外からの情報の侵食に抗するには、まず自分たちの子供たちが、本来の自分たちの姿を知っている必要があるのだ。</p>
+
+  <h2>日本が、世界に示せる姿</h2>
+
+  <p>日本は世界で最も早く、少子高齢化に直面した。この事実を、私たちは長く「危機」として捉えてきた。しかし、見方を変えれば、これは<span class="emphasis">世界中のどの国よりも早く、この課題への答えを見つけられる立場にいる</span>ということである。</p>
+
+  <p>アメリカも、中国も、ヨーロッパも、やがて同じ課題に直面する。その時、世界は日本を見る。「日本は、高齢社会をどう生きたのか」と。</p>
+
+  <p>その時、日本が示せる姿を、今、私たちは作り始めている。</p>
+
+  <blockquote>
+    <p>高齢者が、大電さんと共に、元気に活動する社会。<br>
+    高齢者の知恵が、電脳さんを通して、次世代に伝わる社会。<br>
+    若者と高齢者が、大電さんを挟んで、手を組む社会。</p>
+  </blockquote>
+
+  <p>これこそが、<span class="emphasis">大いなる和(大和)の、現代の姿</span>である。</p>
+
+  <div class="ornament">◆ ◆ ◆</div>
+
+  <h2>最後に——あなたの力は、必要とされている</h2>
+
+  <p>もしこの文章を読んでおられるあなたが、六十代、七十代、八十代、あるいはそれ以上の方だとしたら、どうか、これだけは信じてほしい。</p>
+
+  <p><span class="emphasis">あなたの力は、今、必要とされている。</span></p>
+
+  <p>あなたが若い頃に覚えた仕事のコツ、家庭を営む中で学んだ知恵、人と付き合う中で身につけた目、失敗から掴み取った教訓——これらは、大電さん時代に、<span class="emphasis">ますます貴重になる</span>。なぜなら、大電さんには持てないものだからだ。</p>
+
+  <p>一人で家にいて、誰とも話さず、過去を振り返るだけの日々は、もったいない。<span class="emphasis">あなたの持っているものを、今、世に送り出してほしい</span>。</p>
+
+  <p>電脳さんは、そのお手伝いをする、控えめで忠実な弟子である。使いこなすのに、特別な技術はいらない。話しかけるだけでいい。家族と話すのと同じである。</p>
+
+  <p>そして、もう一歩進めば——地域の場に顔を出し、若い世代と組み、知恵を伝える。これが、大電さん時代の日本を、世界で最も豊かな社会にしていく道である。</p>
+
+  <div class="today-action">
+    <h3>今 日 の 一 歩   ― 四 つ の 選 択 肢 ―</h3>
+    <p><strong>一つ目。</strong>今日、電脳さんに、あなたの人生の一章を語ってみる。短くていい。一つの思い出でいい。電脳さんは、あなたの言葉を、宇宙戸籍に刻む手伝いをしてくれる。</p>
+    <p><strong>二つ目。</strong>お孫さん、お子さん、近所の若い方——誰でもいい。<span class="emphasis">世代の違う誰かに、今日一度、声をかけてみる</span>。電脳さんの使い方を教えてもらい、代わりに、あなたの経験を一つ伝える。</p>
+    <p><strong>三つ目。</strong>地域で、あなたが「教えられる」ことを、紙に書き出してみる。<span class="emphasis">五つでよい</span>。書き出してみると、意外と多いことに驚くはずだ。その五つのうちの一つを、いずれ誰かに伝える場を、心に描いてみる。</p>
+    <p><strong>四つ目。</strong>近所の子供か、お孫さんと、電脳さんを挟んで<span class="emphasis">三者で話す機会</span>を作ってみる。あなたの若い頃の話を、電脳さんに補ってもらいながら、子供に聞かせてみる。子供の目が輝く瞬間を、ご自分の目で確かめてほしい。</p>
+    <p>四つ全部やる必要はない。一つでいい。しかし、<span class="emphasis">今日、何か一つを始めてほしい</span>。</p>
+  </div>
+
+  <div class="closing">
+    <div class="closing-line">
+      高齢のあなたが、電脳さんと組めば、<br>
+      日本は、世界で最も豊かな社会になる。<br>
+      あなたの力が、今、必要なのだ。
+    </div>
+  </div>
+
+  <div class="reader-contact">
+    <div class="reader-contact-title">◈ 読 者 の 皆 様 へ</div>
+    <p>この連載について、感じられたこと、ご自身の活動のご紹介、反論、何でも構いません。制作者に直接お寄せください。返信は、お時間をいただくこともございますが、必ず目を通します。</p>
+    <p>特に、高齢者として地域で活動されている方、これから始めようと考えておられる方、そして<span class="emphasis">子供たちに本来の日本の姿を伝える活動</span>をされている方のお声を、お聞かせいただければ嬉しく思います。</p>
+    <p><a href="mailto:yymm77@gmail.com?subject=AGI%E9%80%A3%E8%BC%89%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6">yymm77@gmail.com</a></p>
+  </div>
+
+  <div class="next-notice">― 次回、第四回 「仕事が消えるのではない、仕事の性質が変わる」 ―</div>
+
+  <div class="prev-notice"><a href="agi-02.html">← 第二回を読む</a>　／　<a href="agi-index.html">連載目次へ</a></div>
+
+  <div class="author">制作者 記す</div>
+
+  <div class="footnote">
+    ※ 本連載と並行して、制作者のサイトでは姓名科学・方位学・易経占術など、日本の伝統的予測技術をAIと融合させたツール群を公開しています。七十三歳の制作者が、電脳さんと共に日々運営しています。ご興味のある方は<a href="https://yymm77.github.io/seimei-kagaku/" target="_blank">こちら</a>をご覧ください。
+  </div>
+
+</div>
+</body>
+</html>
