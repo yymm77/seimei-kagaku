@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>仕事が消えるのではない、仕事の性質が変わる</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&family=Noto+Serif+JP:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --ink-soft: #3a3a3a;
+    --ink-faint: #6b6b6b;
+    --paper: #f5f1e8;
+    --paper-soft: #ebe5d4;
+    --accent: #8b2e2e;
+    --accent-soft: #b85c5c;
+    --gold: #a8895a;
+    --line: #d4ccb8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.95;
+    font-size: 17px;
+    background-image:
+      radial-gradient(circle at 10% 20%, rgba(168, 137, 90, 0.04) 0%, transparent 50%),
+      radial-gradient(circle at 90% 80%, rgba(139, 46, 46, 0.03) 0%, transparent 50%);
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 60px 32px 80px;
+  }
+
+  .series-mark {
+    font-size: 12px;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    text-align: center;
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .episode-number {
+    font-size: 13px;
+    letter-spacing: 0.25em;
+    color: var(--ink-faint);
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  h1 {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 30px;
+    font-weight: 600;
+    line-height: 1.5;
+    text-align: center;
+    margin-bottom: 12px;
+    color: var(--ink);
+    letter-spacing: 0.02em;
+  }
+
+  .subtitle {
+    font-size: 16px;
+    color: var(--ink-soft);
+    text-align: center;
+    margin-bottom: 50px;
+    font-weight: 400;
+    letter-spacing: 0.05em;
+  }
+
+  .ornament {
+    text-align: center;
+    margin: 40px 0;
+    color: var(--gold);
+    font-size: 20px;
+    letter-spacing: 1em;
+  }
+
+  .opening {
+    font-size: 19px;
+    line-height: 2.2;
+    text-align: center;
+    margin: 50px 0;
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .opening p {
+    margin-bottom: 12px;
+  }
+
+  h2 {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 22px;
+    font-weight: 600;
+    margin: 60px 0 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink);
+    letter-spacing: 0.03em;
+  }
+
+  h3 {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 36px 0 16px;
+    color: var(--accent);
+    letter-spacing: 0.03em;
+  }
+
+  p {
+    margin-bottom: 24px;
+    color: var(--ink-soft);
+  }
+
+  .emphasis {
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  blockquote {
+    margin: 32px 0;
+    padding: 20px 28px;
+    border-left: 3px solid var(--accent);
+    background: rgba(255, 255, 255, 0.4);
+    font-style: normal;
+    color: var(--ink);
+  }
+
+  blockquote p:last-child { margin-bottom: 0; }
+
+  .role-box {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--line);
+    padding: 24px 28px;
+    margin: 24px 0;
+    border-radius: 2px;
+  }
+
+  .role-box .role-number {
+    font-size: 13px;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .role-box h4 {
+    font-size: 18px;
+    color: var(--accent);
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+
+  .role-box p {
+    color: var(--ink);
+    margin-bottom: 12px;
+    font-size: 16px;
+  }
+
+  .role-box p:last-child {
+    margin-bottom: 0;
+  }
+
+  .job-table {
+    background: rgba(255, 255, 255, 0.4);
+    border: 1px solid var(--line);
+    padding: 0;
+    margin: 32px 0;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .job-row {
+    display: flex;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .job-row:last-child {
+    border-bottom: none;
+  }
+
+  .job-row .job-name {
+    flex: 0 0 110px;
+    background: var(--paper-soft);
+    padding: 16px 14px;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--ink);
+    letter-spacing: 0.1em;
+    border-right: 1px solid var(--line);
+  }
+
+  .job-row .job-content {
+    flex: 1;
+    padding: 16px 20px;
+    font-size: 15px;
+    line-height: 1.8;
+    color: var(--ink);
+  }
+
+  .job-row .job-content .to-ai {
+    color: var(--ink-faint);
+  }
+
+  .job-row .job-content .to-human {
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .hint-box {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--gold);
+    padding: 24px 28px;
+    margin: 32px 0;
+    border-radius: 2px;
+  }
+
+  .hint-box h4 {
+    font-size: 13px;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+
+  .hint-box p {
+    color: var(--ink);
+    margin-bottom: 14px;
+    font-size: 16px;
+  }
+
+  .hint-box p:last-child {
+    margin-bottom: 0;
+  }
+
+  .closing {
+    margin-top: 70px;
+    padding-top: 40px;
+    border-top: 1px solid var(--line);
+    text-align: center;
+  }
+
+  .closing-line {
+    font-size: 20px;
+    line-height: 2;
+    color: var(--ink);
+    font-weight: 500;
+    margin-bottom: 30px;
+  }
+
+  .today-action {
+    background: var(--paper-soft);
+    border: 1px solid var(--line);
+    padding: 28px 32px;
+    margin: 50px 0 30px;
+    border-radius: 2px;
+  }
+
+  .today-action h3 {
+    font-size: 14px;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    margin-bottom: 16px;
+    font-weight: 600;
+    border: none;
+  }
+
+  .today-action p {
+    margin-bottom: 14px;
+    color: var(--ink);
+    font-size: 16px;
+  }
+
+  .today-action p:last-child {
+    margin-bottom: 0;
+  }
+
+  .reader-contact {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--gold);
+    padding: 28px 32px;
+    margin: 40px 0 30px;
+    border-radius: 2px;
+    text-align: center;
+  }
+
+  .reader-contact-title {
+    font-size: 13px;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+
+  .reader-contact p {
+    color: var(--ink);
+    font-size: 15px;
+    line-height: 1.9;
+    margin-bottom: 16px;
+  }
+
+  .reader-contact p:last-child { margin-bottom: 0; }
+
+  .reader-contact a {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 17px;
+    font-weight: 500;
+    border-bottom: 1px solid var(--accent-soft);
+    padding-bottom: 2px;
+    letter-spacing: 0.05em;
+  }
+
+  .footnote {
+    margin-top: 60px;
+    padding-top: 30px;
+    border-top: 1px dashed var(--line);
+    font-size: 14px;
+    color: var(--ink-faint);
+    line-height: 1.8;
+  }
+
+  .footnote a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid var(--accent-soft);
+  }
+
+  .next-notice {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 14px;
+    color: var(--ink-faint);
+    letter-spacing: 0.15em;
+  }
+
+  .prev-notice {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: var(--ink-faint);
+    letter-spacing: 0.1em;
+  }
+
+  .prev-notice a {
+    color: var(--ink-faint);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--ink-faint);
+    padding-bottom: 2px;
+  }
+
+  .prev-notice a:hover {
+    color: var(--accent);
+  }
+
+  .author {
+    text-align: right;
+    margin-top: 50px;
+    font-size: 14px;
+    color: var(--ink-faint);
+    letter-spacing: 0.1em;
+  }
+
+  @media (max-width: 600px) {
+    .container { padding: 40px 20px 60px; }
+    h1 { font-size: 22px; }
+    body { font-size: 16px; }
+    .opening { font-size: 17px; }
+    .closing-line { font-size: 17px; }
+    .job-row { flex-direction: column; }
+    .job-row .job-name { flex: 1; border-right: none; border-bottom: 1px solid var(--line); }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="series-mark">連載・AGI時代を、おてんとうさまの下で生きる</div>
+  <div class="episode-number">第 四 回</div>
+
+  <h1>仕事が消えるのではない、<br>仕事の性質が変わる</h1>
+  <div class="subtitle">― 人間が残すべき、三つの役割 ―</div>
+
+  <div class="ornament">◆ ◆ ◆</div>
+
+  <div class="opening">
+    <p>「AIに仕事を奪われる」——</p>
+    <p>この言葉は、正確ではない。</p>
+    <p>奪われるのではない。変わるのだ。</p>
+  </div>
+
+  <div class="ornament">◆ ◆ ◆</div>
+
+  <h2>不安を煽る声に、惑わされない</h2>
+
+  <p>新聞、テレビ、ネットの記事——いたるところで、こうした文字が躍っている。</p>
+
+  <blockquote>
+    <p>「十年で四割の仕事が消える」<br>
+    「ホワイトカラーの大量失業時代」<br>
+    「AIに負ける仕事、勝ち残る仕事」</p>
+  </blockquote>
+
+  <p>不安を煽る見出しは、よく売れる。人の恐怖心は、注意を引きつける。しかし、こうした言葉を繰り返し浴びていると、いつの間にか、<span class="emphasis">自分も不安に染まっていく</span>。</p>
+
+  <p>ここで一度、冷静になっていただきたい。</p>
+
+  <p>確かに、大電さんが来る時代に、仕事の形は大きく変わる。しかし、それは<span class="emphasis">「仕事が消える」</span>のではない。<span class="emphasis">「仕事の性質が変わる」</span>のである。この違いは、決定的に重要だ。</p>
+
+  <h2>歴史から学ぶ</h2>
+
+  <p>過去を振り返ってみよう。</p>
+
+  <p>蒸気機関が生まれた時、人々は「馬車の御者の仕事がなくなる」と恐れた。確かに、御者という職業はほぼ消えた。しかし、鉄道員、整備士、運転士、車掌、駅員、信号係——<span class="emphasis">新しい仕事が、何十倍も生まれた</span>。</p>
+
+  <p>電気が普及した時、「ランプ職人の仕事がなくなる」と恐れられた。確かに、ランプ職人は消えた。しかし、電気工事士、発電所の技師、家電メーカーの技術者——新しい仕事が、無数に生まれた。</p>
+
+  <p>コンピュータが普及した時、「事務員の仕事がなくなる」と言われた。確かに、手書きの帳簿を付けるだけの仕事は消えた。しかし、プログラマー、システムエンジニア、データ分析者——新しい仕事が、次々と生まれた。</p>
+
+  <p>大電さん時代も、同じ道筋を辿る。</p>
+
+  <p>ただし、今回の変化は、<span class="emphasis">これまでで最も速く、最も広範</span>になるだろう。だからこそ、早めに理解し、備えることが大切なのである。</p>
+
+  <h2>何が大電さんへ渡され、何が人間に残るのか</h2>
+
+  <p>大電さん時代の仕事を考える時、出発点は、このシンプルな問いである。</p>
+
+  <blockquote>
+    <p>今、私がしている仕事のうち、<br>
+    どの部分が大電さんに渡せて、<br>
+    どの部分は、人間にしかできないのか。</p>
+  </blockquote>
+
+  <p>この問いに、丁寧に答えることができれば、<span class="emphasis">自分の仕事の未来が見えてくる</span>。</p>
+
+  <p>そして結論から言おう。どんな職業にも、<span class="emphasis">必ず、人間にしかできない部分が残る</span>。その部分を深めていけば、大電さん時代においても、あなたの仕事は尊い仕事であり続ける。</p>
+
+  <h2>人間に残る、三つの役割</h2>
+
+  <p>職種を問わず、どんな仕事にも、必ず含まれる三つの領域がある。そして、この三つこそが、大電さん時代に<span class="emphasis">人間が残していく役割</span>である。</p>
+
+  <div class="role-box">
+    <div class="role-number">第 一 の 役 割</div>
+    <h4>対人関係の領域</h4>
+    <p>人と人との間に、信頼を築き、共感を届ける仕事。顧客との深い対話、同僚とのチームワーク、部下の育成、取引先との交渉、家族のようなコミュニティづくり。</p>
+    <p>大電さんは、データとしての人間関係を整理できる。しかし、<span class="emphasis">人の心に直接届く言葉</span>を発することはできない。病気の友を見舞う時、亡くなった人を悼む時、祝いの席で盃を交わす時——そこには、人間にしかできない役割がある。</p>
+  </div>
+
+  <div class="role-box">
+    <div class="role-number">第 二 の 役 割</div>
+    <h4>判断と決断の領域</h4>
+    <p>情報を集め、選択肢を並べ、最終的に「これで行こう」と決める仕事。経営判断、戦略決定、人事評価、資源配分、方針転換。</p>
+    <p>大電さんは、膨大な情報を整理し、選択肢を提示できる。しかし、<span class="emphasis">その選択肢のうちのどれを選ぶか</span>という最終判断は、人間が引き受けるべき重みである。判断には、価値観と責任が伴う。価値観と責任は、人間にしか持てない。</p>
+  </div>
+
+  <div class="role-box">
+    <div class="role-number">第 三 の 役 割</div>
+    <h4>意味と文脈の領域</h4>
+    <p>この仕事は、誰のためにあるのか。何を目指しているのか。なぜ、こうしなければならないのか。仕事に意味を与え、文脈を作る役割。</p>
+    <p>大電さんは、「<span class="emphasis">どうやって</span>」を極める。しかし「<span class="emphasis">なぜ</span>」を問うのは、人間の仕事である。目的を立て、意味を定め、方向を示す——これは、人間が、人間であることの、最も根源的な営みだ。</p>
+  </div>
+
+  <p>この三つの領域が、すべての仕事の<span class="emphasis">中核</span>にある。どんな職種であっても、この三つをしっかり担える人は、大電さん時代において、ますます必要とされる。</p>
+
+  <h2>職種別に見てみる</h2>
+
+  <p>具体的に、様々な職種で、何が大電さんへ渡され、何が人間に残るかを整理してみよう。</p>
+
+  <div class="job-table">
+
+    <div class="job-row">
+      <div class="job-name">経 理</div>
+      <div class="job-content">
+        <span class="to-ai">数字を集める・帳簿を整える・月次報告書を作る → 大電さんへ</span><br>
+        <span class="to-human">数字の意味を経営に伝える・リスクを見抜く・税務の判断 → 人間へ</span>
+      </div>
+    </div>
+
+    <div class="job-row">
+      <div class="job-name">営 業</div>
+      <div class="job-content">
+        <span class="to-ai">顧客リサーチ・提案書の下書き・見積もりの作成 → 大電さんへ</span><br>
+        <span class="to-human">顧客との信頼関係を築く・ニーズを深く聞き取る・交渉の駆け引き → 人間へ</span>
+      </div>
+    </div>
+
+    <div class="job-row">
+      <div class="job-name">医 療</div>
+      <div class="job-content">
+        <span class="to-ai">画像診断の支援・症例の検索・投薬チェック → 大電さんへ</span><br>
+        <span class="to-human">患者との対話・治療方針の決定・家族への説明・看取り → 人間へ</span>
+      </div>
+    </div>
+
+    <div class="job-row">
+      <div class="job-name">法 律</div>
+      <div class="job-content">
+        <span class="to-ai">判例検索・契約書の一次レビュー・文書の整形 → 大電さんへ</span><br>
+        <span class="to-human">依頼人の状況を汲む・戦略を立てる・法廷での判断 → 人間へ</span>
+      </div>
+    </div>
+
+    <div class="job-row">
+      <div class="job-name">製 造</div>
+      <div class="job-content">
+        <span class="to-ai">品質データの管理・生産計画の最適化・予知保全 → 大電さんへ</span><br>
+        <span class="to-human">熟練の技の継承・現場の改善提案・チームの士気 → 人間へ</span>
+      </div>
+    </div>
+
+    <div class="job-row">
+      <div class="job-name">教 育</div>
+      <div class="job-content">
+        <span class="to-ai">個別学習のカスタマイズ・採点・学習記録の管理 → 大電さんへ</span><br>
+        <span class="to-human">子供の心の成長を見守る・動機づけ・人格形成 → 人間へ</span>
+      </div>
+    </div>
+
+    <div class="job-row">
+      <div class="job-name">介 護</div>
+      <div class="job-content">
+        <span class="to-ai">健康状態の見守り・記録の管理・身体介助の一部 → 大電さんへ</span><br>
+        <span class="to-human">心に寄り添う・尊厳を守る・家族との調整 → 人間へ</span>
+      </div>
+    </div>
+
+    <div class="job-row">
+      <div class="job-name">経 営</div>
+      <div class="job-content">
+        <span class="to-ai">市場分析・競合調査・財務シミュレーション → 大電さんへ</span><br>
+        <span class="to-human">ビジョンを示す・社員を鼓舞する・最終決断 → 人間へ</span>
+      </div>
+    </div>
+
+  </div>
+
+  <p>どの職種にも、<span class="emphasis">必ず「人間へ」の部分がある</span>。そして、その部分は、先ほど挙げた三つの役割——対人関係、判断、意味——のどれかに必ず属している。</p>
+
+  <h2>自分の仕事に、同じ問いを立てる</h2>
+
+  <p>上の表は、一般的な例である。大切なのは、<span class="emphasis">あなた自身の仕事について、同じ問いを立ててみる</span>ことだ。</p>
+
+  <p>私自身、若い頃に日産自動車で働き、生産管理と、後に輸出計画の現場にいた。この経験から、お伝えしたいことがある。</p>
+
+  <p>世間では「本社の頭脳労働は進んでいて、工場の現場は古い」と思われがちだ。しかし、実態は<span class="emphasis">しばしば逆</span>である。</p>
+
+  <p>当時の日産の生産管理の現場では、既に相当に洗練されたシステムが動いていた。車種別の工数を積み上げ、<span class="emphasis">ラインが平準化するロジック</span>で生産計画を立てる。同じ車種ばかりが流れると、特定の工程に負荷が集中してしまう。それを防ぐために、計画は三か月・単月・旬の三段階で出力し、CCR(センターコントロールルーム)に運んで、各工程別のスケジュールに落とし込んでいた。</p>
+
+  <p>これは、大電さんの時代の言葉で言えば、<span class="emphasis">最適化アルゴリズムを人間が使いこなしている現場</span>であった。技術は道具として既に動いており、それを現場の知恵で組み立てていたのである。</p>
+
+  <p>ところが、私がその工場から戻って輸出計画課に配属された時、驚いた。そこでは、<span class="emphasis">まだ電卓で計算していた</span>のである。本社の営業部門のほうが、工場の生産現場よりも、はるかに遅れていた。</p>
+
+  <p>この逆転の構図は、実は今の時代にも繰り返されている。<span class="emphasis">現場の技能労働者のほうが、本社のホワイトカラーよりも、道具を使いこなしている</span>——こういう場面が、実に多い。</p>
+
+  <p>大電さんの時代を考える時、この事実は重要な示唆を与える。</p>
+
+  <p>「AIが来て、まず消えるのは現場の仕事だ」という言説は、多くの場合、<span class="emphasis">現実を見ていない</span>。むしろ、本社の事務作業の方が先に大電さんに置き換わる可能性が高い。そして、現場で培われた熟練の知恵、人と機械の呼吸を合わせる力、現場で起きる予期せぬ事態への対応力——これらは、大電さん時代においても、<span class="emphasis">貴重なまま残る</span>。</p>
+
+  <p>大電さんが定型的な計算や書類作成を引き受けてくれるほど、<span class="emphasis">人間は、より高度な判断と、より深い対人関係に、時間を使えるようになる</span>。その「人間らしい仕事」とは何か——それを、一人一人が自分の仕事の中で見極めていく必要がある。</p>
+
+  <div class="hint-box">
+    <h4>◈ 実 践 ヒ ン ト   そ の 一</h4>
+    <p>紙を一枚用意してほしい。縦に線を引いて、二つに分ける。</p>
+    <p>左側に、<span class="emphasis">「大電さんに渡せる仕事」</span>を書き出す。数字を処理する作業、情報を集める作業、定型文書を作る作業、スケジュールを調整する作業——思いつく限り、全部書く。</p>
+    <p>右側に、<span class="emphasis">「人間にしかできない仕事」</span>を書き出す。人と深く話す時間、判断を下す時間、新しい発想を生む時間、誰かを育てる時間、ビジョンを描く時間——こちらも全部書く。</p>
+    <p>書き終えたら、右側の項目を、じっくり眺めてほしい。<span class="emphasis">そこにあるのが、あなたの仕事の未来である</span>。</p>
+  </div>
+
+  <h2>恐れる必要はない、しかし、備える必要はある</h2>
+
+  <p>第一回で述べたこの視座を、ここで思い出してほしい。</p>
+
+  <p>恐れる必要はない。どんな仕事にも、人間にしかできない部分が必ずあるからだ。</p>
+
+  <p>しかし、<span class="emphasis">備える必要はある</span>。なぜなら、自分の仕事のうち、「人間にしかできない部分」を意識的に深めていかなければ、大電さんの時代に取り残されてしまう可能性があるからだ。</p>
+
+  <p>備えるとは、何か。</p>
+
+  <p>三つの行動が基本になる。</p>
+
+  <div class="hint-box">
+    <h4>◈ 実 践 ヒ ン ト   そ の 二</h4>
+    <p><strong>一つ目、対人関係の力を深める。</strong>顧客、同僚、部下、取引先——誰でもいい。目の前の一人と、<span class="emphasis">深く話す時間</span>を持つこと。大電さんの時代には、表面的な関係は価値を失う。深い信頼関係を持つ人ほど、求められる。</p>
+    <p><strong>二つ目、判断の筋肉を鍛える。</strong>日々の仕事の中で、小さな判断であっても、<span class="emphasis">自分で考え、自分で決める</span>癖をつける。大電さんが提案する選択肢を鵜呑みにせず、「<span class="emphasis">なぜこれを選ぶのか</span>」と自分に問う。</p>
+    <p><strong>三つ目、意味を問う習慣を持つ。</strong>自分の仕事は、誰のためか。何を目指しているのか。この仕事を通して、自分は何を世に残したいのか——週に一度でいい。静かな時間を作って、自分に問うてほしい。</p>
+  </div>
+
+  <h2>電脳さんと、組む</h2>
+
+  <p>ここで、発想を変えてみたい。</p>
+
+  <p>大電さんを「競争相手」と見るのか、「<span class="emphasis">協働相手</span>」と見るのか。この違いは、あなたの仕事の未来を大きく分ける。</p>
+
+  <p>競争相手と見れば、あなたは大電さんに負けないように、常に必死にならねばならない。いずれ、疲弊する。</p>
+
+  <p>協働相手と見れば、あなたは大電さんと組んで、<span class="emphasis">一人ではできないことを実現できる</span>ようになる。大電さんが日常作業を引き受け、あなたが対人関係と判断と意味づけに集中する。これで、あなたの仕事は、以前の何倍もの価値を生むようになる。</p>
+
+  <p>私は日々、電脳さんと組んで仕事をしている。姓名科学のツールを開発する時、方位学の計算を整理する時、この連載を書く時——電脳さんは、驚くほどの力を貸してくれる。しかし、<span class="emphasis">何をどう作るか、誰のために作るか、どう伝えるか</span>を決めるのは、私自身である。</p>
+
+  <p>これこそが、大電さん時代の働き方の原型になると、私は確信している。</p>
+
+  <div class="hint-box">
+    <h4>◈ 実 践 ヒ ン ト   そ の 三</h4>
+    <p>明日、職場で、<span class="emphasis">一つの作業を、電脳さんに頼んでみてほしい</span>。会議の議事録の整理、メールの下書き、提案書のアウトライン——何でもいい。</p>
+    <p>そして、電脳さんが仕上げたものを、あなたの判断で磨き上げる。あなたの経験、あなたの知識、あなたの文脈を加える。</p>
+    <p>これが、<span class="emphasis">電脳さんと組む仕事の基本形</span>である。繰り返すうちに、どの作業を渡し、どこに自分の力を集中すればよいか、感覚がつかめてくる。</p>
+  </div>
+
+  <h2>若い方へ、伝えたいこと</h2>
+
+  <p>この記事を、二十代・三十代の若い方が読んでおられるかもしれない。</p>
+
+  <p>私からお伝えしたいことが一つある。</p>
+
+  <p>「AIに仕事を奪われる」と怯えて、<span class="emphasis">自分の可能性を狭めてしまわないでほしい</span>。</p>
+
+  <p>あなたたちは、大電さんと共に働く<span class="emphasis">最初の世代</span>である。この時代を生き抜く技と知恵を、いま身につけていく。それは、上の世代がまだ持っていない貴重なものだ。そして、下の世代に伝えていく役割も、あなたたちが担うことになる。</p>
+
+  <p>恐れず、しかし慢心せず。電脳さんと組み、自分にしかできない部分を深めていく。これが、若い世代のこの時代の生き方である。</p>
+
+  <div class="ornament">◆ ◆ ◆</div>
+
+  <h2>どんな仕事にも、尊さがある</h2>
+
+  <p>最後に、もう一つ、大切なことを。</p>
+
+  <p>大電さん時代の議論では、しばしば「価値のある仕事」「価値のない仕事」という分け方がされる。しかし、これは間違った問いの立て方である。</p>
+
+  <p><span class="emphasis">どんな仕事にも、尊さがある</span>。</p>
+
+  <p>掃除の仕事も、配達の仕事も、店番の仕事も、工場の流れ作業も——そこには、社会を支える、かけがえのない役割がある。そして、どの仕事にも、前に挙げた三つの役割(対人関係・判断・意味)の、人間にしかできない部分が、必ず含まれている。</p>
+
+  <p>大切なのは、自分の仕事の中の<span class="emphasis">人間にしかできない部分</span>を、自分で見つけ、意識し、深めていくことだ。それを続ける限り、あなたの仕事は、大電さん時代にも、尊い仕事であり続ける。</p>
+
+  <div class="today-action">
+    <h3>今 日 の 一 歩</h3>
+    <p>今日、家に帰ったら(あるいは、今すぐでも)、静かな時間を五分、取ってほしい。</p>
+    <p>そして、自分に問うてほしい。<span class="emphasis">「私の今の仕事のうち、人間にしかできない部分は、何だろうか」</span>と。</p>
+    <p>答えが見つからなかったら、電脳さんに話してみるとよい。「私は◯◯の仕事をしています。この仕事のうち、人間にしかできない部分は、何だと思いますか?」と聞けば、電脳さんは、あなたと一緒に考えてくれる。</p>
+    <p>見つかった答えを、<span class="emphasis">紙に書いて、机の前に貼っておいてほしい</span>。毎日、目に入れる。それが、あなたの仕事の未来を照らす灯火になる。</p>
+  </div>
+
+  <div class="closing">
+    <div class="closing-line">
+      仕事は、消えない。<br>
+      性質が、変わるだけである。<br>
+      その変化の中で、人間は、<br>
+      より人間らしく働ける。
+    </div>
+  </div>
+
+  <div class="reader-contact">
+    <div class="reader-contact-title">◈ 読 者 の 皆 様 へ</div>
+    <p>この連載について、感じられたこと、ご自身の職業の変化、ご質問、何でも構いません。制作者に直接お寄せください。返信は、お時間をいただくこともございますが、必ず目を通します。</p>
+    <p>特に、「自分の仕事で、大電さんに渡せる部分、人間に残る部分を整理してみた」というご経験を共有いただければ、大変嬉しく思います。</p>
+    <p><a href="mailto:yymm77@gmail.com?subject=AGI%E9%80%A3%E8%BC%89%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6">yymm77@gmail.com</a></p>
+  </div>
+
+  <div class="next-notice">― 次回、第五回 「『プロンプト』ではない、『会話』である ― AIとの向き合い方を、七十代の私が語る」 ―</div>
+
+  <div class="prev-notice"><a href="agi-03.html">← 第三回を読む</a>　／　<a href="agi-index.html">連載目次へ</a></div>
+
+  <div class="author">制作者 記す</div>
+
+  <div class="footnote">
+    ※ 本連載と並行して、制作者のサイトでは姓名科学・方位学・易経占術など、日本の伝統的予測技術をAIと融合させたツール群を公開しています。七十三歳の制作者が、電脳さんと共に日々運営しています。ご興味のある方は<a href="https://yymm77.github.io/seimei-kagaku/" target="_blank">こちら</a>をご覧ください。
+  </div>
+
+</div>
+</body>
+</html>
