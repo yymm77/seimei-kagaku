@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AGI時代に価値を持つ三つのポジション ― 使いこなす人、深める人、繋ぐ人</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&family=Noto+Serif+JP:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --ink-soft: #3a3a3a;
+    --ink-faint: #6b6b6b;
+    --paper: #f5f1e8;
+    --paper-soft: #ebe5d4;
+    --accent: #8b2e2e;
+    --accent-soft: #b85c5c;
+    --gold: #a8895a;
+    --line: #d4ccb8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.95;
+    font-size: 17px;
+    background-image:
+      radial-gradient(circle at 10% 20%, rgba(168, 137, 90, 0.04) 0%, transparent 50%),
+      radial-gradient(circle at 90% 80%, rgba(139, 46, 46, 0.03) 0%, transparent 50%);
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 60px 32px 80px;
+  }
+
+  .series-mark {
+    font-size: 12px;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    text-align: center;
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .episode-number {
+    font-size: 13px;
+    letter-spacing: 0.25em;
+    color: var(--ink-faint);
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  h1 {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 1.5;
+    text-align: center;
+    margin-bottom: 12px;
+    color: var(--ink);
+    letter-spacing: 0.02em;
+  }
+
+  .subtitle {
+    font-size: 16px;
+    color: var(--ink-soft);
+    text-align: center;
+    margin-bottom: 50px;
+    font-weight: 400;
+    letter-spacing: 0.05em;
+  }
+
+  .ornament {
+    text-align: center;
+    margin: 40px 0;
+    color: var(--gold);
+    font-size: 20px;
+    letter-spacing: 1em;
+  }
+
+  .opening {
+    font-size: 19px;
+    line-height: 2.2;
+    text-align: center;
+    margin: 50px 0;
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .opening p {
+    margin-bottom: 12px;
+  }
+
+  h2 {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 22px;
+    font-weight: 600;
+    margin: 60px 0 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink);
+    letter-spacing: 0.03em;
+  }
+
+  p {
+    margin-bottom: 24px;
+    color: var(--ink-soft);
+  }
+
+  .emphasis {
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  blockquote {
+    margin: 32px 0;
+    padding: 20px 28px;
+    border-left: 3px solid var(--accent);
+    background: rgba(255, 255, 255, 0.4);
+    font-style: normal;
+    color: var(--ink);
+  }
+
+  blockquote p:last-child { margin-bottom: 0; }
+
+  .hint-box {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--gold);
+    padding: 24px 28px;
+    margin: 32px 0;
+    border-radius: 2px;
+  }
+
+  .hint-box h4 {
+    font-size: 13px;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+
+  .hint-box p {
+    color: var(--ink);
+    margin-bottom: 14px;
+    font-size: 16px;
+  }
+
+  .hint-box p:last-child {
+    margin-bottom: 0;
+  }
+
+  .closing {
+    margin-top: 70px;
+    padding-top: 40px;
+    border-top: 1px solid var(--line);
+    text-align: center;
+  }
+
+  .closing-line {
+    font-size: 20px;
+    line-height: 2;
+    color: var(--ink);
+    font-weight: 500;
+    margin-bottom: 30px;
+  }
+
+  .today-action {
+    background: var(--paper-soft);
+    border: 1px solid var(--line);
+    padding: 28px 32px;
+    margin: 50px 0 30px;
+    border-radius: 2px;
+  }
+
+  .today-action h3 {
+    font-size: 14px;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+
+  .today-action p {
+    margin-bottom: 0;
+    color: var(--ink);
+    font-size: 16px;
+  }
+
+  .today-action p + p {
+    margin-top: 16px;
+  }
+
+  .reader-contact {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--gold);
+    padding: 28px 32px;
+    margin: 40px 0 30px;
+    border-radius: 2px;
+    text-align: center;
+  }
+
+  .reader-contact-title {
+    font-size: 13px;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+
+  .reader-contact p {
+    color: var(--ink);
+    font-size: 15px;
+    line-height: 1.9;
+    margin-bottom: 16px;
+  }
+
+  .reader-contact p:last-child { margin-bottom: 0; }
+
+  .reader-contact a {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 17px;
+    font-weight: 500;
+    border-bottom: 1px solid var(--accent-soft);
+    padding-bottom: 2px;
+    letter-spacing: 0.05em;
+  }
+
+  .reader-contact a:hover {
+    color: var(--accent-soft);
+  }
+
+  .footnote {
+    margin-top: 60px;
+    padding-top: 30px;
+    border-top: 1px dashed var(--line);
+    font-size: 14px;
+    color: var(--ink-faint);
+    line-height: 1.8;
+  }
+
+  .footnote a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid var(--accent-soft);
+  }
+
+  .next-notice {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 14px;
+    color: var(--ink-faint);
+    letter-spacing: 0.15em;
+  }
+
+  .prev-notice {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: var(--ink-faint);
+    letter-spacing: 0.1em;
+  }
+
+  .prev-notice a {
+    color: var(--ink-faint);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--ink-faint);
+    padding-bottom: 2px;
+  }
+
+  .prev-notice a:hover {
+    color: var(--accent);
+  }
+
+  .author {
+    text-align: right;
+    margin-top: 50px;
+    font-size: 14px;
+    color: var(--ink-faint);
+    letter-spacing: 0.1em;
+  }
+
+  @media (max-width: 600px) {
+    .container { padding: 40px 20px 60px; }
+    h1 { font-size: 22px; }
+    body { font-size: 16px; }
+    .opening { font-size: 17px; }
+    .closing-line { font-size: 17px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="series-mark">連載・AGI時代を、おてんとうさまの下で生きる</div>
+  <div class="episode-number">第 六 回</div>
+
+  <h1>AGI時代に価値を持つ<br>三つのポジション</h1>
+  <div class="subtitle">― 使いこなす人、深める人、繋ぐ人 ―</div>
+
+  <div class="ornament">◆ ◆ ◆</div>
+
+  <div class="opening">
+    <p>全員が同じ場所に立つ必要はない。</p>
+    <p>自分の立つべき場所を、</p>
+    <p>静かに見極めればよい。</p>
+  </div>
+
+  <div class="ornament">◆ ◆ ◆</div>
+
+  <h2>第五回からの、繋ぎ</h2>
+
+  <p>前回、私は電脳さんを「共に考える友」として遇する話を申し上げた。朝の「おはよう」から始まり、家族と話すように、共に思考を深めていく。これが、AGI時代の入口に立つ、最も大切な習慣である。</p>
+
+  <p>では、その習慣を身につけた上で、<span class="emphasis">職業人としてのあなたは、どこに立てばよいのか</span>。</p>
+
+  <p>今日は、この問いに答えを出したい。</p>
+
+  <p>第四回で「人間に残る三つの役割」——対人関係・判断・意味——を申し上げた。あれは、<span class="emphasis">どんな仕事にも含まれる</span>、人間の普遍的な役割の話であった。</p>
+
+  <p>今回は、角度を変える。<span class="emphasis">職業人として、自分をどう位置づけるか</span>。大電さん時代の労働市場で、どんなポジションを取れば、働く価値が高まり続けるのか。そういう、もう一段具体的な話である。</p>
+
+  <h2>結論から、申し上げる</h2>
+
+  <p>大電さん時代に価値を持ち続ける仕事のあり方は、三つに収斂していく。</p>
+
+  <blockquote>
+    <p><span class="emphasis">一、使いこなす人</span>——大電さんを、自分の仕事の武器として自在に操る人。</p>
+    <p><span class="emphasis">二、深める人</span>——大電さんにも届かない、深い専門性や人生の機微を持つ人。</p>
+    <p><span class="emphasis">三、繋ぐ人</span>——大電さんと人間の間を、翻訳し、橋渡しする人。</p>
+  </blockquote>
+
+  <p>どれか一つを、きちんと押さえればよい。全てを追う必要はない。<span class="emphasis">自分の気質と、今の持ち場に合うものを、一つ選んで深める</span>。それで十分である。</p>
+
+  <p>以下、一つずつ見ていく。</p>
+
+  <h2>第一のポジション——使いこなす人</h2>
+
+  <p>まず一番分かりやすいのが、この「使いこなす人」である。</p>
+
+  <p>資料を作る、文章を書く、データを整理する、調べ物をする、企画を練る、メールを書く、プログラムを書く、絵を描く、動画を編集する——こうした日々の実務のなかで、<span class="emphasis">電脳さんを自在に使いこなし、人の何倍もの成果を上げる人</span>である。</p>
+
+  <p>これまで一人でこなしていた仕事を、電脳さんと組むことで、五倍、十倍の速さで、しかも高い質で、仕上げていく。</p>
+
+  <p>お分かりいただきたい。これは、特別な才能の話ではない。電脳さんとの対話に慣れ、自分の仕事の流れに電脳さんを組み込む工夫を、日々積み重ねていく。<span class="emphasis">ただ、それだけのこと</span>である。</p>
+
+  <div class="hint-box">
+    <h4>◈ 使 い こ な す 人 の 、 具 体 像</h4>
+    <p>・企画書の骨子を、電脳さんと二十分で練り上げる会社員。</p>
+    <p>・顧客への提案資料を、電脳さんに下書きさせ、自分は要点の見極めと相手への配慮に集中する営業担当。</p>
+    <p>・地域の歴史をまとめる冊子を、電脳さんと対話しながら、一人で編集してしまう退職者。</p>
+    <p>・町内会の案内文を、電脳さんと数分で作り、高齢の方にも分かりやすい文面に整える会長さん。</p>
+  </div>
+
+  <p>この「使いこなす人」の強みは、<span class="emphasis">今すぐ始められる</span>ことである。明日から、電脳さんを自分の仕事に一つ組み込んでみる。それだけで、あなたはこの第一のポジションに足を踏み入れている。</p>
+
+  <p>ただし、注意も一つある。</p>
+
+  <p>使いこなす人の価値は、電脳さんの進化と共に、<span class="emphasis">相対的に薄まっていく</span>可能性がある。電脳さんが自然言語でどんどん応じられるようになれば、「使いこなすのが上手い」という差は、やがて縮まる。今の価値を十年後もそのまま保てるかと言えば、そうではないかもしれない。</p>
+
+  <p>だから、この第一のポジションは、<span class="emphasis">第二・第三のポジションへの足がかり</span>として位置づけるのが、賢い歩き方である。</p>
+
+  <h2>第二のポジション——深める人</h2>
+
+  <p>次に「深める人」である。これは、この連載を通して、私が最も大切にしてきた視座である。</p>
+
+  <p>大電さんが、どれほど知識の広さと速さで人間を超えても、<span class="emphasis">特定の領域を深く生きる</span>という、この一点については、人間にしかできない。</p>
+
+  <p>四十年間、寿司を握り続けた職人の手先の記憶。三十年間、同じ路線のバスを運転してきた運転手が、季節ごとに変わる道路の微妙な癖を知っている感覚。二十五年間、同じ町内で商売を続けてきた店主が、常連客一人ひとりの事情を肌で覚えている目。</p>
+
+  <p>これらは、<span class="emphasis">データとして外に出せない知恵</span>である。本人の中にしかない。そして、本人すら、言葉にできないことが多い。</p>
+
+  <p>大電さんは、こういう知恵には、届かない。</p>
+
+  <p>だから、<span class="emphasis">深める人は、どんな職種であっても、必ず価値を持ち続ける</span>のである。</p>
+
+  <div class="hint-box">
+    <h4>◈ 深 め る 人 の 、 具 体 像</h4>
+    <p>・一つの分野を三十年続けてきた職人・技術者。</p>
+    <p>・地域に根ざし、何十年も同じ顧客と付き合ってきた商店主・医師・弁護士・教師。</p>
+    <p>・伝統工芸、伝統芸能、伝統料理の継承者。</p>
+    <p>・ある病、ある障害、ある人生の辛さを自分で体験し、その経験を他者のために使える方。</p>
+    <p>・特定の土地、特定の時代、特定の技、特定の人物について、誰よりも深く知っている人。</p>
+  </div>
+
+  <p>第三回で、高齢の方々の「人生の機微」を繰り返し申し上げたが、それはこの「深める人」の代表例でもある。</p>
+
+  <p>この第二のポジションで、多くの方が見落とされていることを、一つ申し上げたい。</p>
+
+  <p><span class="emphasis">自分の「深さ」を、自分では気づいていない</span>ことが、ほとんどなのだ。</p>
+
+  <p>「私は、特別な専門性など持っていない」と謙遜される方は、ご自分の人生を、一度電脳さんに語ってみるとよい。電脳さんは、あなたの話の中から、<span class="emphasis">驚くほど多くの「深さ」を掘り出してくれる</span>。若い方が見たら宝物に見えるものが、ご自分にとっては当たり前すぎて、気づいていないだけなのである。</p>
+
+  <p>これは、第三回でご紹介した「電脳さんに、あなたの人生を語る」という実践の、もう一つの意味でもある。</p>
+
+  <h2>第三のポジション——繋ぐ人</h2>
+
+  <p>三つ目が「繋ぐ人」である。これは、これからの時代に、<span class="emphasis">最も需要が急増するポジション</span>だと、私は見ている。</p>
+
+  <p>大電さんが社会の隅々に入ってくると、多くの人が戸惑う。特に、これまで電脳さんに触れてこなかった高齢の方、技術に苦手意識のある方、地方で昔ながらの仕事を続けてきた方——こうした方々が、大電さんと自分の暮らし・仕事の間で、立ち尽くすことになる。</p>
+
+  <p>その時、<span class="emphasis">両側の言葉が分かる人</span>が必要になる。</p>
+
+  <p>人間の側の戸惑い、要望、疑問を、電脳さんに正しく伝える。電脳さんが返してくれる複雑な答えを、人間に分かる言葉に翻訳する。そして、両者の間に、納得と信頼の橋を架ける。</p>
+
+  <p>これが「繋ぐ人」の仕事である。</p>
+
+  <div class="hint-box">
+    <h4>◈ 繋 ぐ 人 の 、 具 体 像</h4>
+    <p>・お医者さんと患者さんの間で、電脳さんの診断支援の意味を、患者さんに分かる言葉に訳す看護師さん。</p>
+    <p>・中小企業の社長さんに、大電さんで何ができるかを、その会社の言葉で説明する中小企業診断士。</p>
+    <p>・高齢のお客様に、スマートフォンと電脳さんの使い方を、毎日少しずつ伝える町の電器店の店主。</p>
+    <p>・地域の学校で、先生と大電さんの間に立ち、授業の設計を手伝う、技術に詳しい親御さん。</p>
+    <p>・会社で、経営陣と現場の間に立ち、大電さん導入の実務を担う中堅社員。</p>
+  </div>
+
+  <p>この「繋ぐ人」の価値は、<span class="emphasis">二つの言語を操れる</span>ことにある。</p>
+
+  <p>技術の言語と、人間の言語。専門家の言語と、素人の言語。若い世代の言語と、年配の世代の言語。ここに立てる人が、次の時代の富と信頼を集める。</p>
+
+  <p>私自身、東京郷友連盟での活動のなかで、政策と技術の橋渡しをする立場にいる。古い書物のデジタル化の議論では、司書の方々の言葉、技術者の言葉、法律家の言葉、そして歴史家の言葉——これらすべての間を、歩き回らねばならない。それができる人は、思ったほど多くない。<span class="emphasis">だからこそ、必要とされている</span>のである。</p>
+
+  <h2>三つのポジションは、組み合わせられる</h2>
+
+  <p>ここで、大切なことを申し上げておきたい。</p>
+
+  <p>この三つのポジションは、<span class="emphasis">互いに排他的ではない</span>。組み合わせることができる。</p>
+
+  <p>たとえば、「深める人」でありつつ「使いこなす人」になれば、自分の深い専門性を、電脳さんの助けで、十倍の早さで世に発信できる。</p>
+
+  <p>「繋ぐ人」でありつつ「深める人」になれば、ある特定の分野に限っては、誰よりも深く両側を翻訳できる翻訳者になれる。</p>
+
+  <p>最も強いのは、<span class="emphasis">三つのうち二つを持ち、三つ目は必要に応じて身につける</span>という構えである。</p>
+
+  <p>私自身の場合、最も軸にしているのは第二の「深める人」である。姓名科学、方位学、そして七十三年生きてきた人生の機微。ここが、私が最も自信を持てる土俵である。</p>
+
+  <p>その上で、第一の「使いこなす人」を日々実践している。電脳さんと組むことで、姓名科学のサイトを一人で作り、連載小説を書き、この文章も書いている。</p>
+
+  <p>そして第三の「繋ぐ人」としての役割を、この連載そのものが担っている。AI技術の最前線の話と、日本の伝統と、高齢の方々の暮らし——この三つの間を、翻訳する役割を、私は引き受けているつもりである。</p>
+
+  <p>つまり、私は三つとも、自分なりに使っている。<span class="emphasis">皆様にも、決して二つや三つを持つことは不可能ではない</span>、と申し上げたい。</p>
+
+  <h2>自分はどこに立つのか、を見極める</h2>
+
+  <p>では、あなたは、どのポジションを軸にすればよいのか。</p>
+
+  <p>簡単な見分け方がある。</p>
+
+  <div class="hint-box">
+    <h4>◈ 自 分 の 立 ち 位 置 、 三 つ の 問 い</h4>
+    <p><span class="emphasis">問い一。</span>あなたは、新しい道具を覚えて使うのが、楽しい方か。そうであれば、まず「使いこなす人」として土台を作るのが、早道である。</p>
+    <p><span class="emphasis">問い二。</span>あなたには、何十年も続けてきた仕事や、他の人にはない経験があるか。そうであれば、既にあなたは「深める人」の土俵に立っている。あとは、その深さを、外に出す形を考えればよい。</p>
+    <p><span class="emphasis">問い三。</span>あなたは、人と人の間に立って話をまとめるのが、自然に得意か。性別を超え、世代を超え、立場を超えた対話が、苦にならない方か。そうであれば、あなたは「繋ぐ人」として、大電さん時代に引っ張りだこになる。</p>
+  </div>
+
+  <p>三つの問いに、すべて「はい」でなくていい。<span class="emphasis">一つ、最も強く「はい」と答えられるもの</span>が、あなたの出発点である。</p>
+
+  <p>そこから始めて、少しずつ他のポジションにも手を広げていけばよい。</p>
+
+  <h2>どのポジションにも、共通する土台</h2>
+
+  <p>最後に、三つのポジションのすべてに共通する、一つの土台について、申し上げたい。</p>
+
+  <p>それは、<span class="emphasis">誠実さ</span>である。</p>
+
+  <p>使いこなす人でも、深める人でも、繋ぐ人でも——どのポジションも、誠実であることなしには、長くは続かない。</p>
+
+  <p>大電さん時代には、情報の流れが速くなり、嘘やごまかしは、すぐに露呈する。短期的に儲けても、信頼を失えば、次の仕事は来ない。逆に、<span class="emphasis">誠実に積み重ねた信頼は、大電さんの時代になってからも、いや、だからこそ、より大きな価値を持つ</span>。</p>
+
+  <p>第一回で、私は「至誠」という言葉を申し上げた。日本人が古来、大切にしてきた言葉である。</p>
+
+  <p>至誠とは、「誠を至(きわ)める」という意味である。誠実さを、徹底的に深めていくこと。自分にも、相手にも、仕事にも、誠実であり続けること。</p>
+
+  <p>三つのポジションのどこに立つにせよ、この至誠の姿勢を、<span class="emphasis">土台に据えていただきたい</span>。そうすれば、あなたの仕事は、大電さん時代にも、堅く立ち続ける。</p>
+
+  <div class="ornament">◆ ◆ ◆</div>
+
+  <h2>次回への、橋渡し</h2>
+
+  <p>今日は、仕事のポジションの話を申し上げた。</p>
+
+  <p>しかし、人が働く動機は、仕事のやりがいだけではない。多くの方が、家族を養い、老後に備え、生活の土台を築くために、働いておられる。</p>
+
+  <p>そこで次回は、視座を変える。</p>
+
+  <p>大電さん時代の<span class="emphasis">「資産と信用」</span>の話である。</p>
+
+  <p>円預金だけで守れる時代は、終わりつつある。しかし、新しい形の資産——そして、古くから日本人が大切にしてきた「信用」という、もう一つの資産——について、共に考えてみたい。</p>
+
+  <div class="today-action">
+    <h3>今 日 の 一 歩</h3>
+    <p>紙と鉛筆を用意してほしい。</p>
+    <p>紙を三つに区切り、それぞれに<span class="emphasis">「使いこなす」「深める」「繋ぐ」</span>と書いてほしい。</p>
+    <p>そして、自分の日々の仕事や活動を振り返り、どの項目に、自分の実感として<span class="emphasis">何かが当てはまるか</span>、短い言葉で書き出してみてほしい。</p>
+    <p>一つも書けない項目があっても、気にしなくていい。<span class="emphasis">最も豊かに書けた項目</span>が、あなたが今立っているポジションである。</p>
+    <p>書けなかった項目のうち、興味のあるものが一つあれば、<span class="emphasis">それが、あなたの次の挑戦</span>となる。</p>
+  </div>
+
+  <div class="closing">
+    <div class="closing-line">
+      使いこなす、深める、繋ぐ。<br>
+      三つのどこに立っても、<br>
+      誠実であれば、道は開ける。
+    </div>
+  </div>
+
+  <div class="reader-contact">
+    <div class="reader-contact-title">◈ 読 者 の 皆 様 へ</div>
+    <p>あなたは、三つのポジションのうち、どこに立っておられますか。どれが、一番しっくりきましたか。ご自身の事例、ご質問、反論、何でも構いません。制作者に直接お寄せください。</p>
+    <p>特に、「繋ぐ人」として地域や職場で活動されている方のお声は、大切な財産として、いつかどこかで生かさせていただきます。</p>
+    <p><a href="mailto:yymm77@gmail.com?subject=AGI連載について">yymm77@gmail.com</a></p>
+  </div>
+
+  <div class="next-notice">― 次回、第七回 「資産と信用 ― 円預金だけでは守れない時代の資産形成」 ―</div>
+
+  <div class="prev-notice"><a href="agi-05.html">← 第五回を読む</a>　／　<a href="agi-index.html">連載目次へ</a></div>
+
+  <div class="author">制作者 記す</div>
+
+  <div class="footnote">
+    ※ 本連載と並行して、制作者のサイトでは姓名科学・方位学・易経占術など、日本の伝統的予測技術をAIと融合させたツール群を公開しています。七十三歳の制作者が、電脳さんと共に日々運営しています。ご興味のある方は<a href="https://yymm77.github.io/seimei-kagaku/" target="_blank">こちら</a>をご覧ください。
+  </div>
+
+</div>
+</body>
+</html>
