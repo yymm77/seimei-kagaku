@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>国民強靱化基礎役務制度（仮称）概要版 ― 政策提言</title>
+<meta name="description" content="防災・国土保全・救護自活を中核とし、安全保障の基礎教育を組み込んだ国民教育制度の提言（概要版・たたき台）。災害レジリエンスと防衛抗堪性を一つの人的基盤として捉える総合防衛の構想。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;700;800&family=Noto+Serif+JP:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* seimei-kagaku 本家トークンに統一 */
+    --navy:#1a3a5c; --navy-deep:#14304c; --navy-line:#2f5375;
+    --gold:#8a6914; --gold-soft:#c9a84c;
+    --vermillion:#8b2020;
+    --washi:#f2ead8; --washi-deep:#e8dcc4;
+    --ink:#1a1208; --ink-soft:#5c4a22;
+    --paper:#ffffff;
+    --display:'Shippori Mincho',serif;
+    --body:'Noto Serif JP',serif;
+    --util:'Shippori Mincho',serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--washi); color:var(--ink);
+    font-family:var(--body); font-weight:400; line-height:1.95;
+    font-size:16.5px; -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+  a{color:var(--vermillion);}
+  ::selection{background:var(--gold-soft); color:var(--navy-deep);}
+  :focus-visible{outline:2px solid var(--gold); outline-offset:3px;}
+
+  /* ---------- site bar (portal tie-in) ---------- */
+  .sitebar{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px; padding:11px 24px; background:var(--washi);
+    border-bottom:1px solid var(--border, rgba(138,105,20,.25));
+    font-family:var(--display);
+  }
+  .sb-brand{
+    font-size:12px; font-weight:700; letter-spacing:.34em; text-indent:.34em;
+    color:var(--gold);
+  }
+  .sb-back{
+    font-size:13px; color:var(--ink-soft); text-decoration:none;
+    letter-spacing:.04em; white-space:nowrap;
+  }
+  .sb-back:hover{color:var(--vermillion);}
+
+  /* ---------- masthead ---------- */
+  header.mast{
+    background:var(--navy-deep); color:var(--washi);
+    padding:54px 24px 46px; position:relative; overflow:hidden;
+  }
+  header.mast::after{
+    content:""; position:absolute; left:0; right:0; bottom:0; height:4px;
+    background:linear-gradient(90deg,var(--gold) 0%,var(--gold-soft) 50%,var(--gold) 100%);
+  }
+  .mast-inner{max-width:760px; margin:0 auto;}
+  .eyebrow{
+    font-family:var(--util); font-weight:700; font-size:12px;
+    letter-spacing:.42em; text-indent:.42em; color:var(--gold-soft);
+    text-transform:none; margin-bottom:20px;
+  }
+  h1.title{
+    font-family:var(--display); font-weight:800; line-height:1.32;
+    font-size:clamp(27px,5.4vw,40px); margin:0 0 14px; color:#fff;
+    letter-spacing:.01em;
+  }
+  .subtitle{
+    font-family:var(--display); font-weight:500;
+    font-size:clamp(14.5px,2.4vw,17px); color:#cdd8e4; line-height:1.7;
+    max-width:34em;
+  }
+  .meta{
+    display:flex; flex-wrap:wrap; gap:10px 22px; margin-top:26px;
+    font-family:var(--util); font-size:12.5px; letter-spacing:.06em; color:#9fb1c4;
+  }
+  .meta b{color:var(--gold-soft); font-weight:700;}
+
+  /* ---------- layout ---------- */
+  main{max-width:760px; margin:0 auto; padding:0 24px 10px;}
+  .lead{
+    font-family:var(--display); font-weight:500;
+    font-size:clamp(17px,2.6vw,19.5px); line-height:1.92;
+    color:var(--navy-deep); margin:46px 0 8px;
+  }
+  .lead .hl{color:var(--vermillion); font-weight:600;}
+
+  section{padding:34px 0; border-top:1px solid rgba(184,150,12,.28);}
+  section:first-of-type{border-top:none;}
+  .sec-head{display:flex; align-items:baseline; gap:14px; margin:0 0 18px;}
+  .num{
+    font-family:var(--display); font-weight:700; font-size:30px;
+    color:var(--gold); line-height:1; flex:none;
+    width:1.3em; text-align:center;
+  }
+  h2{
+    font-family:var(--display); font-weight:700;
+    font-size:clamp(19px,3.2vw,23px); color:var(--navy);
+    margin:0; line-height:1.4; letter-spacing:.01em;
+  }
+  h2 .thin{font-weight:500; color:var(--ink-soft); font-size:.82em;}
+  p{margin:0 0 14px;}
+  p:last-child{margin-bottom:0;}
+  b,strong{font-weight:600;}
+  .navy{color:var(--navy);} .verm{color:var(--vermillion);}
+
+  /* lists */
+  ul.points{list-style:none; margin:6px 0 0; padding:0;}
+  ul.points>li{
+    position:relative; padding:8px 0 8px 26px; margin:0;
+    border-bottom:1px dotted rgba(106,98,83,.3);
+  }
+  ul.points>li:last-child{border-bottom:none;}
+  ul.points>li::before{
+    content:""; position:absolute; left:4px; top:18px;
+    width:8px; height:8px; background:var(--gold); transform:rotate(45deg);
+  }
+  ul.points>li b.tag{
+    color:var(--navy); font-weight:700;
+  }
+
+  /* enumerated inline (effects) */
+  .enum{display:grid; gap:8px; margin-top:6px;}
+  .enum>div{padding-left:26px; position:relative;}
+  .enum>div .n{
+    position:absolute; left:0; top:0; font-family:var(--util);
+    font-weight:700; font-size:13px; color:#fff; background:var(--navy);
+    width:19px; height:19px; border-radius:50%; display:flex;
+    align-items:center; justify-content:center; line-height:1;
+  }
+
+  /* callout */
+  .note{
+    background:var(--paper); border:1px solid var(--washi-deep);
+    border-left:5px solid var(--navy); padding:16px 18px; margin:18px 0 0;
+    font-size:15px; line-height:1.85; color:#3a352d;
+  }
+  .note .lbl{
+    display:block; font-family:var(--util); font-weight:700; font-size:12px;
+    letter-spacing:.12em; color:var(--navy); margin-bottom:6px;
+  }
+  .note.caution{border-left-color:var(--vermillion);}
+  .note.caution .lbl{color:var(--vermillion);}
+
+  /* 重心担保 grid */
+  .pillars{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px;}
+  .pillars>div{
+    background:var(--paper); border:1px solid var(--washi-deep);
+    border-top:3px solid var(--gold); padding:14px 16px;
+  }
+  .pillars .k{
+    font-family:var(--util); font-weight:700; font-size:13px;
+    letter-spacing:.08em; color:var(--navy); margin-bottom:5px;
+  }
+  .pillars .v{font-size:14.5px; line-height:1.8;}
+  .pillars .v .verm{font-weight:600;}
+
+  /* ---------- signature: convergence figure ---------- */
+  figure.conv{margin:22px 0 6px;}
+  figure.conv svg{width:100%; height:auto; display:block;}
+  figure.conv figcaption{
+    font-family:var(--util); font-size:12.5px; color:var(--ink-soft);
+    text-align:center; margin-top:10px; letter-spacing:.04em;
+  }
+
+  /* closing */
+  .closing{
+    background:var(--navy-deep); color:#e9eef4; margin-top:8px;
+    padding:40px 24px 46px;
+  }
+  .closing-inner{max-width:760px; margin:0 auto;}
+  .closing h2{color:#fff;}
+  .closing .num{color:var(--gold-soft);}
+  .closing p{color:#d4dde7;}
+  .closing .hl{color:var(--gold-soft); font-weight:600;}
+
+  footer{
+    max-width:760px; margin:0 auto; padding:26px 24px 50px;
+    font-family:var(--util); font-size:12.5px; color:var(--ink-soft);
+    line-height:1.9;
+  }
+  footer hr{border:none; border-top:1px solid rgba(184,150,12,.4); margin:0 0 18px;}
+  footer .sig{color:var(--navy); font-weight:700; font-size:14px;}
+  footer .footer-copy{text-align:center; color:var(--ink-soft); line-height:1.95; margin-top:6px;}
+
+  /* reveal */
+  .reveal{opacity:0; transform:translateY(14px); transition:opacity .7s ease, transform .7s ease;}
+  .reveal.in{opacity:1; transform:none;}
+
+  @media (max-width:560px){
+    .pillars{grid-template-columns:1fr;}
+    .sec-head{gap:10px;}
+    .num{font-size:25px;}
+    header.mast{padding:42px 20px 36px;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto;}
+    .reveal{opacity:1; transform:none; transition:none;}
+  }
+  @media print{
+    body{background:#fff; font-size:11pt; color:#000;}
+    header.mast,.closing{background:#fff; color:#000;}
+    header.mast{border-bottom:2px solid var(--navy);}
+    h1.title,.closing h2{color:var(--navy-deep);}
+    .subtitle,.meta,.closing p{color:#333;}
+    .eyebrow,.meta b,.closing .num{color:var(--gold);}
+    .reveal{opacity:1; transform:none;}
+    section{break-inside:avoid;}
+    header.mast::after{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="sitebar">
+  <span class="sb-brand">NISSHO RESEARCH</span>
+  <a class="sb-back" href="index.html">← 予測技術門 ポータルへ</a>
+</div>
+
+<header class="mast">
+  <div class="mast-inner">
+    <div class="eyebrow">政 策 提 言 ・ 概 要 版</div>
+    <h1 class="title">国民強靱化基礎役務制度<span style="font-size:.62em; font-weight:600;">（仮称）</span></h1>
+    <div class="subtitle">防災・国土保全・救護自活を中核とし、安全保障の基礎教育を組み込んだ国民教育制度の提言</div>
+    <div class="meta"><span><b>区分</b>　たたき台（改訂稿）</span><span><b>時期</b>　2026年6月</span><span><b>制作</b>　制作者</span></div>
+  </div>
+</header>
+
+<main>
+
+  <p class="lead reveal">日本の防衛と国土を支える「人」の基盤――<span class="hl">人的抗堪性（レジリエンス）</span>――は、物的戦力の整備に比して著しく立ち遅れている。本提言は、これを「徴兵制度」によってではなく、<b>全国民を対象とする教育的な国民役務制度</b>によって補うものである。既に成立している国土強靱化基本法（2013年）の理念を「人」の側面へ拡張し、「軍事教練の復活」ではなく「国土強靱化の人的基盤の確立」として設計する。</p>
+
+  <section class="reveal">
+    <div class="sec-head"><span class="num">一</span><h2>提言の趣旨</h2></div>
+    <p>少子化と厳しい戦略環境のもと、現状の志願制度のみでは、自衛官の所要も、基幹インフラを維持する人材も確保できない。本提言は、現役自衛官を直接徴集するのではなく、防災・救護・自活という<b>誰にとっても有用で、誰も否定しがたい能力</b>を中核に据えた国民教育制度を通じて、国家の人的基盤を国民規模で底上げする。</p>
+  </section>
+
+  <section class="reveal">
+    <div class="sec-head"><span class="num">二</span><h2>背景 <span class="thin">― なぜ今、人的基盤か</span></h2></div>
+    <ul class="points">
+      <li>2022年の戦略三文書は弾薬・部品など後方分野に光を当てたが、損耗を補充する<b class="tag">予備戦力の設計は手つかず</b>。現役自衛官約25万人に対し、戦闘技能を持つ補充源は予備自衛官約5万人にとどまる。</li>
+      <li>基幹インフラ（電気・通信・医療等）を災害下・有事下に維持する人材を育てる制度は、ほぼ存在しない。</li>
+      <li>志願制度は少子化のもとで限界に達し、負担は防衛意識の高い者や経済的事情を抱える一部の国民に偏る（「ただ乗り」構造）。</li>
+    </ul>
+  </section>
+
+  <section class="reveal">
+    <div class="sec-head"><span class="num">三</span><h2>理論的核心 <span class="thin">― 「教育」と「防衛」は別物ではない</span></h2></div>
+    <p>本提言の要は次の一点にある。<b class="verm">災害に対するレジリエンスを構成する人的能力と、外部脅威に対する抗堪性を構成する人的能力とは、その大部分が同一である。</b>　救護・自活・通信維持・インフラの運用と復旧・規律ある協働は、大規模災害下で国民の生存を支える能力であると同時に、有事の継戦能力そのものでもある。</p>
+
+    <figure class="conv reveal">
+      <svg viewBox="0 0 720 380" role="img" aria-label="災害への対応と脅威への抵抗が、人的抗堪性という一つの基盤の二つの応用面であることを示す収束図">
+        <defs>
+          <marker id="ah" markerWidth="11" markerHeight="11" refX="6" refY="5" orient="auto">
+            <path d="M0,0 L10,5 L0,10 Z" fill="#8a6914"/>
+          </marker>
+        </defs>
+        <!-- top-left node -->
+        <rect x="46" y="24" width="266" height="78" rx="3" fill="#ffffff" stroke="#1a3a5c" stroke-width="2"/>
+        <text x="179" y="55" text-anchor="middle" font-family="'Shippori Mincho',serif" font-weight="700" font-size="20" fill="#1a3a5c">災害への対応</text>
+        <text x="179" y="82" text-anchor="middle" font-family="'Noto Sans JP',sans-serif" font-size="13.5" fill="#5c4a22">防災・救援・国土保全</text>
+        <!-- top-right node -->
+        <rect x="408" y="24" width="266" height="78" rx="3" fill="#ffffff" stroke="#8b2020" stroke-width="2"/>
+        <text x="541" y="55" text-anchor="middle" font-family="'Shippori Mincho',serif" font-weight="700" font-size="20" fill="#8b2020">脅威への抵抗</text>
+        <text x="541" y="82" text-anchor="middle" font-family="'Noto Sans JP',sans-serif" font-size="13.5" fill="#5c4a22">防衛・継戦・抑止</text>
+        <!-- converging arrows -->
+        <path d="M179,108 C179,170 320,150 350,212" fill="none" stroke="#8a6914" stroke-width="2.4" marker-end="url(#ah)"/>
+        <path d="M541,108 C541,170 400,150 370,212" fill="none" stroke="#8a6914" stroke-width="2.4" marker-end="url(#ah)"/>
+        <text x="360" y="180" text-anchor="middle" font-family="'Noto Sans JP',sans-serif" font-size="12.5" fill="#5c4a22">＝ ほぼ一つの能力</text>
+        <!-- foundation -->
+        <rect x="60" y="228" width="600" height="118" rx="4" fill="#e8dcc4" stroke="#8a6914" stroke-width="2"/>
+        <text x="360" y="270" text-anchor="middle" font-family="'Shippori Mincho',serif" font-weight="800" font-size="27" fill="#14304c" letter-spacing="2">人 的 抗 堪 性</text>
+        <text x="360" y="302" text-anchor="middle" font-family="'Noto Sans JP',sans-serif" font-size="13" fill="#3a352d">救護 ・ 自活 ・ 通信維持 ・ インフラ運用復旧 ・ 規律 ・ 協働</text>
+        <text x="360" y="326" text-anchor="middle" font-family="'Noto Sans JP',sans-serif" font-size="12" fill="#5c4a22">― 災害にも脅威にも揺らがない、共通の基盤 ―</text>
+      </svg>
+      <figcaption>引き金（災害か、攻撃か）を異にするだけの、ほぼ一つの能力。防衛と防災は、その二つの応用面にすぎない。</figcaption>
+    </figure>
+
+    <p>ゆえに「本制度の重心は教育か防衛か」という問いは前提から成り立たない。防衛上の便益は教育のなかに隠した「積荷」ではなく、教育それ自体から導かれる<b>分析的帰結</b>である。本制度の重心は、教育でも防衛でもなく、双方の基盤たる<b class="navy">人的抗堪性</b>にある。これは本提言の独創ではなく、フィンランド（kokonaisturvallisuus）・スウェーデン・スイス（総合防衛）が現に採る確立した教義である。なお、武器操作など<b>戦闘に固有の領域は構造的に除外</b>し、共通基盤にのみ自らを限定する。</p>
+  </section>
+
+  <section class="reveal">
+    <div class="sec-head"><span class="num">四</span><h2>制度の骨格</h2></div>
+    <ul class="points">
+      <li><b class="tag">対象</b>　満18歳に達した全国民（男女共通）。</li>
+      <li><b class="tag">期間</b>　基幹課程6か月、希望者は最長1年まで延長可（延長分は志願制）。</li>
+      <li><b class="tag">第一段階（約2か月・合宿）</b>　応急救護・防災・自活・通信の基礎、安保の基礎教育。</li>
+      <li><b class="tag">第二段階（約4か月）</b>　防災救援／国土保全／救護福祉／海上保安補助／自衛隊後方業務（戦闘職種を除く）から選択し実習。</li>
+      <li><b class="tag">第三段階</b>　修了後は予備役務名簿に登録、再訓練と大規模災害時の招集に応ずる。手当支給・休業補償・猶予制度を整備。</li>
+    </ul>
+  </section>
+
+  <section class="reveal">
+    <div class="sec-head"><span class="num">五</span><h2>憲法の壁と四つの設計要件</h2></div>
+    <p>最大の障壁は、徴兵制を違憲とする憲法18条（苦役の禁止）・13条の確立解釈である。本制度は次の四要件でこの障壁を可能な限り低くする。</p>
+    <ul class="points">
+      <li><b class="tag">①教育としての性格づけ</b>　義務教育の延長線上の国民教育プログラムとし、便益を本人に帰属させる。</li>
+      <li><b class="tag">②男女共通</b>　男子限定が招く14条（平等）問題を回避。</li>
+      <li><b class="tag">③良心的拒否権と非軍事の代替役務</b>を保障。</li>
+      <li><b class="tag">④戦闘・有事招集を本体に含めない</b>　戦地動員の性格を構造的に排除。</li>
+    </ul>
+    <div class="note caution">
+      <span class="lbl">法的到達点についての率直な評価</span>
+      四要件を備えても18条を確実に突破できる保証はない。法的根拠の確立・解釈整理・将来の憲法改正論議という重層的な道筋を要する。本提言は壁を<b>現実的に越えうる水準まで下げる</b>ものであり、消滅させると主張するものではない。
+    </div>
+  </section>
+
+  <section class="reveal">
+    <div class="sec-head"><span class="num">六</span><h2>重心の担保 <span class="thin">― 教育主・防衛従を「設計で示す」</span></h2></div>
+    <p>重心が教育の側にあることを、思想ではなく検証可能な制度の形で固定する。第三者が分解しても重心が動かないことを、四つの指標で証明する。</p>
+    <div class="pillars">
+      <div><div class="k">時間</div><div class="v">安保座学は基幹課程の総時間の<b>15％以内</b>。残余は防災・救護・自活の実技。</div></div>
+      <div><div class="k">予算</div><div class="v">救護・防災・国土保全への配分を主、防衛関連を従とする比率を明示。</div></div>
+      <div><div class="k">評価（KPI）</div><div class="v">成功指標を災害即応性に置き、<span class="verm">自衛官志願者数は指標に含めない</span>（ミッション・ドリフト防止）。</div></div>
+      <div><div class="k">統治機構</div><div class="v">所管を防衛省でなく<b>文民の防災機関</b>とし、自衛隊は一参加者にとどめる。</div></div>
+    </div>
+  </section>
+
+  <section class="reveal">
+    <div class="sec-head"><span class="num">七</span><h2>導入と財政の現実</h2></div>
+    <p>対象は年間約100万人規模で、フィンランド（年間徴集約2.7万人）とは桁が二つ違う。一斉実施は不可能であり、分散・通年・モジュール化と既存資源の活用を前提とする。フランスのSNU（同型の国民役務）は、義務化に年20億ユーロ超を要し収容能力が追いつかず任意参加に留まった。<b>理念より収容能力と財政が成否を決める</b>。導入は、試行期（数千人規模のパイロット）→拡大期→定着期と段階的に進め、義務化の判断は実証データと国民的合意の形成を待つ。</p>
+  </section>
+
+  <section class="reveal">
+    <div class="sec-head"><span class="num">八</span><h2>期待される効果と残された論点</h2></div>
+    <div class="enum">
+      <div><span class="n">1</span>国家レジリエンスの向上。</div>
+      <div><span class="n">2</span>基礎的資質（規律・協働・自立）の涵養。</div>
+      <div><span class="n">3</span>防災・防衛の負担の公平化。</div>
+      <div><span class="n">4</span>安全保障意識の醸成。</div>
+      <div><span class="n">5</span>抑止力の人的基盤（能力の同一性から導かれる結果）。</div>
+    </div>
+    <div class="note">
+      <span class="lbl">残された論点 ― 隠さず明記する</span>
+      教育か役務かの法的争い、軍国主義回帰との批判、教育効果の実証、軍事的有効性との緊張、そして将来の軍事化への「滑り坂」懸念。最後の点は設計で抑制されるが、完全には解消されない政治的判断の問題として残る。
+    </div>
+  </section>
+
+</main>
+
+<div class="closing reveal">
+  <div class="closing-inner">
+    <div class="sec-head"><span class="num">結</span><h2>結び</h2></div>
+    <p>災害に強い国民を育てることと、脅威に耐える国家を築くことは、<span class="hl">人的抗堪性という一つの基盤の二つの現れ</span>にすぎない。国土強靱化を「物」から、それを担う「人」へ広げる――これが本提言の眼目である。</p>
+    <p>制度の是非は、最終的に国民が決すべき価値判断に属する。本提言は、その国民的議論のたたき台として提示される。</p>
+  </div>
+</div>
+
+<footer>
+  <hr>
+  <div class="sig">国民強靱化基礎役務制度（仮称）概要版</div>
+  <div>たたき台（改訂稿）／2026年6月／制作者</div>
+  <div style="margin-bottom:18px;">本稿は政策提言の概要である。制度名・期間・各段階の構成・重心担保の数値・財政試算は、今後の議論に応じて精査・修正されるべきものである。</div>
+
+  <div class="footer-copy">
+    © 2026 日昇リサーチ株式会社<br>
+    牧正人史先生（昭和33年発見・姓名科学体系の創始者）の学問の普及を使命として設立<br>
+    <span style="font-size:0.7rem;opacity:0.7;">GitHub: yymm77 ／ お問い合わせ: 042-355-5678</span>
+  </div>
+  <div style="text-align:center;padding:10px 0 4px;font-size:12px;letter-spacing:.05em;">
+    <a href="tokusho.html" style="color:#b8960c;text-decoration:underline;opacity:.85;">特定商取引法に基づく表記</a>
+  </div>
+  <div style="text-align:center;padding:4px 0 10px;font-size:12px;line-height:2.2;letter-spacing:.04em;">
+    <a href="index.html" style="color:#b8960c;margin:0 6px;">トップ</a>｜
+    <a href="namemaster_v5.html" style="color:#b8960c;margin:0 6px;">姓名科学</a>｜
+    <a href="compatibility_v2.html" style="color:#b8960c;margin:0 6px;">結婚相性</a>｜
+    <a href="houigaku.html" style="color:#b8960c;margin:0 6px;">方位学</a>｜
+    <a href="navi.html" style="color:#b8960c;margin:0 6px;">方位ナビ</a>｜
+    <a href="aisei.html" style="color:#b8960c;margin:0 6px;">吉日・相性</a>｜
+    <a href="iching.html" style="color:#b8960c;margin:0 6px;">易経門</a>｜
+    <a href="story-01.html" style="color:#b8960c;margin:0 6px;">連載小説</a>｜
+    <a href="agi-index.html" style="color:#b8960c;margin:0 6px;">AGI連載</a>
+  </div>
+</footer>
+
+<script>
+  (function(){
+    var rm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var els = document.querySelectorAll('.reveal');
+    if(rm || !('IntersectionObserver' in window)){
+      els.forEach(function(e){e.classList.add('in');}); return;
+    }
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); }
+      });
+    },{threshold:.12, rootMargin:'0px 0px -8% 0px'});
+    els.forEach(function(e){io.observe(e);});
+  })();
+</script>
+</body>
+</html>
