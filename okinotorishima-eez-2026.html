@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>「岩」と呼ぶ海で、彼らは引き金を引いた ― 沖ノ鳥島EEZ射撃訓練の意味</title>
+<meta name="description" content="2026年7月19日、沖ノ鳥島南西約180キロの日本のEEZ内で、中国海軍のミサイル駆逐艦が射撃訓練を実施した。場所・距離・武器・通告・随伴艦の配置から、この事案の「設計」を読み解く。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;700&family=Noto+Serif+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#1a3a5c;
+  --soft-navy:#2c516f;
+  --gold:#b8960c;
+  --vermillion:#8b2e2e;
+  --washi:#f5f1e8;
+  --ink:#1a1208;
+  --line:#d9cfb8;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--washi);
+  color:var(--ink);
+  font-family:"Noto Serif JP","Shippori Mincho",serif;
+  font-weight:400;
+  line-height:2.05;
+  letter-spacing:.04em;
+  font-size:17px;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:760px;margin:0 auto;padding:0 24px 80px;}
+
+/* ── ヘッダー ── */
+.masthead{
+  background:var(--navy);
+  color:var(--washi);
+  padding:56px 24px 48px;
+  border-bottom:4px solid var(--gold);
+}
+.masthead-inner{max-width:760px;margin:0 auto;}
+.eyebrow{
+  font-family:"Shippori Mincho",serif;
+  font-size:.78rem;
+  letter-spacing:.34em;
+  color:var(--gold);
+  margin:0 0 22px;
+}
+h1{
+  font-family:"Shippori Mincho",serif;
+  font-weight:700;
+  font-size:2.05rem;
+  line-height:1.62;
+  margin:0 0 18px;
+  letter-spacing:.02em;
+}
+.subtitle{
+  font-size:.98rem;
+  color:#c9d6e2;
+  margin:0 0 26px;
+  letter-spacing:.1em;
+}
+.byline{
+  font-size:.82rem;
+  color:#a9bccb;
+  letter-spacing:.08em;
+  border-top:1px solid rgba(245,241,232,.22);
+  padding-top:16px;
+  margin:0;
+}
+
+/* ── 見出し ── */
+h2{
+  font-family:"Shippori Mincho",serif;
+  font-weight:600;
+  font-size:1.24rem;
+  line-height:1.7;
+  color:var(--navy);
+  margin:64px 0 8px;
+  padding-left:16px;
+  border-left:4px solid var(--gold);
+  letter-spacing:.03em;
+}
+h2 .num{
+  display:block;
+  font-size:.72rem;
+  letter-spacing:.3em;
+  color:var(--gold);
+  margin-bottom:8px;
+  font-weight:400;
+}
+p{margin:0 0 1.55em;text-align:justify;}
+strong{font-weight:700;color:var(--vermillion);}
+em{font-style:normal;border-bottom:1px solid var(--gold);padding-bottom:1px;}
+
+.lead{
+  font-size:1.06rem;
+  color:var(--soft-navy);
+  margin-top:44px;
+}
+
+/* ── 図版 ── */
+figure{
+  margin:40px 0 44px;
+  padding:0;
+}
+figure img{
+  width:100%;
+  height:auto;
+  display:block;
+  border:1px solid var(--line);
+  background:#fff;
+}
+.grid3{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+}
+.grid3 img{border:1px solid var(--line);}
+figcaption{
+  font-size:.8rem;
+  line-height:1.85;
+  color:var(--soft-navy);
+  margin-top:12px;
+  padding-left:12px;
+  border-left:2px solid var(--line);
+  letter-spacing:.02em;
+}
+figcaption .src{display:block;color:#8a8172;font-size:.74rem;margin-top:4px;}
+
+/* ── 事実確認ボックス ── */
+.factbox{
+  background:#fffdf6;
+  border:1px solid var(--gold);
+  border-top:5px solid var(--gold);
+  padding:30px 30px 22px;
+  margin:44px 0;
+}
+.factbox h3{
+  font-family:"Shippori Mincho",serif;
+  font-size:.94rem;
+  letter-spacing:.22em;
+  color:var(--gold);
+  margin:0 0 20px;
+  font-weight:600;
+}
+.factbox ul{margin:0;padding-left:1.2em;}
+.factbox li{
+  margin-bottom:.85em;
+  line-height:1.92;
+  font-size:.94rem;
+}
+.factbox li:last-child{margin-bottom:0;}
+.factbox .note{
+  font-size:.82rem;
+  color:var(--soft-navy);
+  margin-top:20px;
+  padding-top:16px;
+  border-top:1px dotted var(--line);
+  line-height:1.9;
+}
+
+/* ── 結び ── */
+.closing{
+  font-family:"Shippori Mincho",serif;
+  font-size:1.12rem;
+  color:var(--navy);
+  text-align:center;
+  letter-spacing:.18em;
+  margin:56px 0 0;
+}
+hr.rule{
+  border:0;
+  border-top:1px solid var(--line);
+  margin:56px 0;
+}
+
+/* ── 出典・フッター ── */
+.source{
+  font-size:.82rem;
+  line-height:1.9;
+  color:var(--soft-navy);
+  background:rgba(26,58,92,.045);
+  border-left:3px solid var(--soft-navy);
+  padding:18px 20px;
+  margin:48px 0 40px;
+  word-break:break-all;
+}
+.source a{color:var(--soft-navy);}
+.uca{
+  border:1px solid var(--line);
+  background:#fffdf6;
+  padding:24px 26px;
+  margin:0 0 28px;
+  text-align:center;
+}
+.uca .catch{
+  font-family:"Shippori Mincho",serif;
+  font-size:1.02rem;
+  color:var(--navy);
+  letter-spacing:.1em;
+  margin:0 0 12px;
+}
+.uca p{font-size:.85rem;line-height:1.9;margin:0 0 12px;text-align:center;}
+.uca a{
+  color:var(--vermillion);
+  text-decoration:none;
+  border-bottom:1px solid var(--vermillion);
+  font-size:.85rem;
+}
+.tags{
+  font-size:.88rem;
+  color:var(--soft-navy);
+  letter-spacing:.08em;
+  text-align:center;
+  margin:0;
+}
+.sig{
+  text-align:center;
+  font-family:"Shippori Mincho",serif;
+  font-size:.9rem;
+  color:var(--soft-navy);
+  letter-spacing:.14em;
+  margin:40px 0 0;
+}
+
+@media (max-width:600px){
+  body{font-size:16px;line-height:1.98;}
+  .masthead{padding:40px 20px 34px;}
+  h1{font-size:1.5rem;line-height:1.66;}
+  h2{font-size:1.1rem;margin:52px 0 8px;}
+  .wrap{padding:0 20px 60px;}
+  .factbox{padding:24px 20px 18px;}
+  .grid3{grid-template-columns:1fr;gap:14px;}
+}
+@media print{
+  body{background:#fff;}
+  .masthead{background:#fff;color:var(--ink);border-bottom:2px solid var(--gold);}
+  h1{color:var(--navy);}
+  .subtitle,.byline{color:#555;}
+}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <p class="eyebrow">日本侵食の解析</p>
+    <h1>「岩」と呼ぶ海で、彼らは引き金を引いた</h1>
+    <p class="subtitle">― 沖ノ鳥島EEZ射撃訓練の意味</p>
+    <p class="byline">2026年7月22日　三原嘉明</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+<h2><span class="num">一</span>午前二時の海</h2>
+
+<p class="lead">令和8年（2026年）7月19日、午前2時頃。日本最南端の沖ノ鳥島から南西へ約330キロ、太平洋のただ中である。海上自衛隊の護衛艦「さみだれ」が、北東へ進む四つの影を捉えた。</p>
+
+<p>中国海軍のレンハイ級ミサイル駆逐艦、ルーヤンⅢ級ミサイル駆逐艦、フチ級補給艦。そしてロシア海軍のステレグシチー級フリゲート。三隻と一隻、計4隻の混成である。</p>
+
+<p>その後、同じ島の南西約180キロの海域で、ルーヤンⅢ級ミサイル駆逐艦（艦番号「124」）が射撃訓練を実施した。そこは日本の排他的経済水域（EEZ）の内側だった。</p>
+
+<p>防衛省が公表したのは、二日後の21日である。</p>
+
+<figure>
+  <img src="images/20260721-eez-01.jpg" alt="射撃訓練を実施する中国海軍ルーヤンⅢ級ミサイル駆逐艦とロシア海軍ステレグシチー級フリゲート">
+  <figcaption>
+    （写真左）射撃訓練を実施する中国海軍ルーヤンⅢ級ミサイル駆逐艦（艦番号「124」）、（写真右）ロシア海軍ステレグシチー級フリゲート（艦番号「343」）。
+    <span class="src">出典：防衛省統合幕僚監部</span>
+  </figcaption>
+</figure>
+
+<h2><span class="num">二</span>確認されている事実</h2>
+
+<div class="factbox">
+  <h3>事 実 確 認</h3>
+  <ul>
+    <li>2026年7月19日午前2時頃、海上自衛隊は沖ノ鳥島（東京都）の南西約330キロの海域で、北東進する中国海軍レンハイ級ミサイル駆逐艦（103）、ルーヤンⅢ級ミサイル駆逐艦（124）、フチ級補給艦（903）、ロシア海軍ステレグシチー級フリゲート（343）の計4隻を確認した。</li>
+    <li>その後、沖ノ鳥島の南西約180キロの海域で、ルーヤンⅢ級ミサイル駆逐艦（124）が射撃訓練を実施したことが確認された。同海域は日本のEEZ内である。</li>
+    <li>防衛省が中国艦艇による日本のEEZ内での射撃を公表したのは、今回が初めてとされる。</li>
+    <li>EEZ内で他国の軍隊が射撃訓練を行うこと自体は、国際法上、違法ではない。</li>
+    <li>日本政府は、周辺船舶の航行に危険を及ぼし得るものとして、外交ルートを通じて中国側に申し入れを実施した。</li>
+    <li>木原稔官房長官は、今回の動向を「中ロ両軍の軍事面での連携強化に向けた動きの一環」と認識していると述べ、引き続き懸念を持って注視する考えを示した。</li>
+    <li>射撃訓練の直前、中国海軍から周辺の船舶に対し、訓練の期間と場所について無線で連絡があった。</li>
+    <li>4隻は、7月16日に沖縄本島と宮古島の間の海域を南進した艦艇と同一である。</li>
+    <li>警戒監視・情報収集にあたったのは、海上自衛隊第2水上戦隊所属の護衛艦「さみだれ」（呉）である。</li>
+    <li>中国は沖ノ鳥島を島ではなく岩礁だと主張し、周辺海域を日本のEEZと認めていない。</li>
+  </ul>
+  <p class="note">※ 統合幕僚監部の発表は「射撃訓練」とのみ記している。使用されたのが機関銃であったこと、および事前の無線連絡の内容は、報道各社が伝えたものである。本稿ではこの区別を保って記す。</p>
+</div>
+
+<figure>
+  <img src="images/20260721-eez-02.jpg" alt="中国及びロシア海軍艦艇の行動概要図">
+  <figcaption>
+    行動概要図。7月16日の宮古海峡南下から、19日の射撃実施位置まで。4隻の航跡が一連のものであったことが読み取れる。
+    <span class="src">出典：防衛省統合幕僚監部</span>
+  </figcaption>
+</figure>
+
+<h2><span class="num">三</span>「初めて」の重み</h2>
+
+<p>報道はいずれも「初めて」と伝えた。しかし、ここは慎重でありたい。</p>
+
+<p>防衛省が明らかにしたのは、中国艦艇による日本のEEZ内での射撃を<strong>公表したのが初めて</strong>、ということである。行われたのが初めてだったかどうかは、誰にも断言できないのではないか。</p>
+
+<p>海は広い。監視の目は限られている。今回は、たまたまそこに「さみだれ」がいた。私たちが知り得たのは、見えていた分だけである。この当たり前の事実を、まず自分に言い聞かせておきたいと思う。</p>
+
+<h2><span class="num">四</span>設計その一 ―「岩」と呼ぶ海でなければならなかった</h2>
+
+<p>なぜ沖ノ鳥島だったのか。ここに、この事案の性格が最もよく表れていると感じる。</p>
+
+<p>国連海洋法条約は、人間の居住または独自の経済生活を維持することのできない「岩」には、EEZや大陸棚を認めていない（第121条3項）。日本は沖ノ鳥島を島として約40万平方キロのEEZの根拠とし、護岸を整備し、観測施設を置いて維持してきた。対して中国は、これを岩礁だと主張し、周辺を日本のEEZとは認めていない。</p>
+
+<p>つまり中国の法解釈においては、あの海域は日本のEEZではなく公海である。公海で軍艦が射撃訓練を行うことは、何ら異例ではない。彼らの建前は、そのように組み立てられている。</p>
+
+<p>ここに一つの逆説がある。中国は長年、自国のEEZ内で米軍が行う軍事活動には強く反対してきた。他国のEEZでの射撃を自ら行えば、その原則と正面から衝突する。しかしこの矛盾は、「沖ノ鳥島にEEZは存在しない」という前提を置く限り、解消されてしまう。</p>
+
+<p>他の海域では、こうはいかない。だからこそ沖ノ鳥島でなければならなかったのではないか。<em>場所の選定そのものが、すでに一つの主張なのだ</em>と思う。</p>
+
+<h2><span class="num">五</span>設計その二 ― 180キロと機関銃</h2>
+
+<p>領海は12海里、約22キロである。射撃地点はそこから遥かに外側だった。領海侵入という、誰の目にも明白な違法行為は、注意深く避けられている。</p>
+
+<p>使われたのは機関銃だったと報じられている。ミサイルでも主砲でもない。</p>
+
+<p>私はここに引っかかった。外洋へ出た大型駆逐艦が機関銃を撃つことに、訓練としての価値がどれほどあるのだろうか。乗員の練度維持という説明は可能だが、それならばわざわざ他国の主張するEEZの内側でやる必要はない。</p>
+
+<p>とすれば目的は、訓練そのものではなく、「日本がEEZだと主張する海域で、我が方が射撃を行った」という<strong>記録を残すこと</strong>にあったのではないか。</p>
+
+<p>同時に、機関銃という選択は、事態を悪化させる梯子の最も低い段に留まる。撃った事実だけが欲しく、緊張の激化までは望んでいない。距離も武器も、実に精密に測られていると感じる。</p>
+
+<figure>
+  <div class="grid3">
+    <img src="images/20260721-eez-03.jpg" alt="中国海軍レンハイ級ミサイル駆逐艦（艦番号103）">
+    <img src="images/20260721-eez-04.jpg" alt="中国海軍ルーヤンⅢ級ミサイル駆逐艦（艦番号124）">
+    <img src="images/20260721-eez-05.jpg" alt="中国海軍フチ級補給艦（艦番号903）">
+  </div>
+  <figcaption>
+    左から、中国海軍レンハイ級ミサイル駆逐艦（103）、ルーヤンⅢ級ミサイル駆逐艦（124）、フチ級補給艦（903）。補給艦を伴う編成は、長期の外洋行動を前提としている。
+    <span class="src">出典：防衛省統合幕僚監部</span>
+  </figcaption>
+</figure>
+
+<h2><span class="num">六</span>設計その三 ― 通告と随伴</h2>
+
+<p>射撃の直前、中国海軍は周辺の船舶に対し、訓練の期間と場所を無線で連絡していた。</p>
+
+<p>これは安全への配慮であり、同時にもう一つの意味を帯びる。訓練の期間と場所を自らの権限で周辺に通告するという振る舞いは、それ自体が主権的な行為の演技ではないか。日本の管轄権を、一切経由していない。</p>
+
+<p>そしてロシア艦である。4隻のうち、撃ったのは中国艦1隻のみだった。ロシアのステレグシチー級フリゲートは随伴し、目撃した。参加ではない。</p>
+
+<p>木原官房長官は「中ロ両軍の軍事面での連携強化に向けた動きの一環」との認識を示した。その通りだと思う。ただし、役割は対等ではない。連携は可視化しつつ、法的な責任と国際的な反発は中国が単独で引き受ける配置になっている。ここにも設計が見えるのではないか。</p>
+
+<figure>
+  <img src="images/20260721-eez-06.jpg" alt="ロシア海軍ステレグシチー級フリゲート（艦番号343）">
+  <figcaption>
+    ロシア海軍ステレグシチー級フリゲート（艦番号「343」）。4隻のうち、このロシア艦は撃っていない。
+    <span class="src">出典：防衛省統合幕僚監部</span>
+  </figcaption>
+</figure>
+
+<h2><span class="num">七</span>抗議ではなく「申し入れ」であったこと</h2>
+
+<p>日本政府は、周辺船舶の航行に危険を及ぼし得るものとして、外交ルートを通じて中国に申し入れを行った。抗議ではなく、申し入れである。</p>
+
+<p>これを弱腰と評するのは、たやすい。しかし私は、これは姿勢よりも構造の問題だと思う。EEZ内で他国の軍隊が訓練を行うこと自体は、国際法上禁じられていない。違法でない行為に対して、抗議の法的根拠を立てるのは難しい。</p>
+
+<p>相手方の手法の核心は、まさにここにあるのではないか。<strong>合法性の内側で、不都合を一つずつ積み上げていく</strong>。一つ一つは違法ではない。しかし積み重なった先には、既成事実が残る。</p>
+
+<p>では日本に手がなかったのかといえば、そうではないと思う。今回、日本が取り得た対抗手段は「公表すること」だった。初めての公表という事実そのものが、日本側の一手だったと見るべきではないだろうか。</p>
+
+<h2><span class="num">八</span>午前二時に、誰が見ていたか</h2>
+
+<p>私は東京郷友連盟で、防衛現地研修の企画に携わっている。基地や駐屯地を訪ね、隊員の方々と言葉を交わす機会をいただいてきた。</p>
+
+<p>こうした事案は、たいてい俯瞰図で語られる。矢印と凡例の地図、艦種と艦番号の一覧。今回も統合幕僚監部の資料には、整然とした行動概要図が添えられている。</p>
+
+<p>だが、あの図の一点には人がいる。呉を母港とする第2水上戦隊の護衛艦「さみだれ」。午前2時、太平洋のただ中で、四隻の外国艦を視界に収め続けた乗員たちがいる。撃たれても撃ち返せない前提で、ただ見て、記録する任務である。</p>
+
+<p>今回の「初公表」を可能にしたのは、その目だった。設計を読み解く議論も大切だが、その基礎に何があるのかは、忘れずにおきたいと感じる。</p>
+
+<h2><span class="num">九</span>海に線は引かれていない</h2>
+
+<p>海に線は引かれていない。EEZという境界は、条約と、主張と、それを支える実行によって初めて姿を現す観念である。</p>
+
+<p>線を引くのは、人の意志なのだと思う。そして引かれた線は、誰かが在り続けなければ、静かに薄れていく。</p>
+
+<p>今回撃たれたのは機関銃の弾であって、日本の船でも人でもなかった。被害はない。違法でもない。それでも防衛省は公表し、政府は申し入れをした。その判断の意味を、私たちの側も受け取っておきたいと思う。</p>
+
+<p>沖ノ鳥島の南西180キロ。あの海は、まだ日本のEEZである。</p>
+
+<p class="closing">生かされて今を存在する。</p>
+
+<hr class="rule">
+
+<div class="source">
+出典：防衛省統合幕僚監部「中国及びロシア海軍艦艇の動向について」（令和8年7月21日）<br>
+<a href="https://www.mod.go.jp/js/pdf/2026/p20260721_01.pdf">https://www.mod.go.jp/js/pdf/2026/p20260721_01.pdf</a>（2026年7月22日に利用）<br>
+掲載写真および行動概要図は、同資料から切り出して使用しています。
+</div>
+
+<div class="uca">
+  <p class="catch">知識は解放され、創造者は報われる。</p>
+  <p>創作と引用の対価を、ブロックチェーンで正しく還す。UCA（Universal Creative Attribution）の構想をご覧ください。</p>
+  <a href="https://yymm77.github.io/seimei-kagaku/copyright-proposal.html">新著作権の構想 ―  UCA提言</a>
+</div>
+
+<p class="tags">#牧正人史　#マシレ予測　#沖ノ鳥島</p>
+
+<p class="sig">三原嘉明</p>
+
+</div>
+</body>
+</html>
