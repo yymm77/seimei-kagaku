@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>政策への提言 — 日昇リサーチ</title>
+<meta name="description" content="新著作権の構想（UCA）、FAI国家戦略、国民強靱化基礎役務、国立国会図書館AI開発中核拠点構想。各省庁へ提出した提言を全文公開しています。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;800&family=Noto+Serif+JP:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #1a1208;
+  --ink-light: #3d2b0e;
+  --paper: #f5f1e8;
+  --gold: #8a6914;
+  --gold-bright: #b8960c;
+  --vermillion: #8b2e2e;
+  --jade: #2d5a3d;
+  --indigo: #1a3a5c;
+  --border: rgba(138,105,20,0.24);
+  --shadow: rgba(26,18,8,0.11);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Noto Serif JP', serif;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(138,105,20,0.017) 3px, rgba(138,105,20,0.017) 4px),
+    repeating-linear-gradient(90deg, transparent, transparent 10px, rgba(138,105,20,0.011) 10px, rgba(138,105,20,0.011) 11px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+
+/* ===== 上部の道しるべ ===== */
+.crumbs {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  justify-content: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(245,241,232,0.9);
+  backdrop-filter: blur(6px);
+  font-size: 0.76rem;
+  letter-spacing: 0.12em;
+}
+
+.crumbs a { color: var(--gold); text-decoration: none; }
+.crumbs a:hover { text-decoration: underline; }
+.crumbs .here { opacity: 0.55; }
+
+/* ===== 標題 ===== */
+.hero {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 74px 20px 54px;
+  border-bottom: 1px solid var(--border);
+  background:
+    radial-gradient(ellipse at 50% -10%, rgba(184,150,12,0.16) 0%, transparent 62%);
+}
+
+.hero h1 {
+  font-family: 'Shippori Mincho', serif;
+  font-size: clamp(1.7rem, 5.4vw, 2.9rem);
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-indent: 0.2em;
+  line-height: 1.45;
+}
+
+.hero .en {
+  margin-top: 16px;
+  font-size: 0.72rem;
+  letter-spacing: 0.3em;
+  text-indent: 0.3em;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+
+.hero p.lead {
+  margin: 30px auto 0;
+  max-width: 620px;
+  font-size: 0.87rem;
+  line-height: 2.15;
+  color: var(--ink-light);
+  text-align: left;
+}
+
+/* ===== 提言一覧 ===== */
+main {
+  position: relative;
+  z-index: 1;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 20px 90px;
+}
+
+.item {
+  display: block;
+  position: relative;
+  padding: 40px 34px 34px 40px;
+  margin-top: 30px;
+  background: rgba(255,255,255,0.52);
+  border: 1px solid var(--border);
+  border-left: 5px solid var(--accent, var(--gold));
+  text-decoration: none;
+  transition: background .25s, transform .25s, box-shadow .25s;
+}
+
+.item:hover, .item:focus-visible {
+  background: rgba(255,255,255,0.82);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 34px var(--shadow);
+}
+
+.item-no {
+  position: absolute;
+  top: 16px;
+  right: 22px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 2.6rem;
+  line-height: 1;
+  color: var(--accent, var(--gold));
+  opacity: 0.16;
+  pointer-events: none;
+}
+
+.item-tag {
+  display: inline-block;
+  padding: 3px 12px;
+  margin-bottom: 15px;
+  background: var(--accent, var(--gold));
+  color: #fff;
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+}
+
+.item h2 {
+  font-family: 'Shippori Mincho', serif;
+  font-size: clamp(1.24rem, 3.6vw, 1.62rem);
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  line-height: 1.6;
+}
+
+.item p {
+  margin-top: 16px;
+  font-size: 0.85rem;
+  line-height: 2.1;
+  color: var(--ink-light);
+}
+
+.item dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 7px 18px;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px dashed var(--border);
+  font-size: 0.76rem;
+  line-height: 1.85;
+}
+
+.item dt {
+  color: var(--accent, var(--gold));
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+
+.item dd { color: var(--ink-light); }
+
+.item-go {
+  display: block;
+  margin-top: 22px;
+  text-align: right;
+  font-size: 0.8rem;
+  letter-spacing: 0.18em;
+  color: var(--accent, var(--gold));
+}
+
+/* 実証デモは性格が違うので控えめに */
+.item.demo {
+  background: rgba(255,255,255,0.34);
+  padding: 30px 30px 26px 34px;
+}
+.item.demo h2 { font-size: 1.12rem; }
+
+.section-rule {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 56px;
+  color: var(--ink-light);
+  font-size: 0.74rem;
+  letter-spacing: 0.22em;
+  opacity: 0.68;
+}
+.section-rule::before,
+.section-rule::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ===== 結び ===== */
+footer {
+  position: relative;
+  z-index: 1;
+  border-top: 2px solid var(--border);
+  background: linear-gradient(0deg, rgba(138,105,20,0.09) 0%, transparent 100%);
+  padding: 38px 20px 44px;
+  text-align: center;
+}
+
+.f-uca {
+  font-size: 0.76rem;
+  line-height: 2;
+  color: var(--ink-light);
+  opacity: 0.82;
+}
+.f-uca a { color: var(--gold); }
+
+.f-sign {
+  margin-top: 20px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.16em;
+}
+
+.f-nav {
+  margin-top: 18px;
+  font-size: 0.76rem;
+  line-height: 2.1;
+}
+.f-nav a { color: var(--gold-bright); margin: 0 8px; }
+
+.f-copy {
+  margin-top: 14px;
+  font-size: 0.71rem;
+  line-height: 1.95;
+  color: var(--ink-light);
+  opacity: 0.6;
+}
+
+@media (max-width: 620px) {
+  .hero { padding: 52px 20px 40px; }
+  .item { padding: 32px 22px 26px 26px; }
+  .item-no { font-size: 2rem; top: 12px; right: 14px; }
+  .item dl { grid-template-columns: 1fr; gap: 2px; }
+  .item dt { margin-top: 8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { transition-duration: .001s !important; }
+  .item:hover { transform: none; }
+}
+</style>
+</head>
+<body>
+
+<nav class="crumbs">
+  <a href="https://yymm77.github.io/">玄関</a>
+  <a href="index.html">予測技術門</a>
+  <span class="here">政策への提言</span>
+</nav>
+
+<header class="hero">
+  <h1>政策への提言</h1>
+  <p class="en">Policy Proposals</p>
+  <p class="lead">
+    ここには、私が各省庁へ提出した提言を、提出したそのままの形で置いています。
+    著作権のあり方、人型AIによる国家戦略、災害と防衛を貫く国民役務、
+    そして国立国会図書館を軸としたAI開発拠点。
+    領域は違いますが、いずれも「この国の仕組みを、次の百年に向けてどう組み直すか」という
+    ひとつの問いから出たものです。<br>
+    どなたでも自由にお読みいただけます。引用も、批判も、ご自由に。
+  </p>
+</header>
+
+<main>
+
+  <!-- 一：新著作権の構想 -->
+  <a class="item" style="--accent:#8a6914" href="copyright-proposal.html">
+    <span class="item-no">壱</span>
+    <span class="item-tag">新著作権構想</span>
+    <h2>新著作権の構想 ── UCA</h2>
+    <p>
+      ブロックチェーン技術を活用した知的財産の新しい保護モデル。
+      デジタル時代における著作権のあり方を提言。
+      UCA（Universal Creative Attribution）──知識は解放され、創造者は報われる。
+    </p>
+    <dl>
+      <dt>提出先</dt>
+      <dd>首相官邸／内閣府 知的財産戦略推進事務局／文化庁 著作権課</dd>
+      <dt>年次</dt>
+      <dd>令和8年（2026年）</dd>
+    </dl>
+    <span class="item-go">全文を読む →</span>
+  </a>
+
+  <!-- 二：FAI国家戦略 -->
+  <a class="item" style="--accent:#1a3a5c" href="fai-proposal.html">
+    <span class="item-no">弐</span>
+    <span class="item-tag">FAI国家戦略提言</span>
+    <h2>移民より、FAI。<br>日本にはこの答えがある。</h2>
+    <p>
+      人口減少・災害列島・地政学的脅威——三つの危機を人型AIで突破する国家戦略提言。
+      介護から災害へ、産業へ、そして「人が死なない抑止力」へ。
+      鉄腕アトムの予言が、今現実になろうとしている。
+    </p>
+    <dl>
+      <dt>提出先</dt>
+      <dd>内閣官房／内閣府</dd>
+      <dt>年次</dt>
+      <dd>令和8年（2026年）</dd>
+    </dl>
+    <span class="item-go">全文を読む →</span>
+  </a>
+
+  <!-- 三：国民強靱化基礎役務 -->
+  <a class="item" style="--accent:#8b2e2e" href="kyojinka-proposal.html">
+    <span class="item-no">参</span>
+    <span class="item-tag">国民強靱化基礎役務</span>
+    <h2>徴兵ではなく、教育で。<br>国を支える人をつくる。</h2>
+    <p>
+      災害レジリエンスと防衛抗堪性は、一つの人的基盤の二つの応用面。
+      防災・救護・自活を中核に、安全保障の基礎教育を組み込んだ国民役務の提言。
+      「軍事教練の復活」ではなく「国土強靱化の人的基盤」へ。
+    </p>
+    <dl>
+      <dt>提出先</dt>
+      <dd>内閣総理大臣／防衛大臣（郵送・FAX・オンラインの三経路）</dd>
+      <dt>年次</dt>
+      <dd>令和8年（2026年）7月20日 提出完了</dd>
+    </dl>
+    <span class="item-go">全文を読む →</span>
+  </a>
+
+  <!-- 四：NDL AI開発中核拠点構想 -->
+  <a class="item" style="--accent:#2d5a3d" href="ndl-proposal.html">
+    <span class="item-no">肆</span>
+    <span class="item-tag">NDL AI開発中核拠点構想</span>
+    <h2>国立国会図書館を、<br>AI開発の中核拠点に。</h2>
+    <p>
+      「シラス」と「ウシハク」——統治の二つのかたちを軸に、
+      日本語の知の集積地からAIを立ち上げる構想。
+      国民の知を、国民の手に取り戻すための提言。
+    </p>
+    <dl>
+      <dt>提出先</dt>
+      <dd>国立国会図書館／首相官邸／内閣府／文部科学省</dd>
+      <dt>年次</dt>
+      <dd>令和8年（2026年）</dd>
+    </dl>
+    <span class="item-go">全文を読む →</span>
+  </a>
+
+  <div class="section-rule">実 装 例</div>
+
+  <!-- 実証デモ -->
+  <a class="item demo" style="--accent:#3d2b0e" href="blockchain-ip-demo-v2.html">
+    <span class="item-tag">実証デモ</span>
+    <h2>UCA 実証デモ</h2>
+    <p>
+      新著作権構想（UCA）を実際に動かして確かめられるデモ。
+      SHA-256ハッシュによる作品の同一性検証と、
+      スマートコントラクトによる自動対価還元の仕組みを可視化。
+    </p>
+    <span class="item-go">動かしてみる →</span>
+  </a>
+
+</main>
+
+<footer>
+  <p class="f-uca">
+    このサイトの文章・システムは
+    <a href="copyright-proposal.html">UCA（Universal Creative Attribution）</a>
+    の考えに基づいて公開しています。<br>
+    知識は解放され、創造者は報われる。
+  </p>
+  <p class="f-sign">生かされて今を存在する ／ 三原嘉明</p>
+  <p class="f-nav">
+    <a href="https://yymm77.github.io/">玄関</a>｜
+    <a href="index.html">予測技術門</a>｜
+    <a href="namemaster_v5.html">姓名科学</a>｜
+    <a href="tokusho.html">特定商取引法に基づく表記</a>
+  </p>
+  <p class="f-copy">
+    © 2026 日昇リサーチ株式会社<br>
+    お問い合わせ 042-355-5678
+  </p>
+</footer>
+
+</body>
+</html>
