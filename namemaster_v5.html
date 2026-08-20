@@ -707,7 +707,7 @@ _cntBanner(); cntVisit();
       <div class="legend-item"><div class="legend-dot" style="background:var(--jade)"></div>吉（60点以上）</div>
       <div class="legend-item"><div class="legend-dot" style="background:var(--indigo)"></div>中吉（40〜59点）</div>
       <div class="legend-item"><div class="legend-dot" style="background:var(--vermillion)"></div>凶（39点以下）</div>
-      <div class="legend-item" style="font-size:10px;color:var(--mist)">各分野点数 = 2ポイントのSQ点数合計（最大100点）</div>
+      <div class="legend-item" style="font-size:10px;color:var(--mist)">各分野点数 = 2ポイントのSQ点数合計（最大100点）／原典の12分野×内線・外線＝24本</div>
     </div>
     <div class="domains-grid" id="d-grid"></div>
 
@@ -1117,7 +1117,7 @@ const GI_COMBOS = [
 
 // 総合スコア計算
 function calcTotalScore(pts){
-  const keys = ['I5','C9','K3','I9','K9','D20','I13','A9'];
+  const keys = POINT_KEYS;   // 原典の12ポイント（Ⓜ〜Ⓧ）
   return keys.reduce((sum,k) => sum + suugi(pts[k]).点数, 0);
 }
 
@@ -1304,7 +1304,7 @@ function renderGiCombo(el){
 
 function renderGiTotal(el){
   const pts = _giPts;
-  const keys8 = ['I5','C9','K3','I9','K9','D20','I13','A9'];
+  const keys8 = POINT_KEYS;   // 原典の12ポイント（Ⓜ〜Ⓧ）
   const totals = keys8.map(k=>({k, score:suugi(pts[k]).点数, name:suugi(pts[k]).数意}));
   const totalSum = totals.reduce((a,b)=>a+b.score, 0);
   const avg = Math.round(totalSum / keys8.length);
@@ -1320,7 +1320,7 @@ function renderGiTotal(el){
   html += '</div>';
   
   // スコアバー一覧
-  const PMAP = {I5:'健康・愛情',C9:'蓄財',K3:'社交',I9:'幸福',K9:'所得',D20:'職業',I13:'技能',A9:'能力'};
+  const PMAP = Object.fromEntries(POINT_KEYS.map(k=>[k, POINT_SYMS[k]+' '+k]));
   html += '<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px">';
   totals.sort((a,b)=>b.score-a.score).forEach(t=>{
     const cl = scl(t.score);
@@ -1338,18 +1338,18 @@ function renderGiTotal(el){
   
   // 判定テキスト（原典1章総合判断）
   let judgeText = '';
-  if(totalSum >= 280){
-    judgeText = '8分野合計が280点以上。思ったことはほとんど実現され、努力の一押しは五押しにも匹敵する成果を生む最高の状態です。名前の数意が示す使命を全力で実現してください。';
-  } else if(totalSum >= 220){
-    judgeText = '8分野合計が220〜279点。素晴らしい成果に向かって直進できる状態です。自他共にその活躍に目をみはり、信念と期待で邁進できます。';
-  } else if(totalSum >= 160){
-    judgeText = '8分野合計が160〜219点。自信ある活動ができている状態です。他人が馬鹿に見えるくらいの優越感と自信をもって行動できます。';
+  if(totalSum >= 420){
+    judgeText = '12ポイント合計が420点以上。思ったことはほとんど実現され、努力の一押しは五押しにも匹敵する成果を生む最高の状態です。名前の数意が示す使命を全力で実現してください。';
+  } else if(totalSum >= 330){
+    judgeText = '12ポイント合計が330〜419点。素晴らしい成果に向かって直進できる状態です。自他共にその活躍に目をみはり、信念と期待で邁進できます。';
+  } else if(totalSum >= 240){
+    judgeText = '12ポイント合計が240〜329点。自信ある活動ができている状態です。他人が馬鹿に見えるくらいの優越感と自信をもって行動できます。';
+  } else if(totalSum >= 180){
+    judgeText = '12ポイント合計が180〜239点。物事が好転してきており、楽な気持で励みが出る状態です。だいぶ調子が出てきたと感じ将来に希望がわいてきます。';
   } else if(totalSum >= 120){
-    judgeText = '8分野合計が120〜159点。物事が好転してきており、楽な気持で励みが出る状態です。だいぶ調子が出てきたと感じ将来に希望がわいてきます。';
-  } else if(totalSum >= 80){
-    judgeText = '8分野合計が80〜119点。普通の状態ですが、一部の分野で効率が悪くなっている点があります。各分野の低い点数の数意を調べ、具体的な対策を考えましょう。';
+    judgeText = '12ポイント合計が120〜179点。普通の状態ですが、一部の分野で効率が悪くなっている点があります。各分野の低い点数の数意を調べ、具体的な対策を考えましょう。';
   } else {
-    judgeText = '8分野合計が80点以下。問題が挫折しだして巻き返しの対策に取り組む必要があります。低い分野の数意の解説を読み、一つ一つ改善策を実行してください。';
+    judgeText = '12ポイント合計が120点未満。問題が挫折しだして巻き返しの対策に取り組む必要があります。低い分野の数意の解説を読み、一つ一つ改善策を実行してください。';
   }
   html += '<div style="padding:12px 16px;background:rgba(26,18,8,.04);border-left:3px solid '+rankColor+';font-size:12px;line-height:1.9">'+judgeText+'</div>';
   
@@ -1409,23 +1409,53 @@ function calcCompany(s, m) {
 // =============================================
 // グラフエンジン（既存のまま）
 // =============================================
-// グラフ用12分野（DOMAINSと同一・色付き）
+// =============================================
+// 12分野 × 内線・外線 = 24本（牧正人史・原典 NAMEMASTER.xls 準拠）
+// =============================================
+// 2026-08-20 全面改訂
+//   原典の鑑定シート右半分（N/O列・U/V列）から、12分野それぞれの
+//   内線・外線の組み合わせを抽出して定義し直した。
+//   旧実装は左列6分野（12本）のみで、右列6分野（蓄財・愛情・職業・
+//   性格・能力・勝負＝12本）が丸ごと欠落していた。あわせて
+//   「所得（内面）」「社交（結果）」の2本は名称が入れ替わっていた。
+//
+//   grp は原典の紙面上の左右の位置を示すだけのもので、
+//   この二群に牧先生が名称を与えていたかは確認できていない。
+//   根拠のない命名を避け、位置の表示にとどめている。
 const GRAPH_DOMAINS = [
-  {n:'健康（体力）', ka:'I5',  kb:'A9',  color:'#2d6a4f'},
-  {n:'健康（環境）', ka:'K3',  kb:'K9',  color:'#1a3a5c'},
-  {n:'社交（行動）', ka:'K3',  kb:'F20', color:'#b8960c'},
-  {n:'所得（内面）', ka:'I5',  kb:'D20', color:'#4a235a'},
-  {n:'社交（結果）', ka:'K9',  kb:'F20', color:'#8b4513'},
-  {n:'所得（外面）', ka:'A9',  kb:'D20', color:'#1a6060'},
-  {n:'幸福（感情）', ka:'I9',  kb:'K15', color:'#8a5200'},
-  {n:'幸福（実現）', ka:'I13', kb:'C9',  color:'#3d5a00'},
-  {n:'技能（内面）', ka:'I13', kb:'D24', color:'#5c1a1a'},
-  {n:'技能（外面）', ka:'K15', kb:'F24', color:'#00457a'},
-  {n:'娯楽（内面）', ka:'D20', kb:'F20', color:'#5a3a00'},
-  {n:'娯楽（外面）', ka:'D24', kb:'F24', color:'#6b1f1f'},
+  {n:'健康（内線）', base:'健康', line:'内線', grp:'左', ka:'I5', kb:'A9', sym:'M+S', color:'#2d6a4f', dash:false},
+  {n:'健康（外線）', base:'健康', line:'外線', grp:'左', ka:'K3', kb:'K9', sym:'P+R', color:'#2d6a4f', dash:true},
+  {n:'社交（内線）', base:'社交', line:'内線', grp:'左', ka:'K3', kb:'F20', sym:'P+W', color:'#1a3a5c', dash:false},
+  {n:'社交（外線）', base:'社交', line:'外線', grp:'左', ka:'I5', kb:'D20', sym:'M+U', color:'#1a3a5c', dash:true},
+  {n:'所得（内線）', base:'所得', line:'内線', grp:'左', ka:'K9', kb:'F20', sym:'R+W', color:'#00457a', dash:false},
+  {n:'所得（外線）', base:'所得', line:'外線', grp:'左', ka:'A9', kb:'D20', sym:'S+U', color:'#00457a', dash:true},
+  {n:'幸福（内線）', base:'幸福', line:'内線', grp:'左', ka:'I9', kb:'K15', sym:'O+Q', color:'#1a6060', dash:false},
+  {n:'幸福（外線）', base:'幸福', line:'外線', grp:'左', ka:'I13', kb:'C9', sym:'N+T', color:'#1a6060', dash:true},
+  {n:'技能（内線）', base:'技能', line:'内線', grp:'左', ka:'I13', kb:'D24', sym:'N+V', color:'#3d5a00', dash:false},
+  {n:'技能（外線）', base:'技能', line:'外線', grp:'左', ka:'K15', kb:'F24', sym:'Q+X', color:'#3d5a00', dash:true},
+  {n:'娯楽（内線）', base:'娯楽', line:'内線', grp:'左', ka:'D20', kb:'F20', sym:'U+W', color:'#4a235a', dash:false},
+  {n:'娯楽（外線）', base:'娯楽', line:'外線', grp:'左', ka:'D24', kb:'F24', sym:'V+X', color:'#4a235a', dash:true},
+  {n:'蓄財（内線）', base:'蓄財', line:'内線', grp:'右', ka:'C9', kb:'D24', sym:'T+V', color:'#b8960c', dash:false},
+  {n:'蓄財（外線）', base:'蓄財', line:'外線', grp:'右', ka:'I9', kb:'F24', sym:'O+X', color:'#b8960c', dash:true},
+  {n:'愛情（内線）', base:'愛情', line:'内線', grp:'右', ka:'I5', kb:'I13', sym:'M+N', color:'#8b2e2e', dash:false},
+  {n:'愛情（外線）', base:'愛情', line:'外線', grp:'右', ka:'K3', kb:'K15', sym:'P+Q', color:'#8b2e2e', dash:true},
+  {n:'職業（内線）', base:'職業', line:'内線', grp:'右', ka:'D20', kb:'D24', sym:'U+V', color:'#8b4513', dash:false},
+  {n:'職業（外線）', base:'職業', line:'外線', grp:'右', ka:'F20', kb:'F24', sym:'W+X', color:'#8b4513', dash:true},
+  {n:'性格（内線）', base:'性格', line:'内線', grp:'右', ka:'I5', kb:'K3', sym:'M+P', color:'#5a3a00', dash:false},
+  {n:'性格（外線）', base:'性格', line:'外線', grp:'右', ka:'I13', kb:'K15', sym:'N+Q', color:'#5a3a00', dash:true},
+  {n:'能力（内線）', base:'能力', line:'内線', grp:'右', ka:'A9', kb:'K9', sym:'S+R', color:'#6b1f1f', dash:false},
+  {n:'能力（外線）', base:'能力', line:'外線', grp:'右', ka:'C9', kb:'I9', sym:'T+O', color:'#6b1f1f', dash:true},
+  {n:'勝負（内線）', base:'勝負', line:'内線', grp:'右', ka:'A9', kb:'C9', sym:'S+T', color:'#5c1a1a', dash:false},
+  {n:'勝負（外線）', base:'勝負', line:'外線', grp:'右', ka:'I9', kb:'K9', sym:'O+R', color:'#5c1a1a', dash:true},
 ];
-const WAVE_PERIODS=[11,13,7,9,11,8,13,11,7,9,8,11];
-const WAVE_PHASES=[0,2,1,3,0,4,2,1,3,0,2,4];
+// 分野の並び（原典の紙面順）
+const DOMAIN_ORDER_L = ['健康','社交','所得','幸福','技能','娯楽'];
+const DOMAIN_ORDER_R = ['蓄財','愛情','職業','性格','能力','勝負'];
+// 原典が用いる組合せ数字は12（Ⓜ〜Ⓧ）
+const POINT_KEYS = ['I5','I13','I9','K3','K15','K9','A9','C9','D20','D24','F20','F24'];
+const POINT_SYMS = {I5:'Ⓜ',I13:'Ⓝ',I9:'Ⓞ',K3:'Ⓟ',K15:'Ⓠ',K9:'Ⓡ',A9:'Ⓢ',C9:'Ⓣ',D20:'Ⓤ',D24:'Ⓥ',F20:'Ⓦ',F24:'Ⓧ'};
+const WAVE_PERIODS=[11,13,7,9,11,8,13,11,7,9,8,11,9,12,10,7,13,8,11,9,12,7,10,13];
+const WAVE_PHASES=[0,2,1,3,0,4,2,1,3,0,2,4,1,3,0,2,4,1,3,2,0,4,1,3];
 const AGE_START=15,AGE_OBSERVED=55,AGE_END=100; // デフォルト100歳まで（スライダーで150まで拡張可）
 let activeLines=new Set(GRAPH_DOMAINS.map((_,i)=>i));
 let lastPts=null;
@@ -1451,7 +1481,7 @@ function buildWaveData(pts){
 // =============================================
 function detectLifeEvents(pts, graphOriginYear){
   const events = [];
-  const keys = ['I5','C9','K3','I9','K9','D20','I13','A9'];
+  const keys = POINT_KEYS;   // 原典の12ポイント（Ⓜ〜Ⓧ）
   const scores = keys.map(k => suugi(pts[k]).点数);
   const waveData = buildWaveData(pts);
 
@@ -1701,7 +1731,10 @@ function drawWave(pts,graphOriginYear,graphBirthAge){
       const pathD=seg.map((s,i)=>(i===0?'M':'L')+s.pt).join(' ');
       const path=document.createElementNS('http://www.w3.org/2000/svg','path');
       path.setAttribute('d',pathD);path.setAttribute('fill','none');path.setAttribute('stroke',d.color);
-      path.setAttribute('stroke-width',isSolo?'2.5':'1.8');path.setAttribute('stroke-opacity',dashed?'0.45':'0.85');
+      // 内線は太く濃く、外線は細く淡く（破線は「観測外＝将来」の意味で使用済みのため）
+      const w = isSolo ? (d.dash?2.0:2.6) : (d.dash?1.1:1.9);
+      const op = (dashed?0.45:0.85) * (d.dash?0.72:1);
+      path.setAttribute('stroke-width',String(w));path.setAttribute('stroke-opacity',op.toFixed(2));
       if(dashed)path.setAttribute('stroke-dasharray','5 3');
       path.setAttribute('stroke-linejoin','round');path.setAttribute('stroke-linecap','round');svg.appendChild(path);
     };
@@ -1801,11 +1834,14 @@ function drawWave(pts,graphOriginYear,graphBirthAge){
 function drawRadar(pts){
   const svg=document.getElementById('radar-svg');svg.innerHTML='';
   const CX=200,CY=200,R=155;
-  // 12分野スコア（最大100点）でレーダー描画
-  const radarDomains = DOMAINS;
+  // レーダーは12分野で描く（内線・外線を合算し、分野単位に集約）
+  const radarDomains = DOMAIN_ORDER_L.concat(DOMAIN_ORDER_R).map(base=>{
+    const pair = GRAPH_DOMAINS.filter(d=>d.base===base);
+    return {n:base, _pair:pair};
+  });
   const labels = radarDomains.map(d=>d.n.replace('（','\n（'));
   const N=radarDomains.length;
-  const scores=radarDomains.map(d=>Math.min(100,domainScore(pts,d)));
+  const scores=radarDomains.map(d=>Math.min(100,Math.round(d._pair.reduce((a,x)=>a+domainScore(pts,x),0)/d._pair.length)));
   [20,40,60,80,100].forEach(v=>{
     const pts_poly=[];
     for(let i=0;i<N;i++){const angle=(i/N)*Math.PI*2-Math.PI/2;pts_poly.push((CX+R*v/100*Math.cos(angle)).toFixed(1)+','+(CY+R*v/100*Math.sin(angle)).toFixed(1));}
@@ -1863,16 +1899,21 @@ function buildLegend(pts){
 
 function buildTabs(){
   const tabs=document.getElementById('graph-tabs');tabs.innerHTML='';
-  [{id:'all',label:'全12分野'},{id:'health',label:'健康・体力系'},{id:'economy',label:'経済系（所得・蓄財）'},{id:'social',label:'対人系（社交・愛情）'},{id:'work',label:'仕事系（職業・技能）'},{id:'spirit',label:'精神系（幸福・性格）'}].forEach((tab,ti)=>{
-    const btn=document.createElement('button');btn.className='gtab'+(ti===0?' active':'');btn.textContent=tab.label;
+  const idx = n => GRAPH_DOMAINS.map((d,i)=>[d,i]).filter(([d])=>d.base===n).map(([,i])=>i);
+  const grpIdx = g => GRAPH_DOMAINS.map((d,i)=>[d,i]).filter(([d])=>d.grp===g).map(([,i])=>i);
+  const defs=[
+    {label:'全24本', get:()=>GRAPH_DOMAINS.map((_,i)=>i)},
+    {label:'左の6分野', get:()=>grpIdx('左')},
+    {label:'右の6分野', get:()=>grpIdx('右')},
+    ...DOMAIN_ORDER_L.concat(DOMAIN_ORDER_R).map(n=>({label:n, get:()=>idx(n)})),
+  ];
+  defs.forEach((t,ti)=>{
+    const btn=document.createElement('button');
+    btn.className='gtab'+(ti===0?' active':'');btn.textContent=t.label;
     btn.onclick=()=>{
-      document.querySelectorAll('.gtab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
-      if(tab.id==='all')activeLines=new Set(GRAPH_DOMAINS.map((_,i)=>i));
-      else if(tab.id==='health')activeLines=new Set([0,9]);    // 健康(I5)・能力(A9)
-      else if(tab.id==='economy')activeLines=new Set([4,1]);   // 所得(K9)・蓄財(C9)
-      else if(tab.id==='social')activeLines=new Set([2,3]);    // 社交(K3)・愛情(I9)
-      else if(tab.id==='work')activeLines=new Set([5,6]);      // 職業(D20)・技能(I13)
-      else if(tab.id==='spirit')activeLines=new Set([6,7]);    // 幸福(I9)・性格(I5)
+      document.querySelectorAll('.gtab').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      activeLines=new Set(t.get());
       buildLegend(lastPts);drawWave(lastPts,lastOriginYear,lastBirthAge);
     };
     tabs.appendChild(btn);
@@ -1932,21 +1973,7 @@ function calc(s,m){
   return {I5,C9,K3,I9,K9,A9,D20,I13,D24,F20,F24,K15,cells,template};
 }
 
-// 12分野 = 2ポイントのSQ点数合計（原典NAMEMASTER.xls全例検証済み）
-const DOMAINS=[
-  {n:'健康（体力）', ka:'I5',  kb:'A9' },
-  {n:'健康（環境）', ka:'K3',  kb:'K9' },
-  {n:'社交（行動）', ka:'K3',  kb:'F20'},
-  {n:'所得（内面）', ka:'I5',  kb:'D20'},
-  {n:'社交（結果）', ka:'K9',  kb:'F20'},
-  {n:'所得（外面）', ka:'A9',  kb:'D20'},
-  {n:'幸福（感情）', ka:'I9',  kb:'K15'},
-  {n:'幸福（実現）', ka:'I13', kb:'C9' },
-  {n:'技能（内面）', ka:'I13', kb:'D24'},
-  {n:'技能（外面）', ka:'K15', kb:'F24'},
-  {n:'娯楽（内面）', ka:'D20', kb:'F20'},
-  {n:'娯楽（外面）', ka:'D24', kb:'F24'},
-];
+// 分野定義は GRAPH_DOMAINS に一本化（下方で定義）
 // 分野点数計算: 2ポイントのSQ点数合計
 function domainScore(pts, d){
   if(!pts||!d) return 0;
@@ -2580,7 +2607,7 @@ function analyze(){
 // =============================================
 function renderResult(pts, displayName, originYear, birthAge) {
   const grid=document.getElementById('d-grid');grid.innerHTML='';
-  DOMAINS.forEach((d,i)=>{
+  GRAPH_DOMAINS.forEach((d,i)=>{
     const score=domainScore(pts,d);
     const cl=score>=60?'k':score>=40?'c':'v';
     const col=cl==='k'?'var(--jade)':cl==='c'?'var(--indigo)':'var(--vermillion)';
@@ -2924,7 +2951,7 @@ function showAIPanel(pts, displayName) {
 
   // 調子サマリーを生成
   const summary = document.getElementById('ai-choushi-summary');
-  const keys = ['I5','C9','K3','I9','K9','D20','I13','A9'];
+  const keys = POINT_KEYS;   // 原典の12ポイント（Ⓜ〜Ⓧ）
   const labels = ['健康・愛情・性格','蓄財','社交','幸福','所得・蓄財','職業・娯楽','技能','能力・勝負'];
   let html = '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px">';
   keys.forEach((k,i) => {
@@ -3058,7 +3085,7 @@ function initChat(pts, displayName, mode){
 
   // 最初のウェルカムメッセージ
   const NL = '\n';
-  const keys = ['I5','C9','K3','I9','K9','D20','I13','A9'];
+  const keys = POINT_KEYS;   // 原典の12ポイント（Ⓜ〜Ⓧ）
   const names = {I5:'健康・愛情',C9:'蓄財',K3:'社交',I9:'幸福',K9:'所得',D20:'職業',I13:'技能',A9:'能力'};
   const top = [...keys].sort((a,b)=>suugi(pts[b]).点数-suugi(pts[a]).点数).slice(0,2);
   const bot = [...keys].sort((a,b)=>suugi(pts[a]).点数-suugi(pts[b]).点数).slice(0,2);
@@ -3071,7 +3098,7 @@ function initChat(pts, displayName, mode){
 
 function buildChatSystemPrompt(pts, displayName, mode){
   const isCompany = (mode === 'company');
-  const keys = ['I5','C9','K3','I9','K9','D20','I13','A9'];
+  const keys = POINT_KEYS;   // 原典の12ポイント（Ⓜ〜Ⓧ）
   const names = {I5:'健康・愛情（Ⓜ）',C9:'蓄財（Ⓣ）',K3:'社交（Ⓟ）',I9:'幸福（Ⓞ）',K9:'所得（Ⓡ）',D20:'職業（Ⓤ）',I13:'技能（Ⓝ）',A9:'能力（Ⓢ）'};
   const NL = '\n';
   let pts_desc = keys.map(k=>{
@@ -3232,8 +3259,10 @@ function jobScore(pts, keys){
 
 function showKenkoAndJob(pts){
   // ── 健康運 ──
-  const bodyScore = domainScore(pts, DOMAINS[0]); // 健康（体力）
-  const envScore  = domainScore(pts, DOMAINS[1]); // 健康（環境）
+  const kenkoIn  = GRAPH_DOMAINS.find(d=>d.base==='健康'&&d.line==='内線'); // 健康（体力）
+  const kenkoOut = GRAPH_DOMAINS.find(d=>d.base==='健康'&&d.line==='外線'); // 健康（環境）
+  const bodyScore = domainScore(pts, kenkoIn);
+  const envScore  = domainScore(pts, kenkoOut);
 
   const kenkoArea = document.getElementById('kenko-area');
   const kenkoSec  = document.getElementById('kenko-sec');
@@ -3246,8 +3275,8 @@ function showKenkoAndJob(pts){
 
   kenkoArea.innerHTML =
     '<div class="kenko-grid">'+
-    kenkoCard("健康運（体力）", bodyScore, 100, clBody, kenkoBodyText(bodyScore), pts, DOMAINS[0])+
-    kenkoCard("健康運（環境）", envScore,  100, clEnv,  kenkoEnvText(envScore),   pts, DOMAINS[1])+
+    kenkoCard("健康運（体力）", bodyScore, 100, clBody, kenkoBodyText(bodyScore), pts, kenkoIn)+
+    kenkoCard("健康運（環境）", envScore,  100, clEnv,  kenkoEnvText(envScore),   pts, kenkoOut)+
     '</div>';
 
   // ── 職業分野 ──
@@ -3440,13 +3469,13 @@ async function sendReportMail() {
     return { label: PNAMES_MAIL[k]||k, val: pts[k], score: sq.点数, suugi: sq.数意, desc: sq.解説||'' };
   });
 
-  const domainData = DOMAINS.map(d => ({
+  const domainData = GRAPH_DOMAINS.map(d => ({
     name: d.n, score: domainScore(pts, d)
   }));
 
-  // 健康運テキスト取得
-  const bodyScore = domainScore(pts, DOMAINS[0]);
-  const envScore  = domainScore(pts, DOMAINS[1]);
+  // 健康運テキスト取得（健康・内線＝体力／健康・外線＝環境）
+  const bodyScore = domainScore(pts, GRAPH_DOMAINS.find(d=>d.base==='健康'&&d.line==='内線'));
+  const envScore  = domainScore(pts, GRAPH_DOMAINS.find(d=>d.base==='健康'&&d.line==='外線'));
   const kenkoData = {
     bodyScore, envScore,
     bodyText: kenkoBodyText(bodyScore),
