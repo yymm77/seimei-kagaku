@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>おてんとうさまの下で</title>
+<meta name="description" content="予測技術・政策提言・連載・レシピ。制作したものと、携わっていること。おてんとうさまの下で、生かされて今を存在する。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;800&family=Noto+Serif+JP:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #1a1208;
+  --ink-light: #3d2b0e;
+  --paper: #f2ead8;
+  --gold: #8a6914;
+  --gold-light: #c9a84c;
+  --vermillion: #8b2020;
+  --jade: #2d5a3d;
+  --indigo: #1a3a5c;
+  --border: rgba(138,105,20,0.25);
+  --shadow: rgba(26,18,8,0.12);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Noto Serif JP', serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* 和紙のきめ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(138,105,20,0.018) 3px, rgba(138,105,20,0.018) 4px),
+    repeating-linear-gradient(90deg, transparent, transparent 10px, rgba(138,105,20,0.012) 10px, rgba(138,105,20,0.012) 11px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* おてんとうさま ─ 頁の上から差す光 */
+body::after {
+  content: '';
+  position: fixed;
+  top: -28vmax;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 92vmax;
+  height: 92vmax;
+  border-radius: 50%;
+  background: radial-gradient(circle at center,
+    rgba(201,168,76,0.26) 0%,
+    rgba(201,168,76,0.12) 32%,
+    rgba(201,168,76,0.05) 55%,
+    transparent 72%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+a { color: inherit; }
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+/* ===== 標題 ===== */
+.hero {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 96px 20px 72px;
+}
+
+.hero-mark {
+  width: clamp(88px, 20vw, 124px);
+  height: auto;
+  display: block;
+  margin: 0 auto 32px;
+  filter: drop-shadow(0 0 34px rgba(198,34,27,0.28));
+  animation: rise 1.5s cubic-bezier(.16,.7,.3,1) both,
+             turn 150s linear infinite;
+}
+
+.hero-title {
+  font-family: 'Shippori Mincho', serif;
+  font-size: clamp(1.9rem, 6.2vw, 3.7rem);
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-indent: 0.22em;
+  line-height: 1.35;
+  animation: rise 1.2s 0.25s cubic-bezier(.16,.7,.3,1) both;
+}
+
+.hero-sub {
+  margin-top: 22px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: clamp(0.82rem, 2.4vw, 0.98rem);
+  letter-spacing: 0.36em;
+  text-indent: 0.36em;
+  color: var(--gold);
+  animation: rise 1.2s 0.45s cubic-bezier(.16,.7,.3,1) both;
+}
+
+.hero-desc {
+  margin: 34px auto 0;
+  max-width: 560px;
+  font-size: 0.86rem;
+  line-height: 2.15;
+  color: var(--ink-light);
+  animation: rise 1.2s 0.6s cubic-bezier(.16,.7,.3,1) both;
+}
+
+/* ===== 本体 ===== */
+main {
+  position: relative;
+  z-index: 1;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 20px 96px;
+}
+
+.gate-head {
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+  margin: 76px 0 34px;
+}
+
+.gate-head h2 {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 1.28rem;
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  text-indent: 0.32em;
+  white-space: nowrap;
+}
+
+.gate-head .rule {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.gate-head .note {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  color: var(--ink-light);
+  opacity: 0.62;
+  white-space: nowrap;
+}
+
+/* ── 扉一：制作したもの ── */
+.works {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(268px, 1fr));
+  gap: 18px;
+}
+
+.work {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  padding: 30px 28px 26px;
+  background: rgba(255,255,255,0.5);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--accent, var(--gold));
+  text-decoration: none;
+  transition: background .25s, transform .25s, box-shadow .25s;
+}
+
+.work:hover,
+.work:focus-visible {
+  background: rgba(255,255,255,0.78);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 32px var(--shadow);
+}
+
+.work-name {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 1.22rem;
+  letter-spacing: 0.09em;
+  line-height: 1.45;
+}
+
+.work-desc {
+  font-size: 0.8rem;
+  line-height: 1.95;
+  color: var(--ink-light);
+  flex: 1;
+}
+
+.work-meta {
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  color: var(--accent, var(--gold));
+  opacity: 0.85;
+}
+
+.work-go {
+  align-self: flex-end;
+  font-size: 0.76rem;
+  letter-spacing: 0.2em;
+  color: var(--accent, var(--gold));
+  opacity: 0;
+  transition: opacity .2s;
+}
+
+.work:hover .work-go,
+.work:focus-visible .work-go { opacity: 1; }
+
+/* ── 扉二：携わっていること ── */
+.links {
+  border-top: 1px solid var(--border);
+}
+
+.link-row {
+  display: flex;
+  align-items: baseline;
+  gap: 22px;
+  padding: 21px 6px;
+  border-bottom: 1px solid var(--border);
+  text-decoration: none;
+  transition: background .2s, padding-left .2s;
+}
+
+a.link-row:hover,
+a.link-row:focus-visible {
+  background: rgba(138,105,20,0.07);
+  padding-left: 16px;
+}
+
+.link-name {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 1rem;
+  letter-spacing: 0.09em;
+  flex: 0 0 auto;
+  min-width: 15em;
+}
+
+.link-desc {
+  font-size: 0.79rem;
+  line-height: 1.85;
+  color: var(--ink-light);
+  flex: 1;
+}
+
+.link-go {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  color: var(--gold);
+  opacity: 0.55;
+  flex: 0 0 auto;
+}
+
+.link-row.static { cursor: default; }
+.link-row.static .link-go { opacity: 0.35; }
+
+/* ===== 結び ===== */
+footer {
+  position: relative;
+  z-index: 1;
+  border-top: 2px solid var(--border);
+  background: linear-gradient(0deg, rgba(138,105,20,0.09) 0%, transparent 100%);
+  padding: 40px 20px 46px;
+  text-align: center;
+}
+
+.f-uca {
+  font-size: 0.76rem;
+  line-height: 2;
+  color: var(--ink-light);
+  opacity: 0.8;
+}
+
+.f-uca a { color: var(--gold); }
+
+.f-sign {
+  margin-top: 22px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.16em;
+}
+
+.f-copy {
+  margin-top: 16px;
+  font-size: 0.72rem;
+  line-height: 1.95;
+  color: var(--ink-light);
+  opacity: 0.6;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes turn {
+  to { rotate: 360deg; }
+}
+
+@media (max-width: 640px) {
+  .hero { padding: 62px 20px 48px; }
+  .gate-head { gap: 14px; margin: 56px 0 26px; }
+  .gate-head .note { display: none; }
+  .works { grid-template-columns: 1fr; }
+  .link-row { flex-wrap: wrap; gap: 6px 16px; padding: 18px 4px; }
+  .link-name { min-width: 0; flex: 1 1 100%; }
+  .link-desc { flex: 1 1 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001s !important;
+    animation-delay: 0s !important;
+    transition-duration: 0.001s !important;
+  }
+  .work:hover { transform: none; }
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <img class="hero-mark" src="nissho-mark.png" alt="日昇リサーチ株式会社 社章" width="400" height="400">
+  <h1 class="hero-title">おてんとうさまの下で</h1>
+  <p class="hero-sub">生かされて今を存在する</p>
+  <p class="hero-desc">
+    昭和二十八年生まれ。日産自動車での二十余年を経て、
+    牧正人史先生の姓名科学を受け継ぎ、その体系化と公開を続けています。
+    予測技術のツール、政策への提言、半生の記録、日々の仕事。
+    どれも別々のことをしているようで、根はひとつだと感じています。
+  </p>
+</header>
+
+<main>
+
+  <!-- ═══ 扉一 ═══ -->
+  <div class="gate-head">
+    <h2>制作したもの</h2>
+    <span class="rule"></span>
+    <span class="note">すべて無料でお使いいただけます</span>
+  </div>
+
+  <div class="works">
+
+    <a class="work" style="--accent:#8a6914" href="https://yymm77.github.io/seimei-kagaku/">
+      <div class="work-name">予測技術門</div>
+      <div class="work-desc">
+        姓名科学・方位学・易経・吉日相性。
+        牧正人史先生が昭和三十三年に体系化した姓名科学を礎に、
+        日本の伝統的な予測技術をブラウザだけで使えるようにしました。
+      </div>
+      <div class="work-meta">姓名科学 ／ 方位学 ／ 易経 ／ 吉日相性</div>
+      <div class="work-go">入る →</div>
+    </a>
+
+    <a class="work" style="--accent:#1a3a5c" href="https://yymm77.github.io/seimei-kagaku/#research">
+      <div class="work-name">政策への提言</div>
+      <div class="work-desc">
+        著作権のあり方、人型AIによる国家戦略、災害と防衛を貫く国民役務、
+        国立国会図書館を軸としたAI開発拠点。
+        いずれも各省庁へ提出したものを、そのまま公開しています。
+      </div>
+      <div class="work-meta">UCA著作権 ／ FAI ／ 国民強靱化 ／ NDL構想</div>
+      <div class="work-go">読む →</div>
+    </a>
+
+    <a class="work" style="--accent:#8b2020" href="https://yymm77.github.io/seimei-kagaku/#novel">
+      <div class="work-name">連載</div>
+      <div class="work-desc">
+        半生の記録「至誠の覚醒」と、AIとの日々の対話から生まれた思想連載
+        「AGI時代を、おてんとうさまの下で生きる」。
+        書き手の見てきたものを、そのまま書いています。
+      </div>
+      <div class="work-meta">至誠の覚醒 ／ AGI時代を生きる</div>
+      <div class="work-go">読む →</div>
+    </a>
+
+    <a class="work" style="--accent:#2d5a3d" href="https://yymm77.github.io/mikuni-recipe/">
+      <div class="work-name">三國シェフ<br>レシピアーカイブ</div>
+      <div class="work-desc">
+        三國清三シェフが公開されているレシピを、
+        検索・分量調整・印刷ができる形にまとめたものです。
+        Paddle Works様より掲載の許諾をいただいています。
+      </div>
+      <div class="work-meta">検索・分量調整・動画つき</div>
+      <div class="work-go">開く →</div>
+    </a>
+
+  </div>
+
+  <!-- ═══ 扉二 ═══ -->
+  <div class="gate-head">
+    <h2>携わっていること</h2>
+    <span class="rule"></span>
+    <span class="note">仕事・活動・身近な人の仕事</span>
+  </div>
+
+  <div class="links">
+
+    <!-- ★要修正：TSD研究所のFacebookページURLが未設定です。
+         URLが分かり次第、下の <div class="link-row static"> を
+         <a class="link-row" href="（FacebookページのURL）"> に置き換え、
+         閉じタグ </div> を </a> に変えてください。
+         あわせて .link-go の文言を「見る →」にすると他と揃います。 -->
+    <div class="link-row static">
+      <span class="link-name">TSD研究所</span>
+      <span class="link-desc">
+        府中・多磨学院ビルにて、自習室アミーゴと音楽練習室を運営しています。
+        TSD Kids では子どもたちの学びに直接携わっています。
+        故・筒田芳博先生から引き継いだ場です。
+      </span>
+      <span class="link-go">Facebookにて</span>
+    </div>
+
+    <a class="link-row" href="http://tokyo.goyuren.jp/">
+      <span class="link-name">一般社団法人 東京郷友連盟</span>
+      <span class="link-desc">
+        常務理事（執行委員）として、防衛現地研修の企画と
+        書籍のデジタルアーカイブを担当しています。
+      </span>
+      <span class="link-go">連盟へ →</span>
+    </a>
+
+    <div class="link-row static">
+      <span class="link-name">日昇リサーチ株式会社</span>
+      <span class="link-desc">
+        牧正人史先生の姓名科学を広く伝えることを目的に設立した会社です。
+        上記の予測技術門は、この会社の事業として運営しています。
+      </span>
+      <span class="link-go">代表取締役</span>
+    </div>
+
+    <a class="link-row" href="https://miharaami.github.io/">
+      <span class="link-name">三原あみ 公式サイト</span>
+      <span class="link-desc">
+        演歌・童謡を専門とする作曲家。日本童謡協会会員、JASRAC会員。
+        Musical Kids KOBATO を主宰しています。
+      </span>
+      <span class="link-go">サイトへ →</span>
+    </a>
+
+    <a class="link-row" href="https://shiawaseminna.net/">
+      <span class="link-name">しあわせみんな</span>
+      <span class="link-desc">
+        日々考えたこと、読んだもの、聞いたものの記録。
+        八千件近くを書きためた本拠のブログです。
+      </span>
+      <span class="link-go">ブログへ →</span>
+    </a>
+
+  </div>
+
+</main>
+
+<footer>
+  <p class="f-uca">
+    このサイトの文章・システムは
+    <a href="https://yymm77.github.io/seimei-kagaku/copyright-proposal.html">UCA（Universal Creative Attribution）</a>
+    の考えに基づいて公開しています。<br>
+    知識は解放され、創造者は報われる。
+  </p>
+  <p class="f-sign">生かされて今を存在する ／ 三原嘉明</p>
+  <p class="f-copy">
+    © 2026 日昇リサーチ株式会社<br>
+    お問い合わせ 042-355-5678
+  </p>
+</footer>
+
+</body>
+</html>
