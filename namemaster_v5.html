@@ -738,31 +738,30 @@ _cntBanner(); cntVisit();
     </details>
 
     <div class="sec">人生波動グラフ</div>
-    <div class="graph-note">各分野の点数を時系列で可視化します。タブで分野系統を切り替え、グラフ下の「解説パネル」で分野別・組み合わせ判定・総合評定を確認できます。</div>
+    <div class="graph-note">牧正人史『姓名（なまえ）』巻末の人生グラフ（実データ）です。一本の縦棒は、その一年ぶんの変動のミニマムとマキシマムを、株価の安値・高値と同じ形式で表しています。棒の位置が50点より上か下かで吉凶を、棒の幅が狭いか広いかでその年の変動の激しさを見ます。原典にならい、分野ごとに内線・外線の2枚を突き合わせて表示します。収録は15〜55歳のみです。</div>
     <div class="graph-wrap">
       <div class="graph-tabs" id="graph-tabs"></div>
       <!-- プリセットボタン -->
       <div class="age-preset-row" id="age-preset-row">
         <span class="ar-label">表示期間</span>
-        <button class="ar-preset active" data-end="80" onclick="setPreset(this)">〜80歳</button>
-        <button class="ar-preset" data-end="100" onclick="setPreset(this)">〜100歳</button>
-        <button class="ar-preset" data-end="120" onclick="setPreset(this)">〜120歳</button>
-        <button class="ar-preset" data-end="150" onclick="setPreset(this)">〜150年</button>
+        <button class="ar-preset active" data-start="15" data-end="55" onclick="setPreset(this)">15〜55歳（全期間）</button>
+        <button class="ar-preset" data-start="15" data-end="35" onclick="setPreset(this)">15〜35歳</button>
+        <button class="ar-preset" data-start="35" data-end="55" onclick="setPreset(this)">35〜55歳</button>
         <button class="ar-reset" id="ar-reset">リセット</button>
       </div>
       <!-- スライダー微調整 -->
       <div class="age-range-row" id="age-range-row">
         <span class="ar-label" style="font-size:10px">細調整</span>
         <span class="ar-val" id="ar-start-val">15歳</span>
-        <input type="range" id="ar-start" min="15" max="149" value="15" step="1" class="ar-slider">
+        <input type="range" id="ar-start" min="15" max="54" value="15" step="1" class="ar-slider">
         <span class="ar-sep">〜</span>
-        <input type="range" id="ar-end" min="16" max="150" value="80" step="1" class="ar-slider">
-        <span class="ar-val" id="ar-end-val">80歳</span>
+        <input type="range" id="ar-end" min="16" max="55" value="55" step="1" class="ar-slider">
+        <span class="ar-val" id="ar-end-val">55歳</span>
       </div>
       <div class="graph-container">
         <svg id="wave-svg" width="100%" viewBox="0 0 800 330" preserveAspectRatio="xMidYMid meet"></svg>
       </div>
-      <div class="graph-legend-hint">● クリック：その分野だけ表示　　Shift＋クリック：表示に追加／除外</div>
+      <div class="graph-legend-hint">上のタブで分野を切り替えると、その分野の内線・外線の2枚を突き合わせて表示します</div>
       <div class="graph-legend" id="graph-legend"></div>
     </div>
 
@@ -1188,9 +1187,7 @@ function toggleGiDetail(idx){
   // グラフでその分野をハイライト
   const domainIndex = GRAPH_DOMAINS.findIndex(g => d.label && g.n.startsWith(d.label.replace('運','')));
   if(domainIndex >= 0){
-    activeLines = new Set([domainIndex]);
-    buildLegend(pts);
-    drawWave(pts, lastOriginYear, lastBirthAge);
+    selectDomain(GRAPH_DOMAINS[domainIndex].base);   // 内線・外線の2枚で表示
   }
   
   detail.innerHTML = '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">'
@@ -1285,14 +1282,15 @@ function renderGiCombo(el){
         item.style.borderColor = 'var(--gold)';
         arrow.textContent = '▼ 閉じる';
         // グラフでキーをハイライト
-        const domainIndices = new Set();
+        // 該当する記号を含む分野のうち先頭の1分野を、内線・外線の2枚で表示する
+        let hitBase=null;
         c.keys.forEach(k=>{
-          GRAPH_DOMAINS.forEach((g,gi)=>{ if(g.ka===k||g.kb===k) domainIndices.add(gi); });
+          if(hitBase)return;
+          const g=GRAPH_DOMAINS.find(g=>g.ka===k||g.kb===k);
+          if(g)hitBase=g.base;
         });
-        if(domainIndices.size > 0 && _giPts){
-          activeLines = domainIndices;
-          buildLegend(_giPts);
-          drawWave(_giPts, lastOriginYear, lastBirthAge);
+        if(hitBase && _giPts){
+          selectDomain(hitBase);
         }
       }
     });
@@ -1353,10 +1351,8 @@ function renderGiTotal(el){
   }
   html += '<div style="padding:12px 16px;background:rgba(26,18,8,.04);border-left:3px solid '+rankColor+';font-size:12px;line-height:1.9">'+judgeText+'</div>';
   
-  // グラフを全分野表示に戻す
-  activeLines = new Set(GRAPH_DOMAINS.map((_,i)=>i));
-  buildLegend(pts);
-  drawWave(pts, lastOriginYear, lastBirthAge);
+  // グラフを既定（健康）に戻す
+  selectDomain('健康');
   
   el.innerHTML = html;
 }
@@ -1454,127 +1450,146 @@ const DOMAIN_ORDER_R = ['蓄財','愛情','職業','性格','能力','勝負'];
 // 原典が用いる組合せ数字は12（Ⓜ〜Ⓧ）
 const POINT_KEYS = ['I5','I13','I9','K3','K15','K9','A9','C9','D20','D24','F20','F24'];
 const POINT_SYMS = {I5:'Ⓜ',I13:'Ⓝ',I9:'Ⓞ',K3:'Ⓟ',K15:'Ⓠ',K9:'Ⓡ',A9:'Ⓢ',C9:'Ⓣ',D20:'Ⓤ',D24:'Ⓥ',F20:'Ⓦ',F24:'Ⓧ'};
-const WAVE_PERIODS=[11,13,7,9,11,8,13,11,7,9,8,11,9,12,10,7,13,8,11,9,12,7,10,13];
-const WAVE_PHASES=[0,2,1,3,0,4,2,1,3,0,2,4,1,3,0,2,4,1,3,2,0,4,1,3];
-const AGE_START=15,AGE_OBSERVED=55,AGE_END=100; // デフォルト100歳まで（スライダーで150まで拡張可）
-let activeLines=new Set(GRAPH_DOMAINS.map((_,i)=>i));
-let lastPts=null;
-let lastOriginYear=null,lastBirthAge=null;
-let viewAgeStart=15,viewAgeEnd=80;
+// =============================================
+// 牧正人史『姓名（なまえ）』巻末　人生グラフ（実データ）
+// =============================================
+// 2026-08-21 サインカーブによる仮実装を原典の実データに置き換えた。
+//
+// ■ 帯（縦棒）の意味
+//   牧先生のPCから出力された元データは日々時刻の細かさまである。
+//   書籍にはその全量を載せられないため、一年ぶんの変動の
+//   ミニマムとマキシマムを、株価の安値・高値と同じ形式で
+//   一本の縦棒に表している。
+//   したがって、この帯を一本の折れ線に直してはならない。
+//   実在しない軌跡を捏造することになり、実際のグラフと誤認される。
+//
+// ■ 読み方
+//   棒の位置が50点より上か下かで吉凶を、
+//   棒の幅が狭いか広いかでその年の変動の激しさを見る。
+//   例：50点より上で幅が小さい年は、激しい問題は起きない。
+//
+// ■ 縦軸
+//   0〜100点。基準線は50点。抽出値1単位＝0.5点。
+//
+// ■ 突き合わせ
+//   原典は常に二つの画数のグラフを突き合わせて判断する。
+//   本実装では分野ごとに内線・外線の2枚を並べて表示する。
+//
+// ■ 収録範囲
+//   索引959件（全数を原本と目視照合済み）／波形200枚（640枚中）。
+//   索引に無い組合せは811通りある。「索引に無い」と
+//   「波形が未取得」は理由が異なるため、表示も分ける。
+const MAKI_OFF=110, AGE_START=15, AGE_OBSERVED=55, AGE_END=55;
+const MAKI_RUNS='1-64,81-88,129-144,169-176,201-208,225-232,241-248,257-264,313-320,353-360,481-496,505-544';
+const MAKI_IDX_STR='2:5:1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,1,16,17,18,2,19,20,21,3,22,23,24,4,25,26,27,5,28,29,30,6,31,32,33,7,34,35,36,8|3:5:37,38,39,8,40,41,42,43,44,45,46,47,48,49,50,37,51,52,53,38,54,55,56,39,57,58,59,8,60,61,62,40,63,64,65,41,66,67,68,42,69,70,71|4:5:72,73,74,75,76,77,78,47,79,80,81,82,83,84,85,72,86,87,88,73,89,90,91,74,92,93,94,75,95,96,97,76,98,99,100,77,101,102,103,78|5:5:104,105,106,1,107,108,109,37,110,111,112,72,113,114,115,104,116,117,118,105,119,120,121,106,122,123,124,1,125,126,127,107,128,129,130,108|6:6:131,132,2,133,134,135,38,136,137,138,73,139,140,141,105,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165|7:7:166,3,167,168,169,39,170,171,172,74,173,174,175,106,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202|8:8:4,5,6,7,8,9,10,11,12,13,14,15,1,16,17,18,203,19,20,21,204,22,23,24,205,25,26,27,5,28,29,30,6,31,32,33,7,34,35,36,8|9:9:206,207,208,40,209,210,211,76,212,213,214,107,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,206,230,231,232,207,233,234,235,208,236,237,238,40|10:10:239,240,41,241,242,243,77,244,245,246,108,247,248,249,250,251,252,253,195,254,255,256,6,257,258,259,207,260,261,262,239,263,264,265,240,266,267,268,269|11:11:270,42,271,272,273,78,274,275,276,109,277,278,279,135,280,281,282,169,283,284,285,286,287,288,289,208,290,291,292,240,293,294,295,270,296,297,298,299,300|12:12:43,44,45,46,47,48,49,50,37,51,52,53,301,54,55,56,302,57,58,59,303,60,61,62,304,63,64,65,41,66,67,68,42,69,70,71|13:13:305,306,307,79,308,309,310,110,311,312,313,314,315,316,317,318,319,320,321,9,322,323,324,209,325,326,327,241,328,329,330,271,331,332,333|14:14:334,335,80,336,337,338,111,339,340,341,342,343,344,345,171,346,347,348,10,349,350,351,210,352,353,354,242,355,356,357,272,358|15:15:359,81,360,361,362,112,363,364,365,138,366,367,368,172,369,370,371,11,372,373,374,211,375,376,377,243,378,379,380,273,381|16:16:82,83,84,85,72,86,87,88,73,89,90,91,74,92,93,94,75,95,96,97,76,98,99,100,77,101,102,103,78|17:17:382,383,384,113,385,386,387,139,388,389,390,173,391,392,393,13,394,395,396,212,397,398,399,244,400,401,402|18:18:403,404,114,405,406,407,140,408,409,410,174,411,412,413,14,414,415,416,213,417,418,419,245,420,421|19:19:422,115,423,424,425,141,426,427,428,175,429,430,431,15,432,433,434,214,435,436,437,246,438|20:20:104,116,117,118,105,119,120,121,106,122,123,124,1,125,126,127,107,128,129,130,108|21:21:439,440,441,142,442,443,444,176,445,446,447,16,448,449,450,215,451,452,453|22:22:454,455,143,456,457,458,177,459,460,461,17,462,463,464,216,465,466|23:23:467,144,468,469,470,178,471,472,473,18,474,475,476,217,477|24:24:131,146,147,148,149,150,151,152,153,154,155,156,157|25:25:478,479,480,180,481,482,483,19,484,485,486|26:26:487,488,181,489,490,491,20,492,493|27:27:494,182,495,496,497,21,498|28:28:166,184,185,186,187,188,189|29:29:499,500,501,22,502,503,504|30:30:505,506,23,507,508,509,224|31:31:510,24,511,512,513,225,514|32:32:4,25,26,27,5,28,29|33:33:515,516,517,227,518,519,520|34:34:521,522,228,523,524,525,258|35:35:526,229,527,528,529,259,530|36:36:206,230,231,232,207,233,234|37:37:531,532,533,260,534,535,536|38:38:537,538,261,539,540,541,291|39:39:542,262,543,544,545,292,546|40:40:239,263,264,265,240,266,267|41:41:547,548,549,293,550,551,552|42:42:553,554,294,555,556,557,67|43:43:558,295,559,560,561,68,562|44:44:270,296,297,298,299,300,563|45:45:564,565,566,69,567,568,569|46:46:570,571,70,572,573,574,332|47:47:575,71,576,577,578,333,579|48:48:43,580,581,582,44,583,584|49:49:585,586,587,588,589,590,591|50:50:592,593,594,595,596,597,598|51:51:599,600,601,602,603,604,605|52:52:305,606,607,608,306,609,610|53:53:611,612,613,614,615,616,617|54:54:618,619,620,621,622,623,624|55:55:625,626,627,628,629,630|56:56:334,631,632,633,335|57:57:634,635,636,637|58:58:638,639,640';
+const MAKI_WAVE_B64='WkpbL1dGXkRkRItymXSEc41ybm55UVITMhw8MD8vUz9ZRXxXoHRuXnhoeU1rXXNKWUF5XXBTZVFwUFZEX0ZHGkQoVEJeSHBecWaXd7iKf1xyW3taeGRzY3hjZ0lqT3tiakFcQ3pfflNgO2tUZU5bRVdKSi9KKl5JWUJcSJNrlniFY5F0h29zT2dGPyA4I0IxPSpMLW5SfWR6YJJ4mH+OcodlXEJhS3NXhmyNdYlkjHGMhIxYWDtZRlxARx49J1VBalFVRmxSimiQZG5ub2yDZ3hUYktUSm9LXD5eN1VDWEhrW25ubEhoWXFueFZaQmxRfGZtRVVHOCpxSXtlgGJ5bJh3rHOCUm5ubWp7SmAqOyVCM0MpOSE9LGtEbGRuYnthj32jcIpTW019ZIBGXyw8I0UxUCw3Jk8oY1Bubm5ubm6TfW5uh1NxUEEtUzhhUGlZe2iHdpF/iHKQdpF8jlViOFNDYUJVHiwhOShcOWBRVURfRoJll3uNX25ujGqLd4BTWD1XRmRSXDtOLkU5VzxcTVxOa1lubm5ubm49LFg6Xk9UPmdIgGSYg4Zkbm5ua4dnfVheUFlFWEZZSF9KXUNcQk46WUlsWnhiaEdcQnJVc19nQ1E7ZkhtXG5ua15ubnhlbm56aHxke1FgPVBGNCdXM19Obm5fS3pabm59XG5ubm6BVmdBaEJ4X2xqa1ZWS2xSg2t7YmtTgE9tWGZHWkZmU2I/RyZGJVU4ZExiSV5Ibm6KaY52n4KkhZN6g2JubmUnYjVwSHxeqV2fbJ1oY0NVPYBajmN8NW8eRyJJLm86gUeGWIlCWz1cQJNtqYOubHs9cERdNGg5fTxuRmoiQyJaKnVSj12NV4FYeEqEV4pcmVyCS3JQcW9hRYpLi3K3iX9gfjdkQmI5bEF+PINHZD1QHUYrgDCBYppxfFuVT3Zvc29tVo5fqVNtL0YXRCpkHFo6gFhtUYs+V0FaQZBvmn21b3lSdkqcaIZwbD1mQo5bm3mOZ21ZbWZtMUkiTiJjP21KgkFaRmwxZEJsQ31bnW/Ac4tkezVkQGU1YEJkOIJHZktnGkYoTztubm5ubm5ubp5OY0pWP3Buk1xubm5uiU9ubpBdgViBXaRrqlduNUoeSS5OMWY+ckqZb39jb2xbP25ubm6RXW9slGd3ZGUdOydYLGdGcUKGX25ukERRQGZIfV2fc5xxiFxubm9sj2eYdotilWiVVG5ucG6EX4BVf1BnO2I8VCZELEIqcE+QZJlybm5ubo9RcElVQG5uglF9T2Y1YjlaJT4rXShyTW5ulnKNYIxtiE9rR1Y+bm5nQH9pcW6Ub5tumIV8PlxBWlFfU2s8Y0NpS15MUDU2J1Y5ZkxvbHRlon2jbINsYTtjQWE2RjhRP2xPe1FUQF09SjZgSF9CelyHdqWPlVxubm5uWT9tU3dgfmaqh6t5g2x0RlpHckJyJ1Y8Wkp5UXFGWEpxSVlDX0twSo1umH6PgYVff2WBOkMeOCZPK19HWUJ0WXxZbm51QlVAbFh1Xm9obm5VNlo6aVZyT4Fnkm6klq9neWOFY2s4Sis7JU85bm5ubnVvgGGDam5uXEd2YHhgb2x2W6Nsn1xkQVQ1NyhFOD4nVzNzYoRjkXWDZpJrilFlSllLdEd0UnNIU0phT4BclXCJYYJomW+OV2FEcSM4J0Q5PSdxOXRSemuNboVsjm6WanY/VT9eUVg+XD1PPW9MfmBvQ2RMZEZWPlVMWUl7W5p6fmKOa25ucVF7WlQ8Yz9qXWtebm5ubm5uiWp2OVM8WztvJz8oRDBZMXlgdFyLZaGIw3aBZ3ZPVURSO04jPB9xQF9IZ0hzXH5XdHB4cFY/bm57XWNHc1ZubmtYbm55VVRCa1xubm5ubm5ubnxceFthPlxGY0BIHzgoUzlgS2VMfW6Md6KNrHhubm5ufklDGT0jPS5CMV5BWUh3WZZ/hnBubotyi09gRlRLbm5ua41ncm1ubndQbm5sUFBCXk9uUm9BVEBzW25aVEJYUG5ubUZRRlxPcVh8b4Rmbm6JbItpejtTO1tCTiU2IEgxTUJgRnxbeGuHcKiLqXBpX1dIiVyafGxcbm57aItojFNfQldIW0lWPVU0VENTR3NOdFZiRmxPg1hkOHA9cFx1WGhFeFJ2bmxRcFBsUFdFVU1dOEcjSzRaSVQ9VUyKZJZ7fWFvSoJclIGLbHNkkm2hbXhAU0BgUGA7SCFdNmBQWlFvUnxff1V4Q3ZjYk5lT3VedkpURW9GdlpnPHBAeltzW29Ab01zTWRDU0JvTW9aeVp+VndgXT1qWHFqgnaXd5Z0knmGZWNSS0FuO0klMCE8LFZAXkZXQYFVlWuEYmpiimucZ3w6TDlmTGQ7PyRsIFstXEVWRG1qkGuKZG5ud2d4Z2hQXENSSGA/eWR8a4Boon6kkJR6g21wbWtSVTZCJnAsPy9KMlJBZlByVoxsk3eIfolukYCPZ2BBU0FXPFAoMyNIMFpDXEljSXtemHyQd25ujGyZdG5uRzxzNHpPfWpzaYxuqW+sf4RidWJ+XnA1cRw7JUM2cC1wK3JAeFp7aYJjknmqbaN4hWd7Y3BcXTY+JG4mOjFvNG4xbkRvYHhggHCXbJprkHKAY3ZWPy1rO3tveWp9aaJ9r5ile3pgbm5tYXAsNRgvJ0MyRS0/K1w5c1p8ZnlmjXqpjad4g2JubnVvazE/IDAgOjA6MTgtTT9pR3lebm6HcJeGl4KFbz8oZUB1Y3pveG+Od6aNoX+Ba3FpclxkQnAxNyI6J0QqQjFUOGRNbFd8bot0kniUc4t5iXJzUmBCUkNKOj8mNR5LLlBBXkdwQ2VcjHeXb4VgfG5CNlc8bVh7Ym5ubm6dfJ54lHWOa3ZWYUhWOUw8OCk4J0ExWUJfTl9MbF+QfZh0iWOBbpuAjm5tPlY7Z1BgOXAbOiNQQWdMWEdbS4NVjnyQaG5uRjdTPl9NZU+KYm5unG2SZ4dynW2KaWM9VjtfUGU7Sx4yJlUxY0xcSlxFe1twbopobm5ubm5ubm5tUnJHWElTRl9IW0xXRE47V0xzb3pZY0diSHAxV0NcTVtFcG6TfJttg2qHYZNkqWp7P0c9WUdxVFM0TyVLMFxEWU1cTG5ubm5ubHNxd2pzWmQ/blF2XHVJbkFeQGxffVlqNkpAaEt7ZWlHTz1yL3JCcUpxTG5uonWkgI5hbm6ObI9thE9jP1JHZEFcTUw7VzNYRFJEY1FtXG1dbkloVH9kfFRhP1hCdl+KYGhQb0hkVG5ue1JnTGBMbFhpRFxHcC1lP2ZUcUJcSoZikW2Sa3Nde2V+ZndWbm5wWFpLWkVfT3ZUdW9MP1hBbFuCZWxGVj9sTG5MZklRRllHY1FsVn9kbm6MZG5udW6QdZFjbm5GOzkjcUFyUnFMcUuBXoxvhHB3aHNogFdwVnNYe19yS1JEW0l3W39cb0NLQG9ReV5wSm9JcEdvPW8ybzZvTW9Ib0VvVphtnmyJXW9mjGyUbJJSYkFublQ8ZVZhSldGbm6Ab3tgeWZ7b3NcZUFhUYBnbGNiQVdGckt9bnJSakdiTGlaa0ZbSFlJVTxII0csYTpcUFQ+X0V7XZN4lHBsZoBu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WDBsKn07kUy1bHtdcG5cKGUocTCISG5ukFBmM25un191VpBJWjlaRlQpXD97QoBTeExiPG9QUjh1UWUwglBwPHA+UzNsTW5uemF5SGg+WT5JJF9EfD+KaohWlWNVMWQ5ORddOWo6im5xbopek2rReItmiHeadXlAVDtnUFAyMSNaNWJLW0l4Wo1yfml5ZX9jbFVqSFhJWUphT2NDUz5sTG1hYktmSIBcbm5RPHpafWxnSIBZe3BsVGdUbm5bSoZb0H6EXoZgk35/bUs9Y0heOkwyUTFYSWBLbFh/XGdafG59Ul4/e1ZvXWJBbEB+aGRBXD94VXBHU0FdR1o4VEVcQl5NgVyHb3Jkc2+OeIFISDuFUW5ujGRubpZxj1hlTFtMYUpmQ15FVURjRW9shFdbSm5uhl5jQWhKdmdtWmpWd2OBaoBab2xgSWFIYz5EKEslakZeSVpFj2Shg4pninSTd3tXbm7QtG5ub2xubmZUeFR2Xl9EVEiBXnpaWD5rT35dX0hUSmA4RzNcQl5HVkd7U598hmZ9ZJl3jlJdQ1IwQiE4JD4tOixTKIVObm5tXKF4sIyFd2RJbm56Vm5rbm5qO11LgWBublNEe1B8YmZVZ0xwVFVEW05cNTwkUjRiTlZCakeMbJB8kHeLdW5ud2VpPj8KNBpFKzwsPSZnP29ZeGGHeI9xgm1pT25ubm6BWG5uY0JeQIJhfVtubnRYemp9YHpkd09PPmNPZT4/IEEuV0VbUWxQfmSEa6l6q4+RY3ldfWdkND8ZOCU8L0QtWEFcT2xElW6ddGxfbm5ubquFjGNva4NFbhg4GkYrTzBFNodUiWRubm5smX15Hm5ubm5iLTomUTdBIT0sbER7Ym5un2ytgoBcYk9yPE8ZQiBOMVM2TTdsUm5uaVOEb3Bi0LWobJBxbm59WmovQBlCIz4vPS1nPXdZbm6EZZqJlXV9YnBYYTw+KDIkOitCMVk7cE1+VIJrl3iTc4Zyd01eQVQ1SScxJT4uUz1dTH9ZhXl+Vm5ulXmHd49YbFdeP1dFUDo1IjciXD5fSldHg1mefXpbg12TcnI+Sj1bR2I1SSJYM1xNWEpnS3lpbm5tYn5TbUxtVmdMUkZdUGBJUDpSOG5ubFLReZNzfGCXc5BnWzxXPGBFTigyHlg4YEpVR3NLh3KHZnBddmFzXWNSW0VWQmFKV0lPP1Q+ckx5V1tHcVh9WWE5Yj17Wm1SU0d4UX1YZEFubtK0bm6afHxvj2mibXZGU0JgSWE5TCtWOF1SYE9tUnxhb2xubm5uZ0FsVHtfZUZdSIdhe1RvP2lFe2RhSV1Aak5ZSFRHX0RrUoBhf25yYW5ubm5ubtC1j35ubm9beGpzW2tAXElRRF9MbUhiPks7bUt+X2E/W0NtTGg/Sz1aS2lVf2JtYnBebV1ubodUSzpTNWA7Qxw1HVQqUjxVS2xRgWSUc25ubm7QtItwfmxuZ35Ybm52V21UVkRcQX5fbU5LQmtDeWBnS1VHXjxVNFdJWU1aRWpYjW+KZm5ubm6XgWlLTTxTO0QjOCY8KzwnTD9zW4p1c25ubmhTbm6vbaZtbm6AZm1DVCI/GVc1SDJiQIlRg2ZpTopfoXSPYm5ubm5gKzggQShHMzclajNubm5ujGOofpBtZVB2WH9SYihKKlA3SSxKKG5ubm55Xm5ul22ai49sg2d0WW9GRTA7IjQoRS5hPV5PalmFdpGBh2yQX49dZD1OO2I7VCUzIG8sb0hvRm5unWtubnJclWujZn05VjlkTVYwNiRhOmBQakZubpR1jWeMdottgV9fQFVATTYwIkIoYURfS1tKfUmifIpcimGbfG5uUT1ZPWBOSCxAHmA3YkheR3tcbm5ubm5ub2x3VYlQWEZSRVlLWERPQ2M/bm6CYWtmpYCie2BPalByVGM4NSVUNVM4Rig+J11Jd192VpxgtIeXeX5uZUh1WVQUOiBFL15BTyxNMWJCbF9tVIZfpX2jhm5abm5zcFQcKBhmNW5ubmx9bKB8ooWCYWtba15mNzoVKxo+LEAoPyNZPnNabGOCZKRznIqccXJibGRxRkIpKxs2IjorPS5SOWhMc1x6ao1xmX+QeIFlc1NmQE0vWDNubnxabGWVc5x5knOKdnxZXUlRQk43QicwH0UsUUNfSF9ChViYfW5uemVta6B5bTdLNVlAZztJHzQfUjtgUlZIZEmNXm5ubmR0b4tveV1VU1M2bm5zVoBtjX2MdW5ul3SOW1tDTDReQ04yNx5AIFo/Y0pdQG1Lj26OdnxedF2NdYpMXkFQQFpDWkhKOkouVkRfRWZQdVxtXmJXbWN7VGdAbm5QO25ua0yPXpt+kHZ3ZZh1mnVubks9WEBlPkg1OCNPNmBNYUhoSW5ubm5ubm5ubm58UWxUbFphTlRFalBrS2hCTzxjSHpjbm5ZSXRFfGJpQm5uVixubn1nhWqYba+Gh1hgVG5ueU9cJEMtTDhQNUMjRixbSXtqbm5ubpeCrIKHUWVMcV1sRUIjTCtQOE0xMyBYK3dNcG16WKV3r42TV2NNbm5vbFMuzrNubm5ui0hubpyNjHt5bHVbaEtLMj0iNik9LEQyUTpmTmtWhm6IfJl9jXmRgYxzb1FRQlY+Sy4zJzsgVTBiRV1Obm6RYaF8bm5uZ5t8l3hJLm5uaF56Y4Ztlnybd5J1iGpsUltDVEJKODknMyBLLVM/W0VaRW5uioGXd3xjg2qXf4FSSzlWOmZNSzEuHUkiYEFaTFBEbVJubo1jbm55b4RoSzFubmdPeViMcpR9jXONdJlqj1ViO048XkNROTIfPyVYOmdRW0NxSX5vmIODXW5ubm5ubmJRWTtgRF1QTj1ILlM1V0leRmpQe3Fubm5udnF4cU0zbm5bP2pHimGTf4NkcV+Nb5h2a0tHO19CXk1bMEwdQDVWRVpJZEhqUnpaa1R0Y3VrZkxfQXFvdl5tRE8/ajyFX2hVTzlcRG5dbm5UPFc/W007JW5uilOMa25rj2una598flV3V35rflZuKDwnRStNNkEtVzt+VZVzhVx7bIZ5qX6HVndcfmiOVWItPSc5KFIwQjBWNGg9j2BubnpgiVmrgJN8NSVubnNMbm5rYYBlpG2pkoxjbm57ZG5uUCkoFTgdPy4+KT0kXjlyWHdgbm6CbKKIonF8YG9dbVloPT8nKh04IjctOC5JL2c+aFx1ZXtokXmWhjwtbm5rQG5ubm6IZql8q4+bd4FlbmtubmEzPzIxJDkpPClFLlA5YVBsVXxui3aXepR2j3aKeYJXYUVVQ1A6RitvJG8mVi9fPm9JW0iNW6B+h209L25uXDVubm5ubm6Ta4x4h3KPeox6bFFWNlVBWjhSIy0gPyVXOF1RVkJbR31inXqIXm9bhGKTdIBTXDtNOmBDYj1LNEMpVzNXTlpNXk59b31gSCpubl87XlBuboVom32IeIVlj3SmaoheWDtTPGhMYD1OIDslUjVjUF1KWElubpV2imhubnlifGZvbG9YbEhgSVpIZExfQlxBUEVaQnJMhWNubjcobm5TP11Ja0WQXpl7j3Rua4Nhn2uOYG5ubjVVO19PRzBAH0cuWkdVTFNKaVZ8XXxXd1xubmxbYUVjUW5uc1VQP1M+cG1uXmhMSzVmPIJedl9ubm5ublqWd4Zdbm5ubrCDkW92YG1hj3Zxb0InMxlOLkU1SDJgN25uhG54bmxWjm6ld25ubF+AZn5uYz48FDUbUyhLO0ksYD5nT4FidG5ubm5ubm5ubmhFf3F/cXdmjneuj6qAhGFubm9lbGE/MCwXPyZCL0EqQSleP21deGJtW4t0rXysiYJzc253bnBYTis5FDYfOio7LTkrSTZubm5ua2Vubm5ubm5RPGxSeXB6cIB3m32egJmAj3R9ZGdRVUJRMEsoMiY3JEkwVkJYS1tBaVeRdJl1iGl/XZlylX15bUs4UTZdT0g7PRo4IEY6YUxWPFRBbm5ubm5uVz5lU3BYg2eLeJ53jniIKZp8jWRnRlA5YkNROU4iLhs/KFlAXk9UR11JfGiddI5jbm5ubox7hWBaNUk6X0BfTlIzSx1BMVo/WUtUSG5ubm5ublZDbFFsWIZljXCbfG5ujGmieJVthFNSP1A9ZU9PQUsfPSRYPmlVW0hcSGpXkG+RbHBte16GbIFsbm5vU1hGVUddR1w8XT5RQU9AV0lubm5ubm51PZBlk3B0cm5uooCjfZVobm6Qb4JXY0M1GzskSTBSOk0zYUZxVIZnbm51XI1es4CZgpVkb2xubmw7URw2H0gwUT5ZPUw6ZTtrR3Ngbm5ubm5uUzRzcYxogm6CaJiCsJCtjW5ubm53ZmxiWDVIJzkpPzJFNUY1UkBwTm5uhE2Pc5t2m3uXepJ7j2lubmJFVUJLOD8ubyQ9LlI2WURdSm5uSDdublMvaklvZW5uf26ZeZ+Fn3+fcIxseFFtU1hFSzVMLjYpNShGNFBFVk1cRm5uj1mbfolsbm6RcJaGiFtdOU85XUZZQUocLhxPH2U/XElraT0ubm5JNWBAdFGIWYVtjXWZe5d7lXmNfotYY09OO1pGUzxQKDMiRjBXSWJQWkdZSoBcm3qNbm5ubm6af6B1dktMPlNCYVVjNU0zTSRgOGFQbm40JG5uSDNWPVdKZ0J3WJB3lnBsam5ujXKVYXRTQTZUNlxHYTxFLzUfQDJZSmxHWERhRG5ubm54X25ubm5ubnRNbFFoU2FKUjtdQm9Hb05yQW5uRi9ubks0aEOBVIBpbm5vXJBpummVfH1lf1l7ZHw9WRwtG0YlWThcRVArTTRSRW5ubm57VpForoq6gJ1aaFBxb4BaakVQJEUxVjlZN0UnRSdubkM0bm42Kk4zcUtubm5ucmCbaq2UrYaGYGpdbm59W2gvPBYvG0IjRjU4KEAqVD9tYH1ceWSMYKJ2rI2vbolfcW59aG9aXC9DGTQnQy1HMkAtbm5AMm5uOydLLnJCbm5ubnxgjHKlgaiLjnWBYG1qbm5nQkAyPSQ7JDwvPi5BM007XE9sWG5ugmaTa5Z+qHafdm5ubV9lT2JDVDNPMDkpNCdCLG5uNytubjwtPy1cOmtNZ1V9Z4Zul3WWdYZxjniHdmxQWj1MQVI+SzQxIy8YOytVRF5KVEdgR25ubm6XfohccG2PaqmAemhsOkg7WUplU1k1QiRubjQqbm5BKk0xZjpjSW9rbm6JeJB/hnqEaZZslnqLU2Q0TDtbRV0/SyYtHT4lTT1oTlxGXUBqSm5ulHuNZ2tdbm6Ub49meVFhQFZJXUteTFg7bm4zJG5uQyZLMW4+XE1kTWpcj3megoNscWKCbaCDkWxvOkc6WDlnS1g8SyE2I0owWkxhTF1GbkN6XIhsgW1xZW5ugWV/VW5ucFVvTVhLU0ZsU25uRypublAuUkdiU4xhbCZqUpFSn4G/fZ9vbV10X3RbX0ZWGDkkRzBoRE87RTNNKV1CdD+BZ3ZxinGjfrGAjFFoVnROh251SW5uPChOL0coQzRubkQvbm44Jj0uYjeDWW5ubGCFYKF6tZere4BcbWB7Ym1cWDY7Fy4dQyxDMj0qSihRPHRRbm5uboFimHiyjLx3h3N3dHtleltubkQmMhpDJkUxbm5GI25uPy0/LE8zcUhyXm5ugWqPc6CFnISRboJ0eW5pU2pDUzRKMDckNiQ6KUc3UUJeNF9LbFOIX5B7lXSMZIlvmXiTfIZWZjpPQWJEWEBNKG5uQCJubjw0QDNNNmRLa1t8WYtpjnKldpZ2l3WVdI1vbm5gQVJFWDpNLTQlNyJKLl1HYz1cSl1IcluYdJdwhGlubm9rq4GUaIE9Sz9YO2pNY0Fubjwnbm5FLkAxTT1sR2tSbm6IbI58m36KboNuoX2Sfn1TZzpTO15HV0NQKjEhSSZRPmdKZUtfQWtMim2XgY9scG1ubm5ubm6RVGpEV0FhRF5Tbm45JG5ubytvPGU5bm55W2pQaVGdZa5ssIqhWGpRZz93WVJCUiU5JVM6TkBMMkAdOS1bQoVcbm5ubm5un4Coc45lY09yb25ug29rNDYjOhZDKG5uPCpubkQtbixVLHdDc2N9Z3lkkGK4eaSMrXaFa25uf2NqWW5uRC4vIj0qPC5CMT8wTz5kTm5ugV2BbI9so3yff5d4iXSLaXtRbVRWQ0syTSM5KTgkbm5IK0ItUi5xP3RgdWJubIJooHqciZuBkWyDWHljbm5lRVcwRyc5JTgoQyxwNFE9XUNfTm5ugl+QbJmAj2yEa51tmH+SUWdJTjpdRmE6VCk=';
 
-function buildWaveData(pts){
-  // 12分野の正確な点数 = 2ポイントのSQ点数合計（原典検証済み）
-  // グラフは固定値（分野点数÷2 を基準に微小sin波で視覚的変化を付与）
-  const ages=[];for(let a=AGE_START;a<=AGE_END;a++)ages.push(a);
-  return GRAPH_DOMAINS.map((d,di)=>{
-    const base = Math.min(50, Math.round((domainScore(pts, d)||0) / 2));
-    const period=WAVE_PERIODS[di],phase=WAVE_PHASES[di];
-    return ages.map((age,i)=>{
-      const wave=Math.sin((i+phase)*Math.PI*2/period)*3;
-      return Math.max(1,Math.min(50,Math.round(base+wave)));
-    });
+// 索引：'小-大' → グラフ番号（1〜640）
+const MAKI_IDX=(()=>{
+  const o={};
+  MAKI_IDX_STR.split('|').forEach(part=>{
+    const seg=part.split(':'), a=seg[0], b0=parseInt(seg[1]);
+    seg[2].split(',').forEach((g,i)=>{ o[a+'-'+(b0+i)]=parseInt(g); });
+  });
+  return o;
+})();
+
+// 波形：グラフ番号 → [{age,hi,lo}]　hi/lo は0〜100点に換算済み
+const MAKI_WAVE=(()=>{
+  const nums=[];
+  MAKI_RUNS.split(',').forEach(s=>{
+    const m=s.split('-');
+    if(m.length===2){ for(let i=parseInt(m[0]);i<=parseInt(m[1]);i++) nums.push(i); }
+    else nums.push(parseInt(m[0]));
+  });
+  const bin=atob(MAKI_WAVE_B64), out={};
+  let p=0;
+  nums.forEach(g=>{
+    const rows=[];
+    for(let a=AGE_START;a<=AGE_OBSERVED;a++){
+      const hi=bin.charCodeAt(p++)-MAKI_OFF;
+      const lo=bin.charCodeAt(p++)-MAKI_OFF;
+      rows.push({age:a, hi:50+hi/2, lo:50+lo/2});
+    }
+    out[g]=rows;
+  });
+  return out;
+})();
+
+// 記号ペアの2数値からグラフを引く。必ず昇順に並べ替えてから引く。
+function makiLookup(vA,vB){
+  const lo=Math.min(vA,vB), hi=Math.max(vA,vB), key=lo+'-'+hi;
+  const g=MAKI_IDX[key];
+  if(g===undefined) return {status:'不収録', key:key};            // 原典に該当なし
+  const rows=MAKI_WAVE[g];
+  if(!rows)          return {status:'未取得', key:key, graph:g};  // 波形がまだ読めていない
+  return {status:'ok', key:key, graph:g, rows:rows};
+}
+
+// 24本ぶんの帯データを引く
+function buildBandData(pts){
+  return GRAPH_DOMAINS.map(d=>{
+    const r=makiLookup(pts[d.ka], pts[d.kb]);
+    r.domain=d;
+    return r;
   });
 }
+
+let activeLines=new Set([0,1]);   // 既定は健康の内線・外線
+let lastPts=null;
+let lastOriginYear=null,lastBirthAge=null;
+let viewAgeStart=15,viewAgeEnd=55;
 
 // =============================================
 // ライフイベント予測（原典p.82-93 相乗力・反発力・結集運）
 // =============================================
+// =============================================
+// ライフイベント予測　── 2026-08-21 いったん停止
+// =============================================
+// 旧実装は buildWaveData() のサインカーブを前提に、
+// 0〜50スケールのしきい値（32点で山、22点で谷 など）で
+// 「縁・結婚好機」「仕事の好機」などを判定していた。
+// その土台であるサインカーブが原典の実データに置き換わったため、
+// これらのしきい値はいずれも根拠を失った。
+//
+// 実データに合わせて何を検出すべきかは原典に照らして
+// 決めるべき事柄であり、機械的な読み替えでは埋められない。
+// 判断がつくまでは「現在」マーカーのみを返す。
 function detectLifeEvents(pts, graphOriginYear){
-  const events = [];
-  const keys = POINT_KEYS;   // 原典の12ポイント（Ⓜ〜Ⓧ）
-  const scores = keys.map(k => suugi(pts[k]).点数);
-  const waveData = buildWaveData(pts);
-
-  // 各年齢の全分野平均スコア
-  const avgByAge = [];
-  for(let a = AGE_START; a <= AGE_END; a++){
-    const i = a - AGE_START;
-    let sum = 0, cnt = 0;
-    waveData.forEach((d, di) => {
-      if(d[i] !== undefined){ sum += d[i]; cnt++; }
-    });
-    avgByAge.push({ age: a, avg: cnt > 0 ? sum/cnt : 0 });
-  }
-
-  // ── 1. 局所最大（山）の検出 ──
-  for(let i = 2; i < avgByAge.length - 2; i++){
-    const prev2 = avgByAge[i-2].avg, prev1 = avgByAge[i-1].avg;
-    const cur  = avgByAge[i].avg;
-    const next1 = avgByAge[i+1].avg, next2 = avgByAge[i+2].avg;
-    if(cur > prev1 && cur > prev2 && cur > next1 && cur > next2 && cur >= 32){
-      const age = avgByAge[i].age;
-      // 社交・愛情スコアが高い山 → 結婚・出会い好機
-      const socialScore = waveData[2] ? waveData[2][i] : 0; // K3
-      const loveScore   = waveData[3] ? waveData[3][i] : 0; // I9
-      const loveAvg = (socialScore + loveScore) / 2;
-      if(loveAvg >= 30 && age >= 20 && age <= 55){
-        events.push({ age, type:'love', label:'♥ 縁・結婚好機', color:'#c0392b', score: Math.round(cur) });
-      }
-      // 所得・職業スコアが高い山 → 仕事・昇進のピーク
-      const incomeScore = waveData[4] ? waveData[4][i] : 0; // K9
-      const jobScore    = waveData[5] ? waveData[5][i] : 0; // D20
-      const jobAvg = (incomeScore + jobScore) / 2;
-      if(jobAvg >= 33 && !(loveAvg >= 30 && age <= 55)){
-        events.push({ age, type:'job', label:'★ 仕事の好機', color:'#1a3a5c', score: Math.round(cur) });
-      }
-      // 全体的な大吉期
-      if(cur >= 38 && !(loveAvg >= 30 && age <= 55) && !(jobAvg >= 33)){
-        events.push({ age, type:'peak', label:'✦ 好運期', color:'#b8960c', score: Math.round(cur) });
-      }
+  const events=[];
+  if(graphOriginYear!==null){
+    const currentAge=new Date().getFullYear()-graphOriginYear;
+    if(currentAge>=AGE_START && currentAge<=AGE_OBSERVED){
+      events.push({age:currentAge, type:'now', label:'◆ 現在',
+                   color:'#c0392b', score:null, isNow:true});
     }
   }
-
-  // ── 2. 局所最小（谷）の検出 ──
-  for(let i = 2; i < avgByAge.length - 2; i++){
-    const prev2 = avgByAge[i-2].avg, prev1 = avgByAge[i-1].avg;
-    const cur  = avgByAge[i].avg;
-    const next1 = avgByAge[i+1].avg, next2 = avgByAge[i+2].avg;
-    if(cur < prev1 && cur < prev2 && cur < next1 && cur < next2 && cur <= 22){
-      const age = avgByAge[i].age;
-      events.push({ age, type:'caution', label:'▼ 注意期', color:'#7a6c56', score: Math.round(cur) });
-    }
-  }
-
-  // ── 3. 現在年齢マーカー（生年既知の場合） ──
-  if(graphOriginYear !== null){
-    const currentYear = new Date().getFullYear();
-    const currentAge = currentYear - graphOriginYear;
-    if(currentAge >= AGE_START && currentAge <= AGE_END){
-      events.push({ age: currentAge, type:'now', label:'◆ 現在', color:'#c0392b', score: null, isNow: true });
-    }
-  }
-
-  // 重複除去（同じ年齢に複数あれば最初のものを残す）
-  const seen = new Set();
-  return events.filter(e => {
-    if(seen.has(e.age + e.type)) return false;
-    seen.add(e.age + e.type);
-    return true;
-  });
+  return events;
 }
 
 function resetAgeRange(){
-  viewAgeStart=15;viewAgeEnd=80;
+  viewAgeStart=15;viewAgeEnd=55;
   document.getElementById('ar-start').value=15;
-  document.getElementById('ar-end').value=80;
+  document.getElementById('ar-end').value=55;
   document.getElementById('ar-start-val').textContent='15歳';
-  document.getElementById('ar-end-val').textContent='80歳';
-  // プリセットのactiveを〜80に戻す
+  document.getElementById('ar-end-val').textContent='55歳';
+  // プリセットのactiveを全期間に戻す
   document.querySelectorAll('.ar-preset').forEach(b=>{
-    b.classList.toggle('active', b.dataset.end==='80');
+    b.classList.toggle('active', b.dataset.end==='55' && b.dataset.start==='15');
   });
   if(lastPts)drawWave(lastPts,lastOriginYear,lastBirthAge);
 }
 
 // プリセットボタン処理
 function setPreset(btn){
+  const startVal=parseInt(btn.dataset.start||'15');
   const endVal=parseInt(btn.dataset.end);
   document.querySelectorAll('.ar-preset').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  viewAgeStart=15;viewAgeEnd=endVal;
-  document.getElementById('ar-start').value=15;
+  viewAgeStart=startVal;viewAgeEnd=endVal;
+  document.getElementById('ar-start').value=startVal;
   document.getElementById('ar-end').value=endVal;
-  document.getElementById('ar-start-val').textContent='15歳';
+  document.getElementById('ar-start-val').textContent=startVal+'歳';
   document.getElementById('ar-end-val').textContent=endVal+'歳';
   if(lastPts)drawWave(lastPts,lastOriginYear,lastBirthAge);
 }
@@ -1601,234 +1616,129 @@ function initAgeRangeSliders(){
 function drawWave(pts,graphOriginYear,graphBirthAge){
   const svg=document.getElementById('wave-svg');
   svg.innerHTML='';
-  const W=800,H=330,PL=48,PR=20,PT=20,PB=70;
+  const NS='http://www.w3.org/2000/svg';
+  const mk=(t,at,txt)=>{const e=document.createElementNS(NS,t);for(const k in at)e.setAttribute(k,at[k]);if(txt!==undefined)e.textContent=txt;svg.appendChild(e);return e;};
+  const W=800,H=330,PL=52,PR=18,PT=30,PB=62;
   const iW=W-PL-PR,iH=H-PT-PB;
-  const dispStart=Math.max(AGE_START,Math.min(viewAgeStart,AGE_END-1));
-  const dispEnd=Math.max(dispStart+1,Math.min(viewAgeEnd,AGE_END));
-  const totalSpan=dispEnd-dispStart;
-  const waveData=buildWaveData(pts);
-  const xOf=age=>PL+(age-dispStart)/totalSpan*iW;
-  const showBoundary=AGE_OBSERVED>dispStart&&AGE_OBSERVED<dispEnd;
-  if(showBoundary){
-    const xExt=xOf(AGE_OBSERVED);
-    const r=document.createElementNS('http://www.w3.org/2000/svg','rect');
-    r.setAttribute('x',xExt);r.setAttribute('y',PT);r.setAttribute('width',PL+iW-xExt);r.setAttribute('height',iH);r.setAttribute('fill','rgba(184,150,12,.04)');svg.appendChild(r);
-    const t=document.createElementNS('http://www.w3.org/2000/svg','text');
-    t.setAttribute('x',xExt+6);t.setAttribute('y',PT+12);t.setAttribute('font-size','9');t.setAttribute('fill','rgba(184,150,12,.6)');t.setAttribute('font-family','serif');t.setAttribute('letter-spacing','1');t.textContent='── 推定値（サイン波延長）──';svg.appendChild(t);
-  }else if(dispStart>=AGE_OBSERVED){
-    const bg=document.createElementNS('http://www.w3.org/2000/svg','rect');
-    bg.setAttribute('x',PL);bg.setAttribute('y',PT);bg.setAttribute('width',iW);bg.setAttribute('height',iH);bg.setAttribute('fill','rgba(184,150,12,.04)');svg.appendChild(bg);
-    const extTxt2=document.createElementNS('http://www.w3.org/2000/svg','text');
-    extTxt2.setAttribute('x',PL+8);extTxt2.setAttribute('y',PT+12);
-    extTxt2.setAttribute('font-size','9');extTxt2.setAttribute('fill','rgba(184,150,12,.6)');
-    extTxt2.setAttribute('font-family','serif');extTxt2.setAttribute('letter-spacing','1');
-    extTxt2.textContent='推定値（サイン波延長）';svg.appendChild(extTxt2);
-  }
-  [{y0:0,y1:24,color:'rgba(192,57,43,.04)'},{y0:25,y1:39,color:'rgba(26,58,92,.04)'},{y0:40,y1:50,color:'rgba(45,106,79,.06)'}].forEach(z=>{
-    const r=document.createElementNS('http://www.w3.org/2000/svg','rect');
-    const yTop=PT+iH*(1-z.y1/50),yBot=PT+iH*(1-z.y0/50);
-    r.setAttribute('x',PL);r.setAttribute('y',yTop);r.setAttribute('width',iW);r.setAttribute('height',yBot-yTop);r.setAttribute('fill',z.color);svg.appendChild(r);
-  });
-  [{score:40,label:'吉（40）'},{score:25,label:'中吉（25）'}].forEach(b=>{
-    const y=PT+iH*(1-b.score/50);
-    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
-    line.setAttribute('x1',PL);line.setAttribute('x2',PL+iW);line.setAttribute('y1',y);line.setAttribute('y2',y);line.setAttribute('stroke','rgba(26,18,8,.1)');line.setAttribute('stroke-dasharray','4 3');svg.appendChild(line);
-    const txt=document.createElementNS('http://www.w3.org/2000/svg','text');
-    txt.setAttribute('x',PL-4);txt.setAttribute('y',y+4);txt.setAttribute('text-anchor','end');txt.setAttribute('font-size','8');txt.setAttribute('fill','rgba(26,18,8,.35)');txt.setAttribute('font-family','serif');txt.textContent=b.label;svg.appendChild(txt);
-  });
-  [0,10,20,30,40,50].forEach(v=>{
-    const y=PT+iH*(1-v/50);
-    const txt=document.createElementNS('http://www.w3.org/2000/svg','text');
-    txt.setAttribute('x',PL-6);txt.setAttribute('y',y+4);txt.setAttribute('text-anchor','end');txt.setAttribute('font-size','9');txt.setAttribute('fill','rgba(26,18,8,.3)');txt.setAttribute('font-family','serif');txt.textContent=v;svg.appendChild(txt);
-  });
-  // ── X軸2段表示（上段：満年齢、下段：西暦・和暦） ──
-  // graphOrigin: 人名=生年, 企業=登記年（nullなら西暦計算スキップ）
+
+  const dispStart=Math.max(AGE_START,Math.min(viewAgeStart,AGE_OBSERVED-1));
+  const dispEnd=Math.max(dispStart+1,Math.min(viewAgeEnd,AGE_OBSERVED));
   const span=dispEnd-dispStart;
-  const tickInterval=span<=15?1:span<=30?2:span<=50?5:5;
-  const firstTick=Math.ceil(dispStart/tickInterval)*tickInterval;
+  const xOf=age=>PL+(age-dispStart)/span*iW;
+  const yOf=v=>PT+iH*(100-Math.max(0,Math.min(100,v)))/100;
 
-  // 和暦変換
-  function toWareki(y){
-    if(y>=2019)return '令'+(y-2018);
-    if(y>=1989)return '平'+(y-1988);
-    if(y>=1926)return '昭'+(y-1925);
-    if(y>=1912)return '大'+(y-1911);
-    return '明'+(y-1867);
-  }
+  const bands=buildBandData(pts);
+  const shown=[...activeLines].filter(i=>i>=0&&i<bands.length).sort((a,b)=>a-b);
 
-  // 「現在」マーカー（生年月日または登記年から算出）
-  if(graphOriginYear!==null && graphBirthAge!==null){
-    const nowAge=graphBirthAge; // 現在の年齢（満年齢）
-    if(nowAge>=dispStart && nowAge<=dispEnd){
-      const xNow=xOf(nowAge);
-      // 現在マーカー縦線（朱色）
-      const nowLine=document.createElementNS('http://www.w3.org/2000/svg','line');
-      nowLine.setAttribute('x1',xNow);nowLine.setAttribute('x2',xNow);
-      nowLine.setAttribute('y1',PT);nowLine.setAttribute('y2',PT+iH);
-      nowLine.setAttribute('stroke','rgba(192,57,43,.75)');nowLine.setAttribute('stroke-width','2');
-      nowLine.setAttribute('stroke-dasharray','6 3');svg.appendChild(nowLine);
-      // 「現在」ラベル
-      const nowBg=document.createElementNS('http://www.w3.org/2000/svg','rect');
-      nowBg.setAttribute('x',xNow-14);nowBg.setAttribute('y',PT+2);
-      nowBg.setAttribute('width',28);nowBg.setAttribute('height',14);
-      nowBg.setAttribute('fill','rgba(192,57,43,.85)');nowBg.setAttribute('rx','2');svg.appendChild(nowBg);
-      const nowTxt=document.createElementNS('http://www.w3.org/2000/svg','text');
-      nowTxt.setAttribute('x',xNow);nowTxt.setAttribute('y',PT+12);
-      nowTxt.setAttribute('text-anchor','middle');nowTxt.setAttribute('font-size','9');
-      nowTxt.setAttribute('fill','white');nowTxt.setAttribute('font-family','serif');nowTxt.setAttribute('font-weight','bold');
-      nowTxt.textContent='現在';svg.appendChild(nowTxt);
-    }
-  }
-
-  for(let age=firstTick;age<=dispEnd;age+=tickInterval){
-    if(age<dispStart||age>dispEnd)continue;
-    const x=xOf(age);
-    if(x<PL-1||x>PL+iW+1)continue;
-    const isBoundary=age===AGE_OBSERVED;
-    // グリッド縦線
-    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
-    line.setAttribute('x1',x);line.setAttribute('x2',x);line.setAttribute('y1',PT);line.setAttribute('y2',PT+iH);
-    line.setAttribute('stroke',isBoundary?'rgba(184,150,12,.4)':'rgba(26,18,8,.06)');
-    line.setAttribute('stroke-width',isBoundary?'1.5':'1');
-    if(isBoundary)line.setAttribute('stroke-dasharray','3 2');
-    svg.appendChild(line);
-    // 上段：満年齢
-    const txt=document.createElementNS('http://www.w3.org/2000/svg','text');
-    txt.setAttribute('x',x);txt.setAttribute('y',PT+iH+13);txt.setAttribute('text-anchor','middle');txt.setAttribute('font-size','9');
-    txt.setAttribute('fill',isBoundary?'rgba(184,150,12,.8)':'rgba(26,18,8,.4)');txt.setAttribute('font-family','serif');
-    txt.textContent=age+'歳';svg.appendChild(txt);
-    // 下段：西暦・和暦（生年または登記年が既知の場合のみ）
-    if(graphOriginYear!==null){
-      const seireki=graphOriginYear+age;
-      const wareki=toWareki(seireki);
-      const txt2=document.createElementNS('http://www.w3.org/2000/svg','text');
-      txt2.setAttribute('x',x);txt2.setAttribute('y',PT+iH+24);txt2.setAttribute('text-anchor','middle');txt2.setAttribute('font-size','8');
-      txt2.setAttribute('fill','rgba(26,18,8,.28)');txt2.setAttribute('font-family','serif');
-      txt2.textContent=seireki+'年';svg.appendChild(txt2);
-      const txt3=document.createElementNS('http://www.w3.org/2000/svg','text');
-      txt3.setAttribute('x',x);txt3.setAttribute('y',PT+iH+33);txt3.setAttribute('text-anchor','middle');txt3.setAttribute('font-size','7');
-      txt3.setAttribute('fill','rgba(26,18,8,.22)');txt3.setAttribute('font-family','serif');
-      txt3.textContent=wareki;svg.appendChild(txt3);
-    }
-  }
-  waveData.forEach((data,di)=>{
-    if(!activeLines.has(di))return;
-    const d=GRAPH_DOMAINS[di];
-    const isSolo=activeLines.size===1;
-    const startI=Math.max(0,dispStart-AGE_START);
-    const endI=Math.min(data.length-1,dispEnd-AGE_START);
-    let solidSeg=[],dashSeg=[];
-    for(let i=startI;i<=endI;i++){
-      const age=AGE_START+i;
-      const x=xOf(age);
-      const y=PT+iH*(1-data[i]/50);
-      const pt=x.toFixed(1)+','+y.toFixed(1);
-      if(age<=AGE_OBSERVED)solidSeg.push({pt,x,y,age});
-      else dashSeg.push({pt,x,y,age});
-    }
-    const drawPath=(seg,dashed)=>{
-      if(seg.length<2)return;
-      const pathD=seg.map((s,i)=>(i===0?'M':'L')+s.pt).join(' ');
-      const path=document.createElementNS('http://www.w3.org/2000/svg','path');
-      path.setAttribute('d',pathD);path.setAttribute('fill','none');path.setAttribute('stroke',d.color);
-      // 内線は太く濃く、外線は細く淡く（破線は「観測外＝将来」の意味で使用済みのため）
-      const w = isSolo ? (d.dash?2.0:2.6) : (d.dash?1.1:1.9);
-      const op = (dashed?0.45:0.85) * (d.dash?0.72:1);
-      path.setAttribute('stroke-width',String(w));path.setAttribute('stroke-opacity',op.toFixed(2));
-      if(dashed)path.setAttribute('stroke-dasharray','5 3');
-      path.setAttribute('stroke-linejoin','round');path.setAttribute('stroke-linecap','round');svg.appendChild(path);
-    };
-    if(solidSeg.length>0&&dashSeg.length>0)dashSeg.unshift(solidSeg[solidSeg.length-1]);
-    drawPath(solidSeg,false);drawPath(dashSeg,true);
-    if(isSolo&&totalSpan<=20){
-      for(let i=startI;i<=endI;i++){
-        const age=AGE_START+i;const x=xOf(age);const y=PT+iH*(1-data[i]/50);
-        const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
-        c.setAttribute('cx',x);c.setAttribute('cy',y);c.setAttribute('r','3.5');c.setAttribute('fill',d.color);c.setAttribute('stroke','white');c.setAttribute('stroke-width','1.5');svg.appendChild(c);
-        const lbl=document.createElementNS('http://www.w3.org/2000/svg','text');
-        lbl.setAttribute('x',x);lbl.setAttribute('y',y-8);lbl.setAttribute('text-anchor','middle');lbl.setAttribute('font-size','8');lbl.setAttribute('fill',d.color);lbl.setAttribute('font-family','serif');lbl.setAttribute('font-weight','bold');lbl.textContent=data[i];svg.appendChild(lbl);
-      }
-    }
-    if(!isSolo&&30>=dispStart&&30<=dispEnd){
-      const i=30-AGE_START;const x=xOf(30);const y=PT+iH*(1-data[i]/50);
-      const circle=document.createElementNS('http://www.w3.org/2000/svg','circle');
-      circle.setAttribute('cx',x);circle.setAttribute('cy',y);circle.setAttribute('r','3');circle.setAttribute('fill',d.color);circle.setAttribute('stroke','white');circle.setAttribute('stroke-width','1.5');svg.appendChild(circle);
-    }
+  // ── 目盛と基準線（縦軸は原典どおり0〜100点、50点が基準線）──
+  [0,25,50,75,100].forEach(v=>{
+    const y=yOf(v), base=(v===50);
+    mk('line',{x1:PL,x2:PL+iW,y1:y,y2:y,
+      stroke:base?'rgba(26,18,8,.42)':'rgba(26,18,8,.08)',
+      'stroke-width':base?1.4:1});
+    mk('text',{x:PL-7,y:y+4,'text-anchor':'end','font-size':base?10:9,
+      fill:base?'rgba(26,18,8,.55)':'rgba(26,18,8,.3)','font-family':'serif',
+      'font-weight':base?'bold':'normal'}, v);
   });
-  if(activeLines.size===1){
-    const di=[...activeLines][0];const d=GRAPH_DOMAINS[di];const score=Math.min(100,domainScore(pts,d));
-    const bg=document.createElementNS('http://www.w3.org/2000/svg','rect');
-    bg.setAttribute('x',PL+iW-130);bg.setAttribute('y',PT+4);bg.setAttribute('width',125);bg.setAttribute('height',30);bg.setAttribute('fill','rgba(255,255,255,.85)');bg.setAttribute('rx','2');svg.appendChild(bg);
-    const label=document.createElementNS('http://www.w3.org/2000/svg','text');
-    label.setAttribute('x',PL+iW-68);label.setAttribute('y',PT+15);label.setAttribute('text-anchor','middle');label.setAttribute('font-size','11');label.setAttribute('fill',d.color);label.setAttribute('font-family','serif');label.setAttribute('font-weight','bold');label.textContent=d.n.replace(/　/g,'');svg.appendChild(label);
-    const scoreTxt=document.createElementNS('http://www.w3.org/2000/svg','text');
-    scoreTxt.setAttribute('x',PL+iW-68);scoreTxt.setAttribute('y',PT+28);scoreTxt.setAttribute('text-anchor','middle');scoreTxt.setAttribute('font-size','10');scoreTxt.setAttribute('fill','rgba(26,18,8,.5)');scoreTxt.setAttribute('font-family','serif');scoreTxt.textContent='基準点：'+score+'点';svg.appendChild(scoreTxt);
+  mk('text',{x:PL-7,y:PT-10,'text-anchor':'end','font-size':8,
+    fill:'rgba(26,18,8,.3)','font-family':'serif'},'点');
+
+  // ── X軸（満年齢・西暦・和暦）──
+  const toWareki=y=>y>=2019?'令'+(y-2018):y>=1989?'平'+(y-1988):y>=1926?'昭'+(y-1925):y>=1912?'大'+(y-1911):'明'+(y-1867);
+  const step=span<=12?1:span<=24?2:5;
+  const first=Math.ceil(dispStart/step)*step;
+  for(let age=first;age<=dispEnd;age+=step){
+    const x=xOf(age);
+    mk('line',{x1:x,x2:x,y1:PT,y2:PT+iH,stroke:'rgba(26,18,8,.05)'});
+    mk('text',{x:x,y:PT+iH+14,'text-anchor':'middle','font-size':9,
+      fill:'rgba(26,18,8,.42)','font-family':'serif'},age+'歳');
+    if(graphOriginYear!==null){
+      const sr=graphOriginYear+age;
+      mk('text',{x:x,y:PT+iH+25,'text-anchor':'middle','font-size':8,
+        fill:'rgba(26,18,8,.26)','font-family':'serif'},sr+'年');
+      mk('text',{x:x,y:PT+iH+34,'text-anchor':'middle','font-size':7,
+        fill:'rgba(26,18,8,.2)','font-family':'serif'},toWareki(sr));
+    }
   }
 
-  // ── ライフイベントマーカーを描画 ──
-  if(graphOriginYear !== null || true){
-    const events = detectLifeEvents(pts, graphOriginYear);
-    // 表示範囲内のイベントのみ描画
-    // 同じX座標に複数重ならないよう縦にずらす
-    const xUsed = {};
-    events.forEach(ev => {
-      const age = ev.age;
-      if(age < dispStart || age > dispEnd) return;
-      const x = xOf(age);
-      const xKey = Math.round(x / 12); // 12px以内は同じ列とみなす
-      const slot = xUsed[xKey] !== undefined ? xUsed[xKey] + 1 : 0;
-      xUsed[xKey] = slot;
-      const yBase = ev.isNow ? PT - 4 : PT + iH - 6 - slot * 16;
+  // ── 帯（縦棒）の描画 ──
+  // 一年ぶんの変動のミニマムとマキシマム。株価の安値・高値と同じ形式。
+  // 折れ線で結んではならない（実在しない軌跡になる）。
+  const drawable=shown.filter(i=>bands[i].status==='ok');
+  const colW=iW/span;
+  const n=Math.max(1,drawable.length);
+  const bw=Math.max(2.2,Math.min(11,colW*(n===1?0.5:0.34)));
+  const gap=n===1?0:bw+1.6;
 
-      if(ev.isNow){
-        // 現在マーカー：赤い縦線
-        const vline = document.createElementNS('http://www.w3.org/2000/svg','line');
-        vline.setAttribute('x1',x);vline.setAttribute('x2',x);
-        vline.setAttribute('y1',PT);vline.setAttribute('y2',PT+iH);
-        vline.setAttribute('stroke','rgba(192,57,43,.7)');vline.setAttribute('stroke-width','1.5');
-        vline.setAttribute('stroke-dasharray','4 2');svg.appendChild(vline);
-        const nowBg = document.createElementNS('http://www.w3.org/2000/svg','rect');
-        nowBg.setAttribute('x',x+3);nowBg.setAttribute('y',PT+4);
-        nowBg.setAttribute('width',36);nowBg.setAttribute('height',14);
-        nowBg.setAttribute('fill','rgba(192,57,43,.85)');nowBg.setAttribute('rx','2');svg.appendChild(nowBg);
-        const nowTxt = document.createElementNS('http://www.w3.org/2000/svg','text');
-        nowTxt.setAttribute('x',x+21);nowTxt.setAttribute('y',PT+14);
-        nowTxt.setAttribute('text-anchor','middle');nowTxt.setAttribute('font-size','8');
-        nowTxt.setAttribute('fill','white');nowTxt.setAttribute('font-family','serif');
-        nowTxt.textContent='現在';svg.appendChild(nowTxt);
-      } else {
-        // イベントマーカー：フラグ
-        const flagW = ev.label.length * 6.5 + 8;
-        // 縦棒
-        const stem = document.createElementNS('http://www.w3.org/2000/svg','line');
-        stem.setAttribute('x1',x);stem.setAttribute('x2',x);
-        stem.setAttribute('y1',yBase + 14);stem.setAttribute('y2',yBase - 2);
-        stem.setAttribute('stroke',ev.color);stem.setAttribute('stroke-width','1.2');
-        stem.setAttribute('stroke-opacity','0.7');svg.appendChild(stem);
-        // 菱形マーカー
-        const dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
-        dot.setAttribute('cx',x);dot.setAttribute('cy',yBase + 14);
-        dot.setAttribute('r','3');dot.setAttribute('fill',ev.color);
-        dot.setAttribute('fill-opacity','0.75');svg.appendChild(dot);
-        // ラベル背景
-        const lbg = document.createElementNS('http://www.w3.org/2000/svg','rect');
-        const lx = Math.min(x + 2, PL + iW - flagW - 2);
-        lbg.setAttribute('x',lx);lbg.setAttribute('y',yBase - 2);
-        lbg.setAttribute('width',flagW);lbg.setAttribute('height',13);
-        lbg.setAttribute('fill',ev.color);lbg.setAttribute('fill-opacity','0.15');
-        lbg.setAttribute('stroke',ev.color);lbg.setAttribute('stroke-width','0.8');
-        lbg.setAttribute('stroke-opacity','0.5');lbg.setAttribute('rx','2');svg.appendChild(lbg);
-        // ラベルテキスト
-        const ltxt = document.createElementNS('http://www.w3.org/2000/svg','text');
-        ltxt.setAttribute('x',lx + flagW/2);ltxt.setAttribute('y',yBase + 9);
-        ltxt.setAttribute('text-anchor','middle');ltxt.setAttribute('font-size','8');
-        ltxt.setAttribute('fill',ev.color);ltxt.setAttribute('font-family','serif');
-        ltxt.setAttribute('font-weight','bold');
-        ltxt.textContent = ev.label + (ev.score ? '('+ev.score+')' : '');
-        svg.appendChild(ltxt);
-      }
+  drawable.forEach((di,j)=>{
+    const b=bands[di], d=b.domain;
+    const off=(j-(n-1)/2)*gap;
+    b.rows.forEach(r=>{
+      if(r.age<dispStart||r.age>dispEnd)return;
+      const x=xOf(r.age)+off;
+      const yT=yOf(r.hi), yB=yOf(r.lo);
+      // 内線は塗り、外線は白抜き＋輪郭。同じ分野の2本を確実に見分けるため。
+      const at={x:(x-bw/2).toFixed(1),y:yT.toFixed(1),
+        width:bw.toFixed(1),height:Math.max(1.4,yB-yT).toFixed(1),
+        rx:1,fill:d.color};
+      if(d.dash){ at['fill-opacity']=0.22; at.stroke=d.color;
+                  at['stroke-width']=1; at['stroke-opacity']=0.85; }
+      else      { at['fill-opacity']=0.88; }
+      mk('rect',at);
     });
+  });
+
+  // ── 「現在」マーカー ──
+  if(graphOriginYear!==null && graphBirthAge!==null &&
+     graphBirthAge>=dispStart && graphBirthAge<=dispEnd){
+    const x=xOf(graphBirthAge);
+    mk('line',{x1:x,x2:x,y1:PT,y2:PT+iH,stroke:'rgba(192,57,43,.7)',
+      'stroke-width':1.6,'stroke-dasharray':'5 3'});
+    mk('rect',{x:x-14,y:PT+2,width:28,height:14,fill:'rgba(192,57,43,.85)',rx:2});
+    mk('text',{x:x,y:PT+12,'text-anchor':'middle','font-size':9,fill:'white',
+      'font-family':'serif','font-weight':'bold'},'現在');
   }
+
+  // ── 状態の注記（①実データ／②グラフ未収録／③原典に該当なし）──
+  let noteY=PT+13;
+  shown.forEach(di=>{
+    const b=bands[di], d=b.domain;
+    if(b.status==='ok')return;
+    const msg=b.status==='未取得'
+      ? d.n+'　組合せ'+b.key+'（グラフ'+b.graph+'）── グラフ未収録'
+      : d.n+'　組合せ'+b.key+' ── 原典に該当なし';
+    mk('text',{x:PL+8,y:noteY,'font-size':10,fill:'rgba(26,18,8,.45)',
+      'font-family':'serif'},msg);
+    noteY+=15;
+  });
+
+  if(drawable.length===0){
+    mk('text',{x:PL+iW/2,y:PT+iH/2,'text-anchor':'middle','font-size':12,
+      fill:'rgba(26,18,8,.35)','font-family':'serif'},
+      '表示できる原典グラフがありません');
+  }
+
+  // ── 凡例（グラフ内右上）──
+  if(drawable.length>0){
+    mk('rect',{x:PL+iW-164,y:PT+2,width:164,height:drawable.length*15+6,
+      fill:'rgba(245,241,232,.88)',rx:2});
+  }
+  let lgY=PT+13;
+  drawable.forEach(di=>{
+    const d=bands[di].domain;
+    const sw={x:PL+iW-158,y:lgY-8,width:9,height:9,rx:2,fill:d.color};
+    if(d.dash){ sw['fill-opacity']=0.22; sw.stroke=d.color; sw['stroke-width']=1; }
+    else      { sw['fill-opacity']=0.88; }
+    mk('rect',sw);
+    mk('text',{x:PL+iW-145,y:lgY,'font-size':10,fill:'rgba(26,18,8,.6)',
+      'font-family':'serif'},
+      d.n.replace(/　/g,'')+'　グラフ'+bands[di].graph);
+    lgY+=15;
+  });
+
+  // ── 原典の範囲外である旨（15〜55歳しか存在しない）──
+  mk('text',{x:PL,y:H-8,'font-size':8,fill:'rgba(26,18,8,.28)','font-family':'serif'},
+    '原典の人生グラフは15〜55歳のみ。棒の位置で吉凶を、棒の幅でその年の変動の激しさを見る。');
 }
 
 function drawRadar(pts){
@@ -1876,54 +1786,55 @@ function drawRadar(pts){
   });
 }
 
+// 凡例：表示中の2本について、組合せ・グラフ番号・収録状態を示す
 function buildLegend(pts){
   const leg=document.getElementById('graph-legend');leg.innerHTML='';
-  GRAPH_DOMAINS.forEach((d,di)=>{
+  if(!pts)return;
+  const bands=buildBandData(pts);
+  [...activeLines].sort((a,b)=>a-b).forEach(di=>{
+    const b=bands[di], d=b.domain;
     const score=Math.min(100,domainScore(pts,d));
+    const stat = b.status==='ok'      ? 'グラフ'+b.graph
+               : b.status==='未取得'  ? 'グラフ'+b.graph+'・未収録'
+               : '原典に該当なし';
     const item=document.createElement('div');
-    const isSolo=activeLines.size===1&&activeLines.has(di);
-    item.className='gl-item'+(activeLines.has(di)?(isSolo?' solo':''):' muted');
-    item.innerHTML=`<div class="gl-dot" style="background:${d.color}"></div>${d.n}（${score}点）`;
-    item.title='クリック：この分野だけ表示　Shift+クリック：追加/除外';
-    item.onclick=(e)=>{
-      if(e.shiftKey){if(activeLines.has(di))activeLines.delete(di);else activeLines.add(di);}
-      else{
-        if(activeLines.size===1&&activeLines.has(di)){activeLines=new Set(GRAPH_DOMAINS.map((_,i)=>i));document.querySelectorAll('.gtab').forEach(b=>b.classList.remove('active'));document.querySelector('.gtab')?.classList.add('active');}
-        else{activeLines=new Set([di]);}
-      }
-      buildLegend(lastPts);drawWave(lastPts,lastOriginYear,lastBirthAge);
-    };
+    item.className='gl-item'+(b.status==='ok'?'':' muted');
+    item.innerHTML='<div class="gl-dot" style="background:'+d.color
+      +(b.dash?';opacity:.62':'')+'"></div>'+d.n
+      +'　組合せ'+b.key+'　'+stat+'　（'+score+'点）';
+    item.title='原典の組合せ'+b.key+'　'+stat;
     leg.appendChild(item);
   });
 }
 
+// タブ：分野ごとに内線・外線の2枚を突き合わせる。
+// 24本や6分野をまとめて重ねる表示は廃止した。
+// 帯である以上、重ねれば幅が潰れて読めなくなるためである。
+function domainPair(base){
+  return GRAPH_DOMAINS.map((d,i)=>[d,i]).filter(x=>x[0].base===base).map(x=>x[1]);
+}
+function selectDomain(base){
+  activeLines=new Set(domainPair(base));
+  document.querySelectorAll('.gtab').forEach(b=>
+    b.classList.toggle('active', b.dataset.base===base));
+  buildLegend(lastPts);drawWave(lastPts,lastOriginYear,lastBirthAge);
+}
 function buildTabs(){
   const tabs=document.getElementById('graph-tabs');tabs.innerHTML='';
-  const idx = n => GRAPH_DOMAINS.map((d,i)=>[d,i]).filter(([d])=>d.base===n).map(([,i])=>i);
-  const grpIdx = g => GRAPH_DOMAINS.map((d,i)=>[d,i]).filter(([d])=>d.grp===g).map(([,i])=>i);
-  const defs=[
-    {label:'全24本', get:()=>GRAPH_DOMAINS.map((_,i)=>i)},
-    {label:'左の6分野', get:()=>grpIdx('左')},
-    {label:'右の6分野', get:()=>grpIdx('右')},
-    ...DOMAIN_ORDER_L.concat(DOMAIN_ORDER_R).map(n=>({label:n, get:()=>idx(n)})),
-  ];
-  defs.forEach((t,ti)=>{
+  DOMAIN_ORDER_L.concat(DOMAIN_ORDER_R).forEach((base,ti)=>{
     const btn=document.createElement('button');
-    btn.className='gtab'+(ti===0?' active':'');btn.textContent=t.label;
-    btn.onclick=()=>{
-      document.querySelectorAll('.gtab').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      activeLines=new Set(t.get());
-      buildLegend(lastPts);drawWave(lastPts,lastOriginYear,lastBirthAge);
-    };
+    btn.className='gtab'+(ti===0?' active':'');
+    btn.dataset.base=base;
+    btn.textContent=base;
+    btn.onclick=()=>selectDomain(base);
     tabs.appendChild(btn);
   });
 }
 
 function renderGraphs(pts,originYear,birthAge){
   lastPts=pts;lastOriginYear=originYear||null;lastBirthAge=birthAge||null;
-  activeLines=new Set(GRAPH_DOMAINS.map((_,i)=>i));
-  viewAgeStart=15;viewAgeEnd=80;
+  activeLines=new Set(domainPair('健康'));
+  viewAgeStart=15;viewAgeEnd=55;
   buildTabs();buildLegend(pts);drawWave(pts,originYear,birthAge);drawRadar(pts);initAgeRangeSliders();
 }
 
