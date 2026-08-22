@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>人生グラフ 索引 ─ 牧正人史『姓名（なまえ）』巻末</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700;800&family=Noto+Serif+JP:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#1a3a5c; --gold:#b8960c; --vermillion:#8b2e2e;
+  --washi:#f5f1e8; --ink:#1a1208; --jade:#2d6a4f;
+  --rule:rgba(26,18,8,.14);
+  --dim:rgba(26,18,8,.5);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--washi); color:var(--ink);
+  font-family:"Noto Serif JP",serif; font-size:15px; line-height:1.8;
+  padding:0 0 80px;
+}
+.wrap{max-width:1000px;margin:0 auto;padding:0 20px}
+
+/* ── 見出し ── */
+header{border-bottom:2px solid var(--navy);margin-bottom:28px;padding:36px 0 18px}
+h1{
+  font-family:"Shippori Mincho",serif; font-weight:800;
+  font-size:clamp(22px,4vw,32px); letter-spacing:.14em;
+  margin:0 0 6px; color:var(--navy);
+}
+.sub{font-size:13px;color:var(--dim);letter-spacing:.08em;margin:0}
+.tally{margin-top:14px;font-size:13px;color:var(--dim);letter-spacing:.04em}
+.tally b{color:var(--navy);font-weight:600}
+
+/* ── 引き方 ── */
+.panel{
+  border:1px solid var(--rule); background:rgba(255,255,255,.5);
+  padding:18px 20px; margin-bottom:22px;
+}
+.panel h2{
+  font-family:"Shippori Mincho",serif;font-weight:700;font-size:14px;
+  letter-spacing:.18em;margin:0 0 14px;color:var(--navy);
+}
+.row{display:flex;flex-wrap:wrap;gap:18px 26px;align-items:flex-end}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:12px;color:var(--dim);letter-spacing:.1em}
+input[type=number]{
+  font-family:"Noto Serif JP",serif;font-size:17px;width:88px;padding:7px 9px;
+  border:1px solid var(--rule);background:#fff;color:var(--ink);text-align:center;
+}
+input[type=number]:focus{outline:2px solid var(--gold);outline-offset:1px}
+button{
+  font-family:"Noto Serif JP",serif;font-size:14px;padding:8px 16px;cursor:pointer;
+  border:1px solid var(--navy);background:#fff;color:var(--navy);letter-spacing:.06em;
+}
+button:hover{background:var(--navy);color:var(--washi)}
+button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.step{padding:8px 13px;font-size:16px}
+.hint{font-size:12px;color:var(--dim);margin:12px 0 0}
+
+/* ── 2枚の枠 ── */
+.slots{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:8px}
+@media(max-width:700px){.slots{grid-template-columns:1fr}}
+.slot{border:1px solid var(--rule);background:rgba(255,255,255,.55);padding:14px 16px}
+.slot.active{border-color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold)}
+.slot h3{
+  font-family:"Shippori Mincho",serif;font-weight:700;font-size:13px;
+  letter-spacing:.16em;margin:0 0 10px;display:flex;align-items:center;gap:9px;
+}
+.chip{width:11px;height:11px;border-radius:2px;flex:none}
+.slot .meta{font-size:12.5px;color:var(--dim);min-height:3.2em}
+.slot .meta b{color:var(--ink);font-weight:600}
+.slot .ctl{display:flex;gap:7px;align-items:center;margin-top:10px}
+.pick{font-size:11.5px;letter-spacing:.1em;padding:5px 11px}
+
+/* ── グラフ ── */
+.chart{border:1px solid var(--rule);background:#fff;padding:8px 6px 4px;margin-bottom:8px}
+svg{display:block;width:100%;height:auto}
+.readout{font-size:12.5px;color:var(--dim);margin:0 0 26px;letter-spacing:.03em}
+
+/* ── 索引の三角表 ── */
+.grid-head{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:baseline;margin-bottom:12px}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--dim);flex-wrap:wrap}
+.legend span{display:flex;align-items:center;gap:6px}
+.sw{width:12px;height:12px;border:1px solid var(--rule)}
+.gridwrap{overflow-x:auto;border:1px solid var(--rule);background:#fff;padding:12px}
+#idxgrid{display:grid;gap:1px;font-size:0;min-width:760px}
+.cell{
+  width:100%;aspect-ratio:1;border:0;padding:0;cursor:pointer;
+  background:var(--jade);opacity:.82;
+}
+.cell:hover{outline:2px solid var(--gold);outline-offset:-1px;opacity:1;z-index:2;position:relative}
+.cell.miss{background:rgba(26,18,8,.16)}
+.cell.on{outline:2px solid var(--vermillion);outline-offset:-1px;z-index:3;position:relative}
+.axl{font-size:9px;color:var(--dim);text-align:center;line-height:1;align-self:center;font-family:"Noto Serif JP",serif}
+.axl.r{text-align:right;padding-right:4px}
+
+footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--rule);font-size:12px;color:var(--dim)}
+footer p{margin:.4em 0}
+@media (prefers-reduced-motion:no-preference){
+  .cell{transition:opacity .12s}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>人生グラフ 索引</h1>
+  <p class="sub">牧正人史『姓名（なまえ）』巻末　全640図・索引959件</p>
+  <p class="tally" id="tally"></p>
+</header>
+
+<section class="panel">
+  <h2>引 く</h2>
+  <div class="row">
+    <div class="field">
+      <label for="ia">組合せ　小さいほう</label>
+      <input type="number" id="ia" min="2" max="60" value="15">
+    </div>
+    <div class="field">
+      <label for="ib">大きいほう</label>
+      <input type="number" id="ib" min="2" max="60" value="15">
+    </div>
+    <button onclick="byPair()">組合せから引く</button>
+    <div class="field">
+      <label for="ig">図番号</label>
+      <input type="number" id="ig" min="1" max="640" value="1">
+    </div>
+    <button onclick="byNum()">図番号から引く</button>
+  </div>
+  <p class="hint">組合せは順序を問いません。大小を入れ替えても同じ図が出ます。図番号を選んだあと <b>←</b> <b>→</b> キーで前後の図に移れます。</p>
+</section>
+
+<div class="slots">
+  <div class="slot active" id="slotA">
+    <h3><span class="chip" style="background:var(--navy)"></span>図 A</h3>
+    <div class="meta" id="metaA">未選択</div>
+    <div class="ctl">
+      <button class="step" onclick="step('A',-1)">◀</button>
+      <button class="step" onclick="step('A',1)">▶</button>
+      <button class="pick" onclick="setActive('A')">ここに入れる</button>
+      <button class="pick" onclick="clearSlot('A')">消す</button>
+    </div>
+  </div>
+  <div class="slot" id="slotB">
+    <h3><span class="chip" style="background:var(--vermillion)"></span>図 B　<span style="font-weight:400;letter-spacing:.04em;color:var(--dim);font-size:11px">突き合わせ用</span></h3>
+    <div class="meta" id="metaB">未選択</div>
+    <div class="ctl">
+      <button class="step" onclick="step('B',-1)">◀</button>
+      <button class="step" onclick="step('B',1)">▶</button>
+      <button class="pick" onclick="setActive('B')">ここに入れる</button>
+      <button class="pick" onclick="clearSlot('B')">消す</button>
+    </div>
+  </div>
+</div>
+
+<div class="chart"><svg id="chart" viewBox="0 0 860 340" role="img" aria-label="人生グラフ"></svg></div>
+<p class="readout" id="readout">図を選ぶとグラフが出ます。棒の位置が50点より上か下かで吉凶を、棒の幅が狭いか広いかでその年の変動の激しさを見ます。</p>
+
+<section>
+  <div class="grid-head">
+    <h2 style="font-family:'Shippori Mincho',serif;font-weight:700;font-size:14px;letter-spacing:.18em;margin:0;color:var(--navy)">索引の全体</h2>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--jade);opacity:.82"></i>グラフあり</span>
+      <span><i class="sw" style="background:rgba(26,18,8,.16)"></i>未収録</span>
+      <span><i class="sw" style="background:#fff"></i>原典に該当なし</span>
+    </div>
+  </div>
+  <div class="gridwrap">
+    <div id="idxgrid"></div>
+  </div>
+  <p class="hint">縦が小さいほうの数、横が大きいほうの数です。原典は小さいほうしか収録しないため、表は三角形になります。<b>升目をクリックすると、選んでいるほうの枠にその図が入ります。</b></p>
+</section>
+
+<footer>
+  <p>帯（縦棒）は、その一年ぶんの変動のミニマムとマキシマムを、株価の安値・高値と同じ形式で表したものです。折れ線ではありません。</p>
+  <p>縦軸は0〜100点、基準線は50点。収録は15歳から55歳までです。</p>
+  <p>知識は解放され、創造者は報われる。</p>
+</footer>
+
+</div>
+
+<script src="maki_wave_data.js"></script>
+<script>
+if (typeof window.MAKI_WAVE === 'undefined') {
+  document.body.innerHTML =
+    '<div style="padding:60px 24px;font-family:serif;font-size:16px">' +
+    'maki_wave_data.js が読み込めていません。<br>' +
+    'このHTMLと同じ場所に置いてください。</div>';
+  throw new Error('data missing');
+}
+
+var IDX = window.MAKI_IDX, WAVE = window.MAKI_WAVE;
+var A0 = window.MAKI_AGE_START, A1 = window.MAKI_AGE_END;
+var NAVY = '#1a3a5c', VERM = '#8b2e2e';
+
+// ── 図番 → その図を指す組合せの一覧（逆引き） ──
+var REV = {};
+Object.keys(IDX).forEach(function(k){
+  var g = IDX[k];
+  (REV[g] = REV[g] || []).push(k);
+});
+
+var slot = { A: null, B: null };
+var active = 'A';
+
+// ── 集計 ──
+(function(){
+  var total = Object.keys(IDX).length, have = 0;
+  Object.keys(IDX).forEach(function(k){ if (WAVE[IDX[k]]) have++; });
+  var sheets = Object.keys(WAVE).length;
+  document.getElementById('tally').innerHTML =
+    '波形 <b>' + sheets + '</b> 図／640図　　' +
+    '索引 <b>' + total + '</b> 件のうち <b>' + have + '</b> 件（' +
+    (have / total * 100).toFixed(1) + '％）が引けます';
+})();
+
+// ── 索引の三角表を組む ──
+(function(){
+  var as = [], bs = [];
+  Object.keys(IDX).forEach(function(k){
+    var p = k.split('-');
+    as.push(+p[0]); bs.push(+p[1]);
+  });
+  var aMin = Math.min.apply(null, as), aMax = Math.max.apply(null, as);
+  var bMin = Math.min.apply(null, bs), bMax = Math.max.apply(null, bs);
+  var g = document.getElementById('idxgrid');
+  var nCol = bMax - bMin + 1, nRow = aMax - aMin + 1;
+  g.style.gridTemplateColumns = '28px repeat(' + nCol + ', 1fr)';
+  g.style.gridTemplateRows = '14px repeat(' + nRow + ', 1fr)';
+
+  // 横軸の目盛（5きざみ）
+  for (var b = bMin; b <= bMax; b++) {
+    if (b % 5) continue;
+    var t = document.createElement('div');
+    t.className = 'axl';
+    t.style.gridColumn = (b - bMin + 2); t.style.gridRow = 1;
+    t.textContent = b;
+    g.appendChild(t);
+  }
+  // 縦軸の目盛
+  for (var a = aMin; a <= aMax; a++) {
+    if (a % 5) continue;
+    var t2 = document.createElement('div');
+    t2.className = 'axl r';
+    t2.style.gridColumn = 1; t2.style.gridRow = (a - aMin + 2);
+    t2.textContent = a;
+    g.appendChild(t2);
+  }
+  // 升目
+  Object.keys(IDX).forEach(function(k){
+    var p = k.split('-'), a = +p[0], b = +p[1], num = IDX[k];
+    var c = document.createElement('button');
+    c.className = 'cell' + (WAVE[num] ? '' : ' miss');
+    c.style.gridColumn = (b - bMin + 2);
+    c.style.gridRow = (a - aMin + 2);
+    c.dataset.g = num;
+    c.title = '組合せ ' + k + ' → 図' + num + (WAVE[num] ? '' : '（未収録）');
+    c.setAttribute('aria-label', c.title);
+    c.onclick = function(){ put(active, num); };
+    g.appendChild(c);
+  });
+})();
+
+// ── 図を枠に入れる ──
+function put(which, num){
+  num = Math.max(1, Math.min(640, num | 0));
+  slot[which] = num;
+  document.getElementById('ig').value = num;
+  render();
+}
+function clearSlot(which){ slot[which] = null; render(); }
+function setActive(which){
+  active = which;
+  document.getElementById('slotA').classList.toggle('active', which === 'A');
+  document.getElementById('slotB').classList.toggle('active', which === 'B');
+}
+function step(which, d){
+  if (slot[which] == null) { put(which, 1); return; }
+  put(which, slot[which] + d);
+}
+function byNum(){ put(active, +document.getElementById('ig').value); }
+function byPair(){
+  var a = +document.getElementById('ia').value, b = +document.getElementById('ib').value;
+  var lo = Math.min(a, b), hi = Math.max(a, b), key = lo + '-' + hi;
+  var num = IDX[key];
+  if (num === undefined) {
+    document.getElementById('meta' + active).innerHTML =
+      '組合せ <b>' + key + '</b> は原典に載っていません。';
+    slot[active] = null; render();
+    return;
+  }
+  put(active, num);
+}
+document.addEventListener('keydown', function(e){
+  if (e.target.tagName === 'INPUT') return;
+  if (e.key === 'ArrowLeft')  { step(active, -1); e.preventDefault(); }
+  if (e.key === 'ArrowRight') { step(active,  1); e.preventDefault(); }
+});
+
+// ── 説明文 ──
+function describe(which){
+  var el = document.getElementById('meta' + which), num = slot[which];
+  if (num == null) { el.textContent = '未選択'; return; }
+  var rows = WAVE[num];
+  var combos = (REV[num] || []).slice().sort(function(x, y){
+    return x.split('-')[0] - y.split('-')[0];
+  });
+  var s = '<b>図' + num + '</b>';
+  s += rows ? '　読み取り済み' : '　<span style="color:var(--vermillion)">波形が未収録です</span>';
+  s += '<br>組合せ ' + (combos.length ? combos.join('　') : '（索引に無い図）');
+  if (rows) {
+    var his = rows.map(function(r){ return r.hi; }), los = rows.map(function(r){ return r.lo; });
+    var top = Math.max.apply(null, his), bot = Math.min.apply(null, los);
+    var tAge = rows[his.indexOf(top)].age, bAge = rows[los.indexOf(bot)].age;
+    s += '<br>最高 ' + top.toFixed(1) + '点（' + tAge + '歳）　最低 ' + bot.toFixed(1) + '点（' + bAge + '歳）';
+  }
+  el.innerHTML = s;
+}
+
+// ── グラフを描く ──
+function render(){
+  describe('A'); describe('B');
+  var svg = document.getElementById('chart');
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
+  var NS = 'http://www.w3.org/2000/svg';
+  function mk(t, at, txt){
+    var e = document.createElementNS(NS, t);
+    for (var k in at) e.setAttribute(k, at[k]);
+    if (txt !== undefined) e.textContent = txt;
+    svg.appendChild(e); return e;
+  }
+  var W = 860, H = 340, PL = 54, PR = 16, PT = 22, PB = 46;
+  var iW = W - PL - PR, iH = H - PT - PB;
+  var n = A1 - A0;
+  var xOf = function(age){ return PL + (age - A0) / n * iW; };
+  var yOf = function(v){ return PT + iH * (100 - Math.max(0, Math.min(100, v))) / 100; };
+
+  [0, 25, 50, 75, 100].forEach(function(v){
+    var y = yOf(v), base = (v === 50);
+    mk('line', { x1: PL, x2: PL + iW, y1: y, y2: y,
+      stroke: base ? 'rgba(26,18,8,.45)' : 'rgba(26,18,8,.09)',
+      'stroke-width': base ? 1.4 : 1 });
+    mk('text', { x: PL - 8, y: y + 4, 'text-anchor': 'end', 'font-size': base ? 11 : 10,
+      fill: base ? 'rgba(26,18,8,.6)' : 'rgba(26,18,8,.32)',
+      'font-family': 'serif', 'font-weight': base ? '700' : '400' }, v);
+  });
+  mk('text', { x: PL - 8, y: PT - 7, 'text-anchor': 'end', 'font-size': 9,
+    fill: 'rgba(26,18,8,.32)', 'font-family': 'serif' }, '点');
+
+  for (var age = A0; age <= A1; age += 5) {
+    var x = xOf(age);
+    mk('line', { x1: x, x2: x, y1: PT, y2: PT + iH, stroke: 'rgba(26,18,8,.06)' });
+    mk('text', { x: x, y: PT + iH + 17, 'text-anchor': 'middle', 'font-size': 11,
+      fill: 'rgba(26,18,8,.45)', 'font-family': 'serif' }, age + '歳');
+  }
+
+  var live = ['A', 'B'].filter(function(w){ return slot[w] != null && WAVE[slot[w]]; });
+  var colW = iW / n;
+  var bw = Math.max(3, Math.min(12, colW * (live.length > 1 ? 0.34 : 0.52)));
+  var gap = live.length > 1 ? bw + 1.6 : 0;
+
+  live.forEach(function(w, j){
+    var rows = WAVE[slot[w]];
+    var off = (j - (live.length - 1) / 2) * gap;
+    var col = (w === 'A') ? NAVY : VERM;
+    rows.forEach(function(r){
+      var x = xOf(r.age) + off, yT = yOf(r.hi), yB = yOf(r.lo);
+      var at = { x: (x - bw / 2).toFixed(1), y: yT.toFixed(1),
+        width: bw.toFixed(1), height: Math.max(1.4, yB - yT).toFixed(1),
+        rx: 1, fill: col };
+      if (w === 'B') { at['fill-opacity'] = 0.24; at.stroke = col; at['stroke-width'] = 1; }
+      else { at['fill-opacity'] = 0.88; }
+      mk('rect', at);
+    });
+    mk('rect', { x: PL + iW - 108, y: PT + 4 + j * 16, width: 10, height: 10, rx: 2,
+      fill: col, 'fill-opacity': w === 'B' ? 0.24 : 0.88,
+      stroke: w === 'B' ? col : 'none', 'stroke-width': 1 });
+    mk('text', { x: PL + iW - 93, y: PT + 13 + j * 16, 'font-size': 11,
+      fill: 'rgba(26,18,8,.6)', 'font-family': 'serif' }, '図' + slot[w]);
+  });
+
+  if (!live.length) {
+    mk('text', { x: PL + iW / 2, y: PT + iH / 2, 'text-anchor': 'middle', 'font-size': 13,
+      fill: 'rgba(26,18,8,.34)', 'font-family': 'serif' },
+      slot.A == null && slot.B == null ? '図を選んでください' : 'この図はまだ読み取っていません');
+  }
+
+  document.querySelectorAll('.cell.on').forEach(function(c){ c.classList.remove('on'); });
+  ['A', 'B'].forEach(function(w){
+    if (slot[w] == null) return;
+    document.querySelectorAll('.cell[data-g="' + slot[w] + '"]').forEach(function(c){
+      c.classList.add('on');
+    });
+  });
+
+  var r = document.getElementById('readout');
+  if (live.length === 2) {
+    r.textContent = '原典は常に二つの画数のグラフを突き合わせて判断します。塗りが図A、白抜きが図Bです。';
+  } else if (live.length === 1) {
+    r.textContent = '棒の位置が50点より上か下かで吉凶を、棒の幅が狭いか広いかでその年の変動の激しさを見ます。';
+  } else {
+    r.textContent = '組合せか図番号を入れるか、下の索引をクリックしてください。';
+  }
+}
+
+put('A', 1);
+</script>
+</body>
+</html>
