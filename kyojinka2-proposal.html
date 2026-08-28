@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>国民保護法制の改正に関する提言 ── 国民強靱化基礎役務制度 第二次提言｜三原嘉明</title>
+<meta name="description" content="国民保護法第四十三条は「啓発」で途切れている。技能を育てる一条を継ぎ足す。国民強靱化基礎役務制度（仮称）第二次提言。">
+<meta property="og:title" content="国民保護法制の改正に関する提言 ── 第二次提言">
+<meta property="og:description" content="啓発と育成のあいだに、条文が一つ欠けている。">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;700;800&family=Noto+Serif+JP:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --washi:#f5f1e8;
+  --washi-deep:#ebe4d6;
+  --card:#fffdf8;
+  --navy:#1a3a5c;
+  --navy-soft:#3c5a78;
+  --gold:#b8960c;
+  --gold-pale:#e3d49a;
+  --vermilion:#8b2e2e;
+  --ink:#2a2a28;
+  --ink-mute:#6b6963;
+  --rule:#d9d0bd;
+  --maxw:44rem;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--washi);
+  color:var(--ink);
+  font-family:"Noto Serif JP",serif;
+  font-weight:400;
+  line-height:2.0;
+  font-size:16.5px;
+  letter-spacing:.02em;
+  -webkit-text-size-adjust:100%;
+}
+h1,h2,h3,h4,.disp{font-family:"Shippori Mincho B1",serif;}
+
+/* ---------- 上部の帯 ---------- */
+.topbar{
+  background:var(--navy);
+  color:var(--washi);
+  font-size:.78rem;
+  letter-spacing:.14em;
+  padding:.55rem 1.2rem;
+  display:flex;flex-wrap:wrap;gap:.4rem 1.4rem;
+  justify-content:center;
+}
+.topbar a{color:var(--gold-pale);text-decoration:none;border-bottom:1px solid transparent;}
+.topbar a:hover,.topbar a:focus{border-bottom-color:var(--gold-pale);}
+
+/* ---------- 表題 ---------- */
+header.head{
+  max-width:var(--maxw);margin:0 auto;padding:3.4rem 1.4rem 1.6rem;
+  text-align:center;
+}
+.eyebrow{
+  font-family:"Shippori Mincho B1",serif;
+  font-size:.8rem;letter-spacing:.42em;color:var(--gold);
+  margin:0 0 1.4rem;text-indent:.42em;
+}
+h1{
+  font-size:clamp(1.5rem,5.2vw,2.1rem);
+  font-weight:800;color:var(--navy);
+  line-height:1.55;margin:0 0 .9rem;letter-spacing:.04em;
+}
+.sub{
+  font-family:"Shippori Mincho B1",serif;
+  font-size:clamp(.94rem,3vw,1.06rem);
+  color:var(--navy-soft);margin:0 0 1.8rem;line-height:1.8;
+}
+.byline{
+  font-size:.86rem;color:var(--ink-mute);letter-spacing:.08em;
+  border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);
+  padding:.7rem 0;display:inline-block;
+}
+
+/* ---------- 冒頭の条文図（このページの要） ---------- */
+.thesis{
+  max-width:var(--maxw);margin:2.6rem auto 0;padding:0 1.4rem;
+}
+.thesis-lead{
+  font-family:"Shippori Mincho B1",serif;
+  font-size:1.02rem;color:var(--navy);text-align:center;
+  margin:0 0 1.6rem;line-height:1.9;
+}
+.artstack{display:grid;gap:0;}
+.art{
+  background:var(--card);
+  border:1px solid var(--rule);
+  padding:1.15rem 1.3rem;
+  position:relative;
+}
+.art .no{
+  font-family:"Shippori Mincho B1",serif;
+  font-size:.82rem;letter-spacing:.18em;
+  color:var(--ink-mute);display:block;margin-bottom:.45rem;
+}
+.art p{margin:0;font-size:.95rem;line-height:1.95;color:var(--ink-mute);}
+.art.current{border-left:4px solid var(--rule);}
+.art.new{
+  border-left:4px solid var(--gold);
+  background:linear-gradient(180deg,#fffdf3,#fffdf8);
+}
+.art.new .no{color:var(--vermilion);font-weight:700;}
+.art.new p{color:var(--ink);}
+.gap{
+  text-align:center;padding:.85rem 0;
+  font-family:"Shippori Mincho B1",serif;
+  font-size:.82rem;letter-spacing:.2em;color:var(--vermilion);
+  position:relative;
+}
+.gap::before,.gap::after{
+  content:"";position:absolute;left:50%;width:1px;height:.85rem;
+  background:var(--gold);
+}
+.gap::before{top:0;}
+.gap::after{bottom:0;}
+.thesis-note{
+  font-size:.86rem;color:var(--ink-mute);text-align:center;
+  margin:1.2rem 0 0;line-height:1.9;
+}
+
+/* ---------- 目次 ---------- */
+nav.toc{
+  max-width:var(--maxw);margin:3.2rem auto 0;padding:1.5rem 1.6rem;
+  background:var(--washi-deep);border-top:2px solid var(--navy);
+}
+nav.toc h2{
+  font-size:.82rem;letter-spacing:.3em;color:var(--navy);
+  margin:0 0 .9rem;text-indent:.3em;font-weight:700;
+}
+nav.toc ol{margin:0;padding-left:1.4rem;font-size:.92rem;line-height:2.1;}
+nav.toc a{color:var(--navy);text-decoration:none;border-bottom:1px solid transparent;}
+nav.toc a:hover,nav.toc a:focus{border-bottom-color:var(--gold);}
+
+/* ---------- 本文 ---------- */
+main{max-width:var(--maxw);margin:0 auto;padding:0 1.4rem 4rem;}
+section{padding-top:3.2rem;}
+h2.ch{
+  font-size:1.28rem;font-weight:700;color:var(--navy);
+  margin:0 0 .3rem;line-height:1.6;letter-spacing:.03em;
+}
+h2.ch .chno{
+  display:block;font-size:.74rem;letter-spacing:.3em;
+  color:var(--gold);margin-bottom:.5rem;font-weight:500;
+}
+h2.ch::after{
+  content:"";display:block;width:3.2rem;height:2px;
+  background:var(--gold);margin:.9rem 0 1.6rem;
+}
+h3{
+  font-size:1.03rem;font-weight:700;color:var(--navy);
+  margin:2.4rem 0 .9rem;letter-spacing:.03em;
+}
+p{margin:0 0 1.3rem;}
+strong{font-weight:600;color:var(--navy);}
+em{font-style:normal;color:var(--vermilion);font-weight:600;}
+
+blockquote{
+  margin:1.8rem 0;padding:1.1rem 1.3rem;
+  background:var(--card);
+  border-left:3px solid var(--gold);
+  font-family:"Shippori Mincho B1",serif;
+  font-size:1.05rem;line-height:1.9;color:var(--navy);
+}
+blockquote p:last-child{margin-bottom:0;}
+
+ul,ol{margin:0 0 1.3rem;padding-left:1.5rem;}
+li{margin-bottom:.55rem;}
+
+table{
+  width:100%;border-collapse:collapse;margin:1.6rem 0;
+  font-size:.88rem;line-height:1.8;background:var(--card);
+}
+th,td{border:1px solid var(--rule);padding:.6rem .7rem;text-align:left;vertical-align:top;}
+th{background:var(--washi-deep);color:var(--navy);font-weight:600;white-space:nowrap;}
+
+.clause{
+  background:var(--card);border:1px solid var(--rule);
+  border-left:4px solid var(--navy);
+  padding:1.1rem 1.3rem;margin:1.3rem 0;
+}
+.clause h4{
+  font-size:.94rem;color:var(--vermilion);margin:0 0 .6rem;
+  letter-spacing:.05em;font-weight:700;
+}
+.clause p{margin:0;font-size:.94rem;line-height:1.95;}
+
+.note{
+  background:var(--washi-deep);padding:1rem 1.2rem;margin:1.6rem 0;
+  font-size:.89rem;line-height:1.95;border-left:3px solid var(--ink-mute);
+}
+.note p:last-child{margin-bottom:0;}
+
+.qa{margin:1.6rem 0;}
+.qa dt{
+  font-family:"Shippori Mincho B1",serif;font-weight:700;
+  color:var(--navy);margin:1.5rem 0 .5rem;font-size:1rem;
+}
+.qa dd{margin:0;padding-left:1rem;border-left:2px solid var(--gold-pale);}
+
+.close{
+  margin-top:3.4rem;padding-top:2.4rem;border-top:1px solid var(--rule);
+}
+.close .final{
+  font-family:"Shippori Mincho B1",serif;
+  font-size:1.3rem;font-weight:700;color:var(--vermilion);
+  text-align:center;letter-spacing:.14em;margin:2rem 0 0;
+}
+
+/* ---------- 脚 ---------- */
+footer{
+  background:var(--navy);color:var(--washi);
+  padding:2.6rem 1.4rem;font-size:.83rem;line-height:2;
+}
+footer .inner{max-width:var(--maxw);margin:0 auto;}
+footer a{color:var(--gold-pale);text-decoration:none;}
+footer a:hover,footer a:focus{text-decoration:underline;}
+footer .uca{
+  margin-top:1.6rem;padding-top:1.2rem;
+  border-top:1px solid rgba(245,241,232,.24);
+  font-size:.76rem;color:rgba(245,241,232,.72);letter-spacing:.04em;
+}
+.disclaimer{
+  font-size:.82rem;color:var(--ink-mute);font-style:normal;
+  border-top:1px solid var(--rule);padding-top:1.2rem;margin-top:2.6rem;
+}
+
+/* ---------- 応答 ---------- */
+@media(max-width:600px){
+  body{font-size:15.5px;line-height:1.95;}
+  header.head{padding-top:2.4rem;}
+  table{font-size:.82rem;}
+  th,td{padding:.5rem .5rem;}
+}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}}
+
+/* ---------- 印刷 ---------- */
+@media print{
+  body{background:#fff;font-size:10.5pt;line-height:1.85;}
+  .topbar,nav.toc,footer{display:none;}
+  section{page-break-inside:auto;padding-top:1.6rem;}
+  h2.ch{page-break-after:avoid;}
+  .art,.clause,blockquote,table{page-break-inside:avoid;}
+  main{max-width:none;padding:0;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html">おてんとうさまの下で</a>
+  <a href="proposals.html">政策提言一覧</a>
+  <a href="kyojinka-proposal.html">第一次提言</a>
+</div>
+
+<header class="head">
+  <p class="eyebrow">国民強靱化基礎役務制度（仮称）第二次提言</p>
+  <h1>国民保護法制の改正に関する提言</h1>
+  <p class="sub">── 平時における人材育成の法的位置づけについて</p>
+  <p class="byline">令和八年八月　三原嘉明</p>
+</header>
+
+<div class="thesis">
+  <p class="thesis-lead">現行の国民保護法は、ここで途切れている。</p>
+
+  <div class="artstack">
+    <div class="art current">
+      <span class="no">第四十二条　訓練</span>
+      <p>指定行政機関の長等は、それぞれその国民の保護に関する計画等で定めるところにより、国民の保護のための措置についての訓練を行うよう努めなければならない。</p>
+    </div>
+    <div class="art current" style="border-top:none;">
+      <span class="no">第四十三条　啓発</span>
+      <p>政府は、武力攻撃事態等において国民の保護のための措置の重要性について国民の理解を深めるため、国民に対する啓発に努めなければならない。</p>
+    </div>
+
+    <p class="gap">啓発と育成のあいだに、条文が一つ欠けている</p>
+
+    <div class="art new">
+      <span class="no">第四十三条の二　平時における人材の育成（新設案）</span>
+      <p>国は、武力攻撃災害及び災害の発生時において基幹的な役務の維持に従事しうる者を確保するため、必要な知識及び技能を習得する機会を国民に提供しなければならない。</p>
+    </div>
+  </div>
+
+  <p class="thesis-note">
+    国が負う義務は「理解を深めさせる」ところまでで止まり、「技能を身につけさせる」ところには及んでいない。<br>
+    本提言が求めるのは、条文にして一条である。
+  </p>
+</div>
+
+<nav class="toc" aria-label="目次">
+  <h2>目次</h2>
+  <ol>
+    <li><a href="#c0">序</a></li>
+    <li><a href="#c1">空白の所在</a></li>
+    <li><a href="#c2">なぜ空白が生まれたか</a></li>
+    <li><a href="#c3">設計原理 ── 主語の転換</a></li>
+    <li><a href="#c4">持ち場 ── 年齢階梯という先例</a></li>
+    <li><a href="#c5">基幹役務の再定義 ── 支える役務</a></li>
+    <li><a href="#c6">改正の具体案</a></li>
+    <li><a href="#c7">財政と実施</a></li>
+    <li><a href="#c8">想定される反論への応答</a></li>
+    <li><a href="#c9">結 ── 物から人へ</a></li>
+  </ol>
+</nav>
+
+<main>
+
+<section id="c0">
+<h2 class="ch"><span class="chno">序</span>第一次提言からの前進</h2>
+
+<p>令和八年六月、「国民強靱化基礎役務制度（仮称）」政策提言を各方面に提出した。基幹インフラを災害下・有事下に維持する人材を、教育を通じて育てる制度の必要性を説いたものである。</p>
+
+<p>第一次提言は、制度の必要性と設計を示すにとどまった。それを<strong>どの法律のどこに置くのか</strong>という問いには、答えていない。本提言は、その一点に絞る。</p>
+
+<p>契機が二つある。防災庁設置法が令和八年七月十三日に成立し、同年十一月一日の発足が決まった。実施の器ができる。同じ七月、日本成長戦略が策定され、財源の道筋が示された。器と財源が同じ月に揃った。欠けているのは、法的な位置づけだけである。</p>
+
+<p>そして本提言は、第一次提言に一つの認識を加える。<strong>守るべき設備は増え、守れる人は減っている。その結果、一度助かった命が、その後で失われている。</strong></p>
+</section>
+
+<section id="c1">
+<h2 class="ch"><span class="chno">第一章</span>空白の所在</h2>
+
+<p>基幹的な役務を維持する人材を、平時に育てる。この営みは、現行法のどこに根拠を持つか。四つの法域を検証した結果は、次のとおりである。</p>
+
+<table>
+<tr><th>法律</th><th>対象</th><th>根拠となるか</th></tr>
+<tr><td>国土強靱化基本法</td><td>堤防・道路・電力網といった「物」</td><td>読み込む余地はあるが弱い</td></tr>
+<tr><td>災害対策基本法</td><td>自主防災組織</td><td>任意団体。技能水準の定めなし</td></tr>
+<tr><td>学校教育法</td><td>教育課程</td><td>該当する課程が存在しない</td></tr>
+<tr><td>国民保護法</td><td>有事の「措置」</td><td>平時の育成規定が無い</td></tr>
+</table>
+
+<p>国民保護法が本命であるはずだった。しかし条文を読むと、平時の人材育成は制度化されていない。</p>
+
+<p>第四十二条は訓練を定めるが、その主体は指定行政機関の長等であり、しかも努力義務である。同条第三項は住民について「当該訓練への参加について協力を要請することができる」と定めるにとどまる。</p>
+
+<p>第四十三条は啓発を定める。政府は、措置の重要性について国民の理解を深めるため、啓発に努めなければならない、と。</p>
+
+<p><strong>注目すべきは、この第四十三条で条文が途切れていることである。</strong></p>
+
+<p>国が国民に対して負う義務は「理解を深めさせる」ところまでであり、「技能を身につけさせる」ところには及んでいない。啓発と育成のあいだに、条文が一つ欠けている。</p>
+
+<p>これが、担い手を育てる制度が「ほぼ存在しない」という事態の、法的な正体である。</p>
+</section>
+
+<section id="c2">
+<h2 class="ch"><span class="chno">第二章</span>なぜ空白が生まれたか</h2>
+
+<p>理由は、立法の経緯を追えば明らかである。</p>
+
+<p>国民保護法は平成十六年六月に成立し、同年九月に施行された。有事関連七法の一つである。</p>
+
+<p>同法第四条は、国民の協力について次のように定める。第一項で「必要な協力をするよう努めるものとする」とし、第二項で「前項の協力は国民の自発的な意思にゆだねられるものであって、その要請に当たって強制にわたることがあってはならない」と念を押す。第五条は日本国憲法の保障する自由と権利の尊重を掲げる。</p>
+
+<p>すなわち同法は、<strong>有事に国民が何かをすることを、制度として当てにしない</strong>という前提の上に立っている。当てにしないと決めた法律である。</p>
+
+<p>これは非難されるべきことではない。平成十六年当時の政治情勢において、この構成を採らなければ法は成立しなかった。当時としては合理的な選択であった。</p>
+
+<h3>もう一つの空白</h3>
+
+<p>同法第九条は、国民の保護のための措置を実施するに当たっては、老人、幼児、障害者その他特に配慮を要する者の保護について留意しなければならない、と定める。</p>
+
+<p><strong>守るべき人は、列挙された。しかし、その人々を支える役務そのものを維持するという発想が、法の中に無い。</strong></p>
+
+<p>高齢者は保護の客体としてのみ登場する。介護も保育も、法の視野の外にある。これも空白の一部である。第五章で改めて述べる。</p>
+
+<h3>二十二年で、前提が変わった</h3>
+
+<p>弾道ミサイルの脅威が現実のものとなり、サイバー攻撃が基幹インフラを直接の標的とするようになった。南海トラフ地震と首都直下地震の切迫が指摘され、複合災害が想定されるようになった。そして何より、人口減少と高齢化が進んだ。</p>
+
+<p>現に日本成長戦略は、令和十三年度末までに必要な防護策を実施できている重要インフラ事業者等の割合を百パーセントとする目標を掲げた。設備の側の目標は立った。だがそれを動かす人をどこから供給するのかについて、制度は沈黙している。</p>
+
+<p>本提言は、戦後史の評価には立ち入らない。指摘するのは事実のみである。すなわち、<strong>担い手を育てる制度は、戦後、作られてこなかった</strong>。そして今、作られていないことの帰結が、目に見える形で現れはじめている。</p>
+</section>
+
+<section id="c3">
+<h2 class="ch"><span class="chno">第三章</span>設計原理 ── 主語の転換</h2>
+
+<p>前章で見たとおり、現行法は国民の関与を自発的意思に限定している。制度を作ろうとすれば、ここで分岐に立たされる。</p>
+
+<p><strong>第一の道</strong>は、第四条第二項を削除し、国民に義務を課すことである。これは採らない。理由は二つある。</p>
+
+<p>一つは、議論が直ちに徴兵制の是非に収斂することである。第一次提言が慎重に避けてきた場所へ引き戻され、憲法上の疑義が制度全体を停滞させる。</p>
+
+<p>もう一つは、より重い。<strong>この国には、自発的な相互扶助組織が国家に吸い上げられ、動員機構に転化した前例が実際にある。</strong></p>
+
+<p>次章に詳しく述べるが、明治二十七年の消防組規則によって消防組は知事の警察権に組み込まれ、昭和十四年の警防団令によって戦時組織となり、戦後、占領軍から戦争協力機関とみなされて廃止された。自発性を法によって置き換えることの帰結を、我々は既に一度経験している。同じ轍を踏む設計は、採るべきではない。</p>
+
+<p><strong>本提言が採るのは、第二の道である。</strong></p>
+
+<blockquote><p>「協力」と「教育」を分離し、教育について主語を入れ替える。</p></blockquote>
+
+<ul>
+<li><strong>有事の協力</strong>は、現行どおり国民の自発的意思に委ねる。第四条第二項には一字も触れない。</li>
+<li><strong>平時の教育</strong>は、国が提供する責務として法定する。</li>
+</ul>
+
+<p>国民は「受けなければならない」のではない。「受けることができる」のである。義務を負うのは国のほうである。</p>
+
+<p>この構成であれば、第四条第二項とも第五条とも衝突しない。徴兵制との違いは、条文の構造そのものが説明する。説明のために弁明を要しない設計こそが、この種の制度には必要である。</p>
+
+<h3>三つの歯止め</h3>
+
+<p>先に述べた転化を繰り返さないために、条文には三つの歯止めを内蔵させる。</p>
+
+<table>
+<tr><th></th><th>歯止め</th><th>内容</th><th>由来</th></tr>
+<tr><td>一</td><td>自発性</td><td>第四条第二項を改正しない</td><td>明治二十七年に失われたもの</td></tr>
+<tr><td>二</td><td>目的の限定</td><td>対象を基幹的役務の維持に限る</td><td>昭和十四年に失われたもの</td></tr>
+<tr><td>三</td><td>年齢</td><td>実務従事を含む課程は中等教育以降に限る</td><td>二十世紀の記憶</td></tr>
+</table>
+
+<p><strong>一、自発性の歯止め。</strong>課程を修了した者であっても、有事に従事する義務を負わない。明治二十七年、自生的だった組織が知事の警察権に組み込まれたとき、失われたのはこの自発性であった。</p>
+
+<p><strong>二、目的の歯止め。</strong>育成の対象を、基幹的な役務の維持に限定する。それ以外の任務を後から接ぎ木できない書き方にする。昭和十四年、火災の消火を任務としていた組織に防空という戦時任務が加えられたとき、失われたのはこの目的の限定であった。</p>
+
+<p><strong>三、年齢の歯止め。</strong>実務への従事を含む課程の対象を、中等教育以降に限る。初等教育以下の児童については、防火・防災の学習及び訓練への参加に限り、実務への従事及び有事の役務には及ばないことを、条文に明記する。</p>
+
+<p>歯止めを先に書いておくことは、制度を弱めることではない。<em>歯止めを持たない制度は、いずれ必ず別のものになる。</em>それが、この国が自分自身の歴史から学びうる、最も具体的な教訓である。</p>
+
+<h3>現行法の延長線上にあること</h3>
+
+<p>第四十三条は既に、「国民の理解を深めるため」の啓発を<strong>国の努力義務</strong>としている。主語は、既に国なのである。</p>
+
+<p>本提言は、その主語のまま、対象を「理解」から「技能」へ一段進めることを求めるにすぎない。新奇な立法ではない。</p>
+</section>
+
+<section id="c4">
+<h2 class="ch"><span class="chno">第四章</span>持ち場 ── 年齢階梯という先例</h2>
+
+<h3>制度は無から作れない</h3>
+
+<p>「国民に持ち場を配る制度」と言えば、いかにも新奇に響く。だが、この国には既にあった。</p>
+
+<p>近世の村落には、<strong>若者組</strong>と呼ばれる組織が、ほぼ全国に存在した。若衆組、若者仲間、若連中など、呼び名は地方によって異なる。</p>
+
+<p>数え十五歳前後で村の男子が加入し、若者頭の統率のもとに、村内の警備、消防、水防、災害救助、共同作業を担った。「若者入り」を果たした者は、村から「一人前」と認められた。組の中では、年長者から礼儀や村の慣行についての教育を受けた。</p>
+
+<p>機能は東西で共通していた。神事祭礼、消防、水防、警備、災害救助 ── 地域を越えて同じ内容が並ぶ。呼び名は違うのに、やっていることは同じだった。国が定めたわけでもないのに、同じ形が全国に生じている。</p>
+
+<h3>階梯には、上と下があった</h3>
+
+<p>若者組は、より大きな仕組みの一階梯にすぎない。</p>
+
+<p>年齢階梯制とは、一定範囲の年齢層が組合を作って社会的機能を果たす年齢集団の階梯をいい、子ども組、若者組、娘組がそれぞれ一つの階梯を成す。その中には隠居制も含まれる。地域差はあるが、子供組、若衆組、宿老、中宿老、大宿老、年寄衆（長老組）という段階が置かれていた。</p>
+
+<blockquote><p>持ち場は、一生を通じて移っていく。</p></blockquote>
+
+<p>子どもには子どもの持ち場があり、若者には実働の持ち場があり、年寄には判断と継承の持ち場があった。どの年齢にも位置があり、<strong>位置を失う年齢が無かった。</strong></p>
+
+<p>現代の制度は、これを現役世代だけで切り取っている。子どもは守られるだけ、高齢者は守られるだけ、担うのは中間の世代だけ ── そういう設計になっている。だから中間世代が疲弊し、上下は居場所を失う。</p>
+
+<h3>教育と持ち場は、分けられなかった</h3>
+
+<p>若者組の構造には、現代の制度設計が見落としがちな一点がある。</p>
+
+<blockquote><p>教育と持ち場が、同じ一つの制度だった。</p></blockquote>
+
+<p>先に教育を受けてから持ち場に就いたのではない。<strong>持ち場に入ることが教育の入口であり、務めを果たすことが一人前になる過程そのものだった。</strong>資格を取ってから配属されるのではなく、配属されて働くうちに資格が備わる。</p>
+
+<p>現代の職業訓練は、この順序を逆にしている。座学を修めてから現場に出す。そのため、修了しても現場に立たない者が量産される。</p>
+
+<p>基礎役務制度が若者組から学ぶべきは、精神ではなく<strong>この順序</strong>である。</p>
+
+<h3>個人差は、階梯が吸収していた</h3>
+
+<p>同じ年齢でも、成熟の度合いには相当の差がある。これは現場で子どもや若者に接する者であれば、誰もが知っていることである。制度設計における最大の難所でもある。</p>
+
+<p>年齢階梯制は、この問題を既に解いていた。</p>
+
+<p><strong>入口だけが年齢で、内部は習熟で上がる。</strong>若者組の中には小若い衆から中堅、若者頭という段階があり、そこを上がるのは年齢ではなく、務めを果たした度合いであった。</p>
+
+<p>すなわち、一律の到達を求めない。入った時点では誰も一人前ではなく、段階を上がることが前提とされている。この構造が、個人差を制度の側で吸収していた。</p>
+
+<h3>国は、これを作っていない</h3>
+
+<p>もう一点、重要な事実がある。若者組は、国が作ったものではない。</p>
+
+<p>三重県史によれば、鳥羽藩は若者組を五人組に組み入れて積極的に利用し、津藩は早くからその設立を厳しく禁じていた。<strong>取り込むか、潰すか。藩の対応は分かれたが、いずれにせよ作ってはいない。</strong></p>
+
+<p>自生した組織に対して公権力ができるのは、認めること、支えること、あるいは壊すことである。ゼロから作ることはできない。</p>
+
+<p>前章で「国が提供する責務」としたのは、この含意を踏まえている。<em>国が配るのは持ち場であって、精神ではない。</em></p>
+
+<h3>町の側の系譜と、二度の変質</h3>
+
+<p>村に若者組があったように、町には火消があった。享保三年、南町奉行大岡忠相の建議により、町人自身による<strong>町火消</strong>が編成された。武家の定火消・大名火消とは別に、町を町人が守る仕組みである。</p>
+
+<table>
+<tr><th>年</th><th>出来事</th></tr>
+<tr><td>享保三年（一七一八）</td><td>町火消の編成</td></tr>
+<tr><td>明治五年（一八七二）</td><td>町火消を改組し、消防組となる</td></tr>
+<tr><td>明治二十七年（一八九四）</td><td>消防組規則（勅令）。知事の警察権に掌握され、費用は市町村負担</td></tr>
+<tr><td>昭和五年頃（一九三〇）</td><td>防護団が各地に結成される</td></tr>
+<tr><td>昭和十四年（一九三九）</td><td>警防団令。消防組と防護団を統合。防空監視・空襲下の救護が任務に加わる</td></tr>
+<tr><td>昭和二十二年（一九四七）</td><td>警防団廃止。消防団令により消防団が発足</td></tr>
+<tr><td>昭和二十三年（一九四八）</td><td>消防組織法により、現在の枠組みが定まる</td></tr>
+</table>
+
+<p>ここに、<strong>二度の変質</strong>が刻まれている。</p>
+
+<p>明治二十七年、自生的だった組織が知事の警察権に組み込まれた。このとき失われたのは<strong>自発性</strong>である。</p>
+
+<p>昭和十四年、火災の消火を任務としていた組織に、防空という戦時任務が加えられた。このとき失われたのは<strong>目的の限定</strong>である。</p>
+
+<p>そして戦後、占領軍はこれを戦争協力機関とみなした。組織そのものが否定されたのである。</p>
+
+<p>前章で三つの歯止めを条文に内蔵すると述べたのは、この歴史を踏まえてのことである。<strong>同じ轍は、二度と踏まない。</strong></p>
+
+<h3>今も生きている階梯</h3>
+
+<p>階梯の系譜は、断絶してはいない。現に機能している例が三つある。</p>
+
+<p><strong>一、少年消防クラブ。</strong>主に小学四年生から高校生が参加し、防火・防災の知識を身につけるために活動する組織である。令和七年五月一日現在、全国に約三千九百三十クラブ、約三十七万人のクラブ員がいる。防災マップ作り、防火パトロール、防災訓練への参加などを行う。優良クラブの表彰は、昭和二十九年度から途切れることなく続いている。</p>
+
+<p><em>七十年以上、国の制度として続いていながら、法律に根拠を持たない。</em>消防庁が推奨する任意の組織である。</p>
+
+<p><strong>二、消防団・水防団・自主防災組織。</strong>若者組と町火消の直接の後裔である。消防団は消防組織法、水防団は水防法、自主防災組織は災害対策基本法第五条第二項に根拠を持つ。</p>
+
+<p><strong>三、釜石の事例。</strong>平成二十三年三月十一日、岩手県釜石市。海から五百メートルの位置にある釜石東中学校と鵜住居小学校には、中学生約二百四十名、小学生約三百九十名がいた。</p>
+
+<p>停電で校内放送ができない中、部活動で校庭にいた中学生が自主的に避難を開始し、校舎内の生徒が続いた。隣接する小学校の児童も、日頃の合同訓練を思い出して後に続いた。中学生は小学生と保育園児の手を引き、声をかけながら高台へ移動した。当日登校していた児童・生徒約五百七十名は、全員が助かっている。</p>
+
+<p>これを可能にしたのは、平成十七年から続けられてきた防災教育である。指導した片田敏孝教授は、中学生にこう教えていた。</p>
+
+<blockquote><p>君たちは守られる側ではなく、守る側だ。自分より弱い立場にある小学生や高齢者を連れて逃げるんだ</p></blockquote>
+
+<p>学校の標語は「助けられる人から助ける人へ」であった。</p>
+
+<div class="note">
+<p><strong>ただし、これを「奇跡」と呼ぶべきではない。</strong>釜石市全体では、たまたま学校にいなかった小中学生五名が犠牲になっている。片田教授自身が、死者が出た時点で防災教育は成功したと胸を張ることはできない、と述べている。生存率は九九・八パーセントであった。</p>
+<p>奇跡ではなく、訓練の成果である。そして訓練の成果であってなお、五人が失われた。だからこそ、制度として整える必要がある。</p>
+</div>
+
+<h3>現代の観察</h3>
+
+<p>行動様式そのものも、失われていない。</p>
+
+<p>平成七年の阪神・淡路大震災でも、平成二十三年の東日本大震災でも、記録に残っているのは同じ形である。駅員が最後まで改札に立ち、自治体職員が庁舎に残り、現場作業員が交代を待った。「国のために身を捧げる」と考えた者はほとんどいない。「自分の持ち場だから」と考えた者が、圧倒的に多い。</p>
+
+<blockquote><p>持ち場を離れない。</p></blockquote>
+
+<p>これは美談ではなく、<strong>観察可能な行動様式</strong>である。政策として扱えるのは、こちらである。</p>
+
+<p>そう見ると、問題の所在が変わる。有事に多くの国民が動けないのは、覚悟が足りないからではない。<em>持ち場が無いからである。</em>何かしたいと思っても、自分がどこに立つべきかを知らない。知らない者は動けない。動けない者が滞留すれば、動ける者の足を引く。</p>
+
+<h3>後裔は、細っている</h3>
+
+<p>しかし、消防団も水防団も少年消防クラブも、担い手の減少が続いている。若者組が明治以降に青年団へ再編され、その青年団が公教育の普及と都市化のなかで機能を失っていった過程を思えば、これは偶然ではない。</p>
+
+<p><strong>村と町が持っていた持ち場の配り方は、二十世紀を通じて解体された。</strong>代わるものが用意されないまま、今日に至っている。</p>
+
+<p>基礎役務制度は、この空白を埋めるものである。新しい何かを発明するのではない。<strong>この国が持っていて、失ったものを、現代の基幹役務に合わせて作り直す。</strong>それが本提言の位置づけである。</p>
+</section>
+
+<section id="c5">
+<h2 class="ch"><span class="chno">第五章</span>基幹役務の再定義 ── 支える役務</h2>
+
+<h3>並列は、成立しない</h3>
+
+<p>ここまで基幹的な役務として、電気・ガス・水道・輸送・通信・医療を並べてきた。第一次提言も同じ並べ方をしていた。</p>
+
+<p><strong>しかし、この並べ方は誤りである。</strong></p>
+
+<p>停電した変電所へ復旧に向かう職員は、なぜ現場に立てるのか。子どもを預ける先があるからである。親の介護を代わりに見てくれる人がいるからである。</p>
+
+<blockquote><p>保育が止まれば、電力が止まる。<br>介護が止まれば、通信が止まる。</p></blockquote>
+
+<p>実際、東日本大震災でも熊本地震でも、家族のために持ち場を離れざるを得なかった職員がいた。責められることではない。制度の側が、その人の背中を支えていなかっただけである。</p>
+
+<p>したがって、介護と保育は他の基幹役務の横に並ぶのではない。<strong>他のすべての基幹役務が成り立つための条件</strong>として、その下にある。</p>
+
+<p>前章で触れた釜石の事例が、これを象徴している。中学生と小学生が最初に逃げ込んだのはグループホーム「ございしょの里」であり、次に向かったのはさらに高台の介護福祉施設であった。<strong>高台の介護施設が、地域の避難先として機能した。</strong>介護施設は、守られる場所であると同時に、地域を守る場所でもある。</p>
+
+<h3>証拠 ── 災害関連死</h3>
+
+<p>この主張は、印象論ではない。数字が示している。</p>
+
+<table>
+<tr><th>災害</th><th>直接死</th><th>災害関連死の位置</th></tr>
+<tr><td>東日本大震災（平成二十三年）</td><td>死者・行方不明 約二万人</td><td>認定三千七百九十四人（約一九％）</td></tr>
+<tr><td>熊本地震（平成二十八年）</td><td>五十人</td><td>全死者の約八割</td></tr>
+<tr><td>能登半島地震（令和六年）</td><td>──</td><td>約六四％</td></tr>
+</table>
+
+<p>能登半島地震の災害関連死三百二十一人についての分析では、亡くなった方の九割以上が七十歳以上の高齢者であり、死因の六割を循環器疾患・呼吸器疾患が占めていた。</p>
+
+<p><strong>読み方は、こうである。</strong></p>
+
+<p>「物」の強靱化は、効いた。耐震化が進み、堤防が高くなり、直接死は確実に減った。熊本の直接死五十人という数字が、それを証明している。</p>
+
+<p><em>しかし「人」がいないために、一度助かった命が、その後で失われている。そして失われているのは、ほぼ高齢者である。</em></p>
+
+<p>これは第一次提言以来の「物から人へ」という主張の、最も強い実証である。避難所の環境を維持し、持病を持つ高齢者を見守り、生活不活発を防ぐ ── それを担いうる人が、決定的に足りない。</p>
+
+<h3>高齢者は、客体か</h3>
+
+<p>第二章で触れたとおり、国民保護法第九条は老人・幼児・障害者を「特に配慮を要する者」として掲げる。法の中で、高齢者は保護の客体としてのみ登場する。</p>
+
+<p>しかし現実には、<strong>既に技能を持ちながら持ち場を与えられていない者の大半は、退職した高齢者である。</strong>電気工事の技能、通信設備の知識、看護と介護の経験、車両の整備。それらは退職とともに社会から消える。年齢階梯において、彼らは長老組であった。判断と継承の持ち場を持っていた。</p>
+
+<p>現在、その持ち場が無い。</p>
+
+<h3>三つの転換</h3>
+
+<p>以上をまとめれば、本提言が求めるのは次の三つの転換である。</p>
+
+<ul>
+<li>高齢者を、<strong>守られる対象から、守る側にもなりうる者</strong>へ</li>
+<li>介護・保育を、<strong>福祉から、基幹役務</strong>へ</li>
+<li>災害関連死を、<strong>避けがたい付随被害から、人の配置で防ぎうる死</strong>へ</li>
+</ul>
+
+<p>第三章に述べた「主語の転換」と、同じ形の転換である。</p>
+</section>
+
+<section id="c6">
+<h2 class="ch"><span class="chno">第六章</span>改正の具体案</h2>
+
+<p>以上を踏まえ、国民保護法について次の改正を提案する。</p>
+
+<h3>一、第一条（目的）の拡張</h3>
+
+<p>現行の目的規定は「武力攻撃事態等において」措置を実施することに限定されている。ここに<strong>平時からの備え</strong>を含める文言を加える。以下の改正の前提となる。</p>
+
+<h3>二、第二条第二項（指定地方公共機関）の改正</h3>
+
+<p>現行の例示は「電気、ガス、輸送、通信、<strong>医療</strong>その他の公益的事業を営む法人」である。介護・保育・福祉は例示に無く、実際にも施行から二十年間、指定された例が確認できない。</p>
+
+<p>たとえば千葉県の指定地方公共機関は、ガス事業者等・運送事業者・医療事業者等・放送事業者・公共的施設管理者の五分類であり、介護・福祉・保育関係の団体は一つも含まれていない。</p>
+
+<p>このままでは、後述する育成努力義務が介護・保育について空振りする。したがって、次の二点を提案する。</p>
+
+<ul>
+<li>例示に「<strong>介護、保育</strong>」を加える</li>
+<li>指定は<strong>団体単位</strong>とする</li>
+</ul>
+
+<p>団体単位という点については、既に前例がある。千葉県は個々の病院ではなく、千葉県医師会・薬剤師会・歯科医師会・看護協会という団体を指定している。介護・保育も同様に、都道府県社会福祉協議会、老人福祉施設協議会、保育協議会等を指定すればよい。<strong>新たな仕組みを作る必要はなく、医療における前例に倣うだけである。</strong></p>
+
+<h3>三、第六節の節名変更と新条文の追加</h3>
+
+<p>第一章第六節「組織の整備、訓練」を、<strong>「組織の整備、訓練及び人材の育成」</strong>に改める。そのうえで、第四十三条（啓発）の次に、新たに<strong>第四十三条の二（平時における人材の育成）</strong>を置く。骨子は次のとおりである。</p>
+
+<div class="clause">
+<h4>第一項　国の提供責務</h4>
+<p>国は、武力攻撃災害及び災害の発生時において基幹的な役務 ── 電気、ガス、水道、輸送、通信、医療、<strong>介護その他の高齢者福祉、保育その他の児童福祉</strong>等 ── の維持に従事しうる者を確保するため、必要な知識及び技能を習得する機会を国民に提供しなければならない。</p>
+</div>
+
+<div class="clause">
+<h4>第二項　基礎役務課程の法定</h4>
+<p>前項の機会は、役務の区分ごとの課程として定める。課程は、座学のみによるものではなく、<strong>指定公共機関等の現場における実務への従事を含むもの</strong>とする。課程の種別、技能の水準及び修了の要件は、政令で定める。</p>
+</div>
+
+<div class="clause">
+<h4>第三項　名簿への登録及び習得段階の記載</h4>
+<p>国は、<strong>課程に入った者</strong>を名簿に登録し、災害時又は武力攻撃事態等において従事することが想定される役務及び区域をあらかじめ示すものとする。名簿には、技能の習得段階を併せて記載する。</p>
+</div>
+
+<div class="clause">
+<h4>第四項　年齢の限定</h4>
+<p>第二項の課程のうち実務への従事を含むものの対象は、中等教育以降とする。初等教育以下の児童については、防火及び防災に関する学習並びに訓練への参加に限るものとし、実務への従事及び武力攻撃事態等における役務には及ばない。</p>
+</div>
+
+<div class="clause">
+<h4>第五項　少年消防クラブ等の位置づけ</h4>
+<p>国及び地方公共団体は、前項の学習及び訓練の受け皿として、少年消防クラブその他これに準ずる組織の育成及び支援に努めなければならない。</p>
+</div>
+
+<div class="clause">
+<h4>第六項　指定公共機関等の育成努力義務</h4>
+<p>指定公共機関及び指定地方公共機関は、その業務に係る役務の維持に従事しうる者の育成に努めるとともに、第二項の課程における実務への従事の場を提供するよう努めなければならない。</p>
+</div>
+
+<div class="note">
+<p><strong>第三項について。</strong>登録は修了を待たない。課程に入った時点で登録し、名簿には段階を記す。第四章に述べたとおり、若者組において「若者入り」は技能の証明ではなく、学びの入口であった。入口は年齢で、内部は習熟である。</p>
+<p>現代の職業訓練は、修了して初めて名簿に載る。そのため、修了しない者は最後まで持ち場を持たず、脱落する。順序を戻すことが、この制度の実効性を左右する。</p>
+<p><strong>第四項・第五項について。</strong>少年消防クラブは、昭和二十九年度から七十年以上にわたって続いてきた実践でありながら、法律に根拠を持たない。第五項は、新たに何かを作るものではなく、既にある善き実践に法的な位置を与えるものである。第四項の限定は、子どもに有事の役務を負わせるものではないことを、条文の側で書き切っておくためのものである。</p>
+</div>
+
+<h3>四、第四条第二項は改正しない</h3>
+
+<p>有事における国民の協力は、引き続き自発的意思に委ねられる。課程を修了した者であっても、有事に従事する義務を負わない。技能と名簿は、動きたい者が動けるようにするためのものであり、動かない者を責めるためのものではない。</p>
+
+<p><em>制度の正当性は、ここに懸かっている。</em></p>
+
+<h3>五、教育法制との接続</h3>
+
+<p>課程は、高等学校、高等専門学校、専修学校及び大学の教育課程の一部として履修しうるものとする。</p>
+
+<p>既存の資格制度との単位互換を設ける。電気工事士、危険物取扱者、無線従事者、准看護師に加え、<strong>介護福祉士及び保育士の養成課程</strong>を含める。新規の資格体系を一から作る必要はない。</p>
+
+<h3>六、実施主体</h3>
+
+<p>防災庁を実施主体とする。国民保護は内閣官房、防災は内閣府（防災庁発足後は防災庁）という現行の分担のままでは、平時の人材育成はどちらの所掌からもこぼれ落ちる。</p>
+
+<p>防災庁設置法は令和八年七月十三日に成立し、同年十一月一日に発足する。平時からの備えから災害時の対応、復旧・復興までを一貫して担う組織である。<strong>平時の人材育成は、この「平時からの備え」の中核に位置づけられるべきものであり、新たな所掌を作る必要がない。</strong></p>
+
+<p>第六項に定める実務従事の場については、指定公共機関を所管する各省 ── 経済産業省、総務省、厚生労働省、国土交通省 ── が防災庁と連携する。課程の教育課程への接続については、文部科学省が所管する。</p>
+</section>
+
+<section id="c7">
+<h2 class="ch"><span class="chno">第七章</span>財政と実施</h2>
+
+<p><strong>新規予算の創設を求めない。</strong></p>
+
+<p>日本成長戦略は、分野横断的課題の第五「労働市場改革」において、戦略十七分野及び<strong>それを支える社会インフラ分野</strong>について、スキルの標準化・可視化から教育訓練プログラムの開発・提供まで一気通貫でリ・スキリングを支援することを掲げている。</p>
+
+<p>また同第六「家事等の負担軽減」には、<strong>家事支援サービスに係る国家資格（技能検定）の創設</strong>が明記されている。介護・保育を含む基礎役務課程は、この動きと直接に接続する。</p>
+
+<p>財源は『「強く豊かな日本」投資枠』による。実施は段階的とする。</p>
+
+<table>
+<tr><th>段階</th><th>期間</th><th>対象</th></tr>
+<tr><td>第一段階</td><td>二年</td><td><strong>介護・保育</strong>、電力・通信・水道</td></tr>
+<tr><td>第二段階</td><td>三年</td><td>高等専門学校・専修学校の課程へ組み込み、介護福祉士・保育士養成課程と接続</td></tr>
+<tr><td>第三段階</td><td>──</td><td>医療・輸送・ガスへ拡大。全国名簿を運用に移す</td></tr>
+</table>
+
+<p><strong>介護・保育を第一段階に置く理由</strong>は三つある。平時から既に人手が不足しており制度の効果が最も早く見えること。既に技能を持つ退職者が最も多い分野であること。そして第五章に述べたとおり、他のすべての基幹役務が成り立つための条件であること。</p>
+
+<p>初年度から全国民を対象とする必要はない。まず、既に技能を持ちながら持ち場を与えられていない者に、持ち場を配ることから始める。</p>
+</section>
+
+<section id="c8">
+<h2 class="ch"><span class="chno">第八章</span>想定される反論への応答</h2>
+
+<dl class="qa">
+<dt>一、徴兵制の入口ではないか。</dt>
+<dd><p>主語が国であり、国民に義務が生じない。有事の従事も自発的意思に委ねられ、第四条第二項は改正しない。徴兵制は国民に義務を課す制度であり、本制度は国に義務を課す制度である。方向が逆である。</p></dd>
+
+<dt>二、憲法上の疑義があるのではないか。</dt>
+<dd><p>国民の自由と権利を制約する規定を一切含まない。第五条と衝突する余地がない。</p></dd>
+
+<dt>三、財源はどうするのか。</dt>
+<dd><p>既存の成長戦略の枠内で対応しうる。第七章に述べたとおりである。</p></dd>
+
+<dt>四、自治体の負担が過大になるのではないか。</dt>
+<dd><p>実施主体は防災庁と指定公共機関である。自治体には名簿の照会と訓練場所の提供を求めるにとどめる。現行の国民保護計画の枠内で処理しうる。</p></dd>
+
+<dt>五、有事に義務がないなら、名簿は絵に描いた餅ではないか。</dt>
+<dd><p>もっとも重い反論である。これに対する答えは第四章に述べた。日本の現場が示してきたのは、義務があったから動いたという事実ではなく、持ち場があったから離れなかったという事実である。制度が用意すべきは義務ではなく、位置である。</p></dd>
+
+<dt>六、子どもを動員するのではないか。</dt>
+<dd><p>実務への従事を含む課程の対象は中等教育以降であり、初等教育以下には及ばないことを条文に明記している（第四十三条の二第四項）。</p>
+<p>初等教育以下について定めるのは、防火・防災の学習及び訓練への参加のみである。しかもこれは、少年消防クラブという昭和二十九年度から七十年以上続いてきた既存の実践に、法的な位置づけを与えるにすぎない。<strong>新たに何かをさせる制度ではない。</strong></p></dd>
+
+<dt>七、高齢者に働かせるのではないか。</dt>
+<dd><p>義務は生じない。名簿への登録も課程への参加も任意である。本提言が問題としているのは、技能を持つ人が持ち場を持てないまま置かれている現状である。働かせることではなく、<strong>位置を配ること</strong>が目的である。位置を受け取るかどうかは、本人が決める。</p></dd>
+</dl>
+</section>
+
+<section id="c9" class="close">
+<h2 class="ch"><span class="chno">結</span>物から人へ</h2>
+
+<p>国土強靱化は、これまで「物」を対象としてきた。堤防を高くし、橋を架け替え、電線を地中に埋めた。それは正しい仕事であった。そして、効いた。直接死は確実に減った。</p>
+
+<p>だが、堤防を見回る人がいなければ堤防は守れない。変電所を復旧できる人がいなければ電気は戻らない。<strong>そして、子どもを預かる人がいなければ、堤防を見回る人が現場に立てない。</strong></p>
+
+<p>一度助かった命が、その後で失われている。熊本地震では、亡くなった方の約八割がそれであった。</p>
+
+<p>災害に強い国民を育てることと、脅威に耐える国家を築くことは、人的抗堪性という一つの基盤の二つの現れにすぎない。第一次提言でそう述べた。本提言は、それを法制度の上に置くための、具体的な条文を提案するものである。</p>
+
+<p>かつてこの国には、生涯を通じて誰もが持ち場を持つ仕組みがあった。子どもには子どもの、若者には若者の、年寄には年寄の位置があった。それは二十世紀を通じて解体され、代わるものが用意されないまま今日に至っている。</p>
+
+<p class="final">発明ではない。取り戻すのである。</p>
+
+<p class="disclaimer">本稿は政策提言である。条文案・課程区分・実施年限・財政の見積りは、今後の議論に応じて精査・修正されるべきものである。関係法令の条文番号は令和八年八月時点のものによる。</p>
+</section>
+
+</main>
+
+<footer>
+  <div class="inner">
+    <p>
+      <strong>国民強靱化基礎役務制度（仮称）第二次提言</strong><br>
+      令和八年八月　三原嘉明<br>
+      日昇リサーチ株式会社　代表取締役
+    </p>
+    <p>
+      <a href="kyojinka-proposal.html">第一次提言（令和八年六月）</a>　／　
+      <a href="proposals.html">政策提言一覧</a>　／　
+      <a href="index.html">おてんとうさまの下で</a>
+    </p>
+    <p class="uca">
+      本稿は UCA（Universal Creative Attribution）の考え方に基づき、出典を明示したうえでの引用・転載を歓迎します。<br>
+      © 令和八年　三原嘉明
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
