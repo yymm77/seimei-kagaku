@@ -6,7 +6,7 @@
 <title>新著作権の構想──ブロックチェーンが知的財産を解放する日 | 日昇リサーチ</title>
 <meta name="description" content="デジタル時代の著作権を根本から問い直す。誰もが自由に使えて、意識せずに作者に対価が届く──ブロックチェーンと量子耐性暗号が実現する新しい知財保護モデルの提言。">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;700;800&family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;700;800&family=Noto+Sans+JP:wght@300;400;500;700&family=Inter:wght@300;400;500;600&display=swap');
 
 :root {
   --bg: #0d0d0f;
@@ -476,9 +476,24 @@ hr.rule { border: none; border-top: 1px solid var(--border); margin: 2em 0; }
   .demo-banner { flex-direction: column; }
   .hero { min-height: auto; padding: 100px 20px 60px; }
 }
+
+.lang-jump { text-align:center; padding:34px 20px 6px; }
+.jump-btn { display:inline-block; font-family:'Noto Sans JP',sans-serif;
+  font-size:.82rem; letter-spacing:.06em; text-decoration:none; color:#b8960c;
+  border:1px solid rgba(184,150,12,.45); border-radius:3px; padding:11px 26px;
+  transition:all .25s; }
+.jump-btn:hover { background:rgba(184,150,12,.12); border-color:rgba(184,150,12,.8); }
+.lang-divider { border:0; border-top:1px solid rgba(184,150,12,.22);
+  margin:56px auto 0; max-width:900px; }
+.hero-en h1, .hero-en .hero-sub { font-family:'Inter','Noto Sans JP',sans-serif; }
+.hero-en h1 { letter-spacing:.01em; }
 </style>
 </head>
 <body>
+
+<div class="lang-jump" id="top">
+  <a href="#en" class="jump-btn">English version ↓</a>
+</div>
 
 <!-- ヒーロー -->
 <section class="hero">
@@ -755,10 +770,261 @@ hr.rule { border: none; border-top: 1px solid var(--border); margin: 2em 0; }
   </div>
 </div>
 
+<hr class="lang-divider">
+
+<div class="lang-jump" id="en">
+  <a href="#top" class="jump-btn">↑ 日本語版へ戻る</a>
+</div>
+
+<header class="hero hero-en">
+<div class="hero-inner">
+  <div class="hero-eyebrow">Research and essays ／ A new copyright design</div>
+  <h1>Knowledge should be <em>released.</em><br>Payment should reach its author.</h1>
+  <p class="hero-sub">Free for anyone to use, with remuneration reaching the creator unnoticed — a model for protecting intellectual property in the digital age, built on blockchain and quantum-resistant cryptography.</p>
+</div>
+</header>
+
+<div class="toc-bar">
+  <a href="#e1">The problem</a>
+  <a href="#e2">Three pillars</a>
+  <a href="#e3">Legal framework</a>
+  <a href="#e4">Quantum era</a>
+  <a href="#e5">Internationally</a>
+  <a href="#e6">Roadmap</a>
+  <a href="#e7">Since publication</a>
+</div>
+
+<div class="main">
+
+<section class="section" id="e1">
+<div class="sec-label">Section 1</div>
+<h2>The problem — why creators are not paid</h2>
+
+<p>Copyright arises the moment a book is written. The moment a painting is made, the moment a film is shot. Japan, like every Berne signatory, grants the right without registration or formality of any kind.</p>
+
+<p>But what happens in practice?</p>
+
+<p>There is no means of proving <em>who created what, and when</em>. In digital space content is copied and circulated instantly, and remuneration for creators depends on elaborate procedures routed through collecting societies. For the families of authors whose works are out of print, nothing arrives at all. For foreign works the difficulty is greater still.</p>
+
+<div class="pullquote">Regulation and prohibition cannot stop knowledge from circulating.<br>So invert the premise.<br>Build something where the more a work is used, the more its creator gains.</div>
+
+<p>This proposal is a blueprint for that mechanism. Combining blockchain and smart contracts, a world in which anyone may use a work freely while payment reaches its author unnoticed is technically achievable.</p>
+</section>
+
+<section class="section" id="e2">
+<div class="sec-label">Section 2</div>
+<h2>Three pillars</h2>
+
+<div class="pillars">
+<div class="pillar-card">
+  <div class="pillar-num">Pillar one</div>
+  <div class="pillar-title">Authenticity through<br>digital fingerprints</div>
+  <div class="pillar-desc">On registration, a SHA-256 hash is inscribed on a blockchain. Who created what, and when, is recorded permanently and immutably. Applicable to books, music, images, film — any work of the intellect.</div>
+</div>
+<div class="pillar-card">
+  <div class="pillar-num">Pillar two</div>
+  <div class="pillar-title">Automatic remuneration<br>by smart contract</div>
+  <div class="pillar-desc">On each use or reproduction, payment flows automatically to the author. No intermediary, no collecting society; code executes the contract. Micropayment makes "the more it is used, the more the creator gains" a workable design rather than a slogan.</div>
+</div>
+<div class="pillar-card">
+  <div class="pillar-num">Pillar three</div>
+  <div class="pillar-title">Privacy preserved<br>through hybrid design</div>
+  <div class="pillar-desc">Only hash values are recorded on-chain. Names, addresses and other personal data are held in an encrypted off-chain database. The right to erasure and immutability are satisfied at once.</div>
+</div>
+</div>
+
+<h3>Inverting how price is set</h3>
+
+<p>Determining the value of a work in advance is close to impossible. An unknown photograph can go viral overnight. So rather than pricing it beforehand, let <strong>the volume of use set the price</strong>.</p>
+
+<p>Nothing used, nothing paid. Used a hundred million times, paid accordingly. The author never has to name a figure. The record of use <em>is</em> the remuneration.</p>
+
+<div class="note">This resembles the streaming models of music and video platforms, with one decisive difference. There, intermediaries take most of the revenue. Here there is no intermediary; the smart contract pays the author directly.</div>
+</section>
+
+<section class="section" id="e3">
+<div class="sec-label">Section 3</div>
+<h2>The legal framework, and what it would need</h2>
+
+<table class="data-table">
+<tr><th>Instrument</th><th>Compatibility / action required</th><th>Priority</th></tr>
+<tr><td><strong>Copyright Act, Art. 31</strong><br>(reproduction in libraries)</td><td>A supplementary provision enabling the shift to automatic, direct payment by smart contract</td><td><span class="badge badge-high">Highest</span></td></tr>
+<tr><td><strong>Electronic Signature Act</strong></td><td>An ordinance or guideline expressly encompassing blockchain signatures</td><td><span class="badge badge-high">High</span></td></tr>
+<tr><td><strong>Personal Information Protection Act</strong></td><td>No amendment required, by virtue of the off-chain design. Immediate implementation possible</td><td><span class="badge badge-high">Highest</span></td></tr>
+<tr><td><strong>Economic Security Promotion Act</strong></td><td>Compatible if designated a critical technology within the Cabinet Office development programme</td><td><span class="badge badge-mid">Medium</span></td></tr>
+<tr><td><strong>Berne Convention</strong></td><td>Fully compatible with the prohibition on formalities, since registration is voluntary</td><td>Compatible</td></tr>
+<tr><td><strong>WIPO Copyright Treaty</strong></td><td>Blockchain may be named under Article 11 as a technological protection measure. Japan could lead international standard-setting here</td><td><span class="badge badge-mid">Med–high</span></td></tr>
+</table>
+
+<h3>A concrete proposal to the National Diet Library</h3>
+
+<p>This proposal has been sent to the Electronic Information Department of Japan's National Diet Library. Phase 1 requires no amendment to any statute.</p>
+
+<div class="roadmap">
+<div class="rm-item">
+  <div class="rm-phase">Phase 1<br>Immediate</div>
+  <div class="rm-body">
+    <div class="rm-title">Hashes for the NDL Digital Collections</div>
+    <div class="rm-desc">Assign SHA-256 hashes to a portion of holdings; register them on a private chain under NDL management; publish a verification tool. Feasible within existing law.</div>
+  </div>
+</div>
+<div class="rm-item">
+  <div class="rm-phase">Phase 2<br>Operational</div>
+  <div class="rm-body">
+    <div class="rm-title">Full coverage and public-chain interoperation</div>
+    <div class="rm-desc">Following amendment of the Copyright Act, extend to all digital collections. Interoperation with public chains advances international standardisation.</div>
+  </div>
+</div>
+<div class="rm-item">
+  <div class="rm-phase">Phase 3<br>Complete</div>
+  <div class="rm-body">
+    <div class="rm-title">Smart-contract remuneration in full operation</div>
+    <div class="rm-desc">Automatic micropayment to authors and their families begins. The rights-clearance problem for out-of-print works is solved technically. Proposal to WIPO for international standardisation.</div>
+  </div>
+</div>
+</div>
+</section>
+
+<section class="section" id="e4">
+<div class="sec-label">Section 4</div>
+<h2>Preparing for the quantum era</h2>
+
+<p>SHA-256 would today take effectively infinite time to break. But once quantum computers enter genuine operation — from the 2030s onward — that premise may fall away.</p>
+
+<div class="quantum-box">
+<h4>Staged migration to post-quantum cryptography</h4>
+<p>The US National Institute of Standards and Technology completed standardisation of quantum-resistant algorithms in 2024. A migration plan must be built into this system's design philosophy. On the technical specifics, collaboration with Japan's Information-technology Promotion Agency and the National Institute of Advanced Industrial Science and Technology would be appropriate. What matters is embedding <em>the possibility of migration</em> into the design from the outset.</p>
+</div>
+
+<div class="pullquote">Quantum computing is not only a threat but an opportunity.<br>Whichever country implements a quantum-resistant chain first<br>will hold the next generation's standard for intellectual property.<br>Japan has that opening.</div>
+</section>
+
+<section class="section" id="e5">
+<div class="sec-label">Section 5</div>
+<h2>Reaching outward — a new order for intellectual property</h2>
+
+<h3>First, give the concept a name</h3>
+
+<p>Concepts that changed the world all had names. "The internet." "Blockchain." "Open source." A name is how a concept travels.</p>
+
+<div class="pullquote"><strong>UCA — Universal Creative Attribution</strong><br><br>Free for anyone to use, with payment reaching the creator unnoticed.<br>Knowledge is released; creators are remunerated. A mechanism for both at once.</div>
+
+<div class="world-grid">
+<div class="world-card">
+  <div class="world-org">WIPO</div>
+  <div class="world-role">Proposal for international standardisation; Japan leading express incorporation into WCT Article 11</div>
+</div>
+<div class="world-card">
+  <div class="world-org">UNESCO</div>
+  <div class="world-role">Alignment with international standards for cultural heritage and digital archives</div>
+</div>
+<div class="world-card">
+  <div class="world-org">National Diet Library</div>
+  <div class="world-role">Implementing body for Phase 1; a domestic record as the basis for international proposals</div>
+</div>
+<div class="world-card">
+  <div class="world-org">Agency for Cultural Affairs / METI</div>
+  <div class="world-role">Domestic advancement of copyright amendment and economic-security designation</div>
+</div>
+<div class="world-card">
+  <div class="world-org">IPA / AIST</div>
+  <div class="world-role">Specification of the migration path to quantum-resistant cryptography</div>
+</div>
+<div class="world-card">
+  <div class="world-org">Citizens and writers</div>
+  <div class="world-role">Circulation through blogs and social media. One voice is where policy begins to move</div>
+</div>
+</div>
+</section>
+
+<section class="section" id="e6">
+<div class="sec-label">Section 6</div>
+<h2>Roadmap</h2>
+
+<div class="roadmap">
+<div class="rm-item"><div class="rm-phase">2026<br>Now</div><div class="rm-body"><div class="rm-title">Name the concept, publish the demo, propose to the NDL</div><div class="rm-desc">Establish UCA as a name. Publish the prototype (done). Send the proposal to the National Diet Library, the Agency for Cultural Affairs and METI (done). Begin writing publicly.</div></div></div>
+<div class="rm-item"><div class="rm-phase">2027</div><div class="rm-body"><div class="rm-title">Legislation and NDL pilot</div><div class="rm-desc">Amendment of Copyright Act Article 31. Ordinance under the Electronic Signature Act. Phase 1 pilot begins. Migration plan for quantum-resistant cryptography with IPA and AIST.</div></div></div>
+<div class="rm-item"><div class="rm-phase">2028</div><div class="rm-body"><div class="rm-title">Proposal to WIPO, international standardisation</div><div class="rm-desc">Submit UCA to WIPO as an international standard. Phase 2 in full operation. Begin addressing rights clearance for out-of-print works.</div></div></div>
+<div class="rm-item"><div class="rm-phase">2030–</div><div class="rm-body"><div class="rm-title">Quantum-resistant migration and global adoption</div><div class="rm-desc">Full migration to post-quantum cryptography. Smart-contract remuneration in full operation. UCA, originating in Japan, adopted internationally.</div></div></div>
+</div>
+</section>
+
+<section class="section" id="e7">
+<div class="sec-label">Section 7</div>
+<h2>What has changed since this was written</h2>
+
+<div class="note">This page was first published in April 2026. The design has since developed considerably. This section records what changed, so that a reader arriving here is not left with the earlier picture.</div>
+
+<h3>The centre moved to AI training</h3>
+
+<p>As written above, the design centred on digital archives and out-of-print works. It has since narrowed onto a sharper question: <strong>was this work used to train this model?</strong> A proposal on that basis was submitted to Japan's Cabinet Office and Agency for Cultural Affairs in August 2026, under the heading <em>from disclosure to measurement</em>.</p>
+
+<p>The reasoning is that the transparency debate has stalled on a single axis — how much of a training corpus must be published — and that axis has no equilibrium. But a rightsholder does not want the corpus; they want an answer about one work they already hold. That is a closed question, answerable without disclosure.</p>
+
+<h3>Identification is delegated to an existing standard</h3>
+
+<p>The design no longer defines its own identifier. <strong>ISO 24138:2024 (ISCC)</strong>, published in May 2024, specifies a similarity-preserving content code carrying both an exact component (Instance-Code) and a perceptual one (Content-Code). The latter matters practically: collection pipelines resize images, re-encode audio and normalise text, so exact matching alone fails systematically. UCA now implements that standard rather than competing with it.</p>
+
+<h3>The substantive contribution is on the operator side</h3>
+
+<p>Existing ISCC work already constrains the party that <em>declares</em> a work, through a transparency log. Nothing constrains the party that <em>ingests</em> it. UCA now specifies a corpus commitment log applying the same RFC 6962 construction to the operator, with one structural change: the membership tree is sorted rather than append-ordered, which permits <strong>non-membership proofs</strong>.</p>
+
+<p>That change matters more than it appears. Without it, "present" is provable and "absent" is not — leaving unconstrained precisely the verdict an operator has a financial incentive to falsify.</p>
+
+<h3>Limitations are now stated rather than left to be found</h3>
+
+<p>A commitment binds a claim, not completeness: an operator can commit to a corpus that omits what it trained on, and no cryptographic mechanism detects this. Similarity-preserving codes collide, so an attestation asserts that a member <em>with that code</em> was present, not that a specific work was. And non-membership proofs reveal bracketing neighbours, permitting partial enumeration under repeated query — whether they can be blinded without losing verifiability, we do not know.</p>
+
+<div class="demo-banner">
+  <div class="demo-icon">📐</div>
+  <div class="demo-body">
+    <div class="demo-title">Full technical specification</div>
+    <div class="demo-desc">Corpus Transparency and Usage Attribution — the five-layer design in full, with conformance requirements, the post-quantum migration path, and open questions. Published in English and Japanese under CC-BY.</div>
+  </div>
+  <a href="https://yymm77.github.io/seimei-kagaku/uca-technical-specification.html" class="demo-btn">Read the specification →</a>
+</div>
+
+<div class="demo-banner">
+  <div class="demo-icon">📄</div>
+  <div class="demo-body">
+    <div class="demo-title">Proposal submitted to the Cabinet Office of Japan</div>
+    <div class="demo-desc">"From disclosure to measurement." The full text as submitted in August 2026, during the drafting of Japan's Principles Code on generative AI.</div>
+  </div>
+  <a href="https://yymm77.github.io/seimei-kagaku/uca-cabinet-proposal.html" class="demo-btn">Read the proposal →</a>
+</div>
+</section>
+
+<section class="section" id="edemo">
+<div class="sec-label">Demonstration</div>
+<h2>A working prototype</h2>
+
+<div class="demo-banner">
+  <div class="demo-icon">🔗</div>
+  <div class="demo-body">
+    <div class="demo-title">Blockchain IP protection demo v2</div>
+    <div class="demo-desc">Generate SHA-256 hashes from real files in the registration tab. Simulate automatic settlement by smart contract in the remuneration tab. Inspect an analysis of the surrounding statutes in the legal tab. Runs entirely in the browser; no installation required. An English guide is provided at the foot of the page.</div>
+  </div>
+  <a href="https://yymm77.github.io/seimei-kagaku/blockchain-ip-demo-v2.html" class="demo-btn">Open the demo →</a>
+</div>
+
+<div class="note">This is a proof of concept. It does not write to a live blockchain.</div>
+</section>
+
+<div class="finale">
+<div class="finale-inner">
+<p>Knowledge was, to begin with, something someone gave their life to make. A paper a researcher spent years writing. A painting an artist staked a life on. Words a poet wrote down late at night.</p>
+<p>Those things circulate endlessly through digital space, and nothing reaches the one who made them. We have arrived at a moment when that imbalance can be addressed technically.</p>
+<p class="finale-quote">Knowledge should be released.<br>Payment should <em>reach its author.</em><br>Both, at last, are possible together.</p>
+</div>
+</div>
+
+</div><!-- /main -->
+
 <footer>
   <div style="margin-bottom:12px;">
     <a href="https://yymm77.github.io/seimei-kagaku/">トップページ</a>　|　
     <a href="https://yymm77.github.io/seimei-kagaku/rai-proposal.html">RAI国家戦略提言</a>　|　
+    <a href="https://yymm77.github.io/seimei-kagaku/uca-technical-specification.html">技術仕様</a>　|　
     <a href="https://yymm77.github.io/seimei-kagaku/blockchain-ip-demo-v2.html">デモシステム</a>　|　
     <a href="https://yymm77.github.io/seimei-kagaku/namemaster_v5.html">姓名科学</a>
   </div>
