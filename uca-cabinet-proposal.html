@@ -6,7 +6,7 @@
 <title>開示から、計測へ──内閣府提出 UCA提言全文 | 日昇リサーチ</title>
 <meta name="description" content="生成AIの学習データ開示をめぐる対立は、開示ではなく照合で解ける。内閣府知的財産戦略推進事務局あてに提出したUCA（Universal Creative Attribution）実装提言の全文記録。">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;700;800&family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;700;800&family=Noto+Sans+JP:wght@300;400;500;700&family=Inter:wght@300;400;500;600&display=swap');
 
 :root {
   --bg: #0d0d0f;
@@ -476,9 +476,24 @@ hr.rule { border: none; border-top: 1px solid var(--border); margin: 2em 0; }
   .demo-banner { flex-direction: column; }
   .hero { min-height: auto; padding: 100px 20px 60px; }
 }
+
+.lang-jump { text-align: center; padding: 34px 20px 6px; }
+.jump-btn { display:inline-block; font-family:'Noto Sans JP',sans-serif;
+  font-size:.82rem; letter-spacing:.06em; text-decoration:none; color:#b8960c;
+  border:1px solid rgba(184,150,12,.45); border-radius:3px; padding:11px 26px;
+  transition:all .25s; }
+.jump-btn:hover { background:rgba(184,150,12,.12); border-color:rgba(184,150,12,.8); }
+.lang-divider { border:0; border-top:1px solid rgba(184,150,12,.22);
+  margin:56px auto 0; max-width:900px; }
+.hero-en h1, .hero-en .hero-sub { font-family:'Inter','Noto Sans JP',sans-serif; }
+.hero-en h1 { letter-spacing:.01em; }
 </style>
 </head>
 <body>
+
+<div class="lang-jump" id="top">
+  <a href="#en" class="jump-btn">English version ↓</a>
+</div>
 
 <!-- ヒーロー -->
 <section class="hero">
@@ -741,6 +756,258 @@ hr.rule { border: none; border-top: 1px solid var(--border); margin: 2em 0; }
     <p>この記録を公開しておくのは、同じことを考えている人が、どこかにいるはずだからだ。</p>
   </div>
 </div>
+
+<hr class="lang-divider">
+
+<div class="lang-jump" id="en">
+  <a href="#top" class="jump-btn">↑ 日本語版へ戻る</a>
+</div>
+
+<section class="hero hero-en">
+  <div class="hero-chain"></div>
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Policy proposal ／ Submitted to the Cabinet Office, Japan</div>
+    <h1>From disclosure<br><em>to measurement.</em></h1>
+    <p class="hero-sub">The dispute over generative AI training has stalled on a single axis: whether operators must disclose their training data. What if it were solved by matching rather than disclosure? A full record of the proposal submitted to Japan's Intellectual Property Strategy Headquarters during the drafting of its Principles Code.</p>
+  </div>
+</section>
+
+<div class="main">
+
+<section class="section">
+<div class="sec-label">Submission record</div>
+<h2>About this document</h2>
+
+<p>This is the full text of a proposal submitted in August 2026 to the Intellectual Property Strategy Promotion Secretariat of Japan's Cabinet Office. The prose has been lightly adapted for the web; the substance is identical to what was submitted.</p>
+
+<table class="data-table">
+<tr><td><strong>Submitted to</strong></td><td>Intellectual Property Strategy Promotion Secretariat, Cabinet Office, Government of Japan</td></tr>
+<tr><td><strong>Subject</strong></td><td>Proposal concerning the "Principles Code (provisional title) on the protection of intellectual property and transparency for the appropriate use of generative AI"</td></tr>
+<tr><td><strong>Submitted by</strong></td><td>Nissho Research Co., Ltd. — Yoshiaki Mihara, Representative Director</td></tr>
+<tr><td><strong>Date</strong></td><td>August 2026</td></tr>
+<tr><td><strong>Length</strong></td><td>Cover letter (1 p.) + main text (6 pp.), A4</td></tr>
+</table>
+
+<p>On the timing. Japan's <em>Intellectual Property Promotion Plan 2026</em>, adopted by the Intellectual Property Strategy Headquarters on June 12, 2026, set out the establishment of a Principles Code together with the promotion of "an environment for returning value to creators." Meanwhile, the public consultation on the draft Code (December 26, 2025 – January 26, 2026) drew sharply opposed comments from rightsholders and from AI developers, and revision is ongoing. There is no later moment at which the design itself can still be proposed.</p>
+</section>
+
+<section class="section">
+<div class="sec-label">Section 1</div>
+<h2>Summary of the proposal</h2>
+
+<p>Debate over generative AI and copyrighted works has stalled on a single axis: whether training data must be disclosed. But what rightsholders actually need is not an inventory of training data. It is confirmation of whether their own work was used, and payment for the use. What operators need to protect is their collection methodology and architecture — trade secrets.</p>
+
+<p>These two are in fact compatible. Not by requiring disclosure, but by making matching possible.</p>
+
+<p>Give each work a hash value — a digital fingerprint — and record only the result of matching against it. The operator publishes not a single item of training data; the rightsholder can mechanically confirm, for their own work alone, whether it was used. And in proportion to the number of uses, a smart contract sends payment automatically.</p>
+
+<div class="pullquote">Neither "you may not use it" nor "use is free by default."<br>The third path: use it — but pay automatically for what you used.</div>
+
+<p>This is named <strong>UCA (Universal Creative Attribution)</strong>. Its design and a staged path to implementation follow.</p>
+</section>
+
+<section class="section">
+<div class="sec-label">Section 2</div>
+<h2>Where we are — remuneration currently happens only through litigation</h2>
+
+<p>Disputes over AI training have already begun to move money. In the United States, a major AI developer was reported to have settled a class action over unauthorised use of books for approximately USD 1.5 billion. The settlement was reported to cover some 500,000 works at a flat rate of roughly USD 3,000 each.</p>
+
+<p>The limits of the current mechanism are visible in that figure. Because the per-work amount is flat, it bears no relation to how much each work was used. A work referenced once and a work that strongly shaped the model's output receive the same sum.</p>
+
+<div class="pullquote">Litigation is a tool for adjudicating whether a right exists.<br>It was never built to measure how much a work contributed.</div>
+
+<p>Domestic debate in Japan, meanwhile, oscillates between the broad permission of Article 30-4 of the Copyright Act and the European opt-out model. So long as the choice is framed as "prohibit" or "permit by default", neither option reaches the most natural outcome: payment flowing in proportion to use.</p>
+
+<p><strong>What is needed is not a new prohibition, nor a new freedom. It is a mechanism for measurement.</strong></p>
+</section>
+
+<section class="section">
+<div class="sec-label">Section 3</div>
+<h2>Shifting the question — solve it by measurement, not disclosure</h2>
+
+<p>In the consultation on the draft Principles Code, it was noted that disclosure of crawler identifiers and architectural detail under Principle 1 risks leaking competitively sensitive information; that individual disclosure requests under Principle 2 raise concerns about abuse and workload; and that Principle 3 could permit exploratory requests lacking adequate grounds.</p>
+
+<p>These are all legitimate concerns, and they are of a kind that cannot be resolved so long as the mechanism is disclosure. Widen the scope and operators bear greater burden and competitive harm; narrow it and rightsholders are not satisfied. Adjusting the scope cannot structurally resolve this opposition.</p>
+
+<p>But shift the vantage point one step and the picture changes. What rightsholders want to know is not "the overall shape of the training data" but "for this one work of mine, was it used or not?" That question can be answered without any disclosure.</p>
+
+<table class="data-table">
+<tr><th>Concern raised in consultation</th><th>UCA's response</th></tr>
+<tr><td>Principle 1: disclosing crawler identifiers and architecture leaks competitively sensitive information</td><td>No training data is published at all. What becomes public is only the fact that a matching facility exists. The demand for transparency is met without releasing sensitive information.</td></tr>
+<tr><td>Principle 2: individual disclosure requests require enormous effort and strain operator resources</td><td>Matching is automated and requires no human intervention. Marginal cost barely rises as request volume grows.</td></tr>
+<tr><td>Principle 2: concern that this substitutes for, or circumvents, judicial process</td><td>A matching result records a fact and does not substitute for adjudication of rights or obligations. It rather facilitates evidence-gathering in litigation.</td></tr>
+<tr><td>Principle 3: risk of permitting groundless exploratory requests (fishing expeditions)</td><td>A querent can only match works for which it can produce the hash value. Exploration is structurally impossible.</td></tr>
+</table>
+
+<p>One further point. Within a "comply or explain" framework, the "explain" can be replaced by a machine-readable record rather than a written account. This is of no small practical significance, because a regime in which the quality of the writing determines the assessment works, perversely, against the more conscientious operator.</p>
+</section>
+
+<section class="section">
+<div class="sec-label">Section 4</div>
+<h2>The architecture of UCA — three pillars</h2>
+
+<div class="pillars">
+<div class="pillar-card">
+  <div class="pillar-num">Pillar one</div>
+  <div class="pillar-title">Authenticity through<br>digital fingerprints</div>
+  <div class="pillar-desc">On registration, a SHA-256 hash is inscribed on a blockchain. Who created what, and when, is recorded permanently in a form that cannot be altered. Applicable to books, music, images and video alike.</div>
+</div>
+<div class="pillar-card">
+  <div class="pillar-num">Pillar two</div>
+  <div class="pillar-title">Automatic remuneration<br>by smart contract</div>
+  <div class="pillar-desc">On each use, payment flows to the author automatically. No intermediary organisation stands in between; code executes the contract. Even at a hundredth of a yen per use, a hundred million uses is a meaningful sum.</div>
+</div>
+<div class="pillar-card">
+  <div class="pillar-num">Pillar three</div>
+  <div class="pillar-title">Privacy preserved through<br>hybrid design</div>
+  <div class="pillar-desc">Only hash values are recorded on-chain; names and addresses reside in an encrypted off-chain database. The right to erasure and immutability are satisfied simultaneously. No legislative amendment is required.</div>
+</div>
+</div>
+
+<h3>Formalities remain unnecessary</h3>
+
+<p>Japan, like all Berne signatories, grants rights at the moment of creation without formality. But that grant does not supply any means of proving the right. A hash record fills only that evidentiary gap — registration remains entirely voluntary — without touching the no-formalities principle itself.</p>
+
+<h3>No price is set in advance</h3>
+
+<p>Estimating the value of a work in advance is close to impossible. An obscure photograph may suddenly be used everywhere. If so, let the volume of use set the price. Nothing used, nothing paid; heavily used, paid accordingly. The author no longer has to put a number on their own work.</p>
+
+<p>This resembles the distribution model of music streaming services, with one decisive difference: there, intermediaries take most of the revenue. UCA places no intermediary in the path; the smart contract pays directly.</p>
+</section>
+
+<section class="section">
+<div class="sec-label">Section 5</div>
+<h2>A staged implementation</h2>
+
+<p>The whole need not be stood up at once. It is realistic to begin within the scope that requires no legislative amendment, accumulate a record, and only then proceed to institutional arrangements.</p>
+
+<div class="roadmap">
+<div class="rm-item">
+  <div class="rm-phase">Stage 1</div>
+  <div class="rm-body">
+    <div class="rm-title">Hash assignment and a public verification tool</div>
+    <div class="rm-desc">Digital archive institutions assign SHA-256 hashes to a portion of their holdings and register them on a private chain under their own management. A verification tool is made publicly available. In parallel, operators subscribing to the Principles Code voluntarily trial responding to matching queries. <strong>Feasible within existing law.</strong></div>
+  </div>
+</div>
+<div class="rm-item">
+  <div class="rm-phase">Stage 2</div>
+  <div class="rm-body">
+    <div class="rm-title">Broader coverage and public-chain interoperation</div>
+    <div class="rm-desc">Coverage is extended and interoperation with public chains begins. Matching records are positioned as usable within evidence-gathering procedures. Requires a supplementary provision to Article 31 of the Copyright Act and an ordinance under the Electronic Signature Act.</div>
+  </div>
+</div>
+<div class="rm-item">
+  <div class="rm-phase">Stage 3</div>
+  <div class="rm-body">
+    <div class="rm-title">Automatic micropayment in full operation</div>
+    <div class="rm-desc">Automatic remuneration by smart contract begins. Payment for out-of-print works and works whose rightsholders cannot be identified is achieved technically. Requires legislative amendment.</div>
+  </div>
+</div>
+</div>
+
+<p>Stage 1 could, given the will, be started within the current fiscal year. Against a policy of "promoting an environment for returning value to creators", there is considerable significance in first having one working thing.</p>
+</section>
+
+<section class="section">
+<div class="sec-label">Section 6</div>
+<h2>Position within the legal framework</h2>
+
+<table class="data-table">
+<tr><th>Instrument</th><th>Compatibility / action required</th><th>Priority</th></tr>
+<tr><td><strong>Copyright Act, Art. 31</strong><br>(reproduction in libraries)</td><td>A supplementary provision enabling the shift to automatic, direct payment by smart contract is required</td><td><span class="badge badge-high">High</span></td></tr>
+<tr><td><strong>Copyright Act, Art. 30-4</strong></td><td>No amendment required. This proposal does not narrow the scope permitted by the article; it adds a path along which payment can flow once use is permitted</td><td>—</td></tr>
+<tr><td><strong>Electronic Signature Act</strong></td><td>An ordinance or guideline expressly encompassing blockchain signatures would be desirable</td><td><span class="badge badge-mid">Medium</span></td></tr>
+<tr><td><strong>Personal Information Protection Act</strong></td><td>No amendment required, by virtue of the off-chain design. Immediate implementation is possible</td><td>—</td></tr>
+<tr><td><strong>Berne Convention</strong><br>(no formalities)</td><td>Compatible, as registration is voluntary. No effect whatever on the conditions for the subsistence of rights</td><td>Compatible</td></tr>
+<tr><td><strong>WIPO Copyright Treaty, Art. 11</strong></td><td>Blockchain may be positioned as a technological protection measure. An area in which Japan could lead international standard-setting</td><td><span class="badge badge-mid">Med–high</span></td></tr>
+</table>
+
+<div class="pullquote">This proposal does not restrict Article 30-4.<br>It achieves remuneration without adding a single prohibition.<br>That is the essential point of the design.</div>
+</section>
+
+<section class="section">
+<div class="sec-label">Section 7</div>
+<h2>Preparing for the quantum era, and international standardisation</h2>
+
+<h3>Staged migration to post-quantum cryptography</h3>
+
+<p>SHA-256 is, for today's computers, effectively unbreakable. But once quantum computers enter genuine operation — from the 2030s onward — that premise may weaken. The US National Institute of Standards and Technology completed standardisation of post-quantum cryptography in 2024.</p>
+
+<p>What matters is not producing a complete answer now, but embedding the possibility of migration into the design philosophy from the outset. In specifying the technical detail, collaboration with Japan's Information-technology Promotion Agency (IPA) and the National Institute of Advanced Industrial Science and Technology (AIST) would be appropriate.</p>
+
+<h3>Naming the concept</h3>
+
+<p>Concepts that changed the world all had names. "The internet." "Blockchain." "Open source." A name is how a concept travels. UCA is proposed as a name because this design could circulate internationally as a concept originating in Japan.</p>
+
+<p>International debate on generative AI and intellectual property currently turns almost entirely on the intensity of regulation. No country has yet put forward a third design: measure, then pay.</p>
+
+<div class="world-grid">
+<div class="world-card">
+  <div class="world-org">WIPO</div>
+  <div class="world-role">Proposal for international standardisation; Japan could lead express incorporation into WCT Article 11</div>
+</div>
+<div class="world-card">
+  <div class="world-org">UNESCO</div>
+  <div class="world-role">Alignment with international standards for cultural heritage protection and digital archives</div>
+</div>
+<div class="world-card">
+  <div class="world-org">IPA / AIST</div>
+  <div class="world-role">Specification of the migration path to post-quantum cryptography</div>
+</div>
+<div class="world-card">
+  <div class="world-org">National Diet Library</div>
+  <div class="world-role">Implementing body for Stage 1; a domestic record as the basis for international proposals</div>
+</div>
+</div>
+</section>
+
+<section class="section">
+<div class="sec-label">Section 8</div>
+<h2>About the submitter</h2>
+
+<p>Nissho Research Co., Ltd. is a small company established for research and dissemination in an unrelated field. The submitter is seventy-three years old and previously worked at Nissan Motor Co., Ltd. in export operations and Middle East sales, handling foreign exchange administration.</p>
+
+<p>A word on why this proposal was written. My wife is a composer and a member of the Japanese Society for Rights of Authors, Composers and Publishers. I have watched, as an everyday matter, the position of a rightsholder who cannot tell whether her work has been used and has no means of finding out. At the same time I am myself a daily user of generative AI in my work — including in drafting this proposal. Its developer is a party to the settlement described in Section 2.</p>
+
+<div class="pullquote">I have one foot on the side that would prohibit,<br>and one on the side that uses.<br>I do not write from either alone.</div>
+</section>
+
+<section class="section">
+<div class="sec-label">Materials</div>
+<h2>The submitted document, and a working prototype</h2>
+
+<div class="demo-banner">
+  <div class="demo-icon">📄</div>
+  <div class="demo-body">
+    <div class="demo-title">Submitted document (PDF, Japanese)</div>
+    <div class="demo-desc">The full cover letter and proposal as actually sent to the Intellectual Property Strategy Promotion Secretariat. A4, 7 pages.</div>
+  </div>
+  <a href="uca-cabinet-proposal-20260816.pdf" target="_blank" class="demo-btn">Open PDF →</a>
+</div>
+
+<div class="demo-banner">
+  <div class="demo-icon">🔗</div>
+  <div class="demo-body">
+    <div class="demo-title">Blockchain IP protection demo v2</div>
+    <div class="demo-desc">Generate SHA-256 hashes from real files in the registration tab; simulate automatic settlement by smart contract in the remuneration tab. Runs entirely in the browser, no installation required.</div>
+  </div>
+  <a href="https://yymm77.github.io/seimei-kagaku/blockchain-ip-demo-v2.html" target="_blank" class="demo-btn">Open the demo →</a>
+</div>
+
+<div class="note">The demo is a proof of concept. It does not write to a live blockchain.</div>
+
+<div class="note">A full technical specification of the design described here is published separately: <a href="https://yymm77.github.io/seimei-kagaku/uca-technical-specification.html">Corpus Transparency and Usage Attribution</a> (English and Japanese).</div>
+</section>
+
+<div class="finale">
+<div class="finale-inner">
+<p class="finale-quote">Institutions do not move unless someone puts forward a design.<br>You need not be an expert. If you are affected, there are things you can write.</p>
+<p>Knowledge should be released. Payment should reach its author. Both, at last, are possible together.</p>
+<p>This record is published because someone, somewhere, is thinking the same thing.</p>
+</div>
+</div>
+
+</div><!-- /main -->
 
 <footer>
   <div style="margin-bottom:12px;">

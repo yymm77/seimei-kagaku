@@ -142,10 +142,46 @@
     .royalty-flow { flex-direction: column; }
     .flow-arrow { transform: rotate(90deg); }
   }
+
+.lang-jump { text-align:center; padding:30px 20px 4px; }
+.jump-btn { display:inline-block; font-size:.8rem; letter-spacing:.06em;
+  text-decoration:none; color:#b8960c; border:1px solid rgba(184,150,12,.45);
+  border-radius:3px; padding:10px 24px; transition:all .25s; }
+.jump-btn:hover { background:rgba(184,150,12,.12); border-color:rgba(184,150,12,.8); }
+.lang-divider { border:0; border-top:1px solid rgba(184,150,12,.25);
+  margin:52px auto 0; max-width:1000px; }
+.en-guide { padding:8px 20px 40px; }
+.en-inner { max-width:880px; margin:0 auto; text-align:left;
+  font-family:'Inter',-apple-system,sans-serif; }
+.en-inner .jump-btn { display:block; width:max-content; margin:0 auto 34px; }
+.en-h { font-size:1.5rem; font-weight:500; color:#b8960c;
+  letter-spacing:.01em; margin:0 0 18px; }
+.en-h3 { font-size:1.05rem; font-weight:500; margin:34px 0 12px;
+  padding-bottom:7px; border-bottom:1px solid rgba(184,150,12,.28); }
+.en-p { font-size:.93rem; line-height:1.85; margin:0 0 14px; opacity:.9; }
+.en-table { width:100%; border-collapse:collapse; font-size:.85rem;
+  line-height:1.65; margin:6px 0 4px; }
+.en-table th { text-align:left; font-weight:500; color:#b8960c;
+  padding:9px 12px; border-bottom:1px solid rgba(184,150,12,.3); }
+.en-table td { padding:11px 12px; vertical-align:top;
+  border-bottom:1px solid rgba(184,150,12,.13); opacity:.9; }
+.en-table td:first-child { white-space:nowrap; }
+.en-table em { opacity:.72; font-size:.93em; }
+.en-links { margin:30px 0 0; display:flex; flex-wrap:wrap; gap:10px; }
+.en-links a { font-size:.82rem; text-decoration:none; color:#b8960c;
+  border:1px solid rgba(184,150,12,.4); border-radius:3px; padding:9px 16px; }
+.en-links a:hover { background:rgba(184,150,12,.1); }
+.en-note { margin-top:26px; font-size:.76rem; opacity:.55; }
+@media (max-width:640px){ .en-table td:first-child{white-space:normal;} }
 </style>
 <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 </head>
 <body>
+
+<div class="lang-jump" id="top">
+  <a href="#en" class="jump-btn">Guide for English readers ↓</a>
+</div>
+
 
 <header>
   <h1>知的創造物保護システム <span class="version-tag">v2.0</span></h1>
@@ -512,6 +548,60 @@
   </div>
 
 </div>
+
+
+<hr class="lang-divider">
+
+<section class="en-guide" id="en">
+  <div class="en-inner">
+    <a href="#top" class="jump-btn">↑ 日本語のページ先頭へ</a>
+
+    <h2 class="en-h">Guide for English readers</h2>
+
+    <p class="en-p">This is a working proof of concept for <strong>UCA (Universal Creative Attribution)</strong> — infrastructure for recording that a work exists, verifying its integrity, and settling remuneration in proportion to recorded use.</p>
+
+    <p class="en-p">The interface is in Japanese, but the tool is fully operable without reading it. Everything runs in your browser. <strong>No file is ever transmitted to any server.</strong> Nothing is written to a live blockchain; the ledger is simulated in memory.</p>
+
+    <h3 class="en-h3">The six tabs, in order</h3>
+
+    <table class="en-table">
+      <tr><th>Tab</th><th>What it does</th></tr>
+      <tr><td><strong>① 作品登録</strong><br><em>Register a work</em></td><td>Drop any file into the dashed box. A SHA-256 hash is computed locally and shown. Fill in title, author, wallet address, type, per-use rate and licence terms, then press the button at the foot of the form to append a block.</td></tr>
+      <tr><td><strong>② 対価還元</strong><br><em>Remuneration</em></td><td>Simulate uses of a registered work and watch a smart contract settle payment to the author's wallet automatically, with no intermediary.</td></tr>
+      <tr><td><strong>③ 台帳閲覧</strong><br><em>View the ledger</em></td><td>Inspect the chain of blocks — hash, previous hash, timestamp, metadata, accumulated usage.</td></tr>
+      <tr><td><strong>④ 真正性検証</strong><br><em>Verify authenticity</em></td><td>Drop a file to check whether its hash matches a registered block. A match confirms the work is registered and unaltered; a mismatch indicates it is unregistered or has been modified.</td></tr>
+      <tr><td><strong>⑤ 法体系分析</strong><br><em>Legal framework analysis</em></td><td>An analysis of how this design interacts with existing Japanese statutes and international instruments.</td></tr>
+      <tr><td><strong>⑥ 技術説明</strong><br><em>Technical notes</em></td><td>How the hashing, chaining and settlement simulation work.</td></tr>
+    </table>
+
+    <h3 class="en-h3">Form labels you will encounter</h3>
+
+    <table class="en-table">
+      <tr><td>作品タイトル</td><td>Title of the work</td></tr>
+      <tr><td>著作者名</td><td>Author's name</td></tr>
+      <tr><td>著作者ウォレットアドレス</td><td>Author's wallet address (destination for remuneration)</td></tr>
+      <tr><td>種別</td><td>Type — 書籍 book / 音楽 music / 画像・絵画 image / 映像 video / 学術論文 academic paper / その他 other</td></tr>
+      <tr><td>参照1回あたりの対価（円）</td><td>Amount per use, in yen</td></tr>
+      <tr><td>ライセンス条件</td><td>Licence — 閲覧のみ view only / 非営利複製可 non-commercial copying permitted, payment due / 商用利用可 commercial use permitted, payment due / 著作者指定条件 author-specified</td></tr>
+      <tr><td>備考</td><td>Notes</td></tr>
+      <tr><td>⬡ ブロックチェーンに登録</td><td>Register on the blockchain (the submit button)</td></tr>
+    </table>
+
+    <h3 class="en-h3">What this demonstrates, and what it does not</h3>
+
+    <p class="en-p">It demonstrates that content identity, tamper-evident registration and usage-proportional settlement can be assembled into a working whole, on ordinary web technology, without a server and without transmitting the work itself.</p>
+
+    <p class="en-p">It does not demonstrate corpus-side matching — determining whether a registered work entered an AI training corpus. That is specified separately and is the substantive part of the design. <strong>Registration alone measures nothing.</strong></p>
+
+    <div class="en-links">
+      <a href="https://yymm77.github.io/seimei-kagaku/uca-technical-specification.html">Technical specification (English &amp; Japanese)</a>
+      <a href="https://yymm77.github.io/seimei-kagaku/uca-cabinet-proposal.html">Proposal submitted to the Cabinet Office of Japan</a>
+      <a href="https://yymm77.github.io/seimei-kagaku/copyright-proposal.html">The wider UCA concept</a>
+    </div>
+
+    <p class="en-note">Nissho Research Co., Ltd. — Yoshiaki Mihara, Representative Director. Tama City, Tokyo, Japan.</p>
+  </div>
+</section>
 
 <footer>
   <p>知的創造物保護システム プロトタイプ v2.0</p>

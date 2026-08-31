@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Corpus Transparency and Usage Attribution — UCA Technical Specification | Nissho Research</title>
+<meta name="description" content="A technical specification for measuring whether a registered work entered an AI training corpus, without disclosing the corpus. Built on ISO 24138:2024 (ISCC) and RFC 6962 transparency-log constructions.">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;700;800&family=Noto+Sans+JP:wght@300;400;500;700&family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+  --bg: #0d0d0f;
+  --surface: #141418;
+  --surface2: #1c1c22;
+  --border: rgba(255,255,255,0.08);
+  --text: #e8e6e0;
+  --text-dim: rgba(232,230,224,0.55);
+  --gold: #c9a84c;
+  --gold-dim: rgba(201,168,76,0.15);
+  --teal: #4a9b8f;
+  --teal-dim: rgba(74,155,143,0.12);
+  --red: #c0392b;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Shippori Mincho', serif;
+  font-size: 16px;
+  line-height: 2;
+}
+
+/* ヒーロー */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 80px 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 40%, rgba(74,155,143,0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 30% at 20% 80%, rgba(201,168,76,0.07) 0%, transparent 60%);
+}
+
+.hero-chain {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0.04;
+}
+.hero-chain::before {
+  content: '⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡';
+  font-size: 2rem;
+  color: var(--teal);
+  letter-spacing: 1rem;
+  line-height: 3rem;
+  word-break: break-all;
+  display: block;
+  width: 200%;
+  animation: drift 30s linear infinite;
+}
+@keyframes drift { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+.hero-inner { position: relative; z-index: 1; max-width: 800px; }
+
+.hero-eyebrow {
+  font-family: 'Inter', 'Noto Sans JP', -apple-system, sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.3em;
+  color: var(--teal);
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.hero-eyebrow::before,
+.hero-eyebrow::after {
+  content: '';
+  width: 40px;
+  height: 1px;
+  background: var(--teal);
+  opacity: 0.4;
+}
+
+.hero h1 {
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  font-weight: 800;
+  line-height: 1.4;
+  margin-bottom: 20px;
+  letter-spacing: 0.03em;
+}
+.hero h1 em {
+  font-style: normal;
+  color: var(--gold);
+}
+
+.hero-sub {
+  font-family: 'Inter', 'Noto Sans JP', -apple-system, sans-serif;
+  font-size: 0.95rem;
+  color: var(--text-dim);
+  line-height: 1.9;
+  max-width: 560px;
+  margin: 0 auto 40px;
+}
+
+.hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(74,155,143,0.4);
+  color: var(--teal);
+  padding: 12px 32px;
+  font-family: 'Inter', 'Noto Sans JP', -apple-system, sans-serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.1em;
+  text-decoration: none;
+  transition: all 0.25s;
+}
+.hero-cta:hover {
+  background: var(--teal-dim);
+  border-color: var(--teal);
+}
+
+/* ナビ */
+.toc-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(13,13,15,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 24px;
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.toc-bar a {
+  font-family: 'Inter', 'Noto Sans JP', -apple-system, sans-serif;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  text-decoration: none;
+  padding: 5px 14px;
+  border-radius: 20px;
+  transition: all 0.2s;
+  letter-spacing: 0.05em;
+}
+.toc-bar a:hover { color: var(--text); background: var(--surface2); }
+
+/* メイン */
+.main { max-width: 800px; margin: 0 auto; padding: 0 24px; }
+
+/* セクション */
+.section {
+  padding: 80px 0 60px;
+  border-bottom: 1px solid var(--border);
+}
+.section:last-of-type { border-bottom: none; }
+
+.sec-label {
+  font-family: 'Inter', 'Noto Sans JP', -apple-system, sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.3em;
+  color: var(--teal);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sec-label::after {
+  content: '';
+  flex: 1;
+  max-width: 60px;
+  height: 1px;
+  background: var(--teal);
+  opacity: 0.3;
+}
+
+.section h2 {
+  font-size: clamp(1.3rem, 3vw, 1.8rem);
+  font-weight: 800;
+  line-height: 1.5;
+  margin-bottom: 32px;
+  color: var(--text);
+}
+
+.section h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--gold);
+  margin: 2.5em 0 1em;
+  padding-left: 16px;
+  border-left: 2px solid var(--gold);
+}
+
+.section p { margin-bottom: 1.6em; color: var(--text); }
+
+/* 三本柱カード */
+.pillars {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin: 2.5em 0;
+}
+.pillar-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--teal);
+  padding: 24px 20px;
+}
+.pillar-num {
+  font-family: 'Inter', 'Noto Sans JP', -apple-system, sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  color: var(--teal);
+  margin-bottom: 10px;
+}
+.pillar-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+.pillar-desc {
+  font-family: 'Inter', 'Noto Sans JP', -apple-system, sans-serif;
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  line-height: 1.8;
+}
+
+/* 引用ボックス */
+.pullquote {
+  border-left: 3px solid var(--gold);
+  padding: 20px 28px;
+  margin: 2.5em 0;
+  background: var(--gold-dim);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.9;
+  color: var(--text);
+}
+
+/* データテーブル */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Inter', 'Noto Sans JP', -apple-system, sans-serif;
+  font-size: 0.83rem;
+  margin: 2em 0;
+}
+.data-table th {
+  background: var(--surface2);
+  color: var(--teal);
+  padding: 10px 14px;
+  text-align: left;
+  font-weight: 700;
+  border-bottom: 1px solid var(--teal);
+  letter-spacing: 0.05em;
+}
+.data-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  line-height: 1.7;
+  color: var(--text);
+}
+.data-table tr:hover td { background: var(--surface); }
+
+/* 優先度バッジ */
+.badge {
+  display: inline-block;
+  font-family: 'Inter', 'Noto Sans JP', -apple-system, sans-serif;
+  font-size: 0.68rem;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+.badge-high { background: rgba(192,57,43,0.2); color: #e74c3c; border: 1px solid rgba(192,57,43,0.3); }
+.badge-mid { background: rgba(201,168,76,0.15); color: var(--gold); border: 1px solid rgba(201,168,76,0.3); }
+
+/* ロードマップ */
+.roadmap { margin: 2em 0; }
+.rm-item {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 28px;
+  align-items: flex-start;
+}
+.rm-phase {
+  font-family: 'Inter', 'Noto Sans JP', -apple-system, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--teal);
+  background: var(--teal-dim);
+  border: 1px solid rgba(74,155,143,0.3);
+  padding: 4px 12px;
+  border-radius: 3px;
+  min-width: 80px;
+  text-align: center;
+  margin-top: 4px;
+  white-space: nowrap;
+}
+.rm-body {
+  flex: 1;
+  border-left: 1px solid var(--border);
+  padding-left: 20px;
+}
+.rm-title {
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: var(--text);
+}
+.rm-desc {
+  font-family: 'Inter', 'Noto Sans JP', -apple-system, sans-serif;
+  font-size: 0.83rem;
+  color: var(--text-dim);
+  line-height: 1.8;
+}
+
+/* 注記 */
+.note {
+  font-family: 'Inter', 'Noto Sans JP', -apple-system, sans-serif;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  border: 1px dashed var(--border);
+  padding: 14px 18px;
+  margin: 1.5em 0;
+  line-height: 1.8;
+}
+
+/* デモリンク */
+.demo-banner {
+  background: var(--surface);
+  border: 1px solid var(--teal);
+  padding: 24px 28px;
+  margin: 2.5em 0;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.demo-icon { font-size: 2rem; }
+.demo-body { flex: 1; min-width: 200px; }
+.demo-title {
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: var(--teal);
+}
+.demo-desc {
+  font-family: 'Inter', 'Noto Sans JP', -apple-system, sans-serif;
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  line-height: 1.7;
+}
+.demo-btn {
+  display: inline-block;
+  background: var(--teal);
+  color: #000;
+  font-family: 'Inter', 'Noto Sans JP', -apple-system, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 10px 22px;
+  text-decoration: none;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+.demo-btn:hover { opacity: 0.85; }
+
+/* 量子セクション */
+.quantum-box {
+  background: linear-gradient(135deg, var(--surface) 0%, rgba(74,155,143,0.05) 100%);
+  border: 1px solid rgba(74,155,143,0.2);
+  padding: 32px 28px;
+  margin: 2em 0;
+}
+.quantum-box h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--teal);
+  margin-bottom: 16px;
+  font-family: 'Inter', 'Noto Sans JP', -apple-system, sans-serif;
+}
+.quantum-box p {
+  font-family: 'Inter', 'Noto Sans JP', -apple-system, sans-serif;
+  font-size: 0.88rem;
+  color: var(--text-dim);
+  line-height: 1.9;
+  margin-bottom: 0;
+}
+
+/* 世界発信 */
+.world-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin: 2em 0;
+}
+.world-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  padding: 18px 16px;
+}
+.world-org {
+  font-family: 'Inter', 'Noto Sans JP', -apple-system, sans-serif;
+  font-size: 0.72rem;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+.world-role {
+  font-family: 'Inter', 'Noto Sans JP', -apple-system, sans-serif;
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  line-height: 1.7;
+}
+
+/* フィナーレ */
+.finale {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 80px 24px;
+  text-align: center;
+}
+.finale-inner { max-width: 600px; margin: 0 auto; }
+.finale p {
+  font-family: 'Inter', 'Noto Sans JP', -apple-system, sans-serif;
+  font-size: 0.95rem;
+  color: var(--text-dim);
+  line-height: 2;
+  margin-bottom: 1.5em;
+}
+.finale-quote {
+  font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.9;
+  margin: 2.5em 0;
+}
+.finale-quote em {
+  font-style: normal;
+  color: var(--gold);
+}
+
+/* フッター */
+footer {
+  background: #080809;
+  color: rgba(255,255,255,0.3);
+  text-align: center;
+  padding: 32px 24px;
+  font-family: 'Inter', 'Noto Sans JP', -apple-system, sans-serif;
+  font-size: 0.78rem;
+  line-height: 2;
+}
+footer a { color: var(--teal); text-decoration: none; }
+
+hr.rule { border: none; border-top: 1px solid var(--border); margin: 2em 0; }
+
+@media (max-width: 600px) {
+  .pillars { grid-template-columns: 1fr; }
+  .world-grid { grid-template-columns: 1fr 1fr; }
+  .demo-banner { flex-direction: column; }
+  .hero { min-height: auto; padding: 100px 20px 60px; }
+}
+
+code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .88em;
+       background: rgba(184,150,12,.10); padding: 1px 5px; border-radius: 3px; }
+h1, h2 { letter-spacing: .01em; }
+.hero-sub { max-width: 46em; }
+p { text-align: left; }
+
+footer { border-top: 1px solid rgba(184,150,12,.22); margin-top: 64px;
+         padding: 40px 24px 56px; text-align: center; }
+.f-uca { font-size: .82rem; line-height: 2; opacity: .85; }
+.f-uca a { color: #b8960c; text-decoration: none; }
+.f-nav { margin-top: 20px; font-size: .8rem; line-height: 2.1; }
+.f-nav a { color: #b8960c; margin: 0 8px; text-decoration: none; }
+.f-copy { margin-top: 18px; font-size: .74rem; line-height: 1.95; opacity: .58; }
+
+.lang-jump { text-align: center; padding: 34px 20px 6px; }
+.jump-btn { display: inline-block; font-family: 'Inter','Noto Sans JP',sans-serif;
+  font-size: .82rem; letter-spacing: .06em; text-decoration: none;
+  color: #b8960c; border: 1px solid rgba(184,150,12,.45);
+  border-radius: 3px; padding: 11px 26px; transition: all .25s; }
+.jump-btn:hover { background: rgba(184,150,12,.12); border-color: rgba(184,150,12,.8); }
+.lang-divider { border: 0; border-top: 1px solid rgba(184,150,12,.22);
+  margin: 56px auto 0; max-width: 900px; }
+.hero-ja h1 { font-family: 'Shippori Mincho', serif; }
+</style>
+</head>
+<body>
+
+<div class="lang-jump" id="top">
+  <a href="#ja" class="jump-btn">日本語版はこちら ↓</a>
+</div>
+
+<header class="hero">
+<div class="hero-inner">
+  <div class="hero-eyebrow">Technical Specification / UCA</div>
+  <h1>Corpus transparency<br>and usage attribution</h1>
+  <p class="hero-sub">Measuring whether a registered work entered a training corpus — without disclosing the corpus. A five-layer specification built on ISO 24138:2024 and RFC 6962 transparency-log constructions.</p>
+  <a href="#s1" class="hero-cta">Read the specification ↓</a>
+</div>
+</header>
+
+<nav class="toc-bar">
+  <a href="#s1">Scope</a>
+  <a href="#s2">Principles</a>
+  <a href="#s3">Architecture</a>
+  <a href="#s4">Registration</a>
+  <a href="#s5">Matching</a>
+  <a href="#s6">Audit</a>
+  <a href="#s7">Accounting</a>
+  <a href="#s8">Post-quantum</a>
+  <a href="#s9">Neutrality</a>
+</nav>
+
+<div class="main">
+
+<section class="section" id="s1">
+<div class="sec-label">Section 1</div>
+<h2>Scope — what this answers, and what it does not</h2>
+
+<p>This specification defines infrastructure that answers two questions. First: was this particular work present in the training corpus of this particular model? Second: if so, how is that use recorded and remunerated?</p>
+
+<p>The first question is designed to be answerable <strong>without the operator disclosing any part of its corpus</strong>. The second follows from the first.</p>
+
+<div class="pullquote">Rightsholders do not want the corpus.<br>They want an answer about one work they already hold.<br>That question can be answered without disclosure.</div>
+
+<h3>Out of scope</h3>
+
+<p>Stating the boundaries first is deliberate. A specification that overstates its reach is harder to evaluate than one that does not.</p>
+
+<table class="data-table">
+<tr><th>Excluded</th><th>Reason</th></tr>
+<tr><td><strong>Defining a content identifier</strong></td><td>ISO 24138:2024 (ISCC) already does this. This specification uses it unmodified.</td></tr>
+<tr><td><strong>Determining lawfulness</strong></td><td>A question for each jurisdiction. This layer records facts, not entitlements.</td></tr>
+<tr><td><strong>Requiring corpus disclosure</strong></td><td>Disclosure is the problem this specification exists to avoid.</td></tr>
+<tr><td><strong>Analogue transmission</strong></td><td>Content identity does not survive acoustic transmission. Acoustic fingerprinting addresses that domain — complementary, not competing.</td></tr>
+<tr><td><strong>Live performance</strong></td><td>No digital object exists to identify.</td></tr>
+<tr><td><strong>Replacing judicial process</strong></td><td>Attestations are evidence, not adjudication.</td></tr>
+</table>
+
+<h3>Terms</h3>
+
+<p><strong>Operator</strong> — a party that assembles a corpus of content for training a model. <strong>Registrant</strong> — a rightsholder who has registered a work. <strong>Attestation</strong> — a signed statement by an operator that a queried work was, or was not, present in a specified corpus epoch. <strong>Corpus epoch</strong> — a named, immutable snapshot of a corpus at a point in time.</p>
+</section>
+
+<section class="section" id="s2">
+<div class="sec-label">Section 2</div>
+<h2>Design principles</h2>
+
+<div class="pillars">
+<div class="pillar-card">
+  <div class="pillar-num">One</div>
+  <div class="pillar-title">Matching,<br>not disclosure</div>
+  <div class="pillar-desc">Transparency debates have converged on a single axis: how much of the corpus must be published. That axis has no equilibrium — widening it exposes collection methodology, narrowing it satisfies no one. A closed query about a single work escapes the axis entirely.</div>
+</div>
+<div class="pillar-card">
+  <div class="pillar-num">Two</div>
+  <div class="pillar-title">Measure,<br>do not price</div>
+  <div class="pillar-desc">The value of a work cannot reliably be established in advance. An obscure photograph may be used a hundred million times; a costly production twice. This layer counts uses and divides a pool. It sets no prices.</div>
+</div>
+<div class="pillar-card">
+  <div class="pillar-num">Three</div>
+  <div class="pillar-title">Build on<br>existing standards</div>
+  <div class="pillar-desc">Identification is solved. ISO 24138:2024 specifies a similarity-preserving content code with both exact and perceptual components, with a normative reference implementation. This specification does not restate, extend, or compete with it.</div>
+</div>
+<div class="pillar-card">
+  <div class="pillar-num">Four</div>
+  <div class="pillar-title">Cryptographic<br>agility</div>
+  <div class="pillar-desc">Copyright terms run for the life of the author plus fifty to seventy years. No algorithm chosen in 2026 can be assumed to hold that long. The requirement is not to select correct algorithms but to make replacement an ordinary operation.</div>
+</div>
+</div>
+</section>
+
+<section class="section" id="s3">
+<div class="sec-label">Section 3</div>
+<h2>Architecture — five layers</h2>
+
+<div class="roadmap">
+<div class="rm-item"><div class="rm-phase">Layer 5</div><div class="rm-body"><div class="rm-title">Audit</div><div class="rm-desc">Third-party verification of attestations against published commitments.</div></div></div>
+<div class="rm-item"><div class="rm-phase">Layer 4</div><div class="rm-body"><div class="rm-title">Settlement</div><div class="rm-desc">Automated distribution of a remuneration pool across counted inclusions.</div></div></div>
+<div class="rm-item"><div class="rm-phase">Layer 3</div><div class="rm-body"><div class="rm-title">Accounting</div><div class="rm-desc">What is counted, and in what units.</div></div></div>
+<div class="rm-item"><div class="rm-phase">Layer 2</div><div class="rm-body"><div class="rm-title">Matching</div><div class="rm-desc">Query protocol over ISO 24138 codes. Closed questions, signed answers.</div></div></div>
+<div class="rm-item"><div class="rm-phase">Layer 1</div><div class="rm-body"><div class="rm-title">Registration</div><div class="rm-desc">Anchoring of work identity and claim. Rests on existing ISCC infrastructure.</div></div></div>
+</div>
+
+<p>The boundary between layers 2 and 3 is significant. <strong>Layers 1 and 2 can be implemented on existing standards and existing public registries.</strong> Layers 3 through 5 require new agreements — but not, in the first instance, new law.</p>
+</section>
+
+<section class="section" id="s4">
+<div class="sec-label">Section 4</div>
+<h2>Layer 1 — Registration</h2>
+
+<p>To create a durable, verifiable record that a specified party claimed a specified work at a specified time, and to declare that party's position on machine learning use.</p>
+
+<p>Registration is voluntary. It does not create rights, and its absence does not diminish them. This preserves compatibility with the Berne Convention's prohibition on formalities: registration here is an evidentiary and operational convenience, never a condition of protection.</p>
+
+<h3>Record structure</h3>
+
+<table class="data-table">
+<tr><th>Field</th><th>Content</th></tr>
+<tr><td><code>iscc</code></td><td>ISCC-CODE per ISO 24138:2024 (composite)</td></tr>
+<tr><td><code>instance</code></td><td>Instance-Code — exact data identity</td></tr>
+<tr><td><code>content</code></td><td>Content-Code — perceptual similarity</td></tr>
+<tr><td><code>claimant</code></td><td>Commitment to registrant identity; identity held off-chain</td></tr>
+<tr><td><code>policy</code></td><td>Machine-readable position on ML training use</td></tr>
+<tr><td><code>alg</code></td><td>Explicit algorithm identifiers (see Section 8)</td></tr>
+<tr><td><code>sig</code></td><td>Signature over the above</td></tr>
+</table>
+
+<h3>On-chain and off-chain</h3>
+
+<p>Only hashes and commitments are anchored. Names, addresses and payment instructions reside off-chain in encrypted storage. This resolves an otherwise genuine conflict between immutability and the right to erasure: personal data can be deleted without disturbing the anchored record, because the anchored record never contained it.</p>
+
+<div class="note"><strong>The work itself is never transmitted.</strong> Codes are computed client-side. A registry that does not hold works cannot lose them, cannot leak them, and need not indemnify against either.</div>
+
+<h3>Policy declaration</h3>
+
+<p>A machine-readable field expressing the registrant's position on machine learning use — at minimum: permitted, not permitted, conditional.</p>
+
+<p>The significance of this field is that it converts an intention into something an automated collection process can read at the moment it identifies a work. <strong>A policy that must be looked up by a human is a policy that is not consulted.</strong> Whether such a declaration carries legal effect is a matter for each jurisdiction; this layer records it and does not enforce it.</p>
+</section>
+
+<section class="section" id="s5">
+<div class="sec-label">Section 5</div>
+<h2>Layer 2 — Matching</h2>
+
+<p>A querent submits an ISCC-CODE together with proof of registration. The operator returns a signed attestation naming a verdict — present, absent, or indeterminate — the corpus epoch concerned, the matched unit type, the distance where applicable, and a proof.</p>
+
+<h3>Exact and near matching</h3>
+
+<p>Matching on the Instance-Code answers: was this byte-identical object in the corpus? Matching on the Content-Code, against a declared distance threshold, answers: was an object perceptually equivalent to this one in the corpus?</p>
+
+<p><strong>Near matching is not an enhancement; it is a necessity.</strong> Training pipelines resize images, re-encode audio, and normalise text. An exact-match-only system returns <em>absent</em> for works that were in fact ingested, and does so systematically rather than randomly. ISO 24138's Content-Code is designed for precisely this condition: the same content yields the same code after re-encoding or compression.</p>
+
+<div class="note">A commitment over Content-Codes admits exact membership testing of the <em>code</em>, not of the <em>work</em>. Two perceptually similar works may share a Content-Code. An attestation therefore asserts that a member with the given code was present — not that the querent's specific work was. This is a limitation of similarity-preserving identifiers and is stated in attestations rather than obscured.</div>
+
+<h3>Properties</h3>
+
+<table class="data-table">
+<tr><th>Property</th><th>Mechanism</th></tr>
+<tr><td><strong>Non-disclosure</strong></td><td>The operator publishes a root and answers closed questions. No member list, no collection methodology, no architectural detail is exposed.</td></tr>
+<tr><td><strong>Non-exploration</strong></td><td>A querent can only ask about codes it can produce, and codes are produced from content. Speculative enumeration is not possible.</td></tr>
+<tr><td><strong>Bounded cost</strong></td><td>A query is an indexed lookup with a proof extraction. Marginal cost does not grow with query volume — unlike disclosure regimes, whose burden scales with request count.</td></tr>
+<tr><td><strong>Non-adjudication</strong></td><td>An attestation records membership. It does not determine lawfulness, licence status, or amounts owed.</td></tr>
+</table>
+
+<h3>Corpus epochs</h3>
+
+<p>An operator declares corpus epochs: named, immutable snapshots. Every attestation names the epoch it concerns. Without epochs, "was it in the corpus" is not a well-formed question, because corpora change continuously. With them, attestations are reproducible: a second query against the same epoch must return the same verdict.</p>
+</section>
+
+<section class="section" id="s6">
+<div class="sec-label">Section 6</div>
+<h2>Layer 5 — Audit</h2>
+
+<p>Everything above assumes the operator answers honestly. That assumption cannot be made.</p>
+
+<div class="pullquote">An operator with an incentive to answer <em>absent</em> may answer <em>absent</em>.<br>Self-reporting under financial pressure is not transparency.</div>
+
+<h3>Commitment</h3>
+
+<p>Before an epoch is used for training, the operator computes a Merkle tree over the ISCC-CODEs of all corpus members and publishes the root, following the RFC 6962 construction already used by ISCC transparency logs.</p>
+
+<p><strong>The root discloses nothing.</strong> It is a fixed-length value from which no member can be recovered. <strong>But it binds.</strong> Once published and timestamped, the operator cannot alter what the corpus contained without producing an inconsistent checkpoint.</p>
+
+<h3>One structural change: sorting</h3>
+
+<p>Members are committed as a <strong>sorted</strong> Merkle tree rather than an append-ordered one. This is the sole structural departure from existing transparency-log practice, and it is the substantive contribution of this specification.</p>
+
+<p>A sorted tree admits <strong>non-membership proofs</strong>: absence of a code is proved by exhibiting the two adjacent leaves that bracket the queried position. An append-ordered log cannot do this.</p>
+
+<div class="quantum-box">
+<h4>Why sorting matters more than it appears</h4>
+<p>Under an unsorted commitment, <em>present</em> is provable and <em>absent</em> is not. That leaves unconstrained precisely the verdict an operator has a financial incentive to falsify. The asymmetry is not incidental — it is the whole security question.</p>
+</div>
+
+<h3>What this achieves, and what it does not</h3>
+
+<p>A dishonest <em>absent</em> verdict remains possible but becomes detectable and permanent. If the work is later shown to have been present in the committed epoch — by discovery in litigation or any other means — the false attestation is signed, timestamped, and undeniable.</p>
+
+<p>The design goal is not to make dishonesty impossible. <strong>It is to make dishonesty carry a durable, attributable record.</strong></p>
+
+<div class="note"><strong>Stated limitation.</strong> An operator may commit to a corpus that omits members it in fact trained on. No cryptographic mechanism detects this from the commitment alone, because the commitment is a statement about a set the operator alone assembled. Detection depends on external evidence. A corpus commitment is a commitment to a claim, not a proof of completeness.</div>
+</section>
+
+<section class="section" id="s7">
+<div class="sec-label">Section 7</div>
+<h2>Layer 3 — Accounting</h2>
+
+<p>The countable unit is the <strong>inclusion-epoch</strong>: one registered work, verified present in one committed corpus epoch. It is countable because it is a set-membership fact, verified by Layer 2 and bound by Layer 5.</p>
+
+<h3>What is deliberately not counted</h3>
+
+<p>Contribution weight — the degree to which a work influenced a model's outputs — is not counted in this version. No accepted method exists for measuring it at scale; influence-function approaches remain computationally impractical for production models. A specification requiring contribution weighting would be unimplementable, and would therefore produce no distribution at all.</p>
+
+<p>This is a real limitation. Within an epoch, a work referenced once and a work of decisive influence are treated alike.</p>
+
+<p>It is, however, an improvement on the present alternative. Litigation settlements have distributed uniform per-work amounts across hundreds of thousands of works — the same coarseness, reached at far greater cost and only retrospectively. <strong>A coarse measure applied continuously is more useful than a coarse measure imposed once by a court.</strong></p>
+
+<h3>Design for later refinement</h3>
+
+<p>The accounting record carries a <code>weight</code> field, defaulting to 1. When contribution measurement becomes practicable, weights may be populated without altering the record structure, the query protocol, or the settlement mechanism.</p>
+
+<p>The intended sequence is coarse distribution that works, then refinement — not refinement that does not exist, therefore no distribution.</p>
+
+<h3>Division, not pricing</h3>
+
+<p>An operator's obligation for an epoch is a pool; the pool is divided across inclusion-epochs. This decouples the total from the per-work amount, so the number of registered works can grow without either bankrupting operators or requiring per-work negotiation.</p>
+
+<p>How pool size is determined — a fixed sum, a revenue share, a negotiated rate, a statutory levy — is outside this specification, deliberately. <strong>The unit is portable across all of them.</strong></p>
+</section>
+
+<section class="section" id="s8">
+<div class="sec-label">Section 8</div>
+<h2>Post-quantum migration</h2>
+
+<p>Hash preimage resistance degrades quadratically under quantum search — a loss of strength restored by digest length. Signatures do not degrade gracefully; the loss there is total rather than partial. <strong>The exposure is therefore in attribution, not in identification.</strong></p>
+
+<h3>Why this domain is unusual</h3>
+
+<p>Most systems that anchor data cryptographically need their anchors to hold for years. Financial records lose operational significance quickly; most contracts have finite terms.</p>
+
+<p>Copyright does not. A term of life plus seventy years means a work registered by a young author today may require verification beyond 2150.</p>
+
+<div class="pullquote">Intellectual property registries may have the longest verification horizon<br>of any commonly deployed cryptographic application.<br>This is not usually noticed, and it changes the design requirement.</div>
+
+<h3>Requirements</h3>
+
+<table class="data-table">
+<tr><th>Requirement</th><th>Detail</th></tr>
+<tr><td><strong>Algorithm identifiers</strong></td><td>Every record carries explicit identifiers for its hash and signature algorithms. No algorithm is implicit.</td></tr>
+<tr><td><strong>Dual signature</strong></td><td>Records may carry both classical and post-quantum signatures during a declared transition window.</td></tr>
+<tr><td><strong>Re-anchoring</strong></td><td>A procedure re-signing an existing record under a new algorithm, preserving the original timestamp by reference to the prior anchor. Migration must not require action by the registrant, who may be deceased.</td></tr>
+<tr><td><strong>Deprecation</strong></td><td>A published mechanism declaring an algorithm unacceptable for new records while remaining acceptable for verifying old ones.</td></tr>
+</table>
+
+<p>NIST completed standardisation of post-quantum algorithms in 2024. This specification does not select among them. <strong>It requires that the selection be replaceable.</strong></p>
+</section>
+
+<section class="section" id="s9">
+<div class="sec-label">Section 9</div>
+<h2>Legal neutrality</h2>
+
+<p>This layer is designed to function without modification under each of the principal approaches to text and data mining.</p>
+
+<table class="data-table">
+<tr><th>Regime</th><th>Interaction</th></tr>
+<tr><td><strong>Broad statutory exception</strong><br>(e.g. Japan, Art. 30-4)</td><td>Unaffected. Training remains permitted. This layer adds a remuneration path alongside the permission; it does not narrow the exception.</td></tr>
+<tr><td><strong>Opt-out exception</strong><br>(e.g. EU DSM Art. 4)</td><td>The policy declaration provides a machine-readable expression of reservation.</td></tr>
+<tr><td><strong>Fair use</strong><br>(e.g. United States)</td><td>Unaffected. Attestations may serve as evidence in the factual inquiry without determining its outcome.</td></tr>
+<tr><td><strong>Licence-based</strong></td><td>Attestations provide the usage measurement that per-use licensing requires.</td></tr>
+</table>
+
+<div class="pullquote">This layer changes what is <em>known</em>,<br>not what is <em>permitted</em>.<br>It adds no prohibition.</div>
+
+<p>This is the argument for its portability. A mechanism that requires a jurisdiction to change its position on permission will be adopted only where that position was already changing. <strong>A mechanism that leaves the permission question untouched can be adopted anywhere.</strong></p>
+</section>
+
+<section class="section" id="s10">
+<div class="sec-label">Section 10</div>
+<h2>Relationship to existing standards</h2>
+
+<div class="world-grid">
+<div class="world-card">
+  <div class="world-org">ISO 24138:2024 (ISCC)</div>
+  <div class="world-role">Normative dependency. Used unmodified for identification. No competing identifier is proposed.</div>
+</div>
+<div class="world-card">
+  <div class="world-org">ISCC IEP-0013 / 0014 / 0015 / 0019</div>
+  <div class="world-role">Discovery protocol, transparency log, DID method and signature format. Reused unmodified; this specification applies the log construction to the operator side.</div>
+</div>
+<div class="world-card">
+  <div class="world-org">RFC 6962 / tlog-tiles</div>
+  <div class="world-role">Merkle tree and tiled publication. Existing transparency-log verifiers require little or no modification.</div>
+</div>
+<div class="world-card">
+  <div class="world-org">C2PA</div>
+  <div class="world-role">Complementary. Provenance manifests may be stripped; ISCC codes are computed from content and survive stripping. Where both exist, they reinforce one another.</div>
+</div>
+<div class="world-card">
+  <div class="world-org">Acoustic and video fingerprinting</div>
+  <div class="world-role">Complementary. Addresses analogue-transmitted use that content codes cannot reach.</div>
+</div>
+<div class="world-card">
+  <div class="world-org">NIST post-quantum standards</div>
+  <div class="world-role">Referenced as the migration target. No specific algorithm is mandated.</div>
+</div>
+</div>
+</section>
+
+<section class="section" id="s11">
+<div class="sec-label">Section 11</div>
+<h2>Open questions</h2>
+
+<p>Listed for discussion rather than resolved here.</p>
+
+<table class="data-table">
+<tr><th>Question</th><th>Nature</th></tr>
+<tr><td><strong>Content-Code collision semantics</strong></td><td>What confidence statement should an attestation carry when the matched unit is similarity-preserving?</td></tr>
+<tr><td><strong>Query privacy against enumeration</strong></td><td>Non-membership proofs reveal bracketing neighbours. Repeated queries could enumerate portions of the code space. Whether such proofs can be blinded without losing verifiability is unresolved.</td></tr>
+<tr><td><strong>Epoch granularity</strong></td><td>Continual training pipelines have no natural epoch boundary. How frequently should an operator commit?</td></tr>
+<tr><td><strong>Cross-operator aggregation</strong></td><td>Should inclusion-epochs from multiple operators be aggregated, and by whom?</td></tr>
+<tr><td><strong>Commitment completeness</strong></td><td>Are there attestation designs that constrain omission, rather than only recording it?</td></tr>
+</table>
+</section>
+
+<section class="section" id="demo">
+<div class="sec-label">Reference implementation</div>
+<h2>A working prototype</h2>
+
+<div class="demo-banner">
+  <div class="demo-icon">🔗</div>
+  <div class="demo-body">
+    <div class="demo-title">Blockchain IP protection demo v2</div>
+    <div class="demo-desc">Generate SHA-256 hashes from real files, simulate smart-contract settlement over recorded usage, and inspect an analysis of how the design interacts with existing statutory frameworks. Runs entirely in the browser — no installation, no server, no content transmitted.</div>
+  </div>
+  <a href="https://yymm77.github.io/seimei-kagaku/blockchain-ip-demo-v2.html" target="_blank" class="demo-btn">Open the demo →</a>
+</div>
+
+<div class="note">This is a proof of concept. It does not write to a live blockchain. It demonstrates hash generation, settlement simulation, and legal-framework analysis.</div>
+</section>
+
+<div class="finale">
+<div class="finale-inner">
+<p class="finale-quote">The debate has been about how much to disclose.<br>It need not be a disclosure question at all.</p>
+<p>A rightsholder wants an answer about one work. An operator wants to protect its methodology. Both are satisfied by a closed query bound to a prior commitment — and once membership can be verified, remuneration proportional to use follows without any new prohibition.</p>
+</div>
+</div>
+
+</div><!-- /main -->
+
+<hr class="lang-divider">
+
+<div class="lang-jump" id="ja">
+  <a href="#top" class="jump-btn">↑ Back to English</a>
+</div>
+
+<header class="hero hero-ja">
+<div class="hero-inner">
+  <div class="hero-eyebrow">技術仕様書 ／ ＵＣＡ</div>
+  <h1>コーパスの透明性と<br>利用の帰属</h1>
+  <p class="hero-sub">登録された著作物が学習コーパスに入ったかを、コーパスを開示させることなく計測する。ＩＳＯ 24138:2024 と ＲＦＣ 6962 の透明性ログ構成の上に築いた五層仕様。</p>
+</div>
+</header>
+
+<div class="main">
+
+<section class="section">
+<div class="sec-label">第1章</div>
+<h2>適用範囲 ── 何に答え、何に答えないか</h2>
+
+<p>本仕様は二つの問いに答える基盤を定める。第一に、その著作物はそのモデルの学習コーパスに含まれていたか。第二に、含まれていたとして、その利用はどのように記録され、対価が決済されるか。</p>
+
+<p>第一の問いには、<strong>事業者がコーパスの一部たりとも開示することなく</strong>答えられるよう設計する。第二の問いは、第一の答えから導かれる。</p>
+
+<div class="pullquote">権利者はコーパスを求めていない。<br>既に自ら保有する一点についての答えを求めている。<br>その問いは開示を伴わずに答えられる。</div>
+
+<h3>範囲外</h3>
+
+<p>限界を先に述べる。これは意図的である。到達範囲を過大に述べた仕様書は、そうでないものより評価が困難だからである。</p>
+
+<table class="data-table">
+<tr><th>除外するもの</th><th>理由</th></tr>
+<tr><td><strong>著作物識別子の定義</strong></td><td>ＩＳＯ 24138:2024（ＩＳＣＣ）が既に規定している。本仕様はこれを無改変で用いる</td></tr>
+<tr><td><strong>適法性の判断</strong></td><td>各法域の問題である。本層は事実を記録するのであり、権利を判定しない</td></tr>
+<tr><td><strong>コーパスの開示要求</strong></td><td>開示こそが、本仕様が回避しようとしている問題である</td></tr>
+<tr><td><strong>アナログ伝送</strong></td><td>音響伝送を経ると内容の同一性は保たれない。音響フィンガープリントの領域であり、競合せず補完する</td></tr>
+<tr><td><strong>生演奏</strong></td><td>識別すべきデジタル対象が存在しない</td></tr>
+<tr><td><strong>司法手続の代替</strong></td><td>照合証明は証拠であって、裁定ではない</td></tr>
+</table>
+
+<h3>用語</h3>
+
+<p><strong>事業者</strong> ── モデルの学習を目的としてコンテンツのコーパスを構成する当事者。<strong>登録者</strong> ── 著作物を登録した権利者。<strong>照合証明</strong> ── 照会された著作物が、指定されたコーパス世代に存在したか否かについての、事業者による署名付き言明。<strong>コーパス世代</strong> ── ある時点におけるコーパスの、名前を持つ不変のスナップショット。</p>
+</section>
+
+<section class="section">
+<div class="sec-label">第2章</div>
+<h2>設計原則</h2>
+
+<div class="pillars">
+<div class="pillar-card">
+  <div class="pillar-num">一</div>
+  <div class="pillar-title">開示ではなく、<br>照合</div>
+  <div class="pillar-desc">透明性の議論は一本の軸に収斂している。コーパスをどこまで公開させるか、という軸である。この軸に均衡点はない。広げれば収集手法が露出し、狭めれば誰も納得しない。一点についての閉じた問いは、この軸から完全に抜け出す。</div>
+</div>
+<div class="pillar-card">
+  <div class="pillar-num">二</div>
+  <div class="pillar-title">値をつけず、<br>量を測る</div>
+  <div class="pillar-desc">著作物の価値を事前に確定することはできない。無名の写真が一億回使われることもあり、多額を投じた制作物が二度しか使われないこともある。本層は利用回数を数え、原資を分割する。値はつけない。</div>
+</div>
+<div class="pillar-card">
+  <div class="pillar-num">三</div>
+  <div class="pillar-title">既存標準の<br>上に築く</div>
+  <div class="pillar-desc">識別は既に解決された問題である。ＩＳＯ 24138:2024 は、厳密な同一性判定と知覚的類似性判定の双方を備えた類似性保持型の内容コードを、規範的な参照実装とともに規定している。本仕様はこれを再定義せず、拡張せず、競合しない。</div>
+</div>
+<div class="pillar-card">
+  <div class="pillar-num">四</div>
+  <div class="pillar-title">暗号の<br>交換可能性</div>
+  <div class="pillar-desc">著作権の保護期間は著作者の死後五十年から七十年に及ぶ。二〇二六年に選択したいかなるアルゴリズムも、その期間にわたって有効とは仮定できない。要件は正しいアルゴリズムを選ぶことではなく、交換を通常の操作にすることである。</div>
+</div>
+</div>
+</section>
+
+<section class="section">
+<div class="sec-label">第3章</div>
+<h2>全体構成 ── 五層</h2>
+
+<div class="roadmap">
+<div class="rm-item"><div class="rm-phase">第５層</div><div class="rm-body"><div class="rm-title">監査</div><div class="rm-desc">公開されたコミットメントに対する、照合証明の第三者検証。</div></div></div>
+<div class="rm-item"><div class="rm-phase">第４層</div><div class="rm-body"><div class="rm-title">決済</div><div class="rm-desc">計数された包含に応じた、原資の自動配分。</div></div></div>
+<div class="rm-item"><div class="rm-phase">第３層</div><div class="rm-body"><div class="rm-title">計量</div><div class="rm-desc">何を、どの単位で数えるか。</div></div></div>
+<div class="rm-item"><div class="rm-phase">第２層</div><div class="rm-body"><div class="rm-title">照合</div><div class="rm-desc">ＩＳＯ 24138 コードに対する照会規約。閉じた問いと、署名された答え。</div></div></div>
+<div class="rm-item"><div class="rm-phase">第１層</div><div class="rm-body"><div class="rm-title">登録</div><div class="rm-desc">著作物の同一性と主張の記録。既存のＩＳＣＣ基盤に依拠する。</div></div></div>
+</div>
+
+<p>第２層と第３層の境界には意味がある。<strong>第１層・第２層は既存標準と既存の公的登録簿の上に実装できる。</strong>第３層以降は新たな合意を要するが、少なくとも当初は新たな立法を要しない。</p>
+</section>
+
+<section class="section">
+<div class="sec-label">第4章</div>
+<h2>第１層 ── 登録</h2>
+
+<p>特定の者が、特定の時点に、特定の著作物を主張したという記録を、永続的かつ検証可能な形で作る。あわせて、機械学習利用に関するその者の方針を宣言する。</p>
+
+<p>登録は任意である。登録は権利を発生させず、未登録は権利を減じない。これによりベルヌ条約の無方式主義との整合が保たれる。ここでの登録は証拠上・運用上の便宜であって、保護の要件ではない。</p>
+
+<h3>記録の構造</h3>
+
+<table class="data-table">
+<tr><th>項目</th><th>内容</th></tr>
+<tr><td><code>iscc</code></td><td>ＩＳＯ 24138:2024 準拠のＩＳＣＣ‑ＣＯＤＥ（複合）</td></tr>
+<tr><td><code>instance</code></td><td>Instance-Code ── 厳密な同一性</td></tr>
+<tr><td><code>content</code></td><td>Content-Code ── 知覚的類似性</td></tr>
+<tr><td><code>claimant</code></td><td>登録者の同一性コミットメント。本体はオフチェーン</td></tr>
+<tr><td><code>policy</code></td><td>機械学習利用に関する機械可読な方針</td></tr>
+<tr><td><code>alg</code></td><td>明示的なアルゴリズム識別子（第8章参照）</td></tr>
+<tr><td><code>sig</code></td><td>上記に対する署名</td></tr>
+</table>
+
+<h3>オンチェーンとオフチェーン</h3>
+
+<p>チェーンに記録するのはハッシュとコミットメントのみである。氏名・住所・振込先は、暗号化ストレージにオフチェーンで保管する。これにより、改ざん不可能性と消去権という、本来は衝突する二つの要請が両立する。個人情報は削除できる。記録された値がそもそも個人情報を含んでいないからである。</p>
+
+<div class="note"><strong>著作物そのものは一切送信しない。</strong>コードは利用者側の端末で計算する。著作物を預からない登録簿は、それを失うことも、漏洩することもなく、そのいずれについても免責を約する必要がない。</div>
+
+<h3>方針の宣言</h3>
+
+<p>当該著作物の機械学習利用について、登録者の立場を機械可読な形で表明する項目である。最小限として、可・不可・要相談。</p>
+
+<p>この項目の意義は、意思を、自動収集の過程が著作物を識別した瞬間に読み取れるものへ変換する点にある。<strong>人間が検索して読みに来なければ届かない意思表示は、参照されない意思表示である。</strong>この宣言が法的効果を持つか否かは各法域の問題であり、本層はこれを記録するが執行しない。</p>
+</section>
+
+<section class="section">
+<div class="sec-label">第5章</div>
+<h2>第２層 ── 照合</h2>
+
+<p>照会者はＩＳＣＣ‑ＣＯＤＥと登録の証明を提示する。事業者は署名付きの照合証明を返す。証明には、判定（存在・非存在・判定不能）、対象となるコーパス世代、一致した単位の型、該当する場合は距離、そして証明そのものが含まれる。</p>
+
+<h3>厳密照合と近似照合</h3>
+
+<p>Instance-Code による照合は、ビット単位で同一の対象がコーパスにあったかを答える。Content-Code による照合は、宣言された距離閾値に対して、知覚的に等価な対象がコーパスにあったかを答える。</p>
+
+<p><strong>近似照合は付加機能ではなく、必須である。</strong>学習パイプラインは画像をリサイズし、音声を再エンコードし、テキストを正規化する。厳密照合のみの仕組みは、実際には取り込まれた著作物について「非存在」を返す。しかもそれは無作為にではなく、系統的に生じる。ＩＳＯ 24138 の Content-Code は、まさにこの条件のために設計されている。再エンコードや圧縮を経ても同じコードが得られる。</p>
+
+<div class="note">Content-Code に対するコミットメントは、<em>著作物</em>ではなく<em>コード</em>の構成員資格を厳密に判定する。知覚的に類似する二つの著作物は同一の Content-Code を持ちうる。したがって照合証明は、当該コードを持つ構成員が存在したことを示すのであり、照会者の特定の著作物が存在したことを示すのではない。これは類似性保持型識別子の限界であり、照合証明において曖昧にせず明示する。</div>
+
+<h3>性質</h3>
+
+<table class="data-table">
+<tr><th>性質</th><th>機構</th></tr>
+<tr><td><strong>非開示</strong></td><td>事業者はルート値を公開し、閉じた問いに答える。構成員一覧も、収集手法も、アーキテクチャの詳細も露出しない</td></tr>
+<tr><td><strong>探索不能</strong></td><td>照会者は自ら生成できるコードについてしか照会できず、コードはコンテンツからしか生成できない。推測的な列挙はできない</td></tr>
+<tr><td><strong>費用の有界性</strong></td><td>照会は索引参照と証明の抽出である。限界費用は照会量とともに増大しない。請求件数に比例して負担が増える開示制度とは異なる</td></tr>
+<tr><td><strong>非裁定性</strong></td><td>照合証明は構成員資格を記録する。適法性、許諾の有無、支払うべき額を判断しない</td></tr>
+</table>
+
+<h3>コーパス世代</h3>
+
+<p>事業者はコーパス世代を宣言する。名前を持つ不変のスナップショットである。すべての照合証明は、対象とする世代を明示する。世代の概念がなければ「コーパスに含まれていたか」という問いは成立しない。コーパスは常時変動するからである。世代があれば照合証明は再現可能になる。同一世代への二度目の照会は、同一の判定を返さねばならない。</p>
+</section>
+
+<section class="section">
+<div class="sec-label">第6章</div>
+<h2>第５層 ── 監査</h2>
+
+<p>ここまでの記述は、事業者が正直に答えることを前提としている。この前提は置けない。</p>
+
+<div class="pullquote">「非存在」と答える誘因を持つ事業者は、<br>「非存在」と答えうる。<br>金銭的圧力の下での自己申告は、透明性ではない。</div>
+
+<h3>コミットメント</h3>
+
+<p>ある世代を学習に用いる前に、事業者はコーパス構成員全員のＩＳＣＣ‑ＣＯＤＥについてマークル木を構成し、そのルート値を公開する。ＩＳＣＣの透明性ログが既に用いている ＲＦＣ 6962 の構成に従う。</p>
+
+<p><strong>ルート値は何も開示しない。</strong>固定長の値であり、そこから構成員を復元することはできない。<strong>しかしルート値は拘束する。</strong>ひとたび公開され時刻が刻まれれば、事業者は矛盾するチェックポイントを生じさせずに、その世代の内容を変更できない。</p>
+
+<h3>構造上の変更は一点 ── 整列</h3>
+
+<p>構成員は、追記順ではなく<strong>整列された</strong>マークル木としてコミットする。これは既存の透明性ログの慣行からの唯一の構造的逸脱であり、本仕様の実質的な寄与である。</p>
+
+<p>整列木は<strong>非包含証明</strong>を可能にする。あるコードの不在は、照会位置を挟む隣接二葉を提示することで証明される。追記順のログではこれができない。</p>
+
+<div class="quantum-box">
+<h4>整列が見かけ以上に重要である理由</h4>
+<p>整列されていないコミットメントの下では「存在」は証明可能で「非存在」は証明できない。これは、事業者が偽る金銭的誘因を持つまさにその判定を、無制約のまま残す。この非対称は些細な問題ではなく、安全性の問題そのものである。</p>
+</div>
+
+<h3>達成すること、しないこと</h3>
+
+<p>虚偽の「非存在」判定は依然として可能である。しかし、検出可能かつ永続的になる。当該著作物がコミットされた世代に存在したことが後日 ── 訴訟における証拠開示その他いかなる手段であれ ── 示されたとき、その虚偽の照合証明は署名され、時刻が刻まれ、否認できない形で残っている。</p>
+
+<p>設計の目標は不正を不可能にすることではない。<strong>不正に、永続的で帰属可能な記録を伴わせることである。</strong></p>
+
+<div class="note"><strong>明示する限界。</strong>事業者は、実際には学習に用いた構成員を除外したコーパスにコミットしうる。コミットメントのみからこれを検出する暗号的機構は存在しない。コミットメントとは、事業者自身が構成した集合についての言明だからである。検出は外部の証拠に依存する。コーパス・コミットメントは、主張へのコミットメントであって、完全性の証明ではない。</div>
+</section>
+
+<section class="section">
+<div class="sec-label">第7章</div>
+<h2>第３層 ── 計量</h2>
+
+<p>計量単位は<strong>包含‑世代</strong>である。すなわち、一つの登録著作物が、一つのコミットされたコーパス世代に存在したと検証されたこと。この単位が数えられるのは、それが集合の構成員資格という事実であり、第２層によって検証され、第５層によって拘束されているからである。</p>
+
+<h3>あえて数えないもの</h3>
+
+<p>寄与度 ── ある著作物がモデルの出力にどれだけ影響したか ── は、本版では数えない。大規模に測定する確立された手法が存在せず、影響関数の手法は実運用規模において計算量的に非現実的である。寄与度の測定を要求する仕様は実装不能であり、したがって配分をまったく生じさせない。</p>
+
+<p>これは現実の限界である。同一世代内では、一度しか参照されなかった著作物と決定的な影響を与えた著作物が同等に扱われる。</p>
+
+<p>ただし、現在の代替手段よりは改善である。訴訟上の和解は、数十万点の著作物に一律の額を配分してきた。同じ粗さに、はるかに大きな費用をかけ、しかも事後にしか到達していない。<strong>継続的に適用される粗い計測は、裁判所によって一度だけ課される粗い計測より有用である。</strong></p>
+
+<h3>将来の精緻化への設計</h3>
+
+<p>計量記録は既定値 1 の <code>weight</code> 項目を持つ。寄与度の測定が実用化された時点で、記録構造・照会規約・決済機構のいずれも変更することなく、重みを設定できる。</p>
+
+<p>想定する順序は、まず動く粗い配分、次に精緻化である。存在しない精緻化を待って配分を行わない、という順序ではない。</p>
+
+<h3>価格ではなく分割</h3>
+
+<p>ある世代についての事業者の債務は原資（プール）である。原資を包含‑世代の総数で分割する。これにより総額と一点あたりの額が切り離される。登録件数が増えても、事業者を破綻させることなく、また一点ごとの交渉を要することなく対応できる。</p>
+
+<p>原資の大きさをどう定めるか ── 定額、収益按分、交渉料率、法定補償金 ── は本仕様の範囲外であり、意図的にそうしている。<strong>単位はそのいずれに対しても移植可能である。</strong></p>
+</section>
+
+<section class="section">
+<div class="sec-label">第8章</div>
+<h2>耐量子性への移行</h2>
+
+<p>ハッシュの原像計算困難性は量子探索の下で二乗根に低下するが、これは強度の低下であって破綻ではなく、ダイジェスト長によって回復する。署名は緩やかに劣化せず、そこでの損失は部分的ではなく全面的である。<strong>したがって露出は識別にではなく、帰属にある。</strong></p>
+
+<h3>この分野が特異である理由</h3>
+
+<p>暗号によってデータを固定する多くのシステムは、その固定が数年もてばよい。金融記録は運用上の意味を早く失い、多くの契約には期限がある。</p>
+
+<p>著作権にはそれがない。死後七十年という期間は、本日若い著作者が登録した著作物について、二一五〇年を超えて検証を要求しうることを意味する。</p>
+
+<div class="pullquote">知的財産の登録簿は、広く実運用されている暗号応用のうち、<br>検証期間が最も長い部類に属する可能性がある。<br>このことは通常意識されておらず、設計要件を変える。</div>
+
+<h3>要件</h3>
+
+<table class="data-table">
+<tr><th>要件</th><th>内容</th></tr>
+<tr><td><strong>アルゴリズム識別子</strong></td><td>すべての記録はハッシュ方式と署名方式の識別子を明示的に持つ。暗黙のアルゴリズムを認めない</td></tr>
+<tr><td><strong>二重署名</strong></td><td>宣言された移行期間中、記録は古典署名と耐量子署名の双方を持ってよい</td></tr>
+<tr><td><strong>再アンカリング</strong></td><td>既存の記録を新たなアルゴリズムで署名し直し、先行アンカーを参照することで原時刻を保存する手続。登録者による操作を要してはならない。登録者は既に死亡している可能性がある</td></tr>
+<tr><td><strong>廃止</strong></td><td>あるアルゴリズムを新規記録には受理しないが、既存記録の検証には引き続き受理する、という宣言の公表機構</td></tr>
+</table>
+
+<p>米国国立標準技術研究所は二〇二四年に耐量子アルゴリズムの標準化を完了している。本仕様はその中から選択しない。<strong>選択が交換可能であることを要求する。</strong></p>
+</section>
+
+<section class="section">
+<div class="sec-label">第9章</div>
+<h2>法域中立性</h2>
+
+<p>本層は、テキスト・データマイニングに関する主要な立法方針のいずれの下でも、無改変で機能するよう設計されている。</p>
+
+<table class="data-table">
+<tr><th>制度</th><th>相互作用</th></tr>
+<tr><td><strong>広範な権利制限</strong><br>（日本・第30条の4等）</td><td>影響しない。学習は引き続き許容される。本層は許容と並列に還元の経路を追加するのであり、権利制限を狭めない</td></tr>
+<tr><td><strong>オプトアウト型</strong><br>（ＥＵ ＤＳＭ指令第4条等）</td><td>方針宣言が、留保の機械可読な表明を提供する</td></tr>
+<tr><td><strong>フェアユース</strong><br>（米国等）</td><td>影響しない。照合証明は事実認定における証拠となりうるが、その結論を決定しない</td></tr>
+<tr><td><strong>許諾型</strong></td><td>照合証明は、利用量に応じた許諾が必要とする計測を提供する</td></tr>
+</table>
+
+<div class="pullquote">本層が変えるのは<em>何が知られるか</em>であって、<br><em>何が許されるか</em>ではない。<br>禁止を一つも追加しない。</div>
+
+<p>これが移植可能性の根拠である。ある法域に許諾についての立場の変更を要求する仕組みは、その立場が既に変わりつつある場所でしか採用されない。<strong>許諾の問題に触れない仕組みは、どこでも採用されうる。</strong></p>
+</section>
+
+<section class="section">
+<div class="sec-label">第10章</div>
+<h2>既存標準との関係</h2>
+
+<div class="world-grid">
+<div class="world-card">
+  <div class="world-org">ＩＳＯ 24138:2024（ＩＳＣＣ）</div>
+  <div class="world-role">規範的依存。識別について無改変で用いる。競合する識別子は提案しない</div>
+</div>
+<div class="world-card">
+  <div class="world-org">ＩＳＣＣ ＩＥＰ‑0013／0014／0015／0019</div>
+  <div class="world-role">探索規約、透明性ログ、ＤＩＤ方式、署名形式。無改変で再利用し、ログの構成を事業者側に適用する</div>
+</div>
+<div class="world-card">
+  <div class="world-org">ＲＦＣ 6962 ／ tlog-tiles</div>
+  <div class="world-role">マークル木とタイル公開。既存の透明性ログ検証器がほぼ無改変で検証できる</div>
+</div>
+<div class="world-card">
+  <div class="world-org">Ｃ２ＰＡ</div>
+  <div class="world-role">補完関係。来歴マニフェストは除去されうるが、ＩＳＣＣコードは内容から計算され除去に耐える。双方が存在する場合、相互に補強する</div>
+</div>
+<div class="world-card">
+  <div class="world-org">音響・映像フィンガープリント</div>
+  <div class="world-role">補完関係。内容コードが到達できないアナログ伝送を経た利用を扱う</div>
+</div>
+<div class="world-card">
+  <div class="world-org">ＮＩＳＴ 耐量子暗号標準</div>
+  <div class="world-role">移行先として参照する。特定のアルゴリズムを義務づけない</div>
+</div>
+</div>
+</section>
+
+<section class="section">
+<div class="sec-label">第11章</div>
+<h2>未解決の問い</h2>
+
+<p>本仕様で解決せず、議論に付すもの。</p>
+
+<table class="data-table">
+<tr><th>問い</th><th>性質</th></tr>
+<tr><td><strong>Content-Code の衝突の扱い</strong></td><td>照合された単位が類似性保持型である場合、照合証明はどのような確度の言明を伴うべきか</td></tr>
+<tr><td><strong>列挙に対する照会のプライバシー</strong></td><td>非包含証明は隣接構成員を明かす。反復照会はコード空間の一部を列挙しうる。検証可能性を失わずにこれを秘匿できるかは未解決である</td></tr>
+<tr><td><strong>世代の粒度</strong></td><td>継続的な学習パイプラインには自然な世代境界が存在しない。どの頻度でコミットすべきか</td></tr>
+<tr><td><strong>事業者をまたぐ集計</strong></td><td>複数の事業者による包含‑世代を集計すべきか。誰が行うのか</td></tr>
+<tr><td><strong>コミットメントの完全性</strong></td><td>脱落を記録するにとどまらず、脱落を制約する照合証明の設計はありうるか</td></tr>
+</table>
+</section>
+
+<section class="section">
+<div class="sec-label">参照実装</div>
+<h2>動作するプロトタイプ</h2>
+
+<div class="demo-banner">
+  <div class="demo-icon">🔗</div>
+  <div class="demo-body">
+    <div class="demo-title">ブロックチェーン知財保護デモ v2</div>
+    <div class="demo-desc">実際のファイルからＳＨＡ‑256ハッシュを生成し、記録された利用に基づくスマートコントラクト決済をシミュレートし、既存の法制度との相互作用の分析を確認できます。ブラウザのみで動作し、インストールもサーバも不要で、コンテンツを送信しません。</div>
+  </div>
+  <a href="https://yymm77.github.io/seimei-kagaku/blockchain-ip-demo-v2.html" target="_blank" class="demo-btn">デモを試す →</a>
+</div>
+
+<div class="note">本デモは概念実証です。実際のブロックチェーンへの書き込みは行いません。ハッシュ生成・決済シミュレーション・法体系分析の三機能を実装しています。</div>
+</section>
+
+<div class="finale">
+<div class="finale-inner">
+<p class="finale-quote">議論は、どこまで開示させるかをめぐってきた。<br>しかし、これは開示の問題である必要がない。</p>
+<p>権利者は一点についての答えを求め、事業者は自らの手法を守りたい。事前のコミットメントに結び付けられた閉じた問いは、その双方を同時に満たす。そして構成員資格が検証できるようになれば、利用に応じた対価は、新たな禁止を一つも設けることなく後から続く。</p>
+</div>
+</div>
+
+</div><!-- /main -->
+
+<footer>
+  <div class="f-uca">
+    知識は解放され、創造者は報われる。<br>
+    <a href="https://yymm77.github.io/seimei-kagaku/copyright-proposal.html">https://yymm77.github.io/seimei-kagaku/copyright-proposal.html</a>
+  </div>
+  <div class="f-nav">
+    <a href="https://yymm77.github.io/">玄関</a> |
+    <a href="https://yymm77.github.io/seimei-kagaku/uca-cabinet-proposal.html">内閣府提出版ＵＣＡ提言</a> |
+    <a href="https://yymm77.github.io/seimei-kagaku/blockchain-ip-demo-v2.html">デモシステム</a> |
+    <a href="https://yymm77.github.io/seimei-kagaku/proposals.html">政策への提言</a>
+  </div>
+  <div class="f-copy">
+    第1.0版（草案）── 令和8年9月<br>
+    日昇リサーチ株式会社　代表取締役　三原嘉明<br>
+    東京都多摩市<br><br>
+    ＣＣ‑ＢＹ‑4.0。出典を明記の上、自由に複製・改変・実装していただけます。
+  </div>
+</footer>
+
+</body>
+</html>
