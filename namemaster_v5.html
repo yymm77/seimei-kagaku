@@ -1720,11 +1720,14 @@ function drawWave(pts,graphOriginYear,graphBirthAge){
   // ── 帯（縦棒）の描画 ──
   // 一年ぶんの変動のミニマムとマキシマム。株価の安値・高値と同じ形式。
   // 折れ線で結んではならない（実在しない軌跡になる）。
-  const drawable=shown.filter(i=>bands[i].status==='ok');
+  // 原典は実棒を先（左）、点棒を後（右）に描いている。その順に並べ替える。
+  const drawable=shown.filter(i=>bands[i].status==='ok')
+    .sort((a,b)=>(isSolidBar(bands[b].domain)?1:0)-(isSolidBar(bands[a].domain)?1:0));
   const colW=iW/span;
   const n=Math.max(1,drawable.length);
-  const bw=Math.max(2.2,Math.min(11,colW*(n===1?0.5:0.34)));
-  const gap=n===1?0:bw+1.6;
+  // 棒は細いほうが上下の位置を読み取りやすい。原典の太さに寄せる。
+  const bw=Math.max(1.6,Math.min(6,colW*(n===1?0.26:0.17)));
+  const gap=n===1?0:bw+3;
 
   drawable.forEach((di,j)=>{
     const b=bands[di], d=b.domain;
