@@ -763,6 +763,7 @@ _cntBanner(); cntVisit();
         <span class="ar-label">縦横比</span>
         <button class="ar-preset active" data-asp="auto" onclick="setAspect(this)">自動（原典の密度）</button>
         <button class="ar-preset" data-asp="full" onclick="setAspect(this)">幅いっぱい</button>
+        <button class="ar-preset" id="swap-btn" onclick="swapSolid()">実棒／点棒を入れ替え</button>
         <span class="ar-label" style="font-size:10px;margin-left:10px">拡大</span>
         <input type="range" id="ar-zoom" min="70" max="220" value="100" step="5" class="ar-slider" style="width:120px">
         <span class="ar-val" id="ar-zoom-val">自動</span>
@@ -770,7 +771,7 @@ _cntBanner(); cntVisit();
       <div class="graph-container">
         <svg id="wave-svg" viewBox="0 0 800 330" preserveAspectRatio="xMidYMid meet"></svg>
       </div>
-      <div class="graph-legend-hint">上のタブで分野を切り替えると、その分野の内線・外線の2枚を突き合わせて表示します。凡例には、その図がどの記号ペアから引かれたかを示しています</div>
+      <div class="graph-legend-hint">上のタブで分野を切り替えると、その分野の2枚を突き合わせて表示します。原典どおり実棒（実線）と点棒（破線）で描き分け、凡例にはその図がどの記号ペアから引かれたかを示しています</div>
       <div class="graph-legend" id="graph-legend"></div>
     </div>
 
@@ -1551,6 +1552,12 @@ let viewAgeStart=15,viewAgeEnd=55;
 // 縦横比：'auto'＝1年あたりの横幅を原典の密度に合わせる
 //         'full'＝従来どおり幅いっぱいに広げる
 //         数値   ＝1年あたりの横幅をpxで直に指定
+// 実棒（実線）として描くのはどちら側か。
+// 原典『姓名（なまえ）』3章 図5・図6 の右肩表記では、
+// 社交について 実棒＝M–U（外線）、点棒＝P–W（内線）であった。
+// 他の分野で同じとは限らないため、画面から入れ替えられるようにしてある。
+let solidSide='外線';
+function isSolidBar(d){ return d.line===solidSide; }
 let waveAspect='auto';
 let waveZoom=1;
 let waveZoomTouched=false;   // スライダーを触ったか
@@ -1725,15 +1732,13 @@ function drawWave(pts,graphOriginYear,graphBirthAge){
     b.rows.forEach(r=>{
       if(r.age<dispStart||r.age>dispEnd)return;
       const x=xOf(r.age)+off;
-      const yT=yOf(r.hi), yB=yOf(r.lo);
-      // 内線は塗り、外線は白抜き＋輪郭。同じ分野の2本を確実に見分けるため。
-      const at={x:(x-bw/2).toFixed(1),y:yT.toFixed(1),
-        width:bw.toFixed(1),height:Math.max(1.4,yB-yT).toFixed(1),
-        rx:1,fill:d.color};
-      if(d.dash){ at['fill-opacity']=0.22; at.stroke=d.color;
-                  at['stroke-width']=1; at['stroke-opacity']=0.85; }
-      else      { at['fill-opacity']=0.88; }
-      mk('rect',at);
+      const yT=yOf(r.hi), yB=Math.max(yOf(r.lo), yT+1.4);
+      // 原典どおり、片方を実棒（実線）、もう片方を点棒（破線）で描く。
+      // 塗り／白抜きより判別が明確で、書物と直に見比べられる。
+      const at={x1:x.toFixed(1),y1:yT.toFixed(1),x2:x.toFixed(1),y2:yB.toFixed(1),
+        stroke:d.color,'stroke-width':bw.toFixed(1),'stroke-linecap':'butt'};
+      if(!isSolidBar(d)) at['stroke-dasharray']='5 3.5';
+      mk('line',at);
     });
   });
 
@@ -1769,22 +1774,24 @@ function drawWave(pts,graphOriginYear,graphBirthAge){
 
   // ── 凡例（グラフ内右上）──
   if(drawable.length>0){
-    mk('rect',{x:PL+iW-236,y:PT+2,width:236,height:drawable.length*15+6,
+    mk('rect',{x:PL+iW-256,y:PT+2,width:256,height:drawable.length*15+6,
       fill:'rgba(245,241,232,.88)',rx:2});
   }
   let lgY=PT+13;
   drawable.forEach(di=>{
     const d=bands[di].domain;
-    const sw={x:PL+iW-230,y:lgY-8,width:9,height:9,rx:2,fill:d.color};
-    if(d.dash){ sw['fill-opacity']=0.22; sw.stroke=d.color; sw['stroke-width']=1; }
-    else      { sw['fill-opacity']=0.88; }
-    mk('rect',sw);
+    const solid=isSolidBar(d);
+    const sw={x1:PL+iW-250,y1:lgY-4,x2:PL+iW-235,y2:lgY-4,
+      stroke:d.color,'stroke-width':5};
+    if(!solid) sw['stroke-dasharray']='3 2.5';
+    mk('line',sw);
     // ── 出自を出す ──
     // どの記号ペアから、どの画数値で、どの図が引かれたのかを示す。
     // 原本の該当ページを直接引けるようにするため。
-    mk('text',{x:PL+iW-217,y:lgY,'font-size':10,fill:'rgba(26,18,8,.6)',
+    mk('text',{x:PL+iW-228,y:lgY,'font-size':10,fill:'rgba(26,18,8,.6)',
       'font-family':'serif'},
-      d.n.replace(/　/g,'')+'　'+originLabel(d,pts)+'→ 図'+bands[di].graph);
+      (isSolidBar(d)?'実棒　':'点棒　')+d.n.replace(/　/g,'')+'　'
+      +originLabel(d,pts)+'→ 図'+bands[di].graph);
     lgY+=15;
   });
 
@@ -1870,6 +1877,13 @@ function resetWaveZoom(){
   waveZoomTouched=false; waveZoom=1;
   const z=document.getElementById('ar-zoom');
   if(z){ z.value=100; document.getElementById('ar-zoom-val').textContent='自動'; }
+}
+// 実棒と点棒を入れ替える。原典と見比べて確かめるための操作。
+function swapSolid(){
+  solidSide = (solidSide==='外線') ? '内線' : '外線';
+  const b=document.getElementById('swap-btn');
+  if(b) b.textContent='実棒＝'+solidSide+'　（押すと入れ替え）';
+  if(lastPts) drawWave(lastPts,lastOriginYear,lastBirthAge);
 }
 function setAspect(btn){
   document.querySelectorAll('#aspect-row .ar-preset').forEach(b=>b.classList.remove('active'));
