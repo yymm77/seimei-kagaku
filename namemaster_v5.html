@@ -6,9 +6,9 @@
 <title>姓名科学 — 牧正人史式</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600;900&family=Zen+Old+Mincho:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-  :root{--ink:#1a1208;--paper:#f5f0e8;--gold:#b8960c;--vermillion:#c0392b;--indigo:#1a3a5c;--jade:#2d6a4f;--mist:#8a7f6e;--seal:#8b1a1a}
+  :root{--ink:#1a1208;--paper:#f5f0e8;--gold:#b8960c;--vermillion:#c0392b;--indigo:#1a3a5c;--jade:#2d6a4f;--mist:#6b6050;--seal:#8b1a1a}
   *{margin:0;padding:0;box-sizing:border-box}
-  body{background:var(--paper);color:var(--ink);font-family:'Noto Serif JP',serif;min-height:100vh;overflow-x:hidden}
+  body{background:var(--paper);color:var(--ink);font-family:'Noto Serif JP',serif;min-height:100vh;overflow-x:auto}
   body::before{content:'';position:fixed;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 28px,rgba(160,140,100,.04) 28px,rgba(160,140,100,.04) 29px),repeating-linear-gradient(90deg,transparent,transparent 28px,rgba(160,140,100,.03) 28px,rgba(160,140,100,.03) 29px);pointer-events:none;z-index:0}
   .wrapper{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:48px 24px 80px}
   .header{text-align:center;margin-bottom:52px;position:relative}
@@ -85,17 +85,17 @@
   .sbar-fill{height:100%;border-radius:2px}
   .sec{font-size:11px;letter-spacing:.7em;color:var(--gold);font-weight:600;text-align:center;margin:36px 0 20px}
   .sec::before,.sec::after{content:'─';margin:0 16px;color:rgba(184,150,12,.4)}
-  table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:24px}
-  th{background:var(--ink);color:var(--paper);padding:10px 14px;text-align:left;letter-spacing:.3em;font-size:10px;font-weight:600}
+  table{width:100%;border-collapse:collapse;font-size:15px;margin-bottom:24px}
+  th{background:var(--ink);color:var(--paper);padding:10px 14px;text-align:left;letter-spacing:.2em;font-size:12px;font-weight:600}
   td{padding:10px 14px;border-bottom:1px solid rgba(26,18,8,.06);vertical-align:middle}
   tr:hover td{background:rgba(255,255,255,.5)}
   .badge{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;font-weight:900;font-size:13px;font-family:'Zen Old Mincho',serif}
   details.dbg{background:rgba(26,18,8,.03);border:1px solid rgba(26,18,8,.08);padding:16px;margin-top:20px}
   details.dbg summary{cursor:pointer;font-size:11px;letter-spacing:.4em;color:var(--mist)}
-  .dbg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-top:16px}
+  .dbg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-top:16px}
   .dbg-item{background:white;padding:8px 12px;border-left:2px solid rgba(184,150,12,.4)}
-  .dbg-label{font-size:9px;color:var(--mist);letter-spacing:.3em}
-  .dbg-value{font-size:16px;font-family:'Zen Old Mincho',serif;font-weight:700}
+  .dbg-label{font-size:12px;color:var(--mist);letter-spacing:.15em;font-weight:600}
+  .dbg-value{font-size:21px;font-family:'Zen Old Mincho',serif;font-weight:700}
   .footer{text-align:center;margin-top:64px;padding-top:24px;border-top:1px solid rgba(184,150,12,.2);font-size:10px;letter-spacing:.4em;color:var(--mist)}
   @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
   @media(max-width:600px){.name-row{grid-template-columns:1fr}.domains-grid{grid-template-columns:repeat(2,1fr)}.input-panel{padding:28px 16px}.company-input-wrap{grid-template-columns:1fr}}
@@ -146,7 +146,22 @@
   .gtab{padding:5px 16px;border:1px solid rgba(26,18,8,.15);background:transparent;font-family:'Noto Serif JP',serif;font-size:10px;letter-spacing:.3em;color:var(--mist);cursor:pointer;transition:all .2s;border-radius:1px}
   .gtab.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
   .graph-container{overflow-x:auto;margin-bottom:16px}
-  .graph-legend{display:flex;flex-direction:column;align-items:flex-start;gap:4px;font-size:11px;letter-spacing:.2em;color:var(--mist)}
+  .ns-wrap{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:28px}
+  .ns-tbl{width:100%;border-collapse:collapse;font-size:13px;font-family:'Noto Serif JP',serif}
+  .ns-tbl td{border:1px solid rgba(26,18,8,.18);padding:4px 7px;white-space:nowrap}
+  .ns-base{background:rgba(26,18,8,.05);font-weight:700;text-align:center;font-size:15px;letter-spacing:.2em;width:2.4em}
+  .ns-sym{text-align:center;font-weight:700;font-family:'Zen Old Mincho',serif;font-size:15px;width:2.2em}
+  .ns-num{text-align:right;width:3em}
+  .ns-pt{text-align:right;width:3em;color:var(--indigo)}
+  .ns-sum{text-align:right;width:3.6em;font-weight:700;background:rgba(184,150,12,.07)}
+  .ns-mean{font-size:12px}
+  .ns-g{text-align:center;font-size:11px;color:var(--mist);width:5.5em}
+  .ns-g.none{color:var(--vermillion)}
+  .ns-tbl tr.ns-out td{border-top-style:dashed}
+  .ns-tbl tr:hover td{background:rgba(184,150,12,.05)}
+  @media print{ .ns-wrap{page-break-inside:avoid} #fs-bar{display:none} }
+  @media (max-width:820px){ .ns-wrap{grid-template-columns:1fr} }
+  .graph-legend{display:flex;flex-direction:column;align-items:flex-start;gap:5px;font-size:13px;letter-spacing:.2em;color:var(--mist)}
   .graph-legend-hint{text-align:center;font-size:10px;color:rgba(26,18,8,.3);letter-spacing:.2em;margin:4px 0 10px;font-style:italic}
   .age-range-row{display:flex;align-items:center;gap:8px;justify-content:center;margin:0 0 16px;flex-wrap:wrap}
   .ar-label{font-size:11px;letter-spacing:.3em;color:var(--mist)}
@@ -217,7 +232,7 @@
   /* ── グラフ解説パネル ── */
   /* ── 12ポイント表：数意解説展開 ── */
   #p-table{width:100%;border-collapse:collapse}
-  #p-table th{font-size:10px;letter-spacing:.3em;color:var(--mist);padding:6px 10px;border-bottom:1px solid rgba(184,150,12,.2);font-weight:400;text-align:left}
+  #p-table th{font-size:12px;letter-spacing:.2em;color:var(--mist);padding:6px 10px;border-bottom:1px solid rgba(184,150,12,.2);font-weight:400;text-align:left}
   #p-table td{padding:8px 10px;border-bottom:1px solid rgba(184,150,12,.08);vertical-align:top}
   #p-table tbody tr:hover{background:rgba(184,150,12,.04)}
   .desc-preview{font-size:11px;color:var(--mist);line-height:1.6}
@@ -355,6 +370,32 @@ footer{background:var(--ink);color:var(--paper);padding:20px;text-align:center;m
 </style>
 </head>
 <body>
+<!-- 文字の大きさ。画面全体を等倍で拡大するので、配置は崩れない。 -->
+<div id="fs-bar" style="position:fixed;right:12px;bottom:12px;z-index:9999;
+  background:rgba(245,240,232,.95);border:1px solid rgba(184,150,12,.45);
+  border-radius:3px;padding:7px 12px;display:flex;align-items:center;gap:8px;
+  box-shadow:0 2px 10px rgba(0,0,0,.12);font-family:'Noto Serif JP',serif">
+  <span style="font-size:12px;color:#6b6050;letter-spacing:.1em">文字</span>
+  <input type="range" id="fs-range" min="100" max="180" step="5" value="115"
+    style="width:110px;cursor:pointer">
+  <span id="fs-val" style="font-size:12px;color:#6b6050;min-width:38px">115%</span>
+</div>
+<script>
+(function(){
+  var r=document.getElementById('fs-range'), v=document.getElementById('fs-val');
+  function apply(){
+    var k=r.value/100;
+    // zoom は配置比率を保ったまま全体を拡大する。
+    // font-size を個別に触ると字間の設計（letter-spacing）が崩れるため、こちらを使う。
+    document.body.style.zoom=k;
+    v.textContent=r.value+'%';
+    try{ localStorage.setItem('nm_fs', r.value); }catch(e){}
+  }
+  try{ var s=localStorage.getItem('nm_fs'); if(s) r.value=s; }catch(e){}
+  r.addEventListener('input',apply);
+  apply();
+})();
+</script>
 <!-- ===== カウンターバナー ===== -->
 <div id="counter-banner" style="background:linear-gradient(135deg,#1a3a5c 0%,#2d6a4f 100%);color:#f5f0e8;text-align:center;padding:6px 16px;font-size:13px;font-family:'Noto Serif JP',serif;letter-spacing:.05em;position:relative;z-index:100;">
   👁 本日の訪問 <span id="cnt-visit-today" style="font-weight:700;color:#e0c870;">-</span>名 ／
@@ -736,6 +777,10 @@ _cntBanner(); cntVisit();
       <summary>▶ セル計算値（Excelとの照合用）</summary>
       <div class="dbg-grid" id="dbg-grid"></div>
     </details>
+
+    <div class="sec">姓名分析表</div>
+    <div class="graph-note">NAMEMASTER の解析表と同じ並びです。分野ごとに内線・外線の二組、各組は二つの記号（画数値・点数・数意）と、その合計から成ります。右端は、その組合せに対応する原典の人生グラフの図番号です。</div>
+    <div id="sheet-area"></div>
 
     <div class="sec">人生波動グラフ</div>
     <div class="graph-note">牧正人史『姓名（なまえ）』巻末の人生グラフ（実データ）です。一本の縦棒は、その一年ぶんの変動のミニマムとマキシマムを、株価の安値・高値と同じ形式で表しています。棒の位置が50点より上か下かで吉凶を、棒の幅が狭いか広いかでその年の変動の激しさを見ます。原典にならい、分野ごとに内線・外線の2枚を突き合わせて表示します。収録は15〜55歳のみです。</div>
@@ -1816,6 +1861,59 @@ function drawRadar(pts){
   });
 }
 
+// ── 姓名分析表（NAMEMASTER の解析表と同じ並び）──
+// 一分野は四行。上二行が内線、下二行が外線。
+// 各行は 記号／画数値／点数／合計／数意。右端に原典の図番号。
+function buildAnalysisSheet(pts){
+  const el=document.getElementById('sheet-area'); if(!el) return;
+  el.innerHTML='';
+  if(!pts) return;
+  const cols=[['健康','社交','所得','幸福','技能','娯楽'],
+              ['蓄財','愛情','職業','性格','能力','勝負']];
+  function block(base){
+    const pair=GRAPH_DOMAINS.filter(d=>d.base===base);
+    let out='';
+    pair.forEach((d,pi)=>{
+      const b=makiLookup(pts[d.ka],pts[d.kb]);
+      const sy=(d.sym||'').split('+');
+      const g = b.status==='ok'      ? '図'+b.graph
+              : b.status==='未取得'  ? '図'+b.graph+'※'
+              : '該当なし';
+      [[d.ka,sy[0]||d.ka],[d.kb,sy[1]||d.kb]].forEach((t,i)=>{
+        const v=pts[t[0]], s=suugi(v);
+        out+='<tr'+(pi===1?' class="ns-out"':'')+'>'
+          + (pi===0&&i===0 ? '<td class="ns-base" rowspan="4">'+base+'</td>' : '')
+          + '<td class="ns-sym">'+t[1]+'</td>'
+          + '<td class="ns-num">'+(v===undefined?'—':v)+'</td>'
+          + '<td class="ns-pt">'+s.点数+'</td>'
+          + '<td class="ns-sum">'+(i===1?domainScore(pts,d):'')+'</td>'
+          + '<td class="ns-mean">'+s.数意+'</td>'
+          + (i===1 ? '<td class="ns-g'+(b.status==='ok'?'':' none')+'" rowspan="2">'+g+'</td>' : '')
+          + '</tr>';
+      });
+    });
+    return out;
+  }
+  const wrap=document.createElement('div'); wrap.className='ns-wrap';
+  cols.forEach(list=>{
+    const t=document.createElement('table'); t.className='ns-tbl';
+    t.innerHTML='<tbody>'+list.map(block).join('')+'</tbody>';
+    wrap.appendChild(t);
+  });
+  el.appendChild(wrap);
+  // 原典に図が無い組合せがあれば、その理由を添える
+  const bands=buildBandData(pts);
+  const ng=bands.filter(b=>b.status==='不収録');
+  if(ng.length){
+    const n=document.createElement('div');
+    n.style.cssText='font-size:12px;color:var(--vermillion);margin:-16px 0 24px;line-height:1.9';
+    n.innerHTML='「該当なし」は原典の索引にその組合せの図が無いという意味です。'
+      +'索引は二つの画数値が近い範囲だけを収めており、離れた組合せには図がありません。'
+      +'<br>該当：'+ng.map(b=>b.domain.n+'（'+b.key+'）').join('　');
+    el.appendChild(n);
+  }
+}
+
 // 凡例：表示中の2本について、組合せ・グラフ番号・収録状態を示す
 function buildLegend(pts){
   const leg=document.getElementById('graph-legend');leg.innerHTML='';
@@ -1902,7 +2000,7 @@ function renderGraphs(pts,originYear,birthAge){
   lastPts=pts;lastOriginYear=originYear||null;lastBirthAge=birthAge||null;
   activeLines=new Set(domainPair('健康'));
   viewAgeStart=15;viewAgeEnd=55;
-  buildTabs();buildLegend(pts);drawWave(pts,originYear,birthAge);drawRadar(pts);initAgeRangeSliders();
+  buildTabs();buildAnalysisSheet(pts);buildLegend(pts);drawWave(pts,originYear,birthAge);drawRadar(pts);initAgeRangeSliders();
 }
 
 // =============================================
