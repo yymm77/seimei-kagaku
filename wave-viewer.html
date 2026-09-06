@@ -311,7 +311,7 @@ function describe(which){
   });
   var s = '<b>図' + num + '</b>';
   s += rows ? '　読み取り済み' : '　<span style="color:var(--vermillion)">波形が未収録です</span>';
-  s += '<br>組合せ ' + (combos.length ? combos.join('　') : '（索引に無い図）');
+  s += '<br>この図を指す組合せ ' + (combos.length ? combos.join('　') : '（索引に無い図）');
   if (rows) {
     var his = rows.map(function(r){ return r.hi; }), los = rows.map(function(r){ return r.lo; });
     var top = Math.max.apply(null, his), bot = Math.min.apply(null, los);
