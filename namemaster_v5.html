@@ -146,6 +146,22 @@
   .gtab{padding:5px 16px;border:1px solid rgba(26,18,8,.15);background:transparent;font-family:'Noto Serif JP',serif;font-size:10px;letter-spacing:.3em;color:var(--mist);cursor:pointer;transition:all .2s;border-radius:1px}
   .gtab.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
   .graph-container{overflow-x:auto;margin-bottom:16px}
+  .csv-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:-8px 0 16px}
+  .sc-wrap{display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap;margin-bottom:26px}
+  .sc-name{border-collapse:collapse;font-family:'Zen Old Mincho',serif}
+  .sc-name td{border:1px solid rgba(26,18,8,.18);padding:4px 10px;white-space:nowrap}
+  .sc-ch{font-size:20px;text-align:center;min-width:2.2em}
+  .sc-st{font-size:15px;text-align:right;min-width:2.6em;color:var(--indigo)}
+  .sc-cst{font-size:11px;color:var(--mist);text-align:right}
+  .sc-sum{font-size:12px;letter-spacing:.2em;color:var(--mist);text-align:center}
+  .sc-name tr.sc-mid td{background:rgba(184,150,12,.08)}
+  .sc-arrow{font-size:20px;color:var(--gold);align-self:center}
+  .sc-tbl{border-collapse:collapse;font-size:13px}
+  .sc-tbl td{border:1px solid rgba(26,18,8,.14);padding:5px 12px;white-space:nowrap}
+  .sc-sym{font-family:'Zen Old Mincho',serif;font-size:17px;font-weight:700}
+  .sc-v{font-size:16px;font-weight:700;margin:0 4px}
+  .sc-d{font-size:11px;color:var(--mist);margin-left:4px}
+  @media print{ .sc-wrap{page-break-inside:avoid} }
   .ns-wrap{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:28px}
   .ns-tbl{width:100%;border-collapse:collapse;font-size:13px;font-family:'Noto Serif JP',serif}
   .ns-tbl td{border:1px solid rgba(26,18,8,.18);padding:4px 7px;white-space:nowrap}
@@ -778,7 +794,16 @@ _cntBanner(); cntVisit();
       <div class="dbg-grid" id="dbg-grid"></div>
     </details>
 
+    <div class="sec">字画図</div>
+    <div class="graph-note">姓名の各字と画数から、12の記号がどう導かれるかを示します。霊数は姓の頭と名の尾に置く定数で、姓は 4−字数、名も 4−字数 です。</div>
+    <div id="chart-area"></div>
+
     <div class="sec">姓名分析表</div>
+    <div class="csv-row">
+      <button class="ar-preset" onclick="exportSheetCsv()">分析表をCSVで書き出す</button>
+      <button class="ar-preset" onclick="exportRowCsv()">1行にまとめてCSVで書き出す</button>
+      <span class="ar-label" style="font-size:10px">Excelでそのまま開けます</span>
+    </div>
     <div class="graph-note">NAMEMASTER の解析表と同じ並びです。分野ごとに内線・外線の二組、各組は二つの記号（画数値・点数・数意）と、その合計から成ります。右端は、その組合せに対応する原典の人生グラフの図番号です。</div>
     <div id="sheet-area"></div>
 
@@ -1864,6 +1889,128 @@ function drawRadar(pts){
 // ── 姓名分析表（NAMEMASTER の解析表と同じ並び）──
 // 一分野は四行。上二行が内線、下二行が外線。
 // 各行は 記号／画数値／点数／合計／数意。右端に原典の図番号。
+// ── 字画図（NAMEMASTER 解析表の左半分）──
+// 姓名の各字と画数、そこから12の記号がどう導かれるかを示す。
+//   姓の頭の定数 P = 4 − 姓の字数    名の尾の定数 Q = 4 − 名の字数
+//   Ⓜ=P+姓計  Ⓞ=姓計+名計  Ⓝ=名計+Q  Ⓟ=Ⓞ+P  Ⓡ=Ⓜ+Ⓝ  Ⓠ=Ⓞ+Q
+//   Ⓣ=姓の末字+名の頭字   Ⓢ=（P+姓計−末字）+（Q+名計−頭字）
+//   Ⓤ=1+名の頭字  Ⓦ=Ⓞ+1  Ⓥ=（Ⓜ−1）+（Q+名計−頭字）  Ⓧ=Ⓡ−1
+// ── CSV書き出し ──
+// Excel で開けるよう、先頭にBOMを付け、改行はCRLFにする。
+// カンマ・引用符・改行を含む値は二重引用符で囲む。
+function csvCell(v){
+  v = (v===undefined||v===null) ? '' : String(v);
+  return /[",\r\n]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v;
+}
+function csvDownload(rows, fname){
+  const body = rows.map(r=>r.map(csvCell).join(',')).join('\r\n');
+  const blob = new Blob(['\ufeff'+body], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = fname;
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 0);
+}
+function csvName(pts){
+  return ((pts.seiChars||[]).join('')+(pts.meiChars||[]).join(''))||'姓名';
+}
+function csvStamp(){
+  const d=new Date(), p=n=>('0'+n).slice(-2);
+  return d.getFullYear()+p(d.getMonth()+1)+p(d.getDate());
+}
+
+// 縦並び。NAMEMASTER の解析表と同じ形なので、Excelに貼って直に照合できる。
+function exportSheetCsv(){
+  const pts=lastPts; if(!pts){ alert('先に姓名を入力して判定してください'); return; }
+  const c=pts.cells, rows=[];
+  rows.push(['姓名', csvName(pts)]);
+  rows.push(['テンプレート', pts.template]);
+  rows.push(['書き出し', new Date().toLocaleString('ja-JP')]);
+  rows.push([]);
+  rows.push(['── 字画 ──']);
+  rows.push(['区分','字','画数']);
+  (pts.seiChars||[]).forEach((ch,i)=>rows.push(['姓',ch,pts.sStrokes[i]]));
+  rows.push(['姓','計',c.SS]);
+  (pts.meiChars||[]).forEach((ch,i)=>rows.push(['名',ch,pts.mStrokes[i]]));
+  rows.push(['名','計',c.MS]);
+  rows.push(['霊数','姓の頭',c.P]);
+  rows.push(['霊数','名の尾',c.Q]);
+  rows.push([]);
+  rows.push(['── 12ポイント ──']);
+  rows.push(['記号','セル','画数値','点数','数意']);
+  ['I5','I13','I9','K3','K15','K9','A9','C9','D20','D24','F20','F24'].forEach(k=>{
+    const s=suugi(pts[k]);
+    rows.push([POINT_SYMS[k], k, pts[k], s.点数, s.数意]);
+  });
+  rows.push([]);
+  rows.push(['── 分析表（12分野 × 内線・外線）──']);
+  rows.push(['分野','線','記号1','画数値1','点数1','記号2','画数値2','点数2','合計','組合せ','図番号','状態']);
+  ['健康','社交','所得','幸福','技能','娯楽','蓄財','愛情','職業','性格','能力','勝負'].forEach(base=>{
+    GRAPH_DOMAINS.filter(d=>d.base===base).forEach(d=>{
+      const b=makiLookup(pts[d.ka], pts[d.kb]);
+      const sy=(d.sym||'').split('+');
+      rows.push([base, d.line,
+        sy[0]||d.ka, pts[d.ka], suugi(pts[d.ka]).点数,
+        sy[1]||d.kb, pts[d.kb], suugi(pts[d.kb]).点数,
+        domainScore(pts,d), b.key,
+        b.status==='不収録' ? '' : b.graph,
+        b.status==='ok' ? '収録' : (b.status==='未取得' ? '波形が未収録' : '原典に該当なし')]);
+    });
+  });
+  csvDownload(rows, '姓名分析表_'+csvName(pts)+'_'+csvStamp()+'.csv');
+}
+
+// 横並び。複数名を貼り重ねて一覧にするための形。
+function exportRowCsv(){
+  const pts=lastPts; if(!pts){ alert('先に姓名を入力して判定してください'); return; }
+  const c=pts.cells;
+  const KS=['I5','I13','I9','K3','K15','K9','A9','C9','D20','D24','F20','F24'];
+  const hd=['姓','名','テンプレート','姓計','名計','霊数(姓)','霊数(名)'];
+  const dt=[(pts.seiChars||[]).join(''), (pts.meiChars||[]).join(''), pts.template,
+            c.SS, c.MS, c.P, c.Q];
+  KS.forEach(k=>{ hd.push(POINT_SYMS[k]+k); dt.push(pts[k]); });
+  KS.forEach(k=>{ hd.push(POINT_SYMS[k]+'点'); dt.push(suugi(pts[k]).点数); });
+  ['健康','社交','所得','幸福','技能','娯楽','蓄財','愛情','職業','性格','能力','勝負'].forEach(base=>{
+    GRAPH_DOMAINS.filter(d=>d.base===base).forEach(d=>{
+      const b=makiLookup(pts[d.ka], pts[d.kb]);
+      hd.push(base+d.line+'点'); dt.push(domainScore(pts,d));
+      hd.push(base+d.line+'図'); dt.push(b.status==='不収録' ? '該当なし' : b.graph);
+    });
+  });
+  csvDownload([hd,dt], '姓名一行_'+csvName(pts)+'_'+csvStamp()+'.csv');
+}
+
+function buildStrokeChart(pts){
+  const el=document.getElementById('chart-area'); if(!el) return;
+  el.innerHTML='';
+  if(!pts||!pts.seiChars) return;
+  const c=pts.cells, S=pts.seiChars, M=pts.meiChars;
+  const ss=pts.sStrokes, ms=pts.mStrokes;
+  const row=(a,b)=>'<tr><td class="sc-l">'+a+'</td><td class="sc-r">'+b+'</td></tr>';
+  const sym=(k,label)=>'<span class="sc-sym">'+POINT_SYMS[k]+'</span> '
+      +'<span class="sc-v">'+pts[k]+'</span><span class="sc-d">'+label+'</span>';
+
+  let name='<table class="sc-name"><tbody>';
+  name+='<tr><td class="sc-cst">霊数 '+c.P+'</td><td class="sc-ch">（姓の頭）</td><td></td></tr>';
+  S.forEach((ch,i)=>{ name+='<tr><td></td><td class="sc-ch">'+ch+'</td><td class="sc-st">'+ss[i]+'</td></tr>'; });
+  name+='<tr class="sc-mid"><td></td><td class="sc-sum">姓 計</td><td class="sc-st">'+c.SS+'</td></tr>';
+  M.forEach((ch,i)=>{ name+='<tr><td></td><td class="sc-ch">'+ch+'</td><td class="sc-st">'+ms[i]+'</td></tr>'; });
+  name+='<tr class="sc-mid"><td></td><td class="sc-sum">名 計</td><td class="sc-st">'+c.MS+'</td></tr>';
+  name+='<tr><td class="sc-cst">霊数 '+c.Q+'</td><td class="sc-ch">（名の尾）</td><td></td></tr>';
+  name+='</tbody></table>';
+
+  let derive='<table class="sc-tbl"><tbody>';
+  derive+=row(sym('I5','＝ 霊数'+c.P+' ＋ 姓計'+c.SS), sym('K3','＝ Ⓞ'+pts.I9+' ＋ 霊数'+c.P));
+  derive+=row(sym('I9','＝ 姓計'+c.SS+' ＋ 名計'+c.MS), sym('K9','＝ Ⓜ'+pts.I5+' ＋ Ⓝ'+pts.I13));
+  derive+=row(sym('I13','＝ 名計'+c.MS+' ＋ 霊数'+c.Q), sym('K15','＝ Ⓞ'+pts.I9+' ＋ 霊数'+c.Q));
+  derive+=row(sym('C9','＝ 姓の末字 ＋ 名の頭字'), sym('A9','＝ '+c.C4+' ＋ '+c.C14));
+  derive+=row(sym('D20','＝ 1 ＋ 名の頭字'), sym('F20','＝ Ⓞ'+pts.I9+' ＋ 1'));
+  derive+=row(sym('D24','＝ （Ⓜ'+pts.I5+'−1） ＋ '+c.C14), sym('F24','＝ Ⓡ'+pts.K9+' − 1'));
+  derive+='</tbody></table>';
+
+  el.innerHTML='<div class="sc-wrap">'+name+'<div class="sc-arrow">→</div>'+derive+'</div>';
+}
+
 function buildAnalysisSheet(pts){
   const el=document.getElementById('sheet-area'); if(!el) return;
   el.innerHTML='';
@@ -2000,7 +2147,7 @@ function renderGraphs(pts,originYear,birthAge){
   lastPts=pts;lastOriginYear=originYear||null;lastBirthAge=birthAge||null;
   activeLines=new Set(domainPair('健康'));
   viewAgeStart=15;viewAgeEnd=55;
-  buildTabs();buildAnalysisSheet(pts);buildLegend(pts);drawWave(pts,originYear,birthAge);drawRadar(pts);initAgeRangeSliders();
+  buildTabs();buildStrokeChart(pts);buildAnalysisSheet(pts);buildLegend(pts);drawWave(pts,originYear,birthAge);drawRadar(pts);initAgeRangeSliders();
 }
 
 // =============================================
@@ -2046,7 +2193,9 @@ function calc(s,m){
 
   const cells = {SS,MS,P,Q,C4,C14,I5,C9,K3,I9,K9,A9,D20,I13,D24,F20,F24,K15};
   const template = 'X'.repeat(s.length) + '-' + 'X'.repeat(m.length);
-  return {I5,C9,K3,I9,K9,A9,D20,I13,D24,F20,F24,K15,cells,template};
+  // 字画図を描くために、各字の画数も持たせておく
+  return {I5,C9,K3,I9,K9,A9,D20,I13,D24,F20,F24,K15,cells,template,
+          sStrokes:s.slice(), mStrokes:m.slice()};
 }
 
 // 分野定義は GRAPH_DOMAINS に一本化（下方で定義）
@@ -2665,6 +2814,7 @@ function analyze(){
   document.getElementById('mei-unk').textContent=mv.filter((_,i)=>!ms[i]).length?'字画表にない字: '+mv.filter((_,i)=>!ms[i]).join('　'):'';
   const sS=ss.map(v=>v||1),mS=ms.map(v=>v||1);
   const pts=calc(sS,mS);
+  pts.seiChars=sv.slice(); pts.meiChars=mv.slice();
   document.getElementById('r-name').textContent=sv.join('')+'　'+mv.join('');
   document.getElementById('r-strokes').textContent=[...sv.map((c,i)=>c+'('+sS[i]+')'), ...mv.map((c,i)=>c+'('+mS[i]+')')].join(' ')+'　計'+(sS.reduce((a,b)=>a+b,0)+mS.reduce((a,b)=>a+b,0))+'画';
   document.getElementById('r-tmpl').textContent='テンプレート: '+pts.template;
