@@ -146,7 +146,7 @@
   .gtab{padding:5px 16px;border:1px solid rgba(26,18,8,.15);background:transparent;font-family:'Noto Serif JP',serif;font-size:10px;letter-spacing:.3em;color:var(--mist);cursor:pointer;transition:all .2s;border-radius:1px}
   .gtab.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
   .graph-container{overflow-x:auto;margin-bottom:16px}
-  .graph-legend{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;font-size:10px;letter-spacing:.2em;color:var(--mist)}
+  .graph-legend{display:flex;flex-direction:column;align-items:flex-start;gap:4px;font-size:11px;letter-spacing:.2em;color:var(--mist)}
   .graph-legend-hint{text-align:center;font-size:10px;color:rgba(26,18,8,.3);letter-spacing:.2em;margin:4px 0 10px;font-style:italic}
   .age-range-row{display:flex;align-items:center;gap:8px;justify-content:center;margin:0 0 16px;flex-wrap:wrap}
   .ar-label{font-size:11px;letter-spacing:.3em;color:var(--mist)}
@@ -1756,47 +1756,15 @@ function drawWave(pts,graphOriginYear,graphBirthAge){
       'font-family':'serif','font-weight':'bold'},'現在');
   }
 
-  // ── 状態の注記（①実データ／②グラフ未収録／③原典に該当なし）──
-  let noteY=PT+13;
-  shown.forEach(di=>{
-    const b=bands[di], d=b.domain;
-    if(b.status==='ok')return;
-    const msg=b.status==='未取得'
-      ? d.n+'　'+originLabel(d,pts)+'→ 図'+b.graph+'　── グラフ未収録'
-      : d.n+'　'+originLabel(d,pts)+'── 原典に該当なし';
-    mk('text',{x:PL+8,y:noteY,'font-size':10,fill:'rgba(26,18,8,.45)',
-      'font-family':'serif'},msg);
-    noteY+=15;
-  });
-
   if(drawable.length===0){
     mk('text',{x:PL+iW/2,y:PT+iH/2,'text-anchor':'middle','font-size':12,
       fill:'rgba(26,18,8,.35)','font-family':'serif'},
       '表示できる原典グラフがありません');
   }
 
-  // ── 凡例（グラフ内右上）──
-  if(drawable.length>0){
-    mk('rect',{x:PL+iW-256,y:PT+2,width:256,height:drawable.length*15+6,
-      fill:'rgba(245,241,232,.88)',rx:2});
-  }
-  let lgY=PT+13;
-  drawable.forEach(di=>{
-    const d=bands[di].domain;
-    const solid=isSolidBar(d);
-    const sw={x1:PL+iW-250,y1:lgY-4,x2:PL+iW-235,y2:lgY-4,
-      stroke:d.color,'stroke-width':5};
-    if(!solid) sw['stroke-dasharray']='3 2.5';
-    mk('line',sw);
-    // ── 出自を出す ──
-    // どの記号ペアから、どの画数値で、どの図が引かれたのかを示す。
-    // 原本の該当ページを直接引けるようにするため。
-    mk('text',{x:PL+iW-228,y:lgY,'font-size':10,fill:'rgba(26,18,8,.6)',
-      'font-family':'serif'},
-      (isSolidBar(d)?'実棒　':'点棒　')+d.n.replace(/　/g,'')+'　'
-      +originLabel(d,pts)+'→ 図'+bands[di].graph);
-    lgY+=15;
-  });
+  // 凡例と注記はグラフの下（HTML側）に出す。
+  // 表示期間を狭めるとグラフの横幅が縮むため、図中に置くと
+  // 幅が足りなくなって注記の上に重なってしまう。
 
   // ── 原典の範囲外である旨（15〜55歳しか存在しない）──
   mk('text',{x:PL,y:H-8,'font-size':8,fill:'rgba(26,18,8,.28)','font-family':'serif'},
@@ -1853,18 +1821,25 @@ function buildLegend(pts){
   const leg=document.getElementById('graph-legend');leg.innerHTML='';
   if(!pts)return;
   const bands=buildBandData(pts);
-  [...activeLines].sort((a,b)=>a-b).forEach(di=>{
+  // 原典どおり実棒を先に並べる
+  const order=[...activeLines].sort((a,b)=>
+    (isSolidBar(bands[b].domain)?1:0)-(isSolidBar(bands[a].domain)?1:0));
+  order.forEach(di=>{
     const b=bands[di], d=b.domain;
+    const solid=isSolidBar(d);
     const score=Math.min(100,domainScore(pts,d));
-    const stat = b.status==='ok'      ? 'グラフ'+b.graph
-               : b.status==='未取得'  ? 'グラフ'+b.graph+'・未収録'
-               : '原典に該当なし';
+    // 状態は三つ。①読めた ②図はあるが波形が未収録 ③そもそも原典に図が無い
+    const stat = b.status==='ok'     ? '図'+b.graph
+               : b.status==='未取得' ? '図'+b.graph+'（波形が未収録）'
+               : '原典に該当なし　── 索引にこの組合せの図が存在しません';
     const item=document.createElement('div');
     item.className='gl-item'+(b.status==='ok'?'':' muted');
-    item.innerHTML='<div class="gl-dot" style="background:'+d.color
-      +(b.dash?';opacity:.62':'')+'"></div>'+d.n
-      +'　組合せ'+b.key+'　'+stat+'　（'+score+'点）';
-    item.title='原典の組合せ'+b.key+'　'+stat;
+    const swatch='<span style="display:inline-block;width:20px;height:0;'
+      +'border-top:4px '+(solid?'solid':'dashed')+' '+d.color+'"></span>';
+    item.innerHTML=swatch+'<b>'+(solid?'実棒':'点棒')+'</b>　'+d.n+'　'
+      +originLabel(d,pts)+'→ '+stat
+      +(b.status==='ok'?'　（'+score+'点）':'');
+    item.title=d.n+'　'+originLabel(d,pts)+'　'+stat;
     leg.appendChild(item);
   });
 }
@@ -1886,7 +1861,7 @@ function swapSolid(){
   solidSide = (solidSide==='外線') ? '内線' : '外線';
   const b=document.getElementById('swap-btn');
   if(b) b.textContent='実棒＝'+solidSide+'　（押すと入れ替え）';
-  if(lastPts) drawWave(lastPts,lastOriginYear,lastBirthAge);
+  if(lastPts){ buildLegend(lastPts); drawWave(lastPts,lastOriginYear,lastBirthAge); }
 }
 function setAspect(btn){
   document.querySelectorAll('#aspect-row .ar-preset').forEach(b=>b.classList.remove('active'));
