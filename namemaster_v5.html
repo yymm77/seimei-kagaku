@@ -1693,7 +1693,7 @@ function resetAgeRange(){
   document.getElementById('ar-start-val').textContent='15歳';
   document.getElementById('ar-end-val').textContent='55歳';
   // プリセットのactiveを全期間に戻す
-  document.querySelectorAll('.ar-preset').forEach(b=>{
+  document.querySelectorAll('#age-preset-row .ar-preset').forEach(b=>{
     b.classList.toggle('active', b.dataset.end==='55' && b.dataset.start==='15');
   });
   if(lastPts)drawWave(lastPts,lastOriginYear,lastBirthAge);
@@ -1701,9 +1701,10 @@ function resetAgeRange(){
 
 // プリセットボタン処理
 function setPreset(btn){
+  if(btn.dataset.start===undefined) return;   // 他の用途の ar-preset は無視する
   const startVal=parseInt(btn.dataset.start||'15');
   const endVal=parseInt(btn.dataset.end);
-  document.querySelectorAll('.ar-preset').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#age-preset-row .ar-preset').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   viewAgeStart=startVal;viewAgeEnd=endVal;
   document.getElementById('ar-start').value=startVal;
@@ -1711,6 +1712,25 @@ function setPreset(btn){
   document.getElementById('ar-start-val').textContent=startVal+'歳';
   document.getElementById('ar-end-val').textContent=endVal+'歳';
   if(lastPts)drawWave(lastPts,lastOriginYear,lastBirthAge);
+}
+
+// 一連の描画を一つずつ実行する。
+// どこかで落ちても後続を止めず、失敗した工程を画面に出す。
+// 従来は一つ落ちるとスライダーの初期化まで到達せず、
+// 操作が丸ごと効かなくなっていた。
+function runSteps(steps){
+  const errs=[];
+  steps.forEach(([nm,fn])=>{
+    try{ fn(); }catch(e){ errs.push(nm+' : '+(e&&e.message?e.message:e)); console.error(nm,e); }
+  });
+  const box=document.getElementById('err');
+  if(box){
+    if(errs.length){
+      box.style.display='block';
+      box.innerHTML='描画で問題が起きました（他の部分は表示されています）<br>'
+        +errs.map(s=>'・'+s).join('<br>');
+    }else{ box.style.display='none'; box.textContent=''; }
+  }
 }
 
 function initAgeRangeSliders(){
@@ -2350,7 +2370,15 @@ function renderGraphs(pts,originYear,birthAge){
   lastPts=pts;lastOriginYear=originYear||null;lastBirthAge=birthAge||null;
   activeLines=new Set(domainPair('健康'));
   viewAgeStart=15;viewAgeEnd=55;
-  buildTabs();buildStrokeChart(pts);buildAnalysisSheet(pts);buildLegend(pts);drawWave(pts,originYear,birthAge);drawRadar(pts);initAgeRangeSliders();
+  runSteps([
+    ['buildTabs',       ()=>buildTabs()],
+    ['buildStrokeChart',()=>buildStrokeChart(pts)],
+    ['buildAnalysisSheet',()=>buildAnalysisSheet(pts)],
+    ['buildLegend',     ()=>buildLegend(pts)],
+    ['drawWave',        ()=>drawWave(pts,originYear,birthAge)],
+    ['drawRadar',       ()=>drawRadar(pts)],
+    ['initAgeRangeSliders',()=>initAgeRangeSliders()]
+  ]);
 }
 
 // =============================================
