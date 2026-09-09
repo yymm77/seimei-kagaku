@@ -858,8 +858,8 @@ _cntBanner(); cntVisit();
       <!-- 縦横比 -->
       <div class="age-preset-row" id="aspect-row">
         <span class="ar-label">縦横比</span>
-        <button class="ar-preset active" data-asp="auto" onclick="setAspect(this)">自動（原典の密度）</button>
-        <button class="ar-preset" data-asp="full" onclick="setAspect(this)">幅いっぱい</button>
+        <button class="ar-preset active" data-asp="auto" onclick="setAspect(this)">自動（見やすさ優先）</button>
+        <button class="ar-preset" data-asp="dense" onclick="setAspect(this)">原典の密度</button>
         <button class="ar-preset" id="swap-btn" onclick="swapSolid()">実棒／点棒を入れ替え</button>
         <span class="ar-label" style="font-size:10px;margin-left:10px">拡大</span>
         <input type="range" id="ar-zoom" min="70" max="220" value="100" step="5" class="ar-slider" style="width:120px">
@@ -1748,8 +1748,7 @@ function drawWave(pts,graphOriginYear,graphBirthAge){
   svg.innerHTML='';
   const NS='http://www.w3.org/2000/svg';
   const mk=(t,at,txt)=>{const e=document.createElementNS(NS,t);for(const k in at)e.setAttribute(k,at[k]);if(txt!==undefined)e.textContent=txt;svg.appendChild(e);return e;};
-  const H=330,PL=52,PR=18,PT=30,PB=62;
-  const iH=H-PT-PB;
+  const PL=52,PR=18,PT=30,PB=62;
 
   const dispStart=Math.max(AGE_START,Math.min(viewAgeStart,AGE_OBSERVED-1));
   const dispEnd=Math.max(dispStart+1,Math.min(viewAgeEnd,AGE_OBSERVED));
@@ -1761,19 +1760,26 @@ function drawWave(pts,graphOriginYear,graphBirthAge){
   // 原典は40年ぶんを一定の密度で刷っているので、その密度に合わせる。
   // 40年で730px＝1年あたり18.25px。これを基準とし、
   // 期間が短いときも1年あたりの横幅が広がりすぎないよう上限をかける。
-  const ppyAuto=Math.max(16,Math.min(30,730/span));
-  const ppy=(waveAspect==='auto')?ppyAuto
-           :(waveAspect==='full')?(730/span)
-           :Number(waveAspect);
+  // ── 縦横比 ──
+  // 「自動」は横幅いっぱいを使い、表示期間が短いほど縦を伸ばす。
+  //   期間を狭めたときに、その部分が拡大されて見えるようにするため。
+  //   横だけ広がると上下の動きが相対的に潰れて平べったく見える。
+  // 「原典の密度」は1年あたり18.25px（巻末の40年ぶんと同じ刻み）に固定する。
+  //   原典と直に見比べるとき用。
+  const ppy=(waveAspect==='dense') ? 18.25 : (730/span);
+  const hFac=(waveAspect==='dense') ? 1
+           : Math.max(1, Math.min(2.0, Math.sqrt(40/span)));
   const iW=Math.round(span*ppy);
+  const iH=Math.round(238*hFac);
+  const H=PT+iH+PB;
   const W=PL+iW+PR;
   svg.setAttribute('viewBox','0 0 '+W+' '+H);
-  // 拡大率。スライダーを触っていなければ、入れ物の幅に収まるところまで縮める。
+  // 拡大率。スライダーを触っていなければ、入れ物の幅に合わせる。
   // 縦横を同じ率で変えるので、縦横比は保たれる。
   let z=waveZoom;
   if(!waveZoomTouched){
     const box=svg.parentElement?svg.parentElement.clientWidth:0;
-    if(box>60 && W>box) z=Math.max(0.55, box/W);
+    if(box>60) z=Math.max(0.55, Math.min(1.6, box/W));
   }
   svg.setAttribute('width',Math.round(W*z));
   svg.setAttribute('height',Math.round(H*z));
