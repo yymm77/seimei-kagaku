@@ -671,6 +671,10 @@ _cntBanner(); cntVisit();
               <input type="text" class="name-text-input" id="ca-mei" maxlength="6" placeholder="例：誠一" oninput="onCompatInput()">
               <div class="stroke-preview" id="ca-mei-prev"></div>
             </div>
+            <div class="name-group">
+              <label>生年月日（任意）</label>
+              <input type="date" class="name-text-input" id="ca-birth" style="font-family:inherit">
+            </div>
           </div>
         </div>
         <div id="compat-a-company" style="display:none">
@@ -713,6 +717,10 @@ _cntBanner(); cntVisit();
               <label>名</label>
               <input type="text" class="name-text-input" id="cb-mei" maxlength="6" placeholder="例：和子" oninput="onCompatInput()">
               <div class="stroke-preview" id="cb-mei-prev"></div>
+            </div>
+            <div class="name-group">
+              <label>生年月日（任意）</label>
+              <input type="date" class="name-text-input" id="cb-birth" style="font-family:inherit">
             </div>
           </div>
         </div>
@@ -793,6 +801,25 @@ _cntBanner(); cntVisit();
       <summary>▶ セル計算値（Excelとの照合用）</summary>
       <div class="dbg-grid" id="dbg-grid"></div>
     </details>
+
+    <div id="compat-graph-sec" style="display:none">
+      <div class="sec">二人の人生グラフ</div>
+      <div class="graph-note">原典『姓名（なまえ）』3章と同じ形式です。実棒（実線）は本人の意欲、点棒（破線）は環境を表します。生年月日を入れると西暦で揃うので、同じ年に二人がどうであったかを縦に読めます。</div>
+      <div class="age-preset-row">
+        <span class="ar-label">分野</span>
+        <span id="cg-tabs"></span>
+      </div>
+      <div class="age-preset-row">
+        <span class="ar-label">表示</span>
+        <button class="ar-preset active" data-cg="stack" onclick="setCgMode(this)">上下に並べる</button>
+        <button class="ar-preset" data-cg="over" onclick="setCgMode(this)">重ねる</button>
+        <span class="ar-label" style="margin-left:14px">横軸</span>
+        <button class="ar-preset active" data-cga="year" onclick="setCgAxis(this)">西暦で揃える</button>
+        <button class="ar-preset" data-cga="age" onclick="setCgAxis(this)">年齢で揃える</button>
+      </div>
+      <div class="graph-container"><svg id="cg-svg"></svg></div>
+      <div class="graph-legend" id="cg-legend"></div>
+    </div>
 
     <div class="sec">字画図</div>
     <div class="graph-note">姓名の各字と画数から、12の記号がどう導かれるかを示します。霊数は姓の頭と名の尾に置く定数で、姓は 4−字数、名も 4−字数 です。</div>
@@ -1980,6 +2007,175 @@ function exportRowCsv(){
   csvDownload([hd,dt], '姓名一行_'+csvName(pts)+'_'+csvStamp()+'.csv');
 }
 
+// =============================================
+// 二人の人生グラフ（相性モード）
+// =============================================
+// 原典『姓名（なまえ）』3章 図5・図6 と同じ形式。
+// 上下に並べるか、重ねるかを選べる。
+// 生年月日を入れると西暦で揃うので、同じ年に二人が
+// どうであったかを縦に読める。年齢差があっても比べられる。
+let cgA=null, cgB=null, cgNameA='', cgNameB='';
+let cgBase='社交', cgMode='stack', cgAxis='year';
+let cgBirthA=null, cgBirthB=null;
+const CG_COL={A:'#b8960c', B:'#2f4f7a'};
+
+function setCgMode(btn){
+  document.querySelectorAll('[data-cg]').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); cgMode=btn.dataset.cg; drawCompatGraph();
+}
+function setCgAxis(btn){
+  document.querySelectorAll('[data-cga]').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); cgAxis=btn.dataset.cga; drawCompatGraph();
+}
+function setCgBase(b){ cgBase=b; buildCgTabs(); drawCompatGraph(); }
+
+function buildCgTabs(){
+  const el=document.getElementById('cg-tabs'); if(!el) return;
+  el.innerHTML='';
+  ['健康','社交','所得','幸福','技能','娯楽','蓄財','愛情','職業','性格','能力','勝負']
+    .forEach(b=>{
+      const t=document.createElement('button');
+      t.className='ar-preset'+(b===cgBase?' active':'');
+      t.textContent=b; t.onclick=()=>setCgBase(b);
+      t.style.cssText='padding:3px 9px;font-size:11px;letter-spacing:.1em';
+      el.appendChild(t);
+    });
+}
+
+// その人の、その分野の2本ぶんの帯を取り出す
+function cgBands(pts){
+  return GRAPH_DOMAINS.filter(d=>d.base===cgBase).map(d=>{
+    const b=makiLookup(pts[d.ka], pts[d.kb]);
+    return {d:d, b:b, solid:isSolidBar(d)};
+  }).sort((x,y)=>(y.solid?1:0)-(x.solid?1:0));   // 実棒を先に
+}
+
+function drawCompatGraph(){
+  const sec=document.getElementById('compat-graph-sec');
+  const svg=document.getElementById('cg-svg');
+  if(!sec||!svg) return;
+  if(!cgA||!cgB){ sec.style.display='none'; return; }
+  sec.style.display='block';
+  while(svg.firstChild) svg.removeChild(svg.firstChild);
+  const NS='http://www.w3.org/2000/svg';
+  const mk=(t,a,txt)=>{const e=document.createElementNS(NS,t);
+    for(const k in a) e.setAttribute(k,a[k]);
+    if(txt!==undefined) e.textContent=txt; svg.appendChild(e); return e;};
+
+  // ── 横軸を決める ──
+  // 西暦で揃えるには両方の生年が要る。無ければ年齢で揃える。
+  const byYear = (cgAxis==='year' && cgBirthA && cgBirthB);
+  let ticks=[], ageA=[], ageB=[];
+  if(byYear){
+    const yA=cgBirthA.getFullYear(), yB=cgBirthB.getFullYear();
+    const lo=Math.max(yA+15, yB+15), hi=Math.min(yA+55, yB+55);
+    for(let y=lo; y<=hi; y++){ ticks.push(y); ageA.push(y-yA); ageB.push(y-yB); }
+  }else{
+    for(let a=15; a<=55; a++){ ticks.push(a); ageA.push(a); ageB.push(a); }
+  }
+  if(ticks.length<2){
+    document.getElementById('cg-legend').innerHTML=
+      '<div class="gl-item muted">二人の年齢が離れすぎて、重なる期間がありません</div>';
+    return;
+  }
+
+  const stack = (cgMode==='stack');
+  const PL=54, PR=16, PT=22, PB=44, GAP=14;
+  const ppy=Math.max(14, Math.min(28, 700/ticks.length));
+  const iW=Math.round(ticks.length*ppy);
+  const iH=stack?116:190;
+  const H=PT+iH*(stack?2:1)+(stack?GAP:0)+PB;
+  const W=PL+iW+PR;
+  svg.setAttribute('viewBox','0 0 '+W+' '+H);
+  const box=svg.parentElement?svg.parentElement.clientWidth:0;
+  let z=1; if(box>60 && W>box) z=Math.max(0.55, box/W);
+  svg.setAttribute('width',Math.round(W*z));
+  svg.setAttribute('height',Math.round(H*z));
+
+  const colW=iW/ticks.length;
+  const xOf=i=>PL+(i+0.5)*colW;
+
+  // 一段ぶんを描く
+  function panel(pts, ages, top, col, tag){
+    const yOf=v=>top+iH-(v/100)*iH;
+    mk('rect',{x:PL,y:top,width:iW,height:iH,fill:'none',
+      stroke:'rgba(26,18,8,.12)','stroke-width':1});
+    [0,50,100].forEach(v=>{
+      mk('line',{x1:PL,y1:yOf(v),x2:PL+iW,y2:yOf(v),
+        stroke:v===50?'rgba(26,18,8,.45)':'rgba(26,18,8,.10)','stroke-width':v===50?1:1});
+      mk('text',{x:PL-6,y:yOf(v)+3,'font-size':9,fill:'rgba(26,18,8,.45)',
+        'text-anchor':'end','font-family':'serif'}, v);
+    });
+    mk('text',{x:PL+4,y:top+12,'font-size':11,fill:col,'font-weight':'700',
+      'font-family':'serif'}, tag);
+    const bands=cgBands(pts);
+    const n=bands.length||1;
+    const bw=Math.max(1.4,Math.min(5,colW*(n===1?0.24:0.16)));
+    const gap=n===1?0:bw+2.6;
+    bands.forEach((bd,j)=>{
+      if(bd.b.status!=='ok') return;
+      const off=(j-(n-1)/2)*gap;
+      ages.forEach((a,i)=>{
+        const r=bd.b.rows[a-15]; if(!r) return;
+        const x=xOf(i)+off;
+        const yT=yOf(r.hi), yB=Math.max(yOf(r.lo), yT+1.2);
+        const at={x1:x.toFixed(1),y1:yT.toFixed(1),x2:x.toFixed(1),y2:yB.toFixed(1),
+          stroke:col,'stroke-width':bw.toFixed(1)};
+        if(!bd.solid) at['stroke-dasharray']='4 3';
+        mk('line',at);
+      });
+    });
+    return bands;
+  }
+
+  let bA,bB;
+  if(stack){
+    bA=panel(cgA, ageA, PT, CG_COL.A, cgNameA);
+    bB=panel(cgB, ageB, PT+iH+GAP, CG_COL.B, cgNameB);
+  }else{
+    bA=panel(cgA, ageA, PT, CG_COL.A, '');
+    bB=panel(cgB, ageB, PT, CG_COL.B, '');
+  }
+
+  // ── 横軸の目盛 ──
+  const yBase=PT+iH*(stack?2:1)+(stack?GAP:0);
+  const step=Math.max(1, Math.round(ticks.length/12));
+  ticks.forEach((t,i)=>{
+    if(i%step!==0 && i!==ticks.length-1) return;
+    const x=xOf(i);
+    mk('line',{x1:x,y1:yBase,x2:x,y2:yBase+4,stroke:'rgba(26,18,8,.3)','stroke-width':1});
+    mk('text',{x:x,y:yBase+15,'font-size':9.5,fill:'rgba(26,18,8,.6)',
+      'text-anchor':'middle','font-family':'serif'}, byYear? t+'年' : t+'歳');
+    if(byYear){
+      mk('text',{x:x,y:yBase+27,'font-size':8.5,fill:CG_COL.A,
+        'text-anchor':'middle','font-family':'serif'}, ageA[i]+'歳');
+      mk('text',{x:x,y:yBase+38,'font-size':8.5,fill:CG_COL.B,
+        'text-anchor':'middle','font-family':'serif'}, ageB[i]+'歳');
+    }
+  });
+
+  // ── 凡例 ──
+  const leg=document.getElementById('cg-legend'); leg.innerHTML='';
+  [[cgNameA,cgA,bA,CG_COL.A],[cgNameB,cgB,bB,CG_COL.B]].forEach(([nm,pts,bds,col])=>{
+    bds.forEach(bd=>{
+      const it=document.createElement('div');
+      it.className='gl-item'+(bd.b.status==='ok'?'':' muted');
+      const sw='<span style="display:inline-block;width:20px;height:0;border-top:4px '
+        +(bd.solid?'solid':'dashed')+' '+col+'"></span>';
+      it.innerHTML=sw+'<b style="color:'+col+'">'+nm+'</b>　'
+        +(bd.solid?'実棒':'点棒')+'　'+bd.d.n+'　'+originLabel(bd.d,pts)
+        +'→ '+(bd.b.status==='ok'?'図'+bd.b.graph:'原典に該当なし');
+      leg.appendChild(it);
+    });
+  });
+  if(cgAxis==='year' && !(cgBirthA&&cgBirthB)){
+    const w=document.createElement('div');
+    w.className='gl-item muted';
+    w.textContent='※ 生年月日が両方入っていないため、年齢で揃えて表示しています';
+    leg.appendChild(w);
+  }
+}
+
 function buildStrokeChart(pts){
   const el=document.getElementById('chart-area'); if(!el) return;
   el.innerHTML='';
@@ -2012,6 +2208,7 @@ function buildStrokeChart(pts){
 }
 
 function buildAnalysisSheet(pts){
+  const s=document.getElementById('compat-graph-sec'); if(s) s.style.display='none';
   const el=document.getElementById('sheet-area'); if(!el) return;
   el.innerHTML='';
   if(!pts) return;
@@ -2446,6 +2643,13 @@ function renderCompatResult(ptsA, ptsB, nameA, nameB, score, grade, gradeColor, 
   // p-tableのヘッダーを相性用に変更
   const thead = document.querySelector('#p-table thead tr');
   if(thead) thead.innerHTML = '<th>分野</th><th style="color:var(--gold)">'+nameA.substring(0,8)+'</th><th>相性</th><th style="color:var(--indigo)">'+nameB.substring(0,8)+'</th>';
+
+  // ── 二人の人生グラフ ──
+  cgA=ptsA; cgB=ptsB; cgNameA=nameA; cgNameB=nameB;
+  const ba=document.getElementById('ca-birth'), bb=document.getElementById('cb-birth');
+  cgBirthA = (ba&&ba.value) ? new Date(ba.value) : null;
+  cgBirthB = (bb&&bb.value) ? new Date(bb.value) : null;
+  buildCgTabs(); drawCompatGraph();
 
   // ── 相性の観点別アドバイスを表示 ──
   renderCompatAdvice(ptsA, ptsB, nameA, nameB, score, grade, gradeColor);
