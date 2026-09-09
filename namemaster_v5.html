@@ -821,6 +821,8 @@ _cntBanner(); cntVisit();
       <div class="graph-legend" id="cg-legend"></div>
     </div>
 
+    <!-- 相性モードでは二人ぶんを下に出すので、この一人用の区画は隠す -->
+    <div id="single-detail">
     <div class="sec">字画図</div>
     <div class="graph-note">姓名の各字と画数から、12の記号がどう導かれるかを示します。霊数は姓の頭と名の尾に置く定数で、姓は 4−字数、名も 4−字数 です。</div>
     <div id="chart-area"></div>
@@ -886,6 +888,10 @@ _cntBanner(); cntVisit();
     <div class="radar-wrap">
       <svg id="radar-svg" width="100%" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet"></svg>
     </div>
+    </div><!-- /single-detail -->
+
+    <!-- 相性モード：二人ぶんの字画図と分析表 -->
+    <div id="compat-detail" style="display:none"></div>
 
     <!-- ══ AI解説パネル ══ -->
     <div class="ai-panel" id="ai-panel" style="display:none">
@@ -2109,7 +2115,7 @@ function drawCompatGraph(){
   const PL=54, PR=16, PT=22, PB=44, GAP=14;
   const ppy=Math.max(14, Math.min(28, 700/ticks.length));
   const iW=Math.round(ticks.length*ppy);
-  const iH=stack?116:190;
+  const iH=stack?120:216;
   const H=PT+iH*(stack?2:1)+(stack?GAP:0)+PB;
   const W=PL+iW+PR;
   svg.setAttribute('viewBox','0 0 '+W+' '+H);
@@ -2121,8 +2127,10 @@ function drawCompatGraph(){
   const colW=iW/ticks.length;
   const xOf=i=>PL+(i+0.5)*colW;
 
-  // 一段ぶんを描く
-  function panel(pts, ages, top, col, tag){
+  // 一段ぶんを描く。
+  // shift は「重ねる」ときに二人を左右へずらす量。
+  // 同じ位置に描くと後ろの棒が隠れて読めないため。
+  function panel(pts, ages, top, col, tag, shift, fade){
     const yOf=v=>top+iH-(v/100)*iH;
     mk('rect',{x:PL,y:top,width:iW,height:iH,fill:'none',
       stroke:'rgba(26,18,8,.12)','stroke-width':1});
@@ -2143,10 +2151,11 @@ function drawCompatGraph(){
       const off=(j-(n-1)/2)*gap;
       ages.forEach((a,i)=>{
         const r=bd.b.rows[a-15]; if(!r) return;
-        const x=xOf(i)+off;
+        const x=xOf(i)+off+(shift||0);
         const yT=yOf(r.hi), yB=Math.max(yOf(r.lo), yT+1.2);
         const at={x1:x.toFixed(1),y1:yT.toFixed(1),x2:x.toFixed(1),y2:yB.toFixed(1),
-          stroke:col,'stroke-width':bw.toFixed(1)};
+          stroke:col,'stroke-width':bw.toFixed(1),'stroke-linecap':'butt'};
+        if(fade) at['stroke-opacity']=0.75;
         if(!bd.solid) at['stroke-dasharray']='4 3';
         mk('line',at);
       });
@@ -2156,11 +2165,19 @@ function drawCompatGraph(){
 
   let bA,bB;
   if(stack){
-    bA=panel(cgA, ageA, PT, CG_COL.A, cgNameA);
-    bB=panel(cgB, ageB, PT+iH+GAP, CG_COL.B, cgNameB);
+    bA=panel(cgA, ageA, PT, CG_COL.A, cgNameA, 0, false);
+    bB=panel(cgB, ageB, PT+iH+GAP, CG_COL.B, cgNameB, 0, false);
   }else{
-    bA=panel(cgA, ageA, PT, CG_COL.A, '');
-    bB=panel(cgB, ageB, PT, CG_COL.B, '');
+    // 重ねる：一年ぶんの幅の四分の一だけ左右に振り分ける
+    const sh=Math.max(2, colW*0.16);
+    bA=panel(cgA, ageA, PT, CG_COL.A, '', -sh, false);
+    bB=panel(cgB, ageB, PT, CG_COL.B, '',  sh, true);
+    // 年の区切りを薄く入れて、どの年の対かを見分けやすくする
+    ticks.forEach((t,i)=>{
+      if(i===0) return;
+      const x=PL+i*colW;
+      mk('line',{x1:x,y1:PT,x2:x,y2:PT+iH,stroke:'rgba(26,18,8,.07)','stroke-width':1});
+    });
   }
 
   // ── 横軸の目盛 ──
@@ -2202,8 +2219,8 @@ function drawCompatGraph(){
   }
 }
 
-function buildStrokeChart(pts){
-  const el=document.getElementById('chart-area'); if(!el) return;
+function buildStrokeChart(pts, target){
+  const el=target||document.getElementById('chart-area'); if(!el) return;
   el.innerHTML='';
   if(!pts||!pts.seiChars) return;
   const c=pts.cells, S=pts.seiChars, M=pts.meiChars;
@@ -2233,9 +2250,8 @@ function buildStrokeChart(pts){
   el.innerHTML='<div class="sc-wrap">'+name+'<div class="sc-arrow">→</div>'+derive+'</div>';
 }
 
-function buildAnalysisSheet(pts){
-  const s=document.getElementById('compat-graph-sec'); if(s) s.style.display='none';
-  const el=document.getElementById('sheet-area'); if(!el) return;
+function buildAnalysisSheet(pts, target){
+  const el=target||document.getElementById('sheet-area'); if(!el) return;
   el.innerHTML='';
   if(!pts) return;
   const cols=[['健康','社交','所得','幸福','技能','娯楽'],
@@ -2371,6 +2387,11 @@ function renderGraphs(pts,originYear,birthAge){
   activeLines=new Set(domainPair('健康'));
   viewAgeStart=15;viewAgeEnd=55;
   runSteps([
+    ['モード切替',      ()=>{
+        const a=document.getElementById('compat-graph-sec'); if(a) a.style.display='none';
+        const b=document.getElementById('compat-detail');    if(b) b.style.display='none';
+        const c=document.getElementById('single-detail');    if(c) c.style.display='block';
+      }],
     ['buildTabs',       ()=>buildTabs()],
     ['buildStrokeChart',()=>buildStrokeChart(pts)],
     ['buildAnalysisSheet',()=>buildAnalysisSheet(pts)],
@@ -2684,6 +2705,24 @@ function renderCompatResult(ptsA, ptsB, nameA, nameB, score, grade, gradeColor, 
   cgBirthA = (ba&&ba.value) ? new Date(ba.value) : null;
   cgBirthB = (bb&&bb.value) ? new Date(bb.value) : null;
   buildCgTabs(); drawCompatGraph();
+
+  // 一人用の区画は隠し、二人ぶんの字画図と分析表を下に出す
+  const sd=document.getElementById('single-detail'); if(sd) sd.style.display='none';
+  const cd=document.getElementById('compat-detail');
+  if(cd){
+    cd.style.display='block'; cd.innerHTML='';
+    [[nameA,ptsA,CG_COL.A,'Ａ'],[nameB,ptsB,CG_COL.B,'Ｂ']].forEach(([nm,p,col,tag])=>{
+      const h=document.createElement('div');
+      h.className='sec';
+      h.style.cssText='border-left:4px solid '+col+';padding-left:12px';
+      h.textContent=tag+'　'+nm;
+      cd.appendChild(h);
+      const c1=document.createElement('div'); cd.appendChild(c1);
+      const c2=document.createElement('div'); cd.appendChild(c2);
+      try{ buildStrokeChart(p,c1); }catch(e){ console.error(e); }
+      try{ buildAnalysisSheet(p,c2); }catch(e){ console.error(e); }
+    });
+  }
 
   // ── 相性の観点別アドバイスを表示 ──
   renderCompatAdvice(ptsA, ptsB, nameA, nameB, score, grade, gradeColor);
