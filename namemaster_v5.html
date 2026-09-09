@@ -816,6 +816,19 @@ _cntBanner(); cntVisit();
         <span class="ar-label" style="margin-left:14px">横軸</span>
         <button class="ar-preset active" data-cga="year" onclick="setCgAxis(this)">西暦で揃える</button>
         <button class="ar-preset" data-cga="age" onclick="setCgAxis(this)">年齢で揃える</button>
+        <button class="ar-preset" data-cga="pair" onclick="setCgAxis(this)">年齢を指定して揃える</button>
+      </div>
+      <!-- 生年月日が分からないとき用。原典もこの形で図を出している。 -->
+      <div class="age-range-row" id="cg-pair-row" style="display:none">
+        <span class="ar-label" style="font-size:10px">同じ年にする</span>
+        <span class="ar-val" id="cg-pa-name">Ａ</span>
+        <input type="number" id="cg-pa" min="15" max="55" value="41" class="name-text-input"
+          style="width:64px;text-align:center;padding:4px 6px;font-size:14px">
+        <span class="ar-label" style="font-size:11px">歳　と</span>
+        <span class="ar-val" id="cg-pb-name">Ｂ</span>
+        <input type="number" id="cg-pb" min="15" max="55" value="35" class="name-text-input"
+          style="width:64px;text-align:center;padding:4px 6px;font-size:14px">
+        <span class="ar-label" style="font-size:11px">歳</span>
       </div>
       <div class="age-range-row" id="cg-range-row">
         <span class="ar-label" style="font-size:10px">表示範囲</span>
@@ -2073,6 +2086,15 @@ let cgFrom=null, cgTo=null;      // 表示範囲。null は全期間
 // 原典の巻末は1年あたり約17〜18pxなので、その付近まで詰めれば
 // 原本と同じ密度になる。逆に広げれば数年ぶんを大きく見られる。
 let cgPpy=null, cgHt=null;
+// 「年齢を指定して揃える」ときの基準。
+// 例：高倉健41歳と江利チエミ35歳を同じ列に置く。
+// 生年月日が分からなくても、出来事の年齢さえ分かれば重ねられる。
+let cgPairA=41, cgPairB=35;
+(function(){
+  const a=document.getElementById('cg-pa'), b=document.getElementById('cg-pb');
+  if(a) a.addEventListener('input',()=>{ cgPairA=parseInt(a.value)||15; cgFrom=cgTo=null; drawCompatGraph(); });
+  if(b) b.addEventListener('input',()=>{ cgPairB=parseInt(b.value)||15; cgFrom=cgTo=null; drawCompatGraph(); });
+})();
 
 function cgResetSize(){
   cgPpy=cgHt=null;
@@ -2097,6 +2119,14 @@ function cgResetRange(){ cgFrom=cgTo=null; drawCompatGraph(); }
 
 // 横軸の目盛（全期間）を作る。西暦で揃えるか年齢で揃えるかで単位が変わる。
 function cgFullTicks(){
+  if(cgAxis==='pair'){
+    // Ａの年齢を横軸にし、Ｂはずらして重ねる。
+    // ずれ幅 = 指定したＡの年齢 − 指定したＢの年齢
+    const off=cgPairA-cgPairB;
+    const lo=Math.max(15, 15+off), hi=Math.min(55, 55+off);
+    const t=[]; for(let a=lo;a<=hi;a++) t.push(a);
+    return {byYear:false, pair:true, off:off, t:t};
+  }
   if(cgAxis==='year' && cgBirthA && cgBirthB){
     const yA=cgBirthA.getFullYear(), yB=cgBirthB.getFullYear();
     const lo=Math.max(yA+15,yB+15), hi=Math.min(yA+55,yB+55);
@@ -2132,7 +2162,10 @@ function setCgMode(btn){
 }
 function setCgAxis(btn){
   document.querySelectorAll('[data-cga]').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active'); cgAxis=btn.dataset.cga; cgFrom=cgTo=null; drawCompatGraph();
+  btn.classList.add('active'); cgAxis=btn.dataset.cga; cgFrom=cgTo=null;
+  const r=document.getElementById('cg-pair-row');
+  if(r) r.style.display=(cgAxis==='pair')?'flex':'none';
+  drawCompatGraph();
 }
 function setCgBase(b){ cgBase=b; buildCgTabs(); drawCompatGraph(); }
 
@@ -2176,7 +2209,7 @@ function drawCompatGraph(){
   cgSyncRange(full);
   const ticks=full.t.filter(v=>v>=cgFrom && v<=cgTo);
   const ageA=ticks.map(v=>byYear ? v-full.yA : v);
-  const ageB=ticks.map(v=>byYear ? v-full.yB : v);
+  const ageB=ticks.map(v=>byYear ? v-full.yB : (full.pair ? v-full.off : v));
   if(ticks.length<2){
     document.getElementById('cg-legend').innerHTML=
       '<div class="gl-item muted">二人の年齢が離れすぎて、重なる期間がありません</div>';
@@ -2268,8 +2301,9 @@ function drawCompatGraph(){
     const x=xOf(i);
     mk('line',{x1:x,y1:yBase,x2:x,y2:yBase+4,stroke:'rgba(26,18,8,.3)','stroke-width':1});
     mk('text',{x:x,y:yBase+15,'font-size':9.5,fill:'rgba(26,18,8,.6)',
-      'text-anchor':'middle','font-family':'serif'}, byYear? t+'年' : t+'歳');
-    if(byYear){
+      'text-anchor':'middle','font-family':'serif'},
+      byYear ? t+'年' : (full.pair ? '' : t+'歳'));
+    if(byYear||full.pair){
       mk('text',{x:x,y:yBase+27,'font-size':8.5,fill:CG_COL.A,
         'text-anchor':'middle','font-family':'serif'}, ageA[i]+'歳');
       mk('text',{x:x,y:yBase+38,'font-size':8.5,fill:CG_COL.B,
@@ -2291,6 +2325,13 @@ function drawCompatGraph(){
       leg.appendChild(it);
     });
   });
+  if(cgAxis==='pair'){
+    const w=document.createElement('div');
+    w.className='gl-item';
+    w.innerHTML='※ '+cgNameA+'の<b>'+cgPairA+'歳</b>と'+cgNameB+'の<b>'+cgPairB
+      +'歳</b>が同じ列に並ぶよう重ねています（'+Math.abs(cgPairA-cgPairB)+'歳ずらし）';
+    leg.appendChild(w);
+  }
   if(cgAxis==='year' && !(cgBirthA&&cgBirthB)){
     const w=document.createElement('div');
     w.className='gl-item muted';
@@ -2784,7 +2825,11 @@ function renderCompatResult(ptsA, ptsB, nameA, nameB, score, grade, gradeColor, 
   const ba=document.getElementById('ca-birth'), bb=document.getElementById('cb-birth');
   cgBirthA = (ba&&ba.value) ? new Date(ba.value) : null;
   cgBirthB = (bb&&bb.value) ? new Date(bb.value) : null;
-  cgFrom=cgTo=null; cgPpy=cgHt=null; buildCgTabs(); drawCompatGraph();
+  cgFrom=cgTo=null; cgPpy=cgHt=null;
+  const lblA=document.getElementById('cg-pa-name'), lblB=document.getElementById('cg-pb-name');
+  if(lblA) lblA.textContent=nameA;
+  if(lblB) lblB.textContent=nameB;
+  buildCgTabs(); drawCompatGraph();
 
   // 一人用の区画は隠し、二人ぶんの字画図と分析表を下に出す
   const sd=document.getElementById('single-detail'); if(sd) sd.style.display='none';
