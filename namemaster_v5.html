@@ -817,6 +817,15 @@ _cntBanner(); cntVisit();
         <button class="ar-preset active" data-cga="year" onclick="setCgAxis(this)">西暦で揃える</button>
         <button class="ar-preset" data-cga="age" onclick="setCgAxis(this)">年齢で揃える</button>
       </div>
+      <div class="age-range-row" id="cg-range-row">
+        <span class="ar-label" style="font-size:10px">表示範囲</span>
+        <span class="ar-val" id="cg-from-val"></span>
+        <input type="range" id="cg-from" class="ar-slider">
+        <span class="ar-sep">〜</span>
+        <input type="range" id="cg-to" class="ar-slider">
+        <span class="ar-val" id="cg-to-val"></span>
+        <button class="ar-reset" onclick="cgResetRange()">リセット</button>
+      </div>
       <div class="graph-container"><svg id="cg-svg"></svg></div>
       <div class="graph-legend" id="cg-legend"></div>
     </div>
@@ -2049,6 +2058,39 @@ function exportRowCsv(){
 let cgA=null, cgB=null, cgNameA='', cgNameB='';
 let cgBase='社交', cgMode='stack', cgAxis='year';
 let cgBirthA=null, cgBirthB=null;
+let cgFrom=null, cgTo=null;      // 表示範囲。null は全期間
+
+function cgResetRange(){ cgFrom=cgTo=null; drawCompatGraph(); }
+
+// 横軸の目盛（全期間）を作る。西暦で揃えるか年齢で揃えるかで単位が変わる。
+function cgFullTicks(){
+  if(cgAxis==='year' && cgBirthA && cgBirthB){
+    const yA=cgBirthA.getFullYear(), yB=cgBirthB.getFullYear();
+    const lo=Math.max(yA+15,yB+15), hi=Math.min(yA+55,yB+55);
+    const t=[]; for(let y=lo;y<=hi;y++) t.push(y);
+    return {byYear:true, t:t, yA:yA, yB:yB};
+  }
+  const t=[]; for(let a=15;a<=55;a++) t.push(a);
+  return {byYear:false, t:t};
+}
+
+// スライダーの目盛を、いまの横軸に合わせて作り直す
+function cgSyncRange(full){
+  const f=document.getElementById('cg-from'), t=document.getElementById('cg-to');
+  if(!f||!t||!full.t.length) return;
+  const lo=full.t[0], hi=full.t[full.t.length-1];
+  [f,t].forEach(s=>{ s.min=lo; s.max=hi; s.step=1; });
+  if(cgFrom===null||cgFrom<lo||cgFrom>=hi) cgFrom=lo;
+  if(cgTo===null||cgTo>hi||cgTo<=lo)       cgTo=hi;
+  f.value=cgFrom; t.value=cgTo;
+  const u=full.byYear?'年':'歳';
+  document.getElementById('cg-from-val').textContent=cgFrom+u;
+  document.getElementById('cg-to-val').textContent=cgTo+u;
+  f.oninput=()=>{ let v=parseInt(f.value);
+    if(v>=cgTo-1){ v=cgTo-1; f.value=v; } cgFrom=v; drawCompatGraph(); };
+  t.oninput=()=>{ let v=parseInt(t.value);
+    if(v<=cgFrom+1){ v=cgFrom+1; t.value=v; } cgTo=v; drawCompatGraph(); };
+}
 const CG_COL={A:'#b8960c', B:'#2f4f7a'};
 
 function setCgMode(btn){
@@ -2057,7 +2099,7 @@ function setCgMode(btn){
 }
 function setCgAxis(btn){
   document.querySelectorAll('[data-cga]').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active'); cgAxis=btn.dataset.cga; drawCompatGraph();
+  btn.classList.add('active'); cgAxis=btn.dataset.cga; cgFrom=cgTo=null; drawCompatGraph();
 }
 function setCgBase(b){ cgBase=b; buildCgTabs(); drawCompatGraph(); }
 
@@ -2096,15 +2138,12 @@ function drawCompatGraph(){
 
   // ── 横軸を決める ──
   // 西暦で揃えるには両方の生年が要る。無ければ年齢で揃える。
-  const byYear = (cgAxis==='year' && cgBirthA && cgBirthB);
-  let ticks=[], ageA=[], ageB=[];
-  if(byYear){
-    const yA=cgBirthA.getFullYear(), yB=cgBirthB.getFullYear();
-    const lo=Math.max(yA+15, yB+15), hi=Math.min(yA+55, yB+55);
-    for(let y=lo; y<=hi; y++){ ticks.push(y); ageA.push(y-yA); ageB.push(y-yB); }
-  }else{
-    for(let a=15; a<=55; a++){ ticks.push(a); ageA.push(a); ageB.push(a); }
-  }
+  const full=cgFullTicks();
+  const byYear=full.byYear;
+  cgSyncRange(full);
+  const ticks=full.t.filter(v=>v>=cgFrom && v<=cgTo);
+  const ageA=ticks.map(v=>byYear ? v-full.yA : v);
+  const ageB=ticks.map(v=>byYear ? v-full.yB : v);
   if(ticks.length<2){
     document.getElementById('cg-legend').innerHTML=
       '<div class="gl-item muted">二人の年齢が離れすぎて、重なる期間がありません</div>';
@@ -2113,9 +2152,11 @@ function drawCompatGraph(){
 
   const stack = (cgMode==='stack');
   const PL=54, PR=16, PT=22, PB=44, GAP=14;
-  const ppy=Math.max(14, Math.min(28, 700/ticks.length));
+  // 範囲を狭めたら縦を伸ばす。横だけ広がると上下の動きが潰れて見えるため。
+  const ppy=700/ticks.length;
+  const hFac=Math.max(1, Math.min(1.9, Math.sqrt(41/ticks.length)));
   const iW=Math.round(ticks.length*ppy);
-  const iH=stack?120:216;
+  const iH=Math.round((stack?120:216)*hFac);
   const H=PT+iH*(stack?2:1)+(stack?GAP:0)+PB;
   const W=PL+iW+PR;
   svg.setAttribute('viewBox','0 0 '+W+' '+H);
@@ -2704,7 +2745,7 @@ function renderCompatResult(ptsA, ptsB, nameA, nameB, score, grade, gradeColor, 
   const ba=document.getElementById('ca-birth'), bb=document.getElementById('cb-birth');
   cgBirthA = (ba&&ba.value) ? new Date(ba.value) : null;
   cgBirthB = (bb&&bb.value) ? new Date(bb.value) : null;
-  buildCgTabs(); drawCompatGraph();
+  cgFrom=cgTo=null; buildCgTabs(); drawCompatGraph();
 
   // 一人用の区画は隠し、二人ぶんの字画図と分析表を下に出す
   const sd=document.getElementById('single-detail'); if(sd) sd.style.display='none';
