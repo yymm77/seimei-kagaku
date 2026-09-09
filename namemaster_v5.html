@@ -826,6 +826,15 @@ _cntBanner(); cntVisit();
         <span class="ar-val" id="cg-to-val"></span>
         <button class="ar-reset" onclick="cgResetRange()">リセット</button>
       </div>
+      <div class="age-range-row" id="cg-size-row">
+        <span class="ar-label" style="font-size:10px">横幅</span>
+        <input type="range" id="cg-ppy" min="10" max="140" step="2" value="17" class="ar-slider" style="width:130px">
+        <span class="ar-val" id="cg-ppy-val">自動</span>
+        <span class="ar-label" style="font-size:10px;margin-left:12px">縦幅</span>
+        <input type="range" id="cg-hgt" min="70" max="260" step="5" value="100" class="ar-slider" style="width:110px">
+        <span class="ar-val" id="cg-hgt-val">自動</span>
+        <button class="ar-reset" onclick="cgResetSize()">自動に戻す</button>
+      </div>
       <div class="graph-container"><svg id="cg-svg"></svg></div>
       <div class="graph-legend" id="cg-legend"></div>
     </div>
@@ -2059,6 +2068,30 @@ let cgA=null, cgB=null, cgNameA='', cgNameB='';
 let cgBase='社交', cgMode='stack', cgAxis='year';
 let cgBirthA=null, cgBirthB=null;
 let cgFrom=null, cgTo=null;      // 表示範囲。null は全期間
+// 1年あたりの横幅（px）と、縦の倍率。いずれも null なら自動。
+// 自動は「横は幅いっぱい・期間が短いほど縦を伸ばす」。
+// 原典の巻末は1年あたり約17〜18pxなので、その付近まで詰めれば
+// 原本と同じ密度になる。逆に広げれば数年ぶんを大きく見られる。
+let cgPpy=null, cgHt=null;
+
+function cgResetSize(){
+  cgPpy=cgHt=null;
+  const p=document.getElementById('cg-ppy-val'), h=document.getElementById('cg-hgt-val');
+  if(p) p.textContent='自動';
+  if(h) h.textContent='自動';
+  drawCompatGraph();
+}
+(function(){
+  const p=document.getElementById('cg-ppy'), h=document.getElementById('cg-hgt');
+  if(p) p.addEventListener('input',()=>{
+    cgPpy=parseInt(p.value);
+    document.getElementById('cg-ppy-val').textContent=cgPpy+'px/年';
+    drawCompatGraph(); });
+  if(h) h.addEventListener('input',()=>{
+    cgHt=h.value/100;
+    document.getElementById('cg-hgt-val').textContent=cgHt.toFixed(2)+'倍';
+    drawCompatGraph(); });
+})();
 
 function cgResetRange(){ cgFrom=cgTo=null; drawCompatGraph(); }
 
@@ -2152,16 +2185,22 @@ function drawCompatGraph(){
 
   const stack = (cgMode==='stack');
   const PL=54, PR=16, PT=22, PB=44, GAP=14;
-  // 範囲を狭めたら縦を伸ばす。横だけ広がると上下の動きが潰れて見えるため。
-  const ppy=700/ticks.length;
-  const hFac=Math.max(1, Math.min(1.9, Math.sqrt(41/ticks.length)));
+  // 横幅と縦幅。手で指定があればそれを使い、無ければ自動。
+  // 自動は横を幅いっぱいに使い、期間が短いほど縦を伸ばす。
+  const ppy=(cgPpy!==null) ? cgPpy : (700/ticks.length);
+  const hFac=(cgHt!==null) ? cgHt
+           : Math.max(1, Math.min(1.9, Math.sqrt(41/ticks.length)));
   const iW=Math.round(ticks.length*ppy);
   const iH=Math.round((stack?120:216)*hFac);
   const H=PT+iH*(stack?2:1)+(stack?GAP:0)+PB;
   const W=PL+iW+PR;
   svg.setAttribute('viewBox','0 0 '+W+' '+H);
+  // 入れ物の幅に合わせる。縦横を同じ率で変えるので比率は崩れない。
+  // 横幅を手で指定しているときは、その指定を尊重して等倍で出す。
   const box=svg.parentElement?svg.parentElement.clientWidth:0;
-  let z=1; if(box>60 && W>box) z=Math.max(0.55, box/W);
+  let z=1;
+  if(cgPpy===null && box>60) z=Math.max(0.55, Math.min(1.5, box/W));
+  else if(box>60 && W>box)   z=Math.max(0.4, box/W);
   svg.setAttribute('width',Math.round(W*z));
   svg.setAttribute('height',Math.round(H*z));
 
@@ -2745,7 +2784,7 @@ function renderCompatResult(ptsA, ptsB, nameA, nameB, score, grade, gradeColor, 
   const ba=document.getElementById('ca-birth'), bb=document.getElementById('cb-birth');
   cgBirthA = (ba&&ba.value) ? new Date(ba.value) : null;
   cgBirthB = (bb&&bb.value) ? new Date(bb.value) : null;
-  cgFrom=cgTo=null; buildCgTabs(); drawCompatGraph();
+  cgFrom=cgTo=null; cgPpy=cgHt=null; buildCgTabs(); drawCompatGraph();
 
   // 一人用の区画は隠し、二人ぶんの字画図と分析表を下に出す
   const sd=document.getElementById('single-detail'); if(sd) sd.style.display='none';
