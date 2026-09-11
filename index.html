@@ -1,17 +1,27 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-V0EMF3WHLM"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-V0EMF3WHLM');
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>予測技術ポータル — 日昇リサーチ</title>
-<meta name="description" content="姓名科学・方位学・易経門・吉日相性。牧正人史先生の学問を礎とした予測技術の総合ポータルサイト。">
-<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;700;800&family=Noto+Serif+JP:wght@300;400;700&display=swap" rel="stylesheet">
+<title>おてんとうさまの下で</title>
+<meta name="description" content="予測技術・政策提言・連載・レシピ。制作したものと、携わっていること。おてんとうさまの下で、生かされて今を存在する。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Shippori+Mincho:wght@400;500;600;800&family=Noto+Serif+JP:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
 :root {
   --ink: #1a1208;
   --ink-light: #3d2b0e;
   --paper: #f2ead8;
-  --paper-dark: #e8dcc4;
   --gold: #8a6914;
   --gold-light: #c9a84c;
   --vermillion: #8b2020;
@@ -22,7 +32,6 @@
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
-
 html { scroll-behavior: smooth; }
 
 body {
@@ -33,7 +42,7 @@ body {
   overflow-x: hidden;
 }
 
-/* 和紙テクスチャ */
+/* 和紙のきめ */
 body::before {
   content: '';
   position: fixed;
@@ -45,941 +54,571 @@ body::before {
   z-index: 0;
 }
 
-/* ===== ヒーロー ===== */
+/* おてんとうさま ─ 頁の上から差す光 */
+body::after {
+  content: '';
+  position: fixed;
+  top: -28vmax;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 92vmax;
+  height: 92vmax;
+  border-radius: 50%;
+  background: radial-gradient(circle at center,
+    rgba(201,168,76,0.26) 0%,
+    rgba(201,168,76,0.12) 32%,
+    rgba(201,168,76,0.05) 55%,
+    transparent 72%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+a { color: inherit; }
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+/* ===== 標題 ===== */
 .hero {
   position: relative;
   z-index: 1;
   text-align: center;
-  padding: 72px 20px 56px;
-  border-bottom: 1px solid var(--border);
-  background: linear-gradient(180deg, rgba(138,105,20,0.07) 0%, transparent 100%);
-  overflow: hidden;
+  padding: 96px 20px 72px;
 }
 
-.hero::after {
-  content: '易';
-  position: absolute;
-  font-family: 'Shippori Mincho', serif;
-  font-size: 320px;
-  font-weight: 800;
-  color: rgba(138,105,20,0.04);
-  right: -40px;
-  top: -60px;
-  line-height: 1;
-  pointer-events: none;
-  user-select: none;
-}
-
-.hero-label {
-  display: inline-block;
-  font-size: 0.72rem;
-  letter-spacing: 0.5em;
-  color: var(--gold);
-  border: 1px solid var(--border);
-  padding: 4px 16px;
-  margin-bottom: 20px;
-  animation: fadeDown 0.8s ease both;
+.hero-mark {
+  width: clamp(88px, 20vw, 124px);
+  height: auto;
+  display: block;
+  margin: 0 auto 32px;
+  filter: drop-shadow(0 0 34px rgba(198,34,27,0.28));
+  animation: rise 1.5s cubic-bezier(.16,.7,.3,1) both,
+             turn 150s linear infinite;
 }
 
 .hero-title {
   font-family: 'Shippori Mincho', serif;
-  font-size: clamp(2.2rem, 7vw, 5rem);
+  font-size: clamp(1.9rem, 6.2vw, 3.7rem);
   font-weight: 800;
-  letter-spacing: 0.25em;
-  line-height: 1.15;
-  color: var(--ink);
-  animation: fadeDown 0.8s 0.1s ease both;
-}
-
-.hero-title em {
-  font-style: normal;
-  color: var(--gold);
+  letter-spacing: 0.22em;
+  text-indent: 0.22em;
+  line-height: 1.35;
+  animation: rise 1.2s 0.25s cubic-bezier(.16,.7,.3,1) both;
 }
 
 .hero-sub {
-  margin-top: 16px;
-  font-size: 0.88rem;
-  letter-spacing: 0.3em;
-  color: var(--ink-light);
-  opacity: 0.75;
-  animation: fadeDown 0.8s 0.2s ease both;
+  margin-top: 22px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: clamp(0.82rem, 2.4vw, 0.98rem);
+  letter-spacing: 0.36em;
+  text-indent: 0.36em;
+  color: var(--gold);
+  animation: rise 1.2s 0.45s cubic-bezier(.16,.7,.3,1) both;
 }
 
 .hero-desc {
-  margin-top: 24px;
-  max-width: 540px;
-  margin-left: auto;
-  margin-right: auto;
-  font-size: 0.88rem;
-  line-height: 2;
+  margin: 34px auto 0;
+  max-width: 560px;
+  font-size: 0.86rem;
+  line-height: 2.15;
   color: var(--ink-light);
-  animation: fadeDown 0.8s 0.3s ease both;
+  animation: rise 1.2s 0.6s cubic-bezier(.16,.7,.3,1) both;
 }
 
-/* ===== メインナビ ===== */
-.site-nav {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  display: flex;
-  justify-content: center;
-  border-bottom: 1px solid var(--border);
-  background: rgba(242,234,216,0.95);
-  backdrop-filter: blur(8px);
-}
-
-.site-nav a {
-  padding: 13px 22px;
-  font-family: 'Noto Serif JP', serif;
-  font-size: 0.82rem;
-  letter-spacing: 0.18em;
-  color: var(--ink-light);
-  text-decoration: none;
-  border-right: 1px solid var(--border);
-  transition: all 0.2s;
-}
-
-.site-nav a:first-child { border-left: 1px solid var(--border); }
-.site-nav a:hover { background: rgba(138,105,20,0.1); color: var(--ink); }
-
-/* ===== メインコンテンツ ===== */
+/* ===== 本体 ===== */
 main {
   position: relative;
   z-index: 1;
-  max-width: 1120px;
+  max-width: 1000px;
   margin: 0 auto;
-  padding: 60px 20px 80px;
+  padding: 0 20px 96px;
 }
 
-/* セクションタイトル */
-.section-head {
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.section-head h2 {
-  font-family: 'Shippori Mincho', serif;
-  font-size: 1.6rem;
-  letter-spacing: 0.35em;
-  color: var(--ink);
-  margin-bottom: 8px;
-}
-
-.section-head p {
-  font-size: 0.82rem;
-  letter-spacing: 0.2em;
-  color: var(--ink-light);
-  opacity: 0.65;
-}
-
-.divider {
+.gate-head {
   display: flex;
-  align-items: center;
-  gap: 16px;
-  margin: 56px 0 48px;
+  align-items: baseline;
+  gap: 20px;
+  margin: 76px 0 34px;
 }
 
-.divider::before,
-.divider::after {
-  content: '';
+.gate-head h2 {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 1.28rem;
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  text-indent: 0.32em;
+  white-space: nowrap;
+}
+
+.gate-head .rule {
   flex: 1;
   height: 1px;
   background: var(--border);
 }
 
-.divider span {
-  font-size: 1.1rem;
-  color: var(--gold);
-  opacity: 0.6;
-  letter-spacing: 0.3em;
+.gate-head .note {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  color: var(--ink-light);
+  opacity: 0.62;
+  white-space: nowrap;
 }
 
-/* ===== カードグリッド ===== */
-.card-grid {
+/* ── 扉一：制作したもの ── */
+.works {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(268px, 1fr));
+  gap: 18px;
 }
 
-.card-grid.featured {
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-}
-
-.card {
-  background: rgba(255,255,255,0.45);
-  border: 1px solid var(--border);
-  padding: 32px 28px;
-  text-decoration: none;
-  color: inherit;
+.work {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  transition: all 0.25s;
-  position: relative;
-  overflow: hidden;
-  animation: fadeUp 0.6s ease both;
+  gap: 13px;
+  padding: 30px 28px 26px;
+  background: rgba(255,255,255,0.5);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--accent, var(--gold));
+  text-decoration: none;
+  transition: background .25s, transform .25s, box-shadow .25s;
 }
 
-.card::before {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 3px;
-  background: var(--gold);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.3s ease;
-}
-
-.card:hover {
-  background: rgba(255,255,255,0.7);
+.work:hover,
+.work:focus-visible {
+  background: rgba(255,255,255,0.78);
   transform: translateY(-3px);
-  box-shadow: 0 8px 32px var(--shadow);
+  box-shadow: 0 10px 32px var(--shadow);
 }
 
-.card:hover::before { transform: scaleX(1); }
-
-.card-icon {
-  font-size: 2rem;
-  line-height: 1;
-}
-
-.card-tag {
-  display: inline-block;
-  font-size: 0.68rem;
-  letter-spacing: 0.3em;
-  color: var(--paper);
-  padding: 2px 10px;
-  border-radius: 2px;
-  align-self: flex-start;
-}
-
-.tag-gold { background: var(--gold); }
-.tag-jade { background: var(--jade); }
-.tag-indigo { background: var(--indigo); }
-.tag-vermillion { background: var(--vermillion); }
-.tag-free { background: var(--ink-light); }
-
-.card-title {
+.work-name {
   font-family: 'Shippori Mincho', serif;
-  font-size: 1.25rem;
-  letter-spacing: 0.1em;
-  color: var(--ink);
-  line-height: 1.4;
+  font-size: 1.22rem;
+  letter-spacing: 0.09em;
+  line-height: 1.45;
 }
 
-.card-desc {
-  font-size: 0.82rem;
-  line-height: 1.9;
+.work-desc {
+  font-size: 0.8rem;
+  line-height: 1.95;
   color: var(--ink-light);
   flex: 1;
 }
 
-.card-version {
+.work-meta {
   font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  color: var(--accent, var(--gold));
+  opacity: 0.85;
+}
+
+.work-go {
+  align-self: flex-end;
+  font-size: 0.76rem;
   letter-spacing: 0.2em;
+  color: var(--accent, var(--gold));
+  opacity: 0;
+  transition: opacity .2s;
+}
+
+.work:hover .work-go,
+.work:focus-visible .work-go { opacity: 1; }
+
+/* ── 扉二：携わっていること ── */
+.links {
+  border-top: 1px solid var(--border);
+}
+
+.link-row {
+  display: flex;
+  align-items: baseline;
+  gap: 22px;
+  padding: 21px 6px;
+  border-bottom: 1px solid var(--border);
+  text-decoration: none;
+  transition: background .2s, padding-left .2s;
+}
+
+a.link-row:hover,
+a.link-row:focus-visible {
+  background: rgba(138,105,20,0.07);
+  padding-left: 16px;
+}
+
+.link-name {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 1rem;
+  letter-spacing: 0.09em;
+  flex: 0 0 auto;
+  min-width: 15em;
+}
+
+.link-desc {
+  font-size: 0.79rem;
+  line-height: 1.85;
+  color: var(--ink-light);
+  flex: 1;
+}
+
+.link-go {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
   color: var(--gold);
+  opacity: 0.55;
+  flex: 0 0 auto;
+}
+
+.link-row.static { cursor: default; }
+.link-row.static .link-go { opacity: 0.35; }
+
+/* ===== 結び ===== */
+footer {
+  position: relative;
+  z-index: 1;
+  border-top: 2px solid var(--border);
+  background: linear-gradient(0deg, rgba(138,105,20,0.09) 0%, transparent 100%);
+  padding: 40px 20px 46px;
+  text-align: center;
+}
+
+.f-uca {
+  font-size: 0.76rem;
+  line-height: 2;
+  color: var(--ink-light);
   opacity: 0.8;
 }
 
-.card-arrow {
-  align-self: flex-end;
-  font-size: 0.8rem;
-  letter-spacing: 0.2em;
-  color: var(--gold);
-  opacity: 0;
-  transition: opacity 0.2s;
+.f-uca a { color: var(--gold); }
+
+.f-sign {
+  margin-top: 22px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.16em;
 }
 
-.card:hover .card-arrow { opacity: 1; }
-
-/* 大きなカード（フィーチャード） */
-.card.large {
-  padding: 40px 36px;
-}
-
-.card.large .card-title {
-  font-size: 1.5rem;
-}
-
-/* ===== お知らせ欄 ===== */
-.notice-box {
-  background: rgba(138,105,20,0.06);
-  border: 1px solid var(--border);
-  border-left: 4px solid var(--gold);
-  padding: 20px 24px;
-  margin-bottom: 48px;
-}
-
-.notice-box h3 {
-  font-size: 0.8rem;
-  letter-spacing: 0.3em;
-  color: var(--gold);
-  margin-bottom: 10px;
-}
-
-.notice-list {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.notice-list li {
-  display: flex;
-  gap: 16px;
-  align-items: baseline;
-  font-size: 0.82rem;
-  line-height: 1.7;
-  color: var(--ink-light);
-}
-
-.notice-date {
+.f-copy {
+  margin-top: 16px;
   font-size: 0.72rem;
-  color: var(--gold);
-  letter-spacing: 0.1em;
-  flex-shrink: 0;
-}
-
-/* ===== フッター ===== */
-footer {
-  border-top: 2px solid var(--border);
-  background: linear-gradient(0deg, rgba(138,105,20,0.08) 0%, transparent 100%);
-  padding: 36px 20px;
-  text-align: center;
-  position: relative;
-  z-index: 1;
-}
-
-.footer-inner {
-  max-width: 1120px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-}
-
-.footer-counter img {
-  height: 20px;
-  vertical-align: middle;
-}
-
-.footer-copy {
-  font-size: 0.78rem;
-  letter-spacing: 0.12em;
+  line-height: 1.95;
   color: var(--ink-light);
-  opacity: 0.65;
-  line-height: 1.9;
+  opacity: 0.6;
 }
 
-/* ===== アニメーション ===== */
-@keyframes fadeDown {
-  from { opacity: 0; transform: translateY(-12px); }
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
+@keyframes turn {
+  from { rotate: 0deg; }
+  to   { rotate: 360deg; }
 }
 
-.card:nth-child(1) { animation-delay: 0.05s; }
-.card:nth-child(2) { animation-delay: 0.12s; }
-.card:nth-child(3) { animation-delay: 0.19s; }
-.card:nth-child(4) { animation-delay: 0.26s; }
-.card:nth-child(5) { animation-delay: 0.33s; }
-
-/* ナビに隠れないよう、ページ内リンクの着地点を下げる */
-[id] { scroll-margin-top: 64px; }
-
-/* ===== 全体図 ===== */
-.map {
-  background: rgba(255,255,255,0.4);
-  border: 1px solid var(--border);
-  border-top: 3px solid var(--gold);
-  padding: 34px 26px 26px;
-  margin-bottom: 48px;
-}
-.map .section-head { margin-bottom: 28px; }
-.map-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-  row-gap: 26px;
-}
-.map-col { padding: 0 18px; border-left: 1px solid var(--border); }
-.map-col:first-child { border-left: none; }
-.map-col h3 {
-  font-family: 'Shippori Mincho', serif;
-  font-size: 1.05rem;
-  letter-spacing: 0.2em;
-  padding-bottom: 7px;
-  margin-bottom: 12px;
-  border-bottom: 2px solid var(--gold);
-}
-.map-col h3 a { color: var(--ink); text-decoration: none; }
-.map-col h3 a:hover { color: var(--gold); }
-.map-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-.map-col li a {
-  font-size: 0.88rem;
-  color: var(--indigo);
-  text-decoration: none;
-  line-height: 1.5;
-  border-bottom: 1px solid transparent;
-}
-.map-col li a:hover { border-bottom-color: var(--indigo); }
-.map-col li small {
-  display: block;
-  font-size: 0.7rem;
-  line-height: 1.6;
-  color: var(--ink-light);
-  opacity: 0.75;
-  margin-top: 2px;
-}
-.map-new {
-  font-size: 0.62rem;
-  color: var(--paper);
-  background: var(--vermillion);
-  padding: 1px 6px;
-  margin-left: 6px;
-  vertical-align: 2px;
-  letter-spacing: 0.1em;
+@media (max-width: 640px) {
+  .hero { padding: 62px 20px 48px; }
+  .gate-head { gap: 14px; margin: 56px 0 26px; }
+  .gate-head .note { display: none; }
+  .works { grid-template-columns: 1fr; }
+  .link-row { flex-wrap: wrap; gap: 6px 16px; padding: 18px 4px; }
+  .link-name { min-width: 0; flex: 1 1 100%; }
+  .link-desc { flex: 1 1 100%; }
 }
 
-/* 占術ツール内の小見出し */
-.group-head {
-  font-family: 'Shippori Mincho', serif;
-  font-size: 1.1rem;
-  letter-spacing: 0.25em;
-  color: var(--ink);
-  margin: 8px 0 18px;
-  padding-left: 12px;
-  border-left: 5px solid var(--gold);
-}
-.group-head small {
-  font-family: 'Noto Serif JP', serif;
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
-  color: var(--ink-light);
-  opacity: 0.7;
-  margin-left: 14px;
-}
-.group-gap { height: 40px; }
-
-/* ===== 研究の歩み ===== */
-.ayumi {
-  max-width: 820px;
-  margin: 0 auto;
-  border-top: 1px solid var(--border);
-  list-style: none;
-}
-.ayumi li {
-  display: grid;
-  grid-template-columns: 5.5em 4.8em 1fr;
-  gap: 14px;
-  align-items: baseline;
-  padding: 14px 4px;
-  border-bottom: 1px solid var(--border);
-  font-size: 0.86rem;
-  line-height: 1.85;
-  color: var(--ink-light);
-}
-.ayumi .when { font-size: 0.74rem; color: var(--gold); letter-spacing: 0.1em; }
-.ayumi .st {
-  font-size: 0.68rem;
-  letter-spacing: 0.15em;
-  text-align: center;
-  padding: 1px 0;
-  border: 1px solid var(--jade);
-  color: var(--jade);
-}
-.ayumi .st.now { border-color: var(--vermillion); color: var(--paper); background: var(--vermillion); }
-.ayumi a { color: var(--indigo); }
-.ayumi-note {
-  max-width: 820px;
-  margin: 14px auto 0;
-  font-size: 0.78rem;
-  color: var(--ink-light);
-  opacity: 0.75;
-  line-height: 1.9;
-}
-
-/* ===== レスポンシブ ===== */
-@media (max-width: 760px) {
-  .site-nav { justify-content: flex-start; overflow-x: auto; }
-  .site-nav a { flex: 0 0 auto; }
-  .map-col { border-left: none; padding: 0 4px; }
-  .ayumi li { grid-template-columns: 1fr; gap: 4px; }
-  .ayumi .st { justify-self: start; padding: 1px 10px; }
-}
-@media (max-width: 600px) {
-  .site-nav a { padding: 11px 12px; font-size: 0.75rem; letter-spacing: 0.08em; }
-  .card-grid { grid-template-columns: 1fr; }
-}
 @media (prefers-reduced-motion: reduce) {
-  *, *::before { animation: none !important; transition: none !important; }
   html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001s !important;
+    animation-delay: 0s !important;
+    /* 無限ループを1回で打ち切る。これが無いと社章が超高速で回り続ける */
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001s !important;
+  }
+  /* 社章は回転そのものを止め、正立で静止させる */
+  .hero-mark {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+    rotate: 0deg;
+  }
+  .work:hover { transform: none; }
 }
+
+.lang-jump { text-align:center; padding:26px 20px 0; }
+.jump-btn { display:inline-block; font-family:'Noto Serif JP',serif;
+  font-size:.8rem; letter-spacing:.06em; text-decoration:none;
+  color:var(--gold); border:1px solid var(--border); border-radius:2px;
+  padding:10px 24px; background:rgba(255,255,255,.5); transition:all .25s; }
+.jump-btn:hover { background:rgba(138,105,20,.09); border-color:var(--gold-light); }
+.lang-divider { border:0; border-top:1px solid var(--border);
+  margin:56px auto 0; max-width:820px; }
+.en-gate { padding:6px 24px 8px; max-width:820px; margin:0 auto;
+  font-family:'Inter',system-ui,sans-serif; text-align:left; }
+.en-gate .jump-btn { display:block; width:max-content;
+  margin:0 auto 40px; font-family:'Inter',sans-serif; }
+.en-gate h2 { font-size:1.5rem; font-weight:500; letter-spacing:.01em;
+  color:var(--indigo); margin:0 0 6px; }
+.en-gate .en-tag { font-size:.76rem; letter-spacing:.16em;
+  color:var(--gold); margin:0 0 20px; text-transform:uppercase; }
+.en-gate p { font-size:.93rem; line-height:1.85; margin:0 0 14px;
+  color:var(--ink-light); }
+.en-gate h3 { font-size:1.02rem; font-weight:500; margin:36px 0 14px;
+  padding-bottom:8px; border-bottom:1px solid var(--border); }
+.en-card { display:block; text-decoration:none; color:inherit;
+  background:rgba(255,255,255,.55); border:1px solid var(--border);
+  border-top:3px solid var(--indigo); border-radius:2px;
+  padding:20px 22px; margin-bottom:14px; transition:all .25s; }
+.en-card:hover { background:rgba(255,255,255,.82);
+  box-shadow:0 8px 24px var(--shadow); }
+.en-card b { display:block; font-size:1rem; font-weight:500;
+  color:var(--indigo); margin-bottom:7px; }
+.en-card span { display:block; font-size:.87rem; line-height:1.7;
+  color:var(--ink-light); }
+.en-card i { display:block; font-style:normal; font-size:.79rem;
+  color:var(--gold); margin-top:10px; }
+.en-list { list-style:none; padding:0; margin:0; }
+.en-list li { border-bottom:1px solid var(--border); padding:13px 2px;
+  font-size:.88rem; line-height:1.7; color:var(--ink-light); }
+.en-list li:first-child { border-top:1px solid var(--border); }
+.en-list b { font-weight:500; color:var(--ink); }
+.en-list a { color:var(--gold); text-decoration:none; }
+.en-gate .en-note { margin-top:30px; font-size:.8rem;
+  line-height:1.8; opacity:.72; }
 </style>
 </head>
 <body>
 
-<!-- ヒーロー -->
+<div class="lang-jump" id="top">
+  <a href="#en" class="jump-btn">English ↓</a>
+</div>
+
 <header class="hero">
-  <div class="hero-label">NISSHO RESEARCH</div>
-  <h1 class="hero-title">予測技術<em>門</em></h1>
-  <p class="hero-sub">姓名科学 ／ 方位学 ／ 易経 ／ 吉日相性</p>
+  <img class="hero-mark" src="nissho-mark.png" alt="日昇リサーチ株式会社 社章" width="400" height="400">
+  <h1 class="hero-title">おてんとうさまの下で</h1>
+  <p class="hero-sub">生かされて今を存在する</p>
   <p class="hero-desc">
-    牧正人史先生が昭和33年に体系化した姓名科学を礎とし、<br>
-    方位学・易経・吉日術など日本の伝統的予測技術を<br>
-    現代のAI技術と融合させたポータルサイトです。
+    昭和二十八年生まれ。日産自動車での二十余年を経て、
+    牧正人史先生の姓名科学を受け継ぎ、その体系化と公開を続けています。
+    予測技術のツール、政策への提言、半生の記録、日々の仕事。
+    どれも別々のことをしているようで、根はひとつだと感じています。
   </p>
 </header>
 
-<!-- ナビ -->
-<nav class="site-nav">
-  <a href="https://yymm77.github.io/">← 玄関</a>
-  <a href="#map">全体図</a>
-  <a href="#tools">占術ツール</a>
-  <a href="#myclone">分身AI</a>
-  <a href="#novel">連載小説</a>
-  <a href="#research">政策提言</a>
-  <a href="#ayumi">研究の歩み</a>
-  <a href="namemaster_v5.html">姓名科学</a>
-</nav>
-
 <main>
 
-  <!-- 全体図 -->
-  <section id="map" class="map" aria-labelledby="map-h">
-    <div class="section-head">
-      <h2 id="map-h">全 体 図</h2>
-      <p>このサイトにあるすべてのページ</p>
+  <!-- ═══ 扉一 ═══ -->
+  <div class="gate-head">
+    <h2>制作したもの</h2>
+    <span class="rule"></span>
+    <span class="note">すべて無料でお使いいただけます</span>
+  </div>
+
+  <div class="works">
+
+    <a class="work" style="--accent:#8a6914" href="https://yymm77.github.io/seimei-kagaku/">
+      <div class="work-name">予測技術門</div>
+      <div class="work-desc">
+        姓名科学・方位学・易経・吉日相性。
+        牧正人史先生が昭和三十三年に体系化した姓名科学を礎に、
+        日本の伝統的な予測技術をブラウザだけで使えるようにしました。
+      </div>
+      <div class="work-meta">姓名科学 ／ 方位学 ／ 易経 ／ 吉日相性</div>
+      <div class="work-go">入る →</div>
+    </a>
+
+    <a class="work" style="--accent:#1a3a5c" href="https://yymm77.github.io/seimei-kagaku/proposals.html">
+      <div class="work-name">政策への提言</div>
+      <div class="work-desc">
+        著作権のあり方、人型AIによる国家戦略、災害と防衛を貫く国民役務、
+        国立国会図書館を軸としたAI開発拠点。
+        国民役務については、国民保護法の改正案を条文の形で示した第二次提言を加えました。
+        いずれも各省庁へ提出したものを、そのまま公開しています。
+      </div>
+      <div class="work-meta">UCA著作権 ／ FAI ／ 国民強靱化（第一次・第二次） ／ NDL構想</div>
+      <div class="work-go">読む →</div>
+    </a>
+
+    <a class="work" style="--accent:#8b2020" href="https://yymm77.github.io/seimei-kagaku/#novel">
+      <div class="work-name">連載</div>
+      <div class="work-desc">
+        半生の記録「至誠の覚醒」と、AIとの日々の対話から生まれた思想連載
+        「AGI時代を、おてんとうさまの下で生きる」。
+        書き手の見てきたものを、そのまま書いています。
+      </div>
+      <div class="work-meta">至誠の覚醒 ／ AGI時代を生きる</div>
+      <div class="work-go">読む →</div>
+    </a>
+
+    <a class="work" style="--accent:#3d2b0e" href="https://yymm77.github.io/kiroku/">
+      <div class="work-name">記録</div>
+      <div class="work-desc">
+        その時々の出来事について考えたことを、日付とともに書き留めています。
+        論考も所感も、ここへ残していきます。
+        報道された事実だけを頼りに、なるべく静かに書くよう心がけています。
+      </div>
+      <div class="work-meta">論考 ／ 所感</div>
+      <div class="work-go">読む →</div>
+    </a>
+
+    <a class="work" style="--accent:#2d5a3d" href="https://yymm77.github.io/mikuni-recipe/">
+      <div class="work-name">三國シェフ<br>レシピアーカイブ</div>
+      <div class="work-desc">
+        三國シェフの公開レシピの検索用インデックスです。
+        検索・分量調整・印刷ができる形にまとめました。
+        各レシピの権利は権利者に帰属します。本サイトは非公式の個人運営です。
+      </div>
+      <div class="work-meta">検索・分量調整・動画つき</div>
+      <div class="work-go">開く →</div>
+    </a>
+
+  </div>
+
+  <!-- ═══ 扉二 ═══ -->
+  <div class="gate-head">
+    <h2>携わっていること</h2>
+    <span class="rule"></span>
+    <span class="note">仕事・活動・暮らしのお手伝い</span>
+  </div>
+
+  <div class="links">
+
+    <!-- ★要修正：TSD研究所のFacebookページURLが未設定です。
+         URLが分かり次第、下の <div class="link-row static"> を
+         <a class="link-row" href="（FacebookページのURL）"> に置き換え、
+         閉じタグ </div> を </a> に変えてください。
+         あわせて .link-go の文言を「見る →」にすると他と揃います。 -->
+    <div class="link-row static">
+      <span class="link-name">TSD研究所</span>
+      <span class="link-desc">
+        府中・多磨学院ビルにて、自習室アミーゴと音楽練習室を運営しています。
+        TSD Kids では子どもたちの学びに直接携わっています。
+        故・筒田芳博先生から引き継いだ場です。
+      </span>
+      <span class="link-go">Facebookにて</span>
     </div>
-    <div class="map-grid">
 
-      <div class="map-col">
-        <h3><a href="#seimei">姓名科学</a></h3>
-        <ul>
-          <li><a href="namemaster_v5.html">姓名科学の殿堂</a><small>十二分野の人生グラフと数意の鑑定</small></li>
-          <li><a href="jinsei_graph_bunya.html">人生グラフ 分野別解説</a><span class="map-new">新</span><small>八つの分野の読み方と原典の実例</small></li>
-          <li><a href="meimei.html">命名・改名の研究室</a><span class="map-new">新</span><small>原典の手順で名前の画数を探す（試作）</small></li>
-          <li><a href="aisho.html">相性の研究室</a><span class="map-new">新</span><small>夫婦・親子・職場、会社や国との相性（原典の採点法）</small></li>
-          <li><a href="compatibility_v2.html">相性解析</a><small>二人の姓名から見る相性（試験公開）</small></li>
-          <li><a href="#ayumi">研究の歩み</a><small>原典との照合と校正の記録</small></li>
-        </ul>
-      </div>
+    <a class="link-row" href="http://tokyo.goyuren.jp/">
+      <span class="link-name">一般社団法人 東京郷友連盟</span>
+      <span class="link-desc">
+        令和8年6月より常務理事（執行委員）。防衛現地研修の企画と
+        書籍のデジタルアーカイブを担当しています。
+      </span>
+      <span class="link-go">連盟へ →</span>
+    </a>
 
-      <div class="map-col">
-        <h3><a href="#uranai">方位・易・吉日</a></h3>
-        <ul>
-          <li><a href="iching.html">易経門</a><small>六十四卦の本格易占い</small></li>
-          <li><a href="houigaku.html">方位学ポータル</a><small>三盤統合の吉凶判定と吉日検索</small></li>
-          <li><a href="navi.html">リアルタイム方位ナビ</a><small>移動中の方位を車・バイクで</small></li>
-          <li><a href="aisei.html">吉日・相性アプリ</a><small>吉日検索とAIによる総合鑑定</small></li>
-        </ul>
-      </div>
-
-      <div class="map-col">
-        <h3><a href="#myclone">分身AI</a></h3>
-        <ul>
-          <li><a href="clone-maker.html">MyClone Maker</a><small>自分専用のクローンAIを作る</small></li>
-          <li><a href="clone-bot.html">制作者のクローン</a><small>デモを体験する</small></li>
-        </ul>
-        <h3 style="margin-top:26px"><a href="#novel">連載</a></h3>
-        <ul>
-          <li><a href="story-01.html">至誠の覚醒</a><small>制作者の半生の記録</small></li>
-          <li><a href="agi-index.html">AGI時代を、おてんとうさまの下で生きる</a><small>思想連載</small></li>
-        </ul>
-      </div>
-
-      <div class="map-col">
-        <h3><a href="#research">政策への提言</a></h3>
-        <ul>
-          <li><a href="proposals.html">提言の一覧</a><small>各省庁へ提出した提言の全文</small></li>
-          <li><a href="kyojinka2-proposal.html">国民強靱化基礎役務 第二次</a></li>
-          <li><a href="kyojinka-proposal.html">国民強靱化基礎役務 第一次</a></li>
-          <li><a href="copyright-proposal.html">新著作権の構想（UCA）</a></li>
-          <li><a href="blockchain-ip-demo-v2.html">UCA 実証デモ</a></li>
-          <li><a href="fai-proposal.html">移民より、FAI。</a></li>
-          <li><a href="ndl-proposal.html">国立国会図書館をAI開発の中核拠点に</a></li>
-        </ul>
-      </div>
-
+    <div class="link-row static">
+      <span class="link-name">日昇リサーチ株式会社</span>
+      <span class="link-desc">
+        牧正人史先生の姓名科学を広く伝えることを目的に設立した会社です。
+        上記の予測技術門は、この会社の事業として運営しています。
+      </span>
+      <span class="link-go">代表取締役</span>
     </div>
-  </section>
 
-  <!-- お知らせ -->
-  <div class="notice-box">
-    <h3>◈ 最新情報</h3>
-    <ul class="notice-list">
-      <li><span class="notice-date">2026.09</span>「相性の研究室」を公開。原典第2章の採点法で、人と人、人と会社・国の相性度を共昇期・反発期に分けて出します。</li>
-      <li><span class="notice-date">2026.09</span>「命名・改名の研究室」（試作版）を公開。原典第4章の命名の手順に沿って、名前の画数の組合せを探し、家族との反相性も確かめられます。</li>
-      <li><span class="notice-date">2026.09</span>「人生グラフ 分野別解説」を公開。仕事の飛躍・財運・独立・受験・結婚と離婚・セックス・人生最大の危機・病気の八分野について、原典の読み方と実例を収録。あわせて原典第3章の校正記録を公開。</li>
-      <li><span class="notice-date">2026.08</span>政策提言に「国民保護法制の改正に関する提言」（第二次提言）を公開。啓発で途切れている条文に、技能を育てる一条を継ぎ足す。介護・保育を基幹役務に加える具体案。</li>
-      <li><span class="notice-date">2026.06</span>研究・論考に「国民強靱化基礎役務制度」概要版を公開。災害と防衛を一つの人的抗堪性として捉える、徴兵によらない国民役務の提言。</li>
-      <li><span class="notice-date">2026.04</span>連載「AGI時代を、おてんとうさまの下で生きる」全10回を開始。第一回「AGIは『おてんとうさま』を超えられない」を公開。</li>
-      <li><span class="notice-date">2026.04</span>リアルタイム方位ナビ（navi.html）を公開。車・バイク搭載対応。移動モード／滞在モード・危険日警告機能。</li>
-      <li><span class="notice-date">2026.03</span>易経門（六十四卦占術ポータル）を公開しました。第一分卧法による本格易占い・Claude AI解釈連携。</li>
-      <li><span class="notice-date">2025.12</span>吉日・相性アプリ v1.2.0 を公開。Claude API連携・ステップガイドUI搭載。</li>
-      <li><span class="notice-date">2025.11</span>方位学ポータル v1.2.0 公開。三盤統合表・吉日検索・ドラッグ可能マーカー実装。</li>
-    </ul>
-  </div>
-
-  <!-- 占術ツール -->
-  <div id="tools" class="section-head">
-    <h2>占 術 ツ ー ル</h2>
-    <p>すべて純粋HTML＋CSS＋JS。サーバー不要・ブラウザだけで動作します</p>
-  </div>
-
-  <h3 id="seimei" class="group-head">姓名科学<small>牧正人史『姓名（なまえ）』を原典とする</small></h3>
-  <div class="card-grid featured">
-
-    <a class="card large" href="namemaster_v5.html">
-      <div class="card-icon">𝌋</div>
-      <span class="card-tag tag-gold">月額プレミアム</span>
-      <div class="card-title">姓名科学の殿堂</div>
-      <div class="card-desc">
-        牧正人史先生著「姓名（なまえ）」を原典とするAIシステム。
-        12の分野（健康・蓄財・愛情・職業など）をグラフで可視化。
-        原典精度95%・一万例超の照合済みデータベース。
-      </div>
-      <div class="card-version">namemaster v5.0 ／ 原典精度95%</div>
-      <div class="card-arrow">開く →</div>
+    <a class="link-row" href="https://miharaami.github.io/">
+      <span class="link-name">三原あみ 公式サイト</span>
+      <span class="link-desc">
+        演歌・童謡を専門とする作曲家。日本童謡協会会員、JASRAC会員。
+        Musical Kids KOBATO を主宰しています。
+      </span>
+      <span class="link-go">サイトへ →</span>
     </a>
 
-    <a class="card large" href="jinsei_graph_bunya.html">
-      <div class="card-icon">📈</div>
-      <span class="card-tag tag-vermillion">新着・無料</span>
-      <div class="card-title">人生グラフ 分野別解説</div>
-      <div class="card-desc">
-        仕事の飛躍、財運、独立、受験、結婚と離婚、セックス、人生最大の危機、病気。
-        八つの分野で人生グラフのどの二本を重ねて読むかを、牧先生が遺した実例とともに解説。
-        巻末人生グラフ640枚の実データで、ご自分の姓名の波も描けます。
-      </div>
-      <div class="card-version">原典 第3章準拠 ／ 2026年9月公開</div>
-      <div class="card-arrow">読む →</div>
+    <a class="link-row" href="https://shiawaseminna.net/">
+      <span class="link-name">しあわせみんな</span>
+      <span class="link-desc">
+        日々考えたこと、読んだもの、聞いたものの記録。
+        八千件近くを書きためた本拠のブログです。
+      </span>
+      <span class="link-go">ブログへ →</span>
     </a>
 
-    <a class="card" href="meimei.html">
-      <div class="card-icon">🖌</div>
-      <span class="card-tag tag-vermillion">新着・試作</span>
-      <div class="card-title">命名・改名の研究室</div>
-      <div class="card-desc">
-        原典第4章の命名の手順を計算で手助けする研究用の道具。
-        姓と家族の名前、望む道（医者・弁護士・芸術家・良妻賢母など原典の23分野）を入れると、
-        原典の式にかなう名前の画数の組合せを並べます。両親・兄弟姉妹との反相性も確かめられます。
-      </div>
-      <div class="card-version">原典 第4章準拠 ／ 試作版・ご感想募集</div>
-      <div class="card-arrow">開く →</div>
-    </a>
-
-    <a class="card" href="aisho.html">
-      <div class="card-icon">🤝</div>
-      <span class="card-tag tag-vermillion">新着・無料</span>
-      <div class="card-title">相性の研究室</div>
-      <div class="card-desc">
-        原典第2章の採点法どおりに、完全・準・補佐の相性と反相性を一つずつ拾い、
-        共に上昇する時期と反発する時期の相性度を出します。夫婦・親子・友人・職場の相手のほか、
-        会社・団体・国との相性も、二十四のポイントで調べられます。
-      </div>
-      <div class="card-version">原典 第2章準拠 ／ 本書の実例18組と照合</div>
-      <div class="card-arrow">開く →</div>
-    </a>
-
-    <a class="card" href="compatibility_v2.html">
-      <div class="card-icon">⚖️</div>
-      <span class="card-tag tag-gold">月額プレミアム</span>
-      <div class="card-title">相性解析</div>
-      <div class="card-desc">
-        姓名科学による相性診断。内面性格（A:B）と対人性格（A:C）
-        の2軸で10タイプ（S1〜S5陽・K1〜K5陰）に分類。
-      </div>
-      <div class="card-version">compatibility v2.0 ／ 試験公開・ご感想募集</div>
-      <div class="card-arrow">開く →</div>
-    </a>
-
-  </div>
-
-  <div class="group-gap"></div>
-  <h3 id="uranai" class="group-head">方位・易・吉日<small>九星方位学・易経・吉日術</small></h3>
-  <div class="card-grid">
-
-    <a class="card" href="iching.html">
-      <div class="card-icon">☰</div>
-      <span class="card-tag tag-indigo">Claude AI連携</span>
-      <div class="card-title">易 経 門</div>
-      <div class="card-desc">
-        第一分卧法（大衍の数）による本格易占い。
-        六十四卦の詳細解説（周易原典＋Dr.Murphy）を収録。
-        変爻・之卦まで表示し、AIが問いに対する現代語解釈を生成。
-      </div>
-      <div class="card-version">iching v1.0 ／ 第一分卧法実装</div>
-      <div class="card-arrow">開く →</div>
-    </a>
-
-    <a class="card" href="houigaku.html">
-      <div class="card-icon">🧭</div>
-      <span class="card-tag tag-jade">月額プレミアム</span>
-      <div class="card-title">方位学ポータル</div>
-      <div class="card-desc">
-        本命星・月命星算出、日盤・月盤・年盤カレンダー、
-        三盤統合スコア判定、吉日検索、地図連携。
-        高木彬光著「方位学入門」準拠。
-      </div>
-      <div class="card-version">houigaku v1.3.0</div>
-      <div class="card-arrow">開く →</div>
-    </a>
-
-    <a class="card" href="navi.html">
-      <div class="card-icon">🚗</div>
-      <span class="card-tag tag-jade">GPS連携</span>
-      <div class="card-title">リアルタイム方位ナビ</div>
-      <div class="card-desc">
-        車・バイクでの移動中に使える専用ナビ画面。
-        進行方向の吉凶をリアルタイム表示。
-        移動モード／滞在モードの切替対応。危険日自動警告。
-      </div>
-      <div class="card-version">navi v1.0.0</div>
-      <div class="card-arrow">開く →</div>
-    </a>
-
-    <a class="card" href="aisei.html">
-      <div class="card-icon">🌸</div>
-      <span class="card-tag tag-jade">Claude AI連携</span>
-      <div class="card-title">吉日・相性アプリ</div>
-      <div class="card-desc">
-        吉日検索（1人でも動作）とステップガイドUI。
-        Claude APIによる総合鑑定文を生成。
-        方位学データと組み合わせた深い考察が可能。
-      </div>
-      <div class="card-version">aisei v1.2.0</div>
-      <div class="card-arrow">開く →</div>
-    </a>
-
-  </div>
-
-  <!-- 研究の歩み -->
-  <div class="divider"><span>◇</span></div>
-
-  <div id="ayumi" class="section-head">
-    <h2>研 究 の 歩 み</h2>
-    <p>牧正人史先生の原典と、このサイトの計算・データとの照合の記録</p>
-  </div>
-
-  <ol class="ayumi">
-    <li><span class="when">2026.08</span><span class="st">済</span><span>原典の鑑定シート（NAMEMASTER.xls）の実例68名で十二数の計算式を照合し、六種類あった計算の型を一つの式に整理しました。</span></li>
-    <li><span class="when">2026.09</span><span class="st">済</span><span>『姓名（なまえ）』巻末の人生グラフ、索引959件・波形640枚の全数をデータ化しました。</span></li>
-    <li><span class="when">2026.09</span><span class="st">済</span><span>原典第3章に載る15名の姓名分析図で計算式を照合し、180項目中179項目が一致しました。残る1項目は原典側の計算違いと判明しました。</span></li>
-    <li><span class="when">2026.09</span><span class="st">済</span><span>原典第3章の校正記録（4件）を公開しました。→ <a href="jinsei_graph_bunya.html#verify">人生グラフ 分野別解説の末尾</a></span></li>
-    <li><span class="when">2026.09</span><span class="st">済</span><span>原典第4章の命名シートの式が、十二の数の計算式とまったく同じであることを確かめ、姓1〜3字・名1〜3字のどの型にも使える命名の道具を試作しました。→ <a href="meimei.html">命名・改名の研究室</a></span></li>
-    <li><span class="when">2026.09</span><span class="st">済</span><span>原典28〜29頁の数意数値表で、1画から60画までの点数と数意をすべて照合しました。点数は全件一致し、数意の字を原典どおりに6件改めました。</span></li>
-    <li><span class="when">2026.09</span><span class="st">済</span><span>原典第4章「最も効果をあらわす画数一覧」の23分野を取り込み、命名の研究室で望む道から画数を探せるようにしました。</span></li>
-    <li><span class="when">2026.09</span><span class="st">済</span><span>原典第2章の会社・国・英語名の分析法を確かめました。配置枠（4・8・12・16点）と二十四のポイントの式は、本書の分析図17例・262項目がすべて一致しました。あわせて相性の採点法を実装し、本書の実例18組と照合しました。→ <a href="aisho.html">相性の研究室</a></span></li>
-    <li><span class="when">2026.09</span><span class="st">済</span><span>字画表の3字（細・沢・器）を、原典の分析図の画数どおりに改めました。</span></li>
-    <li><span class="when">進行中</span><span class="st now">進行中</span><span>巻末の原図640枚とデータとを一枚ずつ突き合わせ、すべての図で原図との一致を確かめています。</span></li>
-  </ol>
-  <p class="ayumi-note">研究が進むたびに、ここに書き足していきます。</p>
-
-  <!-- MyClone -->
-  <div class="divider"><span>✦</span></div>
-
-  <div id="myclone" class="section-head">
-    <h2>分 身 A I</h2>
-    <p>自分の判断・知識・価値観を持つクローンBotを作る</p>
-  </div>
-
-  <div class="card-grid featured">
-
-    <a class="card large" href="clone-maker.html">
-      <span class="card-tag tag-free">完全無料</span>
-      <div class="card-title">MyClone Maker</div>
-      <div class="card-desc">
-        名前・職業・判断ルールを入力するだけで、あなた専用のクローンAIが5分で完成。
-        寝ている間も、あなたの代わりに考え、動き続ける分身を作れます。
-      </div>
-      <div class="card-version">clone-maker v1.0 ／ Claude API使用</div>
-      <div class="card-arrow">作る →</div>
-    </a>
-
-    <a class="card large" href="clone-bot.html">
-      <div class="card-icon">🤖</div>
-      <span class="card-tag tag-indigo">デモ</span>
-      <div class="card-title">制作者のクローン（デモ）</div>
-      <div class="card-desc">
-        制作者自身のクローンBotを体験できます。姓名科学・方位学・連載小説など
-        進行中の全プロジェクトを把握した分身AIが、どう動くかをご覧ください。
-      </div>
-      <div class="card-version">clone-bot v1.0 ／ 制作者専用サンプル</div>
-      <div class="card-arrow">体験する →</div>
-    </a>
-
-  </div>
-
-  <!-- 連載小説 -->
-  <div class="divider"><span>☽</span></div>
-
-  <div id="novel" class="section-head">
-    <h2>連 載 小 説</h2>
-    <p>制作者による半生の記録・無料公開</p>
-  </div>
-
-  <div class="card-grid">
-    <a class="card" href="story-01.html">
-      <div class="card-icon">📖</div>
-      <span class="card-tag tag-free">無料</span>
-      <div class="card-title">至誠の覚醒</div>
-      <div class="card-desc">
-        語り手・制作者による半生の記録。第1〜21話公開済み。
-        牧正人史先生との出会い、姓名科学との邂逅、
-        そして日本の歴史的陰謀への気づきを描く自伝的連載。
-      </div>
-      <div class="card-version">サイト内連載・随時更新</div>
-      <div class="card-arrow">読む →</div>
-    </a>
-
-    <a class="card" href="agi-index.html">
-      <div class="card-icon">◉</div>
-      <span class="card-tag tag-vermillion">新着・連載中</span>
-      <div class="card-title">AGI時代を、<br>おてんとうさまの下で生きる</div>
-      <div class="card-desc">
-        制作者が日々AIと交わす会話から生まれた思想連載。
-        AGIは人類の知恵の総和を超え始めている。しかしおてんとうさまは超えられない。
-        この二つの真実が同時に立つ時代を、七十三年を生きた一人の日本人として記す。
-      </div>
-      <div class="card-version">全10回連載 ／ 第一回公開中</div>
-      <div class="card-arrow">読む →</div>
-    </a>
-  </div>
-
-  <!-- 研究・論考 -->
-  <div class="divider"><span>☾</span></div>
-
-  <div id="research" class="section-head">
-    <h2>政 策 へ の 提 言</h2>
-    <p>各省庁へ提出した提言を全文公開しています</p>
-    <p style="margin-top:14px;">
-      <a href="proposals.html" style="display:inline-block;padding:9px 26px;border:1px solid #b8960c;color:#b8960c;text-decoration:none;font-size:0.82rem;letter-spacing:0.14em;">提言の一覧を見る →</a>
-    </p>
-  </div>
-
-  <div class="card-grid">
-    <a class="card" href="copyright-proposal.html">
-      <div class="card-icon">🔗</div>
-      <span class="card-tag tag-free">新着・無料</span>
-      <div class="card-title">新著作権の構想</div>
-      <div class="card-desc">
-        ブロックチェーン技術を活用した知的財産の新しい保護モデル。
-        デジタル時代における著作権のあり方を提言。
-        UCA（Universal Creative Attribution）──知識は解放され、創造者は報われる。
-      </div>
-      <div class="card-version">新著作権構想 ／ 令和8年（2026年）</div>
-      <div class="card-arrow">読む →</div>
-    </a>
-
-    <a class="card" href="fai-proposal.html">
-      <div class="card-icon">🤖</div>
-      <span class="card-tag tag-indigo">新着・無料</span>
-      <div class="card-title">移民より、FAI。<br>日本にはこの答えがある。</div>
-      <div class="card-desc">
-        人口減少・災害列島・地政学的脅威——三つの危機を人型AIで突破する国家戦略提言。
-        介護から災害へ、産業へ、そして「人が死なない抑止力」へ。
-        鉄腕アトムの予言が、今現実になろうとしている。
-      </div>
-      <div class="card-version">FAI国家戦略提言 ／ 令和8年（2026年）</div>
-      <div class="card-arrow">読む →</div>
-    </a>
-
-    <a class="card" href="kyojinka-proposal.html">
-      <div class="card-icon">⛑</div>
-      <span class="card-tag tag-vermillion">新着・無料</span>
-      <div class="card-title">徴兵ではなく、教育で。<br>国を支える人をつくる。</div>
-      <div class="card-desc">
-        災害レジリエンスと防衛抗堪性は、一つの人的基盤の二つの応用面。
-        防災・救護・自活を中核に、安全保障の基礎教育を組み込んだ国民役務の提言。
-        「軍事教練の復活」ではなく「国土強靱化の人的基盤」へ。
-      </div>
-      <div class="card-version">国民強靱化基礎役務 第一次 ／ 令和8年（2026年）6月</div>
-      <div class="card-arrow">読む →</div>
-    </a>
-
-    <a class="card" href="kyojinka2-proposal.html">
-      <div class="card-icon">⚖️</div>
-      <span class="card-tag tag-vermillion">新着・無料</span>
-      <div class="card-title">啓発で途切れた条文に、<br>一条を継ぎ足す。</div>
-      <div class="card-desc">
-        国民保護法第四十三条は「啓発」で終わっている。技能を育てる規定が、そこに無い。
-        第四十三条の二を新設し、平時の人材育成を国の提供責務として法定する具体案。
-        若者組から少年消防クラブへ続く年齢階梯の系譜に、介護と保育を加えて位置づける。
-      </div>
-      <div class="card-version">国民強靱化基礎役務 第二次 ／ 令和8年（2026年）8月</div>
-      <div class="card-arrow">読む →</div>
-    </a>
-
-    <a class="card" href="ndl-proposal.html">
-      <div class="card-icon">🏛</div>
-      <span class="card-tag tag-jade">無料</span>
-      <div class="card-title">国立国会図書館を、<br>AI開発の中核拠点に。</div>
-      <div class="card-desc">
-        「シラス」と「ウシハク」——統治の二つのかたちを軸に、
-        日本語の知の集積地からAIを立ち上げる構想。
-        国民の知を、国民の手に取り戻すための提言。
-        NDL・首相官邸・内閣府・文部科学省へ提出済み。
-      </div>
-      <div class="card-version">NDL AI開発中核拠点構想 ／ 令和8年（2026年）</div>
-      <div class="card-arrow">読む →</div>
-    </a>
-
-    <a class="card" href="blockchain-ip-demo-v2.html">
-      <div class="card-icon">⛓</div>
-      <span class="card-tag tag-free">実証デモ</span>
-      <div class="card-title">UCA 実証デモ</div>
-      <div class="card-desc">
-        新著作権構想（UCA）を実際に動かして確かめられるデモ。
-        SHA-256ハッシュによる作品の同一性検証と、
-        スマートコントラクトによる自動対価還元の仕組みを可視化。
-      </div>
-      <div class="card-version">blockchain-ip-demo v2 ／ 新著作権構想の実装例</div>
-      <div class="card-arrow">試す →</div>
-    </a>
+    <div class="link-row static">
+      <span class="link-name">ハウスワークサービス多摩店</span>
+      <span class="link-desc">
+        知人の工務店の社長が言い出しっぺで始まった組織です。
+        傘下に電気工事・大工・内装・水道工事の職人が揃っており、
+        その仲間たちの力を借りながら、私は多摩地区を担当しています。
+        簡単な大工仕事、水道栓のパッキング交換、下水の詰まり、遺品整理、
+        出張墓掃除、家庭教師、高齢者の暮らしまわりのお手伝い。
+        扱う範囲は、ほぼすべての人間活動の領域にわたります。
+        介護福祉士の資格を持っているため、福祉に関わる仕事もお受けできます。
+        積極的な宣伝はしてきませんでしたが、昔まいたチラシを手元に置いてくださっていた方から、
+        今も声がかかることがあります。
+        ひとつ上の「しあわせみんな」は、この店の名で運営しているブログです。
+      </span>
+      <span class="link-go">多摩地区にて</span>
+    </div>
 
   </div>
 
 </main>
 
-<!-- フッター -->
+<hr class="lang-divider">
+
+<section class="en-gate" id="en">
+  <a href="#top" class="jump-btn">↑ 日本語のページへ戻る</a>
+
+  <p class="en-tag">Nissho Research Co., Ltd.</p>
+  <h2>Under the sun</h2>
+
+  <p>I am Yoshiaki Mihara, born 1953, in Tama City, Tokyo. After more than twenty years at Nissan Motor Co., Ltd. — in export operations and foreign exchange administration — I took up the work of Maki Masahitoshi, who in 1958 systematised a Japanese method of prediction from personal names, and have continued to formalise and publish it since.</p>
+
+  <p>This site holds several strands of work that look separate but are not: prediction tools, proposals submitted to government ministries, a record of my life, and the daily work of a small business. Everything here is free to use.</p>
+
+  <h3>If you came for UCA</h3>
+
+  <p>UCA — Universal Creative Attribution — is a design for recording that a work exists, verifying whether it entered an AI training corpus, and settling remuneration in proportion to recorded use. <strong>Without requiring the operator to disclose its corpus.</strong> These three pages carry it, and each has a full English version.</p>
+
+  <a class="en-card" href="https://yymm77.github.io/seimei-kagaku/uca-technical-specification.html">
+    <b>Technical specification</b>
+    <span>Corpus Transparency and Usage Attribution. A five-layer design built on ISO 24138:2024 (ISCC) and RFC 6962 transparency-log constructions. Includes stated limitations and open questions.</span>
+    <i>English first, Japanese below →</i>
+  </a>
+
+  <a class="en-card" href="https://yymm77.github.io/seimei-kagaku/uca-cabinet-proposal.html">
+    <b>Proposal submitted to the Cabinet Office of Japan</b>
+    <span>"From disclosure to measurement." The full text of a proposal submitted in August 2026 to Japan's Intellectual Property Strategy Promotion Secretariat, during the drafting of its Principles Code on generative AI.</span>
+    <i>Japanese first, English below →</i>
+  </a>
+
+  <a class="en-card" href="https://yymm77.github.io/seimei-kagaku/blockchain-ip-demo-v2.html">
+    <b>Working prototype</b>
+    <span>Generate SHA-256 hashes from real files, register them on a simulated chain, and watch settlement execute. Runs entirely in your browser; no file is transmitted to any server.</span>
+    <i>Japanese interface, English guide below →</i>
+  </a>
+
+  <h3>Everything else here</h3>
+
+  <ul class="en-list">
+    <li><b>Prediction tools</b> — Name science, directional divination (<em>hōigaku</em>), the I Ching, and auspicious-day calculation. Pure HTML, CSS and JavaScript; no server. <a href="https://yymm77.github.io/seimei-kagaku/">Enter →</a></li>
+    <li><b>Policy proposals</b> — Copyright, a national strategy for humanoid AI, a civic service bridging disaster resilience and defence, and a proposal to make the National Diet Library a centre for AI development. All submitted to ministries and published as sent. <a href="https://yymm77.github.io/seimei-kagaku/proposals.html">Read →</a></li>
+    <li><b>Serialised writing</b> — A record of my life, and a series on living under the sun in the age of AGI.</li>
+    <li><b>Notes on the day</b> — Occasional writing on current events, dated and kept as a record. <a href="https://yymm77.github.io/kiroku/">Read →</a></li>
+    <li><b>Chef Mikuni recipe archive</b> — Some 1,700 recipes published by chef Kiyomi Mikuni, made searchable and scalable. <a href="https://yymm77.github.io/mikuni-recipe/">Open →</a></li>
+    <li><b>Tokyo Goyu Renmei</b> — Executive director since June 2026. Field study programmes and digital archiving of the association's books.</li>
+    <li><b>TSD Institute</b> — A study room and music practice rooms in Fuchu, inherited from the late Yoshihiro Tsutsuda, my teacher.</li>
+    <li><b>Ami Mihara</b> — My wife, a composer of Japanese popular song and children's songs; member of JASRAC and of the Japan Children's Song Association. <a href="https://miharaami.github.io/">Her site →</a></li>
+    <li><b>Housework Service Tama</b> — Practical help for households in the Tama area: carpentry, plumbing, drain clearing, estate clearance, grave cleaning, tutoring, and support for older people at home. I am a certified care worker.</li>
+  </ul>
+
+  <p class="en-note">The text and systems on this site are published under the UCA principle: <strong>knowledge is released; creators are remunerated.</strong><br>
+  Contact: +81-42-355-5678 — Tama City, Tokyo, Japan.</p>
+</section>
+
 <footer>
-  <div class="footer-inner">
-    <div class="footer-counter">
-      <img src="https://hits.sh/yymm77.github.io/seimei-kagaku.svg?style=flat-square&color=b8960c&labelColor=1a1208&label=訪問者数" alt="訪問者数">
-    </div>
-    <div class="footer-copy">
-      © 2026 日昇リサーチ株式会社<br>
-      牧正人史先生（昭和33年発見・姓名科学体系の創始者）の学問の普及を使命として設立<br>
-      <span style="font-size:0.7rem;opacity:0.7;">GitHub: yymm77 ／ お問い合わせ: 042-355-5678</span>
-    </div>
-  </div>
-<div style="text-align:center;padding:10px 0 4px;font-size:12px;letter-spacing:.05em;">
-  <a href="tokusho.html" style="color:#b8960c;text-decoration:underline;opacity:.85;">特定商取引法に基づく表記</a>
-</div>
-<div style="text-align:center;padding:4px 0 10px;font-size:12px;line-height:2.2;letter-spacing:.04em;">
-  <a href="https://yymm77.github.io/" style="color:#b8960c;margin:0 6px;">玄関</a>｜
-  <a href="index.html" style="color:#b8960c;margin:0 6px;">トップ</a>｜
-  <a href="proposals.html" style="color:#b8960c;margin:0 6px;">政策提言</a>｜
-  <a href="namemaster_v5.html" style="color:#b8960c;margin:0 6px;">姓名科学</a>｜
-  <a href="jinsei_graph_bunya.html" style="color:#b8960c;margin:0 6px;">分野別解説</a>｜
-  <a href="meimei.html" style="color:#b8960c;margin:0 6px;">命名</a>｜
-  <a href="aisho.html" style="color:#b8960c;margin:0 6px;">相性</a>｜
-  <a href="compatibility_v2.html" style="color:#b8960c;margin:0 6px;">結婚相性</a>｜
-  <a href="houigaku.html" style="color:#b8960c;margin:0 6px;">方位学</a>｜
-  <a href="navi.html" style="color:#b8960c;margin:0 6px;">方位ナビ</a>｜
-  <a href="aisei.html" style="color:#b8960c;margin:0 6px;">吉日・相性</a>｜
-  <a href="iching.html" style="color:#b8960c;margin:0 6px;">易経門</a>｜
-  <a href="story-01.html" style="color:#b8960c;margin:0 6px;">連載小説</a>｜
-  <a href="agi-index.html" style="color:#b8960c;margin:0 6px;">AGI連載</a>
-</div>
+  <p class="f-uca">
+    このサイトの文章・システムは
+    <a href="https://yymm77.github.io/seimei-kagaku/copyright-proposal.html">UCA（Universal Creative Attribution）</a>
+    の考えに基づいて公開しています。<br>
+    知識は解放され、創造者は報われる。
+  </p>
+  <p class="f-sign">生かされて今を存在する ／ 三原嘉明</p>
+  <p class="f-copy">
+    © 2026 日昇リサーチ株式会社<br>
+    お問い合わせ 042-355-5678
+  </p>
 </footer>
 
 </body>
