@@ -58,13 +58,24 @@ td.ok{color:var(--jade);font-weight:700}td.ng{color:var(--vermillion);font-weigh
 .bk{background:var(--wash);padding:10px 16px;margin:10px 0;font-size:14.5px;max-width:52em}
 details summary{cursor:pointer;font:700 17px "Zen Old Mincho",serif;color:var(--indigo)}
 .wrap{overflow-x:auto}
-footer{max-width:1080px;margin:0 auto;padding:18px 24px 44px;font-size:13px;color:var(--mute);border-top:1px solid var(--rule)}
+footer{max-width:1080px;margin:0 auto;padding:18px 24px 90px;font-size:13px;color:var(--mute);border-top:1px solid var(--rule)}
+/* 行き先（玄関・トップ・先頭へ） */
+.mast-links{margin:0 0 12px;font-size:13px;letter-spacing:.08em}
+.mast-links a{color:#e6d9a8;text-decoration:none;margin-right:1.6em}
+.mast-links a:hover{color:#fff;text-decoration:underline}
+.foot-links{text-align:center;font-size:13px;line-height:2.2;margin:0 0 16px;letter-spacing:.04em}
+.foot-links a{color:var(--gold);margin:0 6px;white-space:nowrap}
+.to-top{position:fixed;right:16px;bottom:16px;z-index:6;background:var(--indigo);color:var(--paper);
+  border:1px solid var(--gold);font:600 14px/1 "Noto Serif JP",serif;padding:11px 14px;cursor:pointer;
+  letter-spacing:.06em;visibility:hidden}
+.to-top.show{visibility:visible}
+.to-top:hover{background:var(--ink)}
 @media (max-width:760px){.two{grid-template-columns:1fr}.scores{grid-template-columns:1fr 1fr}.scores div:nth-child(2){border-right:0}main{padding:20px 14px 60px}.mast h1{font-size:28px}}
 </style>
 </head>
 <body>
 <header class="mast"><div class="mast-in">
-  <a class="back" href="index.html">← 予測技術門にもどる</a>
+  <p class="mast-links"><a href="https://yymm77.github.io/">← 玄関</a><a href="index.html">← 予測技術門（トップ）</a></p>
   <h1>相性の研究室</h1>
   <p>夫婦、親子、友人、職場の相手、そして会社や国との相性を、原典第2章の採点法どおりに数えます。二つの姓名分析図の間で、同じ画数、4倍の画数、末尾の同じ画数、そして2倍・8倍の画数（反相性）を一つずつ拾い、共に上昇する時期と反発する時期の相性度を出します。</p>
 </div></header>
@@ -121,7 +132,15 @@ footer{max-width:1080px;margin:0 auto;padding:18px 24px 44px;font-size:13px;colo
 </details>
 
 </main>
-<footer>牧正人史先生（昭和33年、姓名科学を発見）の体系を、日昇リサーチ株式会社が再構成しています。入力した名前は、この画面の中だけで計算され、どこにも送られません。</footer>
+<footer>
+  <nav class="foot-links" aria-label="サイト内の行き先">
+    <a href="https://yymm77.github.io/">玄関</a>｜
+    <a href="index.html">トップ</a>｜
+    <a href="namemaster_v5.html">姓名科学</a>｜
+    <a href="jinsei_graph_bunya.html">人生グラフ</a>｜
+    <a href="meimei.html">命名</a>
+  </nav>
+  牧正人史先生（昭和33年、姓名科学を発見）の体系を、日昇リサーチ株式会社が再構成しています。入力した名前は、この画面の中だけで計算され、どこにも送られません。</footer>
 
 <script src="maki_core_data.js"></script>
 <script src="maki_aisho.js"></script>
@@ -320,6 +339,17 @@ document.addEventListener('DOMContentLoaded', ()=>{
   // 最初は山本夫妻を表示
   sel.value = '0'; const ex0 = EX[0]; setSide('A', ex0.a); setSide('B', ex0.b); document.getElementById('rel').value = ex0.rel; CUR_EX = ex0; run(true);
 });
+</script>
+<button type="button" class="to-top" id="toTop" aria-label="ページの先頭へ戻る">▲ 先頭へ</button>
+<script>
+/* 先頭へ戻るボタン：少し下へ読み進めたら出す */
+(function(){
+  const btn=document.getElementById('toTop');
+  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const tick=()=>btn.classList.toggle('show', window.scrollY>600);
+  window.addEventListener('scroll', tick, {passive:true}); tick();
+  btn.addEventListener('click', ()=>window.scrollTo({top:0, behavior: reduce?'auto':'smooth'}));
+})();
 </script>
 </body>
 </html>

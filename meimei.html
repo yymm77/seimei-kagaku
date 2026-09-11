@@ -84,7 +84,18 @@ svg.wave .tb{stroke:var(--indigo);stroke-width:2.4;stroke-dasharray:3.2 2.4}
 svg.wave .na{font:600 14px "Noto Serif JP",serif;fill:var(--mute);text-anchor:middle}
 .wscroll{overflow-x:auto}
 .legend{font-size:12.5px;color:var(--mute)}
-footer{max-width:1080px;margin:0 auto;padding:18px 24px 44px;font-size:13px;color:var(--mute);border-top:1px solid var(--rule)}
+footer{max-width:1080px;margin:0 auto;padding:18px 24px 90px;font-size:13px;color:var(--mute);border-top:1px solid var(--rule)}
+/* 行き先（玄関・トップ・先頭へ） */
+.mast-links{margin:0 0 12px;font-size:13px;letter-spacing:.08em}
+.mast-links a{color:#e6d9a8;text-decoration:none;margin-right:1.6em}
+.mast-links a:hover{color:#fff;text-decoration:underline}
+.foot-links{text-align:center;font-size:13px;line-height:2.2;margin:0 0 16px;letter-spacing:.04em}
+.foot-links a{color:var(--gold);margin:0 6px;white-space:nowrap}
+.to-top{position:fixed;right:16px;bottom:16px;z-index:6;background:var(--indigo);color:var(--paper);
+  border:1px solid var(--gold);font:600 14px/1 "Noto Serif JP",serif;padding:11px 14px;cursor:pointer;
+  letter-spacing:.06em;visibility:hidden}
+.to-top.show{visibility:visible}
+.to-top:hover{background:var(--ink)}
 @media (max-width:700px){ body{font-size:15.5px} .mast h1{font-size:28px} main{padding:20px 14px 60px} }
 </style>
 </head>
@@ -92,7 +103,7 @@ footer{max-width:1080px;margin:0 auto;padding:18px 24px 44px;font-size:13px;colo
 
 <header class="mast">
   <div class="mast-in">
-    <a class="back" href="index.html">← 予測技術門にもどる</a>
+    <p class="mast-links"><a href="https://yymm77.github.io/">← 玄関</a><a href="index.html">← 予測技術門（トップ）</a></p>
     <h1>命名・改名の研究室</h1>
     <p>原典『姓名（なまえ）』第4章の命名の手順を、計算で手助けする試作版です。姓と家族の名前、望む人生の方向を入れると、原典の式にかなう名前の画数の組合せを、点数の順に並べます。</p>
   </div>
@@ -206,6 +217,13 @@ footer{max-width:1080px;margin:0 auto;padding:18px 24px 44px;font-size:13px;colo
 </main>
 
 <footer>
+  <nav class="foot-links" aria-label="サイト内の行き先">
+    <a href="https://yymm77.github.io/">玄関</a>｜
+    <a href="index.html">トップ</a>｜
+    <a href="namemaster_v5.html">姓名科学</a>｜
+    <a href="jinsei_graph_bunya.html">人生グラフ</a>｜
+    <a href="aisho.html">相性</a>
+  </nav>
   牧正人史先生（昭和33年、姓名科学を発見）の体系を、日昇リサーチ株式会社が再構成しています。字画と数意は、原典の鑑定シート（NAMEMASTER.xls）の字画表と数意表によります。
 </footer>
 
@@ -585,6 +603,17 @@ document.addEventListener('DOMContentLoaded', ()=>{
   if (!window.MAKI_SQ || !window.MAKI_JK)
     document.getElementById('err2').textContent = '字画表・数意表（maki_core_data.js）が読み込めていません。このページと同じフォルダに置いてください。';
 });
+</script>
+<button type="button" class="to-top" id="toTop" aria-label="ページの先頭へ戻る">▲ 先頭へ</button>
+<script>
+/* 先頭へ戻るボタン：少し下へ読み進めたら出す */
+(function(){
+  const btn=document.getElementById('toTop');
+  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const tick=()=>btn.classList.toggle('show', window.scrollY>600);
+  window.addEventListener('scroll', tick, {passive:true}); tick();
+  btn.addEventListener('click', ()=>window.scrollTo({top:0, behavior: reduce?'auto':'smooth'}));
+})();
 </script>
 </body>
 </html>
