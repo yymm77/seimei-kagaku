@@ -61,6 +61,7 @@ table.cand tr.sel{background:#f3e7c2}
 .chip.hi{background:#efe0a6}
 .chip.lo{background:#f4d3cd;color:var(--vermillion)}
 .chip.ng{outline:2px solid var(--vermillion)}
+.chip.way{box-shadow:inset 0 -3px 0 var(--indigo)}
 .flag{color:var(--vermillion);font-weight:700}
 /* 詳細 */
 #detail{margin-top:18px}
@@ -141,12 +142,19 @@ footer{max-width:1080px;margin:0 auto;padding:18px 24px 44px;font-size:13px;colo
 
 <h2>三　どんな人生を望むか</h2>
 <div class="panel">
+  <div class="row" style="margin-bottom:14px">
+    <label class="f">望む道（原典の23分野）
+      <select id="way"><option value="">選ばない</option></select>
+    </label>
+  </div>
+  <p class="hint" id="wayInfo" style="margin:-6px 0 14px"></p>
   <fieldset><legend class="hint" style="margin:0 0 6px">伸ばしたい分野（複数可）。選んだ分野の二本の線（内線・外線）の点数を重く見ます。</legend>
     <div class="checks" id="domains"></div>
   </fieldset>
   <div class="row" style="margin-top:14px">
     <label class="f">並べる順
       <select id="rank">
+        <option value="way">望む道の画数（位置の一致、次に個数）</option>
         <option value="key">原典の重要点（男児・女児で異なる）</option>
         <option value="total">十二の数の総合点</option>
         <option value="dom">選んだ分野の点</option>
@@ -159,7 +167,7 @@ footer{max-width:1080px;margin:0 auto;padding:18px 24px 44px;font-size:13px;colo
     </label>
     <label class="f" style="flex-direction:row;align-items:center;gap:6px;color:var(--ink)"><input type="checkbox" id="noInner" checked> 名前の中で反発し合う数を含む候補を外す</label>
   </div>
-  <p class="hint">医者や法律家など、職業の名前から選ぶ機能は、原典の「各分野の特徴のある画数」を取り込んでから加える予定です。今は十二分野で選んでください。</p>
+  <p class="hint">「望む道」を選ぶと、原典第4章の「最も効果をあらわす画数一覧」にある、その道に特徴のある画数が十二の数にいくつ入るか、そして原典が特に力を発揮するとする位置に入っているかを数えます。</p>
   <div style="margin-top:14px"><button type="button" id="run">候補を出す</button></div>
   <div class="err" id="err2" role="alert"></div>
 </div>
@@ -168,7 +176,7 @@ footer{max-width:1080px;margin:0 auto;padding:18px 24px 44px;font-size:13px;colo
 <section id="result" hidden>
   <h2>四　候補の画数</h2>
   <p class="summary" id="summary"></p>
-  <p class="hint">行を押すと、下に詳しい内容が出ます。数の背景は、金色が40点以上、朱が10点以下。朱の枠は家族との反相性です。□の記号は原典で重要点とされる数です。</p>
+  <p class="hint">行を押すと、下に詳しい内容が出ます。数の背景は、金色が40点以上、朱が10点以下。朱の枠は家族との反相性、紺の下線は望む道に特徴のある画数です。□の記号は原典で重要点とされる数です。</p>
   <div class="tbl-wrap"><table class="cand" id="cand"></table></div>
 </section>
 
@@ -190,7 +198,8 @@ footer{max-width:1080px;margin:0 auto;padding:18px 24px 44px;font-size:13px;colo
   <p>手順は、最初にⓇ（姓から決まるⓂと下段の補数の和より大きい数）を選び、そこからⓃ・Ⓞ・Ⓦ・Ⓧ、さらにⓅ・Ⓠが機械的に決まります。次に名の頭の字の画数（ロ）を選ぶと、Ⓣ・Ⓤ・Ⓢ・Ⓥが決まります。原典はこれを何度も試しながら、よい数がそろうまで繰り返すよう勧めています。このページはその試行を、あり得るすべての組合せについて一度に行います。</p>
   <p>原典の命名シートは2字姓・2字名の型で書かれていますが、上段と下段の補数（点の数）を字数に合わせて置き換えれば、同じ式が姓1〜3字・名1〜3字のすべてに当てはまります。このページはその一つの式で計算しています。</p>
   <p>改名の場合、戸籍名は変えられないため、改名による実質的な変化は70％にとどまり、戸籍名の影響が30％残るとされます。改名の影響が表れるのは、20代で2年後、30代で3年後です。結婚による改姓も同じです。</p>
-  <p class="hint">典拠：牧正人史『姓名（なまえ）』第4章「人生のすべてが決まる命名・改名のポイント」pp.178–181</p>
+  <p>原典第4章の後半には「最も効果をあらわす画数一覧」があり、政治家・実業家・医者・弁護士・芸術家・スポーツマンから、良妻賢母・玉の輿・経済的に恵まれた一生まで、23の分野ごとに特徴のある画数と、それが特に力を発揮する位置が挙げられています。例に挙げられた人名の後の数は、その人の十二の数のうち特徴のある画数がいくつあるかを示すもので、このページの「望む道」の個数と同じ数え方です。</p>
+  <p class="hint">典拠：牧正人史『姓名（なまえ）』第4章「人生のすべてが決まる命名・改名のポイント」pp.178–192</p>
 </div>
 
 </main>
@@ -308,8 +317,17 @@ function forbiddenSet(fam){
 /* ============================================================
    候補の評価
    ============================================================ */
+function wayOf(){ const k = document.getElementById('way').value; return (window.MAKI_WAY||[]).find(w=>w.key===k) || null; }
 function evaluate(S, G, sex, fam, forb, doms){
   const c = calc12(S, G);
+  const way = wayOf();
+  let wayCount = 0, wayPos = [], wayPair = null;
+  if (way){
+    const set = new Set(way.nums);
+    wayCount = KEYS.filter(k=>set.has(c[k])).length;
+    wayPos = way.pos.filter(k=>set.has(c[k]));
+    if (way.pair) wayPair = way.pair.every(n=>KEYS.some(k=>c[k]===n));
+  }
   const vals = KEYS.map(k=>c[k]);
   const total = vals.reduce((a,v)=>a+pt(v),0);
   const key = KEYPTS[sex].reduce((a,k)=>a+pt(c[k]),0);
@@ -324,7 +342,8 @@ function evaluate(S, G, sex, fam, forb, doms){
   const counts = {}; vals.forEach(v=>counts[v]=(counts[v]||0)+1);
   const same = Object.entries(counts).filter(([v,n])=>n>=2).map(([v,n])=>`${v}（${n}つ）`);
   const famNg = KEYS.filter(k=>forb.has(c[k])).map(k=>({k, v:c[k], why:forb.get(c[k])}));
-  return {S, G, c, total, key, dom, low, over, inner, same, famNg};
+  const wayScore = way ? wayPos.length*20 + wayCount : 0;
+  return {S, G, c, total, key, dom, low, over, inner, same, famNg, way, wayCount, wayPos, wayPair, wayScore};
 }
 
 function generate(){
@@ -338,7 +357,9 @@ function generate(){
   if (errs.length){ e2.textContent = errs.join('／'); return; }
   const forb = forbiddenSet(fam);
   const doms = DOMAINS.filter((d,i)=>document.getElementById('dom'+i).checked);
-  const rank = document.getElementById('rank').value;
+  let rank = document.getElementById('rank').value;
+  if (rank==='way' && !wayOf()){ e2.textContent = '「望む道の画数」で並べるときは、望む道を選んでください'; return; }
+  if (rank==='way') rank = 'wayScore';
   if (rank==='dom' && !doms.length){ e2.textContent = '「選んだ分野の点」で並べるときは、分野を一つ以上選んでください'; return; }
   const famMode = document.querySelector('input[name=famMode]:checked').value;
   const lowMax = +document.getElementById('lowMax').value;
@@ -377,27 +398,29 @@ let STATE = null;
 
 const chip = (r, k) => {
   const v = r.c[k], p = pt(v);
-  const cls = ['chip', p>=40?'hi':'', p<=10?'lo':'', r.famNg.some(x=>x.k===k)?'ng':''].join(' ');
+  const isWay = r.way && r.way.nums.includes(v);
+  const cls = ['chip', p>=40?'hi':'', p<=10?'lo':'', r.famNg.some(x=>x.k===k)?'ng':'', isWay?'way':''].join(' ');
   return `<span class="${cls}" title="${k}${v}：${sq(v).数意}（${p}点）">${v}</span>`;
 };
 function renderTable(rows, n){
   document.getElementById('result').hidden = false;
   const keyset = KEYPTS[STATE.sex];
-  const rankName = {key:'重要点', total:'総合点', dom:'分野の点'}[STATE.rank];
+  const rankName = {key:'重要点', total:'総合点', dom:'分野の点', wayScore:'望む道の画数'}[STATE.rank];
   document.getElementById('summary').innerHTML = STATE.relaxed
     ? `あり得る組合せ ${n} 通りの中に、すべての条件を満たすものはありませんでした。家族との反相性や名前の中の反発を避けながら良い数をそろえるのは、それだけ難しいということです。<b>条件に反する点が少ない順</b>に上位 ${rows.length} 通りを示します（「反する点」の列）。`
     : `あり得る組合せ ${n} 通りのうち、条件に合うもの ${STATE.kept.length} 通り。${rankName}の高い順に上位 ${rows.length} 通りを示します。`;
-  const head = `<thead><tr><th>順</th><th>名の頭の字</th><th>残りの字</th><th>名の合計</th>${KEYS.map(k=>`<th>${mk(k, keyset.includes(k))}</th>`).join('')}<th>重要点</th><th>総合点</th><th>分野</th><th>同じ数</th><th>反発</th><th>家族</th>${STATE.relaxed?'<th>反する点</th>':''}</tr></thead>`;
+  const head = `<thead><tr><th>順</th><th>名の頭の字</th><th>残りの字</th><th>名の合計</th>${KEYS.map(k=>`<th>${mk(k, keyset.includes(k))}</th>`).join('')}<th>望む道</th><th>重要点</th><th>総合点</th><th>分野</th><th>同じ数</th><th>反発</th><th>家族</th>${STATE.relaxed?'<th>反する点</th>':''}</tr></thead>`;
   const body = rows.map((r,i)=>{
     const rest = STATE.m===1 ? '—' : STATE.m===2 ? `${r.G[1]}画` : `計${r.G[1]+r.G[2]}画`;
     return `<tr class="c" data-i="${i}"><td>${i+1}</td><td>${r.G[0]}画</td><td>${rest}</td><td>${r.G.reduce((a,b)=>a+b,0)}画</td>
       ${KEYS.map(k=>`<td>${chip(r,k)}</td>`).join('')}
+      <td>${r.way ? `${r.wayPos.length}/${r.way.pos.length||'—'}位置・${r.wayCount}個${r.wayPair?'◎':''}` : '—'}</td>
       <td><b>${r.key}</b></td><td>${r.total}</td><td>${STATE.doms.length? r.dom : '—'}</td>
       <td>${r.same.length}</td><td>${r.inner.length? `<span class="flag">${r.inner.length}</span>` : '○'}</td>
       <td>${r.famNg.length? `<span class="flag">${r.famNg.length}</span>` : '○'}</td>${STATE.relaxed?`<td class="flag">${r.viol}</td>`:''}</tr>`;
   }).join('');
   const t = document.getElementById('cand');
-  t.innerHTML = head + `<tbody>${body || '<tr><td colspan="23">組合せがありません。</td></tr>'}</tbody>`;
+  t.innerHTML = head + `<tbody>${body || '<tr><td colspan="24">組合せがありません。</td></tr>'}</tbody>`;
   t.querySelectorAll('tr.c').forEach(tr=>tr.onclick = ()=>{
     t.querySelectorAll('tr.sel').forEach(x=>x.classList.remove('sel')); tr.classList.add('sel');
     renderDetail(rows[+tr.dataset.i], false);
@@ -464,6 +487,17 @@ function renderDetail(r, fromEval){
     return `<h3>${d.n}　内線 ${mk(d.a[0])}${c[d.a[0]]}・${mk(d.a[1])}${c[d.a[1]]}（実線）／外線 ${mk(d.b[0])}${c[d.b[0]]}・${mk(d.b[1])}${c[d.b[1]]}（破線）</h3>
       <div class="wscroll">${svgWave(b.w, a.w)}</div><p class="legend">内線：${a.note}　外線：${b.note}</p>`;
   }).join('');
+  let wayHtml = '';
+  if (r.way){
+    const w = r.way, set = new Set(w.nums);
+    const hits = KEYS.filter(k=>set.has(c[k])).map(k=>`${mk(k)}${c[k]}`).join(' ') || 'なし';
+    wayHtml = `<h3>望む道：${w.title}</h3>
+      <p style="font-size:14.5px">この道に特徴のある画数（原典）：${w.nums.join('・')}<br>
+      十二の数のうち、これに当たるもの：${hits}（${r.wayCount}個）<br>
+      ${w.pos.length ? `特に力を発揮するとされる位置 ${w.pos.map(k=>mk(k)).join('')} のうち、当たっている位置：${r.wayPos.length? r.wayPos.map(k=>`${mk(k)}${c[k]}`).join(' ') : 'なし'}（${r.wayPos.length}/${w.pos.length}）` : '（この道は、原典に位置の記載がありません）'}
+      ${w.pair ? `<br>${w.pair.join('画と')}画を合わせもつか：${r.wayPair ? '<b>合わせもつ</b>' : 'もたない'}` : ''}
+      ${w.note ? `<br><span class="hint">原典の注記：${w.note}</span>` : ''}</p>`;
+  }
   const title = fromEval ? `「${r.label}」の十二の数` : `名の頭の字 ${ro}画・残り ${G.length===1?'なし':ha+'画'} の組合せ`;
   document.getElementById('detail').innerHTML = `
     <h2>${title}</h2>
@@ -471,6 +505,7 @@ function renderDetail(r, fromEval){
        同じ数：${r.same.length? r.same.join('、') : 'なし'}　名前の中の反発：${r.inner.length? `<span class="flag">${r.inner.join('、')}</span>` : 'なし'}　
        家族との反相性：${r.famNg.length? `<span class="flag">${r.famNg.length}か所</span>` : 'なし'}</p>
     <div class="dgrid">${cells}</div>
+    ${wayHtml}
     <h3>命名シート</h3>
     <table class="sheet"><tbody>${sheet.map(([a,b])=>`<tr><td>${a}</td><td><b>${b}</b></td></tr>`).join('')}</tbody></table>
     <p style="font-size:14.5px">${eqs.join('　／　')}</p>
@@ -503,6 +538,18 @@ function evalName(){
 document.addEventListener('DOMContentLoaded', ()=>{
   document.querySelectorAll('.prose p, .warn p').forEach(p=>{
     p.innerHTML = p.innerHTML.replace(/[\u24C2-\u24CD]/g, ch => mk(String.fromCharCode(ch.charCodeAt(0)-0x24B6+65)));
+  });
+  const wsel = document.getElementById('way');
+  ['職業','人生'].forEach(g=>{
+    const og = document.createElement('optgroup'); og.label = g==='職業' ? '職業・才能' : '人生・家庭';
+    (window.MAKI_WAY||[]).filter(w=>w.group===g).forEach(w=>{ const o=document.createElement('option'); o.value=w.key; o.textContent=w.title; og.appendChild(o); });
+    wsel.appendChild(og);
+  });
+  wsel.addEventListener('change', ()=>{
+    const w = wayOf(), info = document.getElementById('wayInfo');
+    if (!w){ info.innerHTML = ''; return; }
+    document.getElementById('rank').value = 'way';
+    info.innerHTML = `特徴のある画数：${w.nums.join('・')}　${w.pos.length ? '特に力を発揮する位置：'+w.pos.map(k=>mk(k)).join('') : '位置の記載なし'}${w.note ? '<br>原典の注記：'+w.note : ''}`;
   });
   document.getElementById('domains').innerHTML = DOMAINS.map((d,i)=>
     `<label><input type="checkbox" id="dom${i}"> ${d.n}</label>`).join('');
