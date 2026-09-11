@@ -629,7 +629,7 @@ footer{max-width:1080px;margin:0 auto;padding:20px 24px 50px;font-size:13px;colo
   </div>
 </section>
 
-<details class="verify">
+<details class="verify" id="verify">
   <summary>十二数の算出式と、本書の分析図との照合</summary>
   <div class="prose">
     <p>姓の字数を k、名の字数を m とすると、上の点（霊数）は 4−k 個、下の点は 4−m 個、いずれも1画ずつ置かれます。本書の分析図15名分から次の関係を読み取り、全員で照合しました。</p>
@@ -917,12 +917,13 @@ document.addEventListener('DOMContentLoaded', ()=>{
     document.querySelector('.calc').scrollIntoView({block:'start'});
   }));
   document.querySelectorAll('#tabs button').forEach(b=>b.addEventListener('click', ()=>showTab(b.dataset.id, true)));
-  window.addEventListener('hashchange', ()=>showTab(location.hash.slice(1)));
+  window.addEventListener('hashchange', ()=>{ if(location.hash==='#verify'){ const v=document.getElementById('verify'); v.open=true; v.scrollIntoView(); } else showTab(location.hash.slice(1)); });
 
   circleMarks(document.querySelector('main'));
   runCalc('牧正人史（8／5・2・5）');
   renderVerify();
-  showTab(location.hash.slice(1) || 'kyotsu');
+  if (location.hash === '#verify') { const v=document.getElementById('verify'); v.open=true; showTab('kyotsu'); v.scrollIntoView(); }
+  else showTab(location.hash.slice(1) || 'kyotsu');
 });
 </script>
 </body>
