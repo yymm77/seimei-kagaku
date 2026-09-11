@@ -181,14 +181,20 @@ footer{max-width:1080px;margin:0 auto;padding:20px 24px 50px;font-size:13px;colo
 
 <!-- ============ 十二数の計算 ============ -->
 <section class="calc" aria-labelledby="calc-h">
-  <h2 id="calc-h">十二の数を出す</h2>
-  <p class="note">姓と名の画数を、一字ずつ読点かカンマで区切って入れてください（例：今倉正諦なら 姓「4,10」名「5,16」）。本書の事例名を選ぶと、その画数が入ります。各分野のページに、この数から組まれる二本のグラフが示されます。</p>
+  <h2 id="calc-h">あなたの名前で見る</h2>
+  <p class="note">日常で名乗っている姓と名を漢字で入れてください。画数は原典の字画表から自動で入ります。字画表にない字があるときは、下の画数の欄に数字で入れてください。各分野のページに、あなたの名前から組まれる二本の人生グラフが示されます。入力した名前は、この画面の中だけで計算され、どこにも送られません。</p>
   <div class="calc-row">
+    <label>姓<input id="inSeiK" type="text" placeholder="例：牧" autocomplete="off" aria-describedby="calc-err"></label>
+    <label>名<input id="inMeiK" type="text" placeholder="例：正人史" autocomplete="off" aria-describedby="calc-err"></label>
+    <button id="calcBtn" type="button">グラフを見る</button>
+    <label>本書の事例から<select id="exSel"><option value="">選ぶ</option></select></label>
+  </div>
+  <div class="calc-row" style="margin-top:10px">
     <label>姓の画数<input id="inS" inputmode="numeric" value="8" aria-describedby="calc-err"></label>
     <label>名の画数<input id="inG" inputmode="numeric" value="5,2,5" aria-describedby="calc-err"></label>
-    <label>本書の事例から<select id="exSel"><option value="">選ぶ</option></select></label>
-    <button id="calcBtn" type="button">計算する</button>
+    <span class="note" id="kakuInfo" style="margin:0 0 8px"></span>
   </div>
+  <p class="note" style="margin-top:8px">画数について：姓名科学では、旧字体の画数を用います。字画表は、新字体で入れた字も旧字体の画数で数えるようにしてあります（例：継は繼の20画、恵は惠の12画）。ただし部首は字形どおりに数え、さんずい（氵）を「水」の4画に読み替えることはしません（例：清は11画、洋は9画）。字画表にない字をご自分で調べて入れるときは、辞林などの漢和辞典で旧字体の画数を確かめ、部首も字形どおりに数えてください。</p>
   <div class="err" id="calc-err" role="alert"></div>
   <div class="twelve" id="twelve"></div>
   <div class="who" id="who"></div>
@@ -596,6 +602,7 @@ footer{max-width:1080px;margin:0 auto;padding:20px 24px 50px;font-size:13px;colo
           <tr><td>総計</td><td>317点（3分の1で106点）</td><td>〈順調〉</td></tr>
         </tbody>
       </table>
+      <p class="fig">校正注：上の表は原典本文のままです。原典28〜29頁の数意数値表では、7画は28点、30画は25点で、本文ではこの二つの点数が入れ替わっています（社会面の合計92点は変わりません）。また、分析図と算出式ではⓋは24画（37点）で、本文の「Ⓥ25画＝31点」とは異なります。24画で数えると、社会面は98点、総計は323点になります。</p>
       <p>経済面が最も高く、社会面が低い数値は、強い個性となって現れます。Ⓤ7画「一念堅持の運」とⓌ28画「難題処理の運」は準相性の関係にあり、一つのことを思いつめ、七難八苦をことごとく吸い寄せる性質を持ちます。志知さん・中畠さんには内部矛盾を生む反発数が多かったのに対し、横井さんには反発数がなかったことが、生還の鍵になったと思われます。</p>
     </div>
   </div>
@@ -669,6 +676,7 @@ footer{max-width:1080px;margin:0 auto;padding:20px 24px 50px;font-size:13px;colo
       <tbody>
         <tr><td>受験　加藤木守さんの分析図 Ⓢ</td><td>21（上段18＋下段3）</td><td>28（上段25＋下段3）</td><td>同じ図のⓇ38・Ⓣ10・Ⓥ31と整合。上段の式は NAMEMASTER.xls の3字姓の実例で確認済み</td></tr>
         <tr><td>人生最大の危機　横井庄一さんの総合判断 Ⓥ</td><td>本文「Ⓥ25画」</td><td>24画</td><td>分析図の印刷値・算出式ともに24</td></tr>
+        <tr><td>人生最大の危機　横井庄一さんの総合判断 7画・30画の点数</td><td>7画＝25点、30画＝28点</td><td>7画＝28点、30画＝25点</td><td>原典28〜29頁の数意数値表。二つの点数が入れ替わっている</td></tr>
         <tr><td>財運　図14 柴田清秀さんの実棒</td><td>巻末図355（索引14-41）の形</td><td>巻末図72（索引16-20）</td><td>巻末原図との目視照合。本文の記述も図72の動きと一致</td></tr>
       </tbody>
     </table>
@@ -683,6 +691,7 @@ footer{max-width:1080px;margin:0 auto;padding:20px 24px 50px;font-size:13px;colo
 </footer>
 
 <!-- 巻末人生グラフのデータ（同じフォルダに置く。fetchではなくscriptで読む） -->
+<script src="maki_core_data.js"></script>
 <script src="maki_wave_data.js"></script>
 <script>
 /* ============================================================
@@ -705,6 +714,41 @@ function calc12(S, G){
   const U = 1 + G[0], V = R - U, W = O + 1, X = R - 1;
   return {M,N,O,P,Q,R,S:Sx,T,U,V,W,X};
 }
+
+/* ============================================================
+   漢字 → 画数（原典の字画表 MAKI_JK）
+   ============================================================ */
+function kanjiToStrokes(str){
+  const chars = [...(str||'').replace(/[\s　]/g,'')];
+  const JK = window.MAKI_JK || {};
+  const out = [], miss = [];
+  chars.forEach(c=>{ if (JK[c]) out.push(JK[c]); else miss.push(c); });
+  return {chars, strokes:out, miss};
+}
+function syncKanji(fill = true){
+  const s = kanjiToStrokes(document.getElementById('inSeiK').value);
+  const m = kanjiToStrokes(document.getElementById('inMeiK').value);
+  const info = document.getElementById('kakuInfo'), err = document.getElementById('calc-err');
+  if (!window.MAKI_JK){ err.textContent = '字画表（maki_core_data.js）が読み込めていません。画数を数字で入れてください。'; return false; }
+  const miss = s.miss.concat(m.miss);
+  if (!s.chars.length || !m.chars.length){ info.textContent = ''; return false; }
+  if (miss.length){
+    const JK = window.MAKI_JK;
+    if (fill) document.getElementById('inS').value = s.chars.map(c=>JK[c]||'?').join(',');
+    if (fill) document.getElementById('inG').value = m.chars.map(c=>JK[c]||'?').join(',');
+    err.textContent = `字画表にない字があります：${miss.join('、')}。下の画数の欄の「?」を、その字の旧字体の画数に書き換えてから「グラフを見る」を押してください。`;
+    info.textContent = ''; return false;
+  }
+  err.textContent = '';
+  document.getElementById('inS').value = s.strokes.join(',');
+  document.getElementById('inG').value = m.strokes.join(',');
+  info.textContent = s.chars.map((c,i)=>c+s.strokes[i]).join(' ') + '　' + m.chars.map((c,i)=>c+m.strokes[i]).join(' ');
+  return true;
+}
+const EX_NAMES = {'今居芳夫':['今居','芳夫'],'柴田清秀':['柴田','清秀'],'高橋圭三':['高橋','圭三'],'加藤木守':['加藤木','守'],
+  '継明仁':['継','明仁'],'正田美智子':['正田','美智子'],'小田敏政':['小田','敏政'],'小田智恵美':['小田','智恵美'],
+  '今倉正諦':['今倉','正諦'],'今倉三枝子':['今倉','三枝子'],'横井庄一':['横井','庄一'],'中畠悟':['中畠','悟'],
+  '志知幹夫':['志知','幹夫'],'石原裕次郎':['石原','裕次郎'],'岸洋子':['岸','洋子']};
 
 /* ============================================================
    本書の事例（画数は分析図から。printed は分析図の印刷値）
@@ -831,7 +875,7 @@ function renderTwelve(){
   document.getElementById('twelve').innerHTML = GROUPS.map(g =>
     `<section><h3>${g.name}</h3><dl>${g.keys.map(k=>`<div><dt>${mk(k)}</dt><dd>${CUR[k]}</dd></div>`).join('')}</dl></section>`
   ).join('');
-  document.getElementById('who').textContent = CUR_NAME ? `表示中：${CUR_NAME}` : '';
+  document.getElementById('who').textContent = CUR_NAME ? `表示中：${CUR_NAME}　上の帯で分野を選ぶと、この名前の人生グラフが出ます。` : '';
 }
 
 function pairHtml(p){ return `${mk(p[0])}${CUR[p[0]]}・${mk(p[1])}${CUR[p[1]]}`; }
@@ -881,6 +925,9 @@ function loadExample(key){
   const e = EXAMPLES.find(x=>x.key===key); if(!e) return;
   document.getElementById('inS').value = e.S.join(',');
   document.getElementById('inG').value = e.G.join(',');
+  const nm = EX_NAMES[key] || ['',''];
+  document.getElementById('inSeiK').value = nm[0]; document.getElementById('inMeiK').value = nm[1];
+  document.getElementById('kakuInfo').textContent = '画数は原典の分析図によります';
   document.getElementById('exSel').value = key;
   CUR_EX = e;
   runCalc(e.label);
@@ -929,8 +976,30 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const sel = document.getElementById('exSel');
   EXAMPLES.forEach(e=>{ const o=document.createElement('option'); o.value=e.key; o.textContent=e.label; sel.appendChild(o); });
   sel.addEventListener('change', ()=>{ if(sel.value) loadExample(sel.value); });
-  document.getElementById('calcBtn').addEventListener('click', ()=>{ sel.value=''; runCalc(); });
-  ['inS','inG'].forEach(id=>document.getElementById(id).addEventListener('keydown', e=>{ if(e.key==='Enter'){ sel.value=''; runCalc(); } }));
+  const nameLabel = ()=>{
+    const s = document.getElementById('inSeiK').value.trim(), m = document.getElementById('inMeiK').value.trim();
+    return (s && m) ? `${s} ${m}` : undefined;
+  };
+  const go = ()=>{ sel.value=''; CUR_EX = null; runCalc(nameLabel()); CUR_EX = null; renderFields(); };
+  const tryGo = ()=>{
+    const sk = document.getElementById('inSeiK').value.replace(/[\s　]/g,''), mk2 = document.getElementById('inMeiK').value.replace(/[\s　]/g,'');
+    if (sk || mk2){
+      if (!syncKanji(false)){
+        // 字画表にない字がある：画数の欄が字数どおり手入力されていれば、それで計算する
+        const S = parseStrokes(document.getElementById('inS').value), G = parseStrokes(document.getElementById('inG').value);
+        if (S && G && S.length === [...sk].length && G.length === [...mk2].length){ document.getElementById('calc-err').textContent = ''; go(); }
+        return;
+      }
+    }
+    go();
+  };
+  document.getElementById('calcBtn').addEventListener('click', tryGo);
+  ['inSeiK','inMeiK'].forEach(id=>{
+    const el = document.getElementById(id);
+    el.addEventListener('input', ()=>{ syncKanji(); });
+    el.addEventListener('keydown', e=>{ if(e.key==='Enter') tryGo(); });
+  });
+  ['inS','inG'].forEach(id=>document.getElementById(id).addEventListener('keydown', e=>{ if(e.key==='Enter') go(); }));
   document.querySelectorAll('button.try').forEach(b=>b.addEventListener('click', ()=>{
     loadExample(b.dataset.ex);
     document.querySelector('.calc').scrollIntoView({block:'start'});

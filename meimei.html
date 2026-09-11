@@ -122,6 +122,7 @@ footer{max-width:1080px;margin:0 auto;padding:18px 24px 44px;font-size:13px;colo
   </div>
   <div class="err" id="err1" role="alert"></div>
   <p class="hint" id="seiInfo"></p>
+  <p class="hint">画数は旧字体で数えます。字画表は新字体で入れた字も旧字体の画数で数えるようにしてあります（例：継は繼の20画）。ただし部首は字形どおりに数え、さんずい（氵）は3画のままです（例：清は11画）。字画表にない字をご自分で調べるときは、辞林などの漢和辞典で旧字体の画数を確かめ、その姓名の全部の字の画数を数字で入れてください。</p>
 </div>
 
 <h2>二　家族の名前</h2>
@@ -251,7 +252,7 @@ function toStrokes(str){
   }
   const chars = [...str.replace(/\s/g,'')], out = [], miss = [];
   chars.forEach(c=>{ const v = JK()[c]; if (v) out.push(v); else miss.push(c); });
-  if (miss.length) return {err:`字画表にない字があります：${miss.join('、')}（画数を数字で入れてください）`};
+  if (miss.length) return {err:`字画表にない字があります：${miss.join('、')}。全部の字の画数を「4,7」のように数字で入れてください（旧字体の画数で）`};
   return {strokes:out, text:chars.map((c,i)=>c+out[i]).join(' ')};
 }
 let HAN_BY_STROKE = null;
@@ -447,7 +448,7 @@ function renderDetail(r, fromEval){
   ];
   const cells = KEYS.map(k=>{
     const v = c[k], s = sq(v), ng = r.famNg.find(x=>x.k===k);
-    return `<div class="dcell${ng?' bad':''}">${mk(k, keyset.includes(k))}<span class="n">${v}</span>${s.数意}<br><span class="p">${s.点数}点${keyset.includes(k)?'・重要点':''}${ng?`　家族と反相性（${ng.why.join('、')}）`:''}</span></div>`;
+    return `<div class="dcell${ng?' bad':''}">${mk(k, keyset.includes(k))}<span class="n">${v}</span>${s.数意}<br><span class="p">${s.点数}点${s.数標?'〈'+s.数標+'〉':''}${keyset.includes(k)?'・重要点':''}${ng?`　家族と反相性（${ng.why.join('、')}）`:''}</span></div>`;
   }).join('');
   const byS = hanByStroke();
   const kanjiBox = (n, label) => `<h3>${label}（${n}画）</h3><div class="kanji">${(byS[n]||[]).join('') || '字画表に該当する字がありません'}</div>`;
