@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>人生グラフ 分野別解説｜牧正人史 姓名科学</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600;700&family=Zen+Old+Mincho:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a1208; --paper:#f5f0e8; --gold:#b8960c; --vermillion:#c0392b; --indigo:#1a3a5c;
+  --rule:#d9ccb2; --wash:#ece4d4; --mute:#6b5d48;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Noto Serif JP","游明朝",serif;font-size:17px;line-height:1.95;letter-spacing:.02em}
+a{color:var(--indigo)}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+/* 題字 */
+header.masthead{background:var(--indigo);color:var(--paper);border-bottom:6px solid var(--gold)}
+.mast-in{max-width:1080px;margin:0 auto;padding:40px 24px 34px;display:grid;grid-template-columns:auto 1fr;gap:40px;align-items:center}
+.mast-title{font-family:"Zen Old Mincho",serif;font-weight:900;writing-mode:vertical-rl;text-orientation:upright;font-size:46px;line-height:1.1;letter-spacing:.14em;margin:0}
+.mast-kicker{font:700 20px/1.5 "Zen Old Mincho",serif;color:#e6d9a8;letter-spacing:.3em;margin:0 0 10px}
+.mast-lead{max-width:36em;font-size:16px;line-height:2;color:#efe8d8}
+.mast-lead b{color:#fff;font-weight:700}
+.mast-src{margin-top:14px;font-size:13px;color:#cbbd8f}
+
+/* 分野の見出し帯 */
+nav.fields{position:sticky;top:0;z-index:5;background:var(--paper);border-bottom:1px solid var(--rule)}
+.fields-in{max-width:1080px;margin:0 auto;padding:0 12px;display:flex;overflow-x:auto;scrollbar-width:thin}
+.fields button{flex:0 0 auto;background:none;border:0;border-bottom:3px solid transparent;
+  font:600 15px/1 "Noto Serif JP",serif;color:var(--mute);padding:15px 13px 12px;cursor:pointer;letter-spacing:.06em}
+.fields button[aria-selected="true"]{color:var(--indigo);border-bottom-color:var(--gold)}
+.fields button:hover{color:var(--ink)}
+
+main{max-width:1080px;margin:0 auto;padding:28px 24px 80px}
+
+/* 十二数の計算 */
+.calc{border:1px solid var(--rule);background:#fbf8f2;padding:20px 22px;margin-bottom:34px}
+.calc h2{margin:0 0 4px;font:700 19px/1.5 "Zen Old Mincho",serif;color:var(--indigo);border-left:6px solid var(--gold);padding-left:12px}
+.calc p.note{margin:4px 0 14px;font-size:14px;color:var(--mute);line-height:1.8}
+.calc-row{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:end}
+.calc label{font-size:14px;color:var(--mute);display:flex;flex-direction:column;gap:4px}
+.calc input,.calc select{font:16px "Noto Serif JP",serif;padding:7px 10px;border:1px solid #bfae8a;background:#fff;color:var(--ink);min-width:9em}
+.calc button{font:700 15px "Noto Serif JP",serif;background:var(--indigo);color:var(--paper);border:0;padding:9px 20px;cursor:pointer;letter-spacing:.1em}
+.calc button:hover{background:#244b73}
+.calc .err{color:var(--vermillion);font-size:14px;min-height:1.4em;margin-top:6px}
+.twelve{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:14px;border:1px solid var(--rule)}
+.twelve section{padding:10px 14px;border-right:1px solid var(--rule)}
+.twelve section:last-child{border-right:0}
+.twelve h3{margin:0 0 6px;font:700 14px/1.4 "Noto Serif JP",serif;color:var(--mute);letter-spacing:.2em}
+.twelve dl{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:0}
+.twelve dt{text-align:center;color:var(--indigo)}
+.twelve dd{margin:0;text-align:center;font:700 22px/1.2 "Zen Old Mincho",serif}
+.who{margin-top:10px;font-size:14px;color:var(--mute)}
+
+/* 丸囲み記号 */
+.mk{display:inline-flex;align-items:center;justify-content:center;width:1.5em;height:1.5em;border:1.4px solid currentColor;border-radius:50%;
+  font:700 .74em/1 "Noto Serif JP",serif;margin:0 .06em;vertical-align:.12em;letter-spacing:0}
+
+/* 分野パネル */
+.panel{scroll-margin-top:64px}
+.wscroll{overflow-x:auto}
+.panel h2.ttl{font:900 34px/1.35 "Zen Old Mincho",serif;margin:6px 0 2px;letter-spacing:.08em}
+.panel .sub{margin:0 0 26px;color:var(--mute);font-size:15px}
+.panel h3{font:700 20px/1.5 "Zen Old Mincho",serif;color:var(--indigo);border-left:6px solid var(--gold);padding-left:12px;margin:40px 0 12px}
+.panel h4{font:700 17px/1.5 "Noto Serif JP",serif;margin:28px 0 6px;color:var(--ink)}
+.prose p{margin:0 0 1em;max-width:40em}
+.page-ref{font-size:13px;color:var(--mute)}
+
+/* 見るグラフ */
+.gview .gcard{border-top:2px solid var(--ink);border-bottom:1px solid var(--rule);padding:14px 0 10px;margin-bottom:18px}
+.gview .gcap{font:700 16px "Zen Old Mincho",serif;margin-bottom:6px}
+.pairs{display:flex;flex-wrap:wrap;gap:8px 34px;font-size:16px}
+.pairs .lbl{display:inline-block;min-width:4.2em;font-weight:700}
+.pairs .jitsu .lbl{color:var(--ink)}
+.pairs .ten .lbl{color:var(--indigo)}
+.pairs .val{font:700 18px "Zen Old Mincho",serif;margin-left:.4em}
+.pairs .val em{font-style:normal;color:var(--vermillion)}
+svg.wave{width:100%;min-width:640px;height:auto;display:block;margin-top:10px;background:#fffdf8;border:1px solid var(--rule)}
+svg.wave .grid{stroke:#e4dac6;stroke-width:1}
+svg.wave .base{stroke:var(--ink);stroke-width:1.2}
+svg.wave .yl,svg.wave .xl{font:11px "Noto Serif JP",serif;fill:var(--mute)}
+svg.wave .yl{text-anchor:end}
+svg.wave .xl{text-anchor:middle}
+svg.wave .jb{stroke:var(--ink);stroke-width:2.4}
+svg.wave .tb{stroke:var(--indigo);stroke-width:2.4;stroke-dasharray:3.2 2.4}
+svg.wave .na{font:600 15px "Noto Serif JP",serif;fill:var(--mute);text-anchor:middle}
+svg.wave .band{fill:#f3e7c2;opacity:.6}
+svg.wave .bandl{font:600 11px "Noto Serif JP",serif;fill:#8a6f0a}
+svg.wave .mark{font:700 11px "Noto Serif JP",serif;fill:var(--vermillion);text-anchor:middle}
+.gcard .src{font-size:12.5px;color:var(--mute);margin-top:2px}
+svg.wave .na2{font:13px "Noto Serif JP",serif;fill:var(--mute);text-anchor:middle}
+.legend{font-size:13px;color:var(--mute);margin-top:6px}
+.legend .j,.legend .t{display:inline-block;width:18px;height:0;vertical-align:middle;margin-right:4px}
+.legend .j{border-top:2.4px solid var(--ink)}
+.legend .t{border-top:2.4px dashed var(--indigo);margin-left:14px}
+.aux{font-size:15px;margin:8px 0 0;padding-left:0;list-style:none}
+.aux li{margin:2px 0}
+
+/* 好機と警戒 */
+.signs{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--rule);margin:18px 0 6px;max-width:48em}
+.signs div{padding:12px 16px}
+.signs div+div{border-left:1px solid var(--rule)}
+.signs b{display:block;font-family:"Zen Old Mincho",serif;font-size:16px;margin-bottom:4px}
+.signs .go b{color:var(--indigo)}
+.signs .st b{color:var(--vermillion)}
+.signs p{margin:0;font-size:15px;line-height:1.85}
+
+/* 事例の年譜 */
+.case{background:var(--wash);padding:18px 22px 10px;margin:14px 0 18px;max-width:48em}
+.case .who2{font:700 17px "Zen Old Mincho",serif;margin:0 0 2px}
+.case .fig{font-size:13px;color:var(--mute);margin:0 0 10px}
+.case p{margin:0 0 .8em;font-size:15.5px}
+ol.tl{list-style:none;margin:0 0 10px;padding:0}
+ol.tl li{display:grid;grid-template-columns:6.4em 1fr;gap:10px;padding:6px 0;border-top:1px dotted #c9b995;font-size:15.5px;line-height:1.85}
+ol.tl li b{font-family:"Zen Old Mincho",serif;color:var(--indigo);font-weight:700}
+.case button.try{font:600 13px "Noto Serif JP",serif;background:none;border:1px solid var(--indigo);color:var(--indigo);padding:4px 12px;cursor:pointer;margin-bottom:10px}
+.case button.try:hover{background:var(--indigo);color:var(--paper)}
+
+table.ref{border-collapse:collapse;font-size:15px;margin:10px 0;width:100%;max-width:52em}
+table.ref th,table.ref td{border-bottom:1px solid var(--rule);padding:7px 8px;text-align:left;vertical-align:top}
+table.ref th{font-weight:700;color:var(--mute);font-size:13.5px;letter-spacing:.1em;border-bottom:2px solid var(--ink)}
+
+details.verify{margin-top:60px;border-top:2px solid var(--ink);padding-top:14px}
+details.verify summary{cursor:pointer;font:700 17px "Zen Old Mincho",serif;color:var(--indigo)}
+details.verify table{border-collapse:collapse;font-size:13.5px;margin-top:12px;width:100%}
+details.verify th,details.verify td{border:1px solid var(--rule);padding:4px 5px;text-align:center}
+details.verify td.nm{text-align:left;white-space:nowrap}
+details.verify td.bad{background:#f7dcd6;color:var(--vermillion);font-weight:700}
+details.verify p{font-size:14.5px;max-width:48em}
+.vwrap{overflow-x:auto}
+footer{max-width:1080px;margin:0 auto;padding:20px 24px 50px;font-size:13px;color:var(--mute);border-top:1px solid var(--rule)}
+
+@media (max-width:760px){
+  body{font-size:16px}
+  .mast-in{grid-template-columns:1fr;padding:30px 18px 24px}
+  .mast-title{writing-mode:horizontal-tb;font-size:32px}
+  main{padding:20px 16px 60px}
+  .twelve{grid-template-columns:1fr}
+  .twelve section{border-right:0;border-bottom:1px solid var(--rule)}
+  .signs{grid-template-columns:1fr}
+  .signs div+div{border-left:0;border-top:1px solid var(--rule)}
+  ol.tl li{grid-template-columns:5em 1fr}
+  .panel h2.ttl{font-size:27px}
+}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="mast-in">
+    <h1 class="mast-title">人生グラフ</h1>
+    <div>
+      <p class="mast-kicker">八分野の解説</p>
+      <p class="mast-lead">姓名から出る十二の数のうち、<b>どの二組を重ねるか</b>で、見える人生の場面が変わります。仕事の飛躍、財運、独立、受験、結婚と離婚、夫婦の愛情、人生最大の危機、病気。八つの分野それぞれの読み方と、牧正人史先生が遺した実例を一つずつたどります。</p>
+      <p class="mast-src">典拠：牧正人史『姓名（なまえ）』第3章「自分自身の未来を予知する——人生グラフ」pp.144–174</p>
+    </div>
+  </div>
+</header>
+
+<nav class="fields" aria-label="分野">
+  <div class="fields-in" role="tablist" id="tabs">
+    <button role="tab" data-id="kyotsu">共通の読み方</button>
+    <button role="tab" data-id="shigoto">仕事の飛躍</button>
+    <button role="tab" data-id="zaiun">財運</button>
+    <button role="tab" data-id="dokuritsu">独立</button>
+    <button role="tab" data-id="juken">受験</button>
+    <button role="tab" data-id="kekkon">結婚・離婚</button>
+    <button role="tab" data-id="sex">セックス</button>
+    <button role="tab" data-id="kiki">人生最大の危機</button>
+    <button role="tab" data-id="byoki">病気</button>
+  </div>
+</nav>
+
+<main>
+
+<!-- ============ 十二数の計算 ============ -->
+<section class="calc" aria-labelledby="calc-h">
+  <h2 id="calc-h">十二の数を出す</h2>
+  <p class="note">姓と名の画数を、一字ずつ読点かカンマで区切って入れてください（例：今倉正諦なら 姓「4,10」名「5,16」）。本書の事例名を選ぶと、その画数が入ります。各分野のページに、この数から組まれる二本のグラフが示されます。</p>
+  <div class="calc-row">
+    <label>姓の画数<input id="inS" inputmode="numeric" value="8" aria-describedby="calc-err"></label>
+    <label>名の画数<input id="inG" inputmode="numeric" value="5,2,5" aria-describedby="calc-err"></label>
+    <label>本書の事例から<select id="exSel"><option value="">選ぶ</option></select></label>
+    <button id="calcBtn" type="button">計算する</button>
+  </div>
+  <div class="err" id="calc-err" role="alert"></div>
+  <div class="twelve" id="twelve"></div>
+  <div class="who" id="who"></div>
+</section>
+
+<!-- ============ 共通の読み方 ============ -->
+<section class="panel" id="kyotsu" role="tabpanel">
+  <h2 class="ttl">共通の読み方</h2>
+  <p class="sub">八分野すべてに通じる、人生グラフの基本</p>
+  <div class="prose">
+    <h3>二本の棒</h3>
+    <p>どの分野も、十二の数のうち二組の組合せから描かれる二本のグラフを重ねて読みます。破線で描かれる<b>点棒</b>は「環境」、つまり周囲や相手、置かれた状況の側から自分に向かってくる力です。実線の<b>実棒</b>は「感情」、自分の内側から出てくる意欲や、物事をさばく力です。一本の縦棒は、その一年のうちに動いた幅（最低点から最高点まで）を表します。</p>
+
+    <h3>高さより向き</h3>
+    <p>縦軸は0点から100点、50点の中心線より上か下かで、力の余裕と不足を見ます。けれども本書の実例が一貫して教えているのは、位置の高低よりも「上昇に向かっているのか、下降に向かっているのか」を見きわめることです。高い位置にあっても下降の途中なら用心し、低い位置でも底を打って上を向いたなら、それは好機の入口です。</p>
+
+    <h3>陰きわまって陽転する</h3>
+    <p>底をつけて反転する時期は、独立、受験、財運、病気からの快復など、多くの分野で最大の転機になります。本書は、大きな成功を収めた人の転身が、しばしばこの反転期に重なっていると指摘しています。</p>
+
+    <h3>二本の関係で読む</h3>
+    <table class="ref">
+      <thead><tr><th>形</th><th>読み</th></tr></thead>
+      <tbody>
+        <tr><td>両棒そろって上昇</td><td>追い風。何事も進めやすい時期。</td></tr>
+        <tr><td>両棒そろって低位・下降</td><td>危機。離婚、資金難、不合格、発病などが重なりやすい。</td></tr>
+        <tr><td>点棒が上がるなかで、実棒が底から反転</td><td>飛躍の兆し（逆の組合せもある）。</td></tr>
+        <tr><td>点棒は低迷、実棒だけが高い</td><td>環境の悪さを意欲で支えている状態。実棒が頂点を打って下がり始める時が崩れやすい。</td></tr>
+        <tr><td>点棒は高い、実棒が低い</td><td>周囲は整っているのに気持ちが伴わない。病気の分野では突発的な事故・災害に注意。</td></tr>
+      </tbody>
+    </table>
+
+    <h3>半年単位の推定</h3>
+    <p>棒は一年分の幅なので、その年の前半と後半のどちらで動いたかは、翌年の棒で推定します。翌年の棒が下降していれば、その年は後半から下降した、翌年が上昇していれば後半から上昇した、と見ます（石原裕次郎さんの例）。</p>
+
+    <h3>どの名前で見るか</h3>
+    <p>実際に日常で名乗っている名前で見ます。芸名であっても私生活で使っていればその名で見ます（岸洋子さん。本名は小山洋子）。一方、離婚のように私生活そのものの問題は戸籍名で見ます（高倉健さん＝小田敏政、江利チエミさん＝小田智恵美）。姓のない皇族方の場合、本書では姓の位置に「継」（20画）を置いて分析しています。</p>
+
+    <h3>名前が変わったとき</h3>
+    <p>結婚や改名で名前が変わると、人生グラフも変わります。旧姓のグラフが実生活に影響を残す期間は、20代なら結婚後満2年、30代なら3年とされています。この期間は新しい生活の土台をつくる、非常に貴重な歳月です。</p>
+
+    <h3>二人で見る</h3>
+    <p>結婚・離婚・夫婦生活の分野は、本人だけでなく相手のグラフを並べることで、事情が立体的に見えてきます。事例の年齢はいずれも満年齢です。</p>
+
+    <h3>十二の数と、本書での呼び名</h3>
+    <table class="ref">
+      <thead><tr><th>面</th><th>数</th><th>本書に出てくる呼び名</th></tr></thead>
+      <tbody>
+        <tr><td>精神面</td><td>Ⓜ Ⓝ Ⓟ Ⓠ</td><td>Ⓝ 愛情思念　Ⓠ 思考環境（考える問題）</td></tr>
+        <tr><td>経済面</td><td>Ⓢ Ⓣ Ⓞ Ⓡ</td><td>Ⓢ 所得活動　Ⓣ 家庭貯蓄</td></tr>
+        <tr><td>社会面</td><td>Ⓤ Ⓥ Ⓦ Ⓧ</td><td>Ⓤ 社会感情　Ⓦ 社会環境（社会の評判）　Ⓧ 家庭環境</td></tr>
+      </tbody>
+    </table>
+
+    <h3>namemaster の十二分野との関係</h3>
+    <p>namemaster は原典の鑑定シートにならい、健康・社交・所得など十二分野を内線（実線）と外線（破線）の二本で示します。3章の八分野は、このうちの二本を選んで重ねたものです。ただし組み方は一対一ではありません。</p>
+    <p>愛情・勝負の二分野は、namemaster の内線が3章の実棒に、外線が点棒にそのまま当たります。一方、社交・所得・幸福の三分野では逆になり、namemaster で内線（実線）の組が、3章では点棒（破線、環境）として読まれています。病気は、所得の内線と蓄財の外線という別々の分野の線を組み合わせています。各分野のグラフの下に、namemaster 上の対応する線を示しました。</p>
+
+    <h3>分野と組合せの一覧</h3>
+    <table class="ref">
+      <thead><tr><th>分野</th><th>点棒（環境・破線）</th><th>実棒（感情・実線）</th></tr></thead>
+      <tbody>
+        <tr><td>仕事の飛躍</td><td>Ⓡ—Ⓦ 環境性</td><td>Ⓢ—Ⓤ 処理感情</td></tr>
+        <tr><td>財運</td><td>Ⓞ—Ⓡ 経済環境（支出）</td><td>Ⓢ—Ⓣ 経済感情性（収入）</td></tr>
+        <tr><td>独立</td><td>Ⓡ—Ⓦ 職業環境性</td><td>Ⓢ—Ⓤ 職業感情性</td></tr>
+        <tr><td>受験</td><td>Ⓟ—Ⓠ 環境性</td><td>Ⓜ—Ⓝ 感情性（処理力）</td></tr>
+        <tr><td>結婚・離婚</td><td>Ⓟ—Ⓦ 環境性（好かれる）</td><td>Ⓜ—Ⓤ 感情性（愛する）</td></tr>
+        <tr><td>セックス</td><td>Ⓞ—Ⓠ 愛情環境性</td><td>Ⓣ—Ⓝ 愛情思考性</td></tr>
+        <tr><td>人生最大の危機</td><td>精神 Ⓟ—Ⓠ／経済 Ⓞ—Ⓡ</td><td>精神 Ⓜ—Ⓝ／経済 Ⓢ—Ⓣ</td></tr>
+        <tr><td>病気</td><td>Ⓡ—Ⓦ 社会環境</td><td>Ⓞ—Ⓧ 家庭環境</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ 仕事の飛躍 ============ -->
+<section class="panel" id="shigoto" role="tabpanel" hidden>
+  <h2 class="ttl">仕事の飛躍</h2>
+  <p class="sub">飛躍のチャンスはいつか　<span class="page-ref">pp.154–155</span></p>
+  <div class="gview" data-field="shigoto"></div>
+  <div class="prose">
+    <h3>読み方の要点</h3>
+    <p>昇進試験、社内選抜、抜擢、配置転換といった仕事の上での飛躍の時期は、職場や周囲の状況を示す点棒Ⓡ—Ⓦと、自分の仕事をさばく気力を示す実棒Ⓢ—Ⓤの組合せで見ます。</p>
+    <p>飛躍のサインは、点棒が上昇の流れにあるところへ、実棒が下降や低迷から上昇へと転じてくる時です。実棒が先に上がり、点棒が後から追いついてくる逆の形もあります。</p>
+    <p>いま高い位置にあるかどうかより、両棒がどちらへ向かっているかを見きわめてください。高い位置にあっても下降に向かっているなら、大きな勝負は一呼吸待つのが賢明です。</p>
+    <div class="signs">
+      <div class="go"><b>好機のサイン</b><p>点棒の上昇中に、実棒が底から反転する。両棒が中心線のあたりから揃って上を向く。</p></div>
+      <div class="st"><b>警戒のサイン</b><p>高位にあっても両棒が下向き。実棒の小休止は、次の飛躍への準備期間と心得る。</p></div>
+    </div>
+
+    <h3>本書の事例</h3>
+    <div class="case">
+      <p class="who2">今居芳夫さん（大手商事会社勤務・著者の後輩）</p>
+      <p class="fig">図12　19〜26歳　点棒Ⓡ28・Ⓦ25／実棒Ⓢ12・Ⓤ9</p>
+      <button class="try" data-ex="今居芳夫">この事例の画数で計算する</button>
+      <p>大学入試の後はアルバイトを続けて家計を助け、23歳でようやく卒業にこぎつけた人です。入社1年目、翌年に控えた社内試験（海外留学の選抜、30人に1人の狭き門）に悩んで相談に来ました。</p>
+      <ol class="tl">
+        <li><b>22歳</b>卒業前年の入社試験。縁故もないのに、一般試験の前に直接重役室に乗り込んで頼み込み、今の会社に入った。実棒が底をついて大きく上昇に転じた年。</li>
+        <li><b>23歳</b>点棒が底をつき、新しい環境への転換。実棒もぐんと勢いを増して上昇。</li>
+        <li><b>24歳半ば</b>相談の時期。実棒は入社以来の一服状態。</li>
+        <li><b>25歳</b>点棒が一段と飛躍し、実棒の処理感情も猛烈な意欲を示す。著者は先回りして「合格おめでとう」と励まし、本人は半信半疑ながら真剣に勉強に取り組んで、見事合格した。</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 財運 ============ -->
+<section class="panel" id="zaiun" role="tabpanel" hidden>
+  <h2 class="ttl">財運</h2>
+  <p class="sub">めぐまれる時期、失う時期　<span class="page-ref">pp.158–160</span></p>
+  <div class="gview" data-field="zaiun"></div>
+  <div class="prose">
+    <h3>読み方の要点</h3>
+    <p>お金の入り方には、少しずつ貯めていく型と、ある時期にまとまって入ってくる型があります。前者は運というより努力の領分です。このグラフが教えるのは後者、まとまったお金が入ってくる時期が何歳か、です。点棒Ⓞ—Ⓡは経済の環境、すなわち出ていくお金の側を、実棒Ⓢ—Ⓣは経済の感情、すなわち入ってくるお金の側を表します。</p>
+    <p>まとまって入った時に、それを元手に次の利益を生む事業を育てたり、家を建てて家賃の支出をなくしたりすると、お金が殖えていく好循環が生まれます。</p>
+    <p>両棒の底は資金繰りの最も苦しい時です。本書の経験則では、運の悪い時は焦れば焦るほど悪い現象を招きます。事業をやめたり転職したりするより、経費をできるだけ切り詰めて効率のよい運営に徹し、次の好転期まで持ちこたえる根気が求められます。悪い状態がいつまでも続くことはありません。</p>
+    <div class="signs">
+      <div class="go"><b>好機のサイン</b><p>両棒が底を打って揃って上昇。大口の取引や入金がめぐってくる時期。</p></div>
+      <div class="st"><b>警戒のサイン</b><p>開業して数年、両棒が下降に移る。販売より仕入・支払の資金繰りに追われやすい。</p></div>
+    </div>
+
+    <h3>本書の事例</h3>
+    <div class="case">
+      <p class="who2">柴田清秀さん（民芸品職人・民芸品店主）</p>
+      <p class="fig">図14　34〜42歳　点棒Ⓞ32・Ⓡ36／実棒Ⓣ16・Ⓢ20</p>
+      <p class="fig">校正注：本書の図14の実棒は、本来の巻末図72（索引16-20）ではなく、巻末図355（索引14-41）を取り違えて描かれています（巻末原図との目視照合で確認）。このページのグラフは正しい巻末図72によるもので、本文の「39歳で底、40歳で上昇」とも一致します。</p>
+      <button class="try" data-ex="柴田清秀">この事例の画数で計算する</button>
+      <ol class="tl">
+        <li><b>35歳</b>親ゆずりの民芸品職人から、東京の先輩と協力して民芸品を売る店を開いて独立。</li>
+        <li><b>〜37歳</b>独立後2年半ほどは、まずまずの成績。</li>
+        <li><b>38歳</b>3年を過ぎたころから調子が落ち、販売よりも仕入代金の調達に走り回る日々に。両棒とも下降し、不振が本格化。</li>
+        <li><b>39歳</b>いよいよ行き詰まり、転職のことばかり口にする。両棒とも底で、最も金に苦しむ時期。著者は40歳からの好転を見て、店はやめず経費を切り詰めるよう何度も励ました。</li>
+        <li><b>40歳〜</b>2年ほど後、羽田空港で偶然再会したときはアメリカへ商談に向かうところだった。あの後1年ほどは苦しかったが、以前に工夫した特殊な民芸品が米国のバイヤーの目にとまって大量の注文が入り、日本ブームにも乗って店は軌道に乗った。グラフは両棒とも40歳で上昇に転じている。</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 独立 ============ -->
+<section class="panel" id="dokuritsu" role="tabpanel" hidden>
+  <h2 class="ttl">独立</h2>
+  <p class="sub">どんな時期がいいか　<span class="page-ref">pp.156–157</span></p>
+  <div class="gview" data-field="dokuritsu"></div>
+  <div class="prose">
+    <h3>読み方の要点</h3>
+    <p>独立は、仕事の飛躍と同じ組合せ（点棒Ⓡ—Ⓦ、実棒Ⓢ—Ⓤ）を、職業環境と職業感情という観点から読みます。</p>
+    <p>本筋は、点棒と実棒が揃って最高位に向かって上昇している時です。それほど強い最盛期でなければ、勤めを辞めて独り立ちすることはなかなかできない、というのが本書の見立てです。</p>
+    <p>ただし独立の成否は、その後に必ず訪れる苦難期をどう越えるかで決まります。苦難を突破して再起できる人こそ真の経営者であり、独立の有資格者だといえます。</p>
+    <p>もう一つの型が、グラフが底を打って反転する「陰きわまって陽転する」時期の独立です。本書は、大成功者の職業転換はこの反転期に重なることが多いと述べています。よほど優れた先見性と決断力がなければ見抜けない時期だからこそ、グラフで前もって見定めておく意味があります。</p>
+    <div class="signs">
+      <div class="go"><b>好機のサイン</b><p>両棒が最高位へ向けて揃って上昇。または、長い低迷の底からの反転期。</p></div>
+      <div class="st"><b>警戒のサイン</b><p>独立の数年後に両棒が急降下する形。その時期を耐える備えがあるかを先に確かめる。</p></div>
+    </div>
+
+    <h3>本書の事例</h3>
+    <div class="case">
+      <p class="who2">高橋圭三さん（元NHKアナウンサー）</p>
+      <p class="fig">図13　37〜50歳（昭和30〜43年）　点棒Ⓡ39・Ⓦ36／実棒Ⓢ17・Ⓤ7</p>
+      <button class="try" data-ex="高橋圭三">この事例の画数で計算する</button>
+      <ol class="tl">
+        <li><b>37〜41歳</b>実棒が急速に下降して低迷。長いアナウンサー生活のなかのスランプ期と推測される。</li>
+        <li><b>40歳</b>点棒が飛躍的に好転し、アナウンサー部の管理職に。ただし実棒は低位のままで、気持ちのスランプは抜けきっていない。</li>
+        <li><b>43歳</b>実棒がようやく急上昇し、新しい意欲が芽生える。これが昭和36年10月のNHK退社につながった。</li>
+        <li><b>43〜44歳</b>両棒とも横ばい。実棒のわずかな下降は、気持ちの上での緊張を表す。</li>
+        <li><b>昭和37年4月</b>プロダクション設立。点棒・実棒とも、これまでの人生で最高位に向かって上昇している時期。</li>
+        <li><b>47〜49歳</b>両棒とも急降下し、職業面の苦難期に。この2年余りをよく耐えて再起した。</li>
+      </ol>
+      <p>著者の補足として、大成功者の典型的な転身の時期は、このグラフでいえば昭和33年の40歳か、昭和43年の50歳、つまり底からの反転期にあたる、と述べられています。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 受験 ============ -->
+<section class="panel" id="juken" role="tabpanel" hidden>
+  <h2 class="ttl">受験</h2>
+  <p class="sub">能力はどこで発揮できるか　<span class="page-ref">pp.161–162</span></p>
+  <div class="gview" data-field="juken"></div>
+  <div class="prose">
+    <h3>読み方の要点</h3>
+    <p>入試、資格試験、検定など、力を試される場面の時期は、試験をめぐる状況を示す点棒Ⓟ—Ⓠと、頭と気持ちの処理力を示す実棒Ⓜ—Ⓝで見ます。</p>
+    <p>成功のチャンスは、両棒が底をついて上昇に向かう時です。そのとき両棒が中心線より上にあれば、実力以上の力が発揮できるでしょう。</p>
+    <p>グラフが下降している、あるいは低迷しているさなかに受験を迎えなければならない人は、第二志望、第三志望を考えておくのが賢明です。不合格が続く時期は自信を失いやすい時期でもあるので、時期を見きわめること自体が大切な対策になります。</p>
+    <div class="signs">
+      <div class="go"><b>好機のサイン</b><p>両棒が底打ちから上昇へ。反転した時点で中心線より上にあれば、なおよい。</p></div>
+      <div class="st"><b>警戒のサイン</b><p>点棒の悪化と実棒の低迷が重なる年。併願や日程の組み直しで備える。</p></div>
+    </div>
+
+    <h3>本書の事例</h3>
+    <div class="case">
+      <p class="who2">加藤木守さん（調理師から東大へ）</p>
+      <p class="fig">図15　26〜37歳　点棒Ⓟ35・Ⓠ37／実棒Ⓜ29・Ⓝ9　（週刊文春 昭和47年6月の記事による）</p>
+      <button class="try" data-ex="加藤木守">この事例の画数で計算する</button>
+      <p>中学を卒業して上京し、さまざまな苦労の末に調理師の見習いとなり、10年の修業で一級の腕前になった人です。そこから発奮して東大を志し、3年がかりで検定14科目をすべて取得しました。</p>
+      <ol class="tl">
+        <li><b>31歳</b>最初の東大受験、不合格。点棒の環境悪化と、実棒の処理力の低迷。</li>
+        <li><b>32歳</b>東大紛争で入試そのものが行われなかった。</li>
+        <li><b>33歳</b>再受験、不合格。点棒は低迷、実棒は下降し始めていた。</li>
+        <li><b>34歳</b>三度目は相当いいところまでいきながら不合格。両棒とも低迷し、深刻な自信喪失期に。</li>
+        <li><b>35歳</b>「また落ちたら東大はあきらめる」と覚悟を決め、周囲にも宣言して真剣に取り組み、ついに合格。点棒は大幅に上昇し、実棒も転換期を示す。</li>
+        <li><b>その後</b>両棒とも勢いよく上昇。著者は、調理師出身の博士の誕生も予見している。</li>
+      </ol>
+      <p>社会感情を表すⓊは7画「一念堅持の運」で、グアム島から帰還した横井庄一さんと同じ数です。意固地なほどの信念を貫き通す強さが特徴とされます。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 結婚・離婚 ============ -->
+<section class="panel" id="kekkon" role="tabpanel" hidden>
+  <h2 class="ttl">結婚・離婚</h2>
+  <p class="sub">しあわせに、いつめぐり合うか／危機に、いつ遭遇するか　<span class="page-ref">pp.144–153</span></p>
+  <div class="gview" data-field="kekkon"></div>
+  <div class="prose">
+    <h3>結婚の時期</h3>
+    <p>点棒Ⓟ—Ⓦは「人に愛される」、つまり相手に好かれる状態の環境を、実棒Ⓜ—Ⓤは「自分が愛する」、自分の方から好きになる感情を表します。</p>
+    <p>本書によれば、男性は自分で相手を選んで決める結婚が多いため、点棒の高低にかかわらず実棒の最盛時に結婚することが多いようです。逆に女性は最良の相手に選ばれて決まる場合が多いため、実棒の高低にかかわらず点棒の最盛期に結婚することが多いといいます。</p>
+    <p>見合いでも、交際が始まり好きになった段階からは恋愛と同じです。好期にはためらわず、時期を生かして動く人がどんなことにも成功する、と本書は説きます。</p>
+
+    <h3>結婚後の安定</h3>
+    <p>結婚は挙式で始まるものです。けじめとしての目標ではあっても、最終目標ではありません。結婚後の生活には、男性は点棒Ⓟ—Ⓦ、女性は実棒Ⓜ—Ⓤがそれぞれ強く影響します。この棒が結婚の時期から上昇に向かっていることが、安定した将来を約束する第一歩です。</p>
+    <p>入籍でどちらかが改姓すれば人生グラフは変わります。旧姓のグラフが実生活に影響を残すのは、20代なら結婚後満2年、30代なら3年です。</p>
+    <p>なお、このグラフは意欲の達成運を見るものでもあるため、同じ読み方で結婚以外の願いごとがいつ叶うかも予測できます。</p>
+
+    <div class="signs">
+      <div class="go"><b>好機のサイン</b><p>男性は実棒の最盛時、女性は点棒の最盛期。結婚の時期から、男性の点棒・女性の実棒が上昇に向かう。</p></div>
+      <div class="st"><b>警戒のサイン</b><p>二人のグラフの点棒・実棒が、同時に低位にあるか下降をたどる時期（離婚の危機）。</p></div>
+    </div>
+
+    <h3>本書の事例（結婚）</h3>
+    <div class="case">
+      <p class="who2">上皇陛下（当時 皇太子殿下）</p>
+      <p class="fig">図5　21〜27歳　点棒Ⓟ35・Ⓦ33／実棒Ⓜ23・Ⓤ9　（姓の位置に「継」20画）</p>
+      <button class="try" data-ex="継明仁">この事例の画数で計算する</button>
+      <ol class="tl">
+        <li><b>21〜24歳</b>点棒は下降。</li>
+        <li><b>24歳後半〜25歳</b>点棒が好転し、対外的に最も恵まれた好機を迎える。若い女性の憧れを集め、「テニスコートの恋」が芽生えた時期と推察される。</li>
+        <li><b>23〜25歳</b>実棒は23歳を底として、24歳、25歳へと急上昇。</li>
+        <li><b>25歳</b>ご成婚。実棒の最盛期にあたる。一方で点棒は24歳でかなり低下しており、意欲は盛んでも、まとめるまでには苦労の多い環境にあったと推察される。</li>
+      </ol>
+      <p>点棒が結婚の時期に低下していても、実棒が上昇して高い位置にあれば、自分の処理力で停滞を制し、理想的な恋愛を実らせることができる、という例です。</p>
+    </div>
+    <div class="case">
+      <p class="who2">上皇后陛下（正田美智子様）</p>
+      <p class="fig">図6　20〜26歳　点棒Ⓟ36・Ⓦ35／実棒Ⓜ12・Ⓤ10</p>
+      <button class="try" data-ex="正田美智子">この事例の画数で計算する</button>
+      <ol class="tl">
+        <li><b>20〜21歳</b>点棒は安定上昇。実棒が低く、愛情面での意欲的な目標は特になかったと考えられる。</li>
+        <li><b>22歳</b>点棒が急上昇し、愛情面の環境（相手に好かれる状態）に恵まれてくる。しかし実棒は低く、意欲の方はこの問題を避けたいという緊張状態にあったと考えられる。</li>
+        <li><b>24歳</b>ご成婚。点棒は最盛期となり、実棒も急上昇して、自分の方からも心が向かう形になる。結婚の具体化を表している。</li>
+      </ol>
+    </div>
+    <div class="case">
+      <p class="who2">理想的な見合い結婚（図7）</p>
+      <p class="fig">図7　20〜26歳</p>
+      <ol class="tl">
+        <li><b>22歳</b>実棒が底をつき、上昇に転じる。</li>
+        <li><b>23歳</b>点棒が最盛期。周囲の人が見合い話をたくさん持ってくるのは、こういう状態のときである。実棒が多少低くても、自ら進んで見合いをし、話をまとめる努力が望まれる。この好機を逃すと、将来大きな悔いを残す縁談だったと気づくことになる。</li>
+      </ol>
+    </div>
+    <div class="case">
+      <p class="who2">結婚後に苦労した見合い結婚（図8・著者の知人女性）</p>
+      <p class="fig">図8　20〜27歳</p>
+      <ol class="tl">
+        <li><b>24歳</b>点棒の最盛時（相手に好かれる状態）に、たいへん幸福な見合い結婚。</li>
+        <li><b>〜27歳前半</b>夫の商売不振でトラブルが続き、実家に帰ることもあって離婚話が出る。点棒・実棒とも下降。</li>
+        <li><b>27歳後半</b>待望の子の誕生で、どうにか安定（実棒が上昇）。その後は結婚による改姓で人生グラフが変わり、次第に幸福な生活を送るようになった。</li>
+      </ol>
+    </div>
+
+    <h3>離婚の危機</h3>
+    <p>離婚の危機を調べるときも、同じ点棒Ⓟ—Ⓦと実棒Ⓜ—Ⓤを用います。危ないのは、<b>二人のグラフ</b>の点棒・実棒が同時に低い位置にあるか、下降をたどっている時です。離婚は私生活の問題ですから、芸名ではなく戸籍名で見ます。</p>
+    <p>さらに総合診断として、二人それぞれの姓名にある相乗力と反発力（内部の矛盾）、そして二人の相性度を併せて見ます。反発力の組を持つ人は、反発期に入るとその矛盾が表に出て、家庭環境を突発的に壊すことがあります。</p>
+    <p>本書は、反発期を過ぎれば以前にも増して仲良くなれる場合があるとして、一時の混乱で離婚に踏み切らず別居にとどめる、改名によって私生活の相性度を高める、といった努力を勧めています。</p>
+
+    <h3>本書の事例（離婚）</h3>
+    <div class="case">
+      <p class="who2">高倉健さん（戸籍名 小田敏政）</p>
+      <p class="fig">図9　36〜42歳　点棒Ⓟ29・Ⓦ28／実棒Ⓜ10・Ⓤ12</p>
+      <button class="try" data-ex="小田敏政">この事例の画数で計算する</button>
+      <ol class="tl">
+        <li><b>37歳</b>点棒（環境）の悪化が始まる。</li>
+        <li><b>39歳</b>実棒（感情）も急速に下降。不安感や不信感を広げる難題の出現を意味する。</li>
+        <li><b>41歳</b>点棒も実棒も底をつき、離婚に至った。</li>
+      </ol>
+    </div>
+    <div class="case">
+      <p class="who2">江利チエミさん（戸籍名 小田智恵美）</p>
+      <p class="fig">図10　30〜36歳　点棒Ⓟ43・Ⓦ42／実棒Ⓜ10・Ⓤ13</p>
+      <button class="try" data-ex="小田智恵美">この事例の画数で計算する</button>
+      <ol class="tl">
+        <li><b>33〜34歳</b>点棒は33歳、実棒は34歳を頂点として、揃って急速な下降を示し始める。</li>
+        <li><b>35歳</b>グラフはさらに悪化し、離婚に至った。</li>
+      </ol>
+    </div>
+
+    <h4>姓名分析による総合診断</h4>
+    <p>高倉健さんは良い画数を揃えていますが、相乗力（Ⓟ29とⓆ29）に対して、反発力の組がⓈ（所得活動）15画「理想進展の運」とⓍ（家庭環境）30画「高速横転の運」です。仕事に熱中すればするほど、反発期に入って家庭環境を突発的に壊す、という内部矛盾を抱えていたことになります。</p>
+    <p>江利チエミさんは、Ⓤ13画「才気活発の運」、Ⓥ31画「志節温厚の運」、Ⓞ41画「衆望包括の運」と立派な画数を持ち、相乗力はⓅ43とⓍ43、Ⓠ42とⓌ42の二組です。反発力はⓉ（家庭貯蓄）17画「片面勝利の運」とⓃ（愛情思念）34画「先鋭後折の運」の一組で、家庭の蓄えに専念して成果を上げていたのが、突然の悲哀（実姉との金銭問題）に転じる形を示しています。</p>
+    <p>二人の相性度は、完全相性（31画と27画の二組）で12点、補佐相性（末尾が0・1・2・7の四組）で13点、合計25点。これに対し反相性は21画と42画（江利さん側に二つ）の一組で18点あり、二人が共に上昇する時期には43点ある相性度が、反発期にはわずか7点に落ちてしまいます。江利さんのⓆとⓌの42画「多種多芸の運、流動的な変化性」と、高倉さんのⓃの21画「率先指揮の運、強いプライド」は、共に上昇する時期には強く惹かれ合う一方、反発期には逆転して互いを憎み合うことにもなる組合せです。</p>
+    <p>図11は、この反相性の画数どうしのグラフ（点棒は高倉さんの21の組合せ、実棒は江利さんの42の組合せ）を重ねたものです。高倉さんの21は38歳から下降して低い位置を横ばいし、江利さんの42は33歳を頂点に下降、離婚した35歳で最低位に落ちています。高倉さんの点棒が42歳から好転しているのは、それまでの悩みから解放されたことを意味します。</p>
+  </div>
+</section>
+
+<!-- ============ セックス ============ -->
+<section class="panel" id="sex" role="tabpanel" hidden>
+  <h2 class="ttl">セックス</h2>
+  <p class="sub">あなたの中の上昇時、下降時　<span class="page-ref">pp.163–165</span></p>
+  <div class="gview" data-field="sex"></div>
+  <div class="prose">
+    <h3>読み方の要点</h3>
+    <p>性生活・夫婦生活の調子は、愛情をめぐる環境を示す点棒Ⓞ—Ⓠ（愛情環境性）と、愛情にかかわる自分の思いを示す実棒Ⓣ—Ⓝ（愛情思考性）の組合せで見ます。</p>
+    <p>この分野では、点棒の「環境」はほとんどの場合、相手のこと、つまり相手の健康や相手の気持ちを指します。実棒は自分の側の心配や喜びです。</p>
+    <p>夫婦それぞれのグラフを並べると、一方の不調が他方の点棒にどう映るかがよく見えます。二人の両棒が揃って上向く時期が、心身ともに充実した夫婦生活の時期です。低迷期には、相手の快復や好転の時期を見通して待つことが、焦りや不和を防ぎます。</p>
+    <div class="signs">
+      <div class="go"><b>好機のサイン</b><p>両棒が同時に上昇。夫婦のグラフが揃って上を向く。</p></div>
+      <div class="st"><b>警戒のサイン</b><p>点棒の急降下（相手の不調）。実棒の「心配」が、それより先に動き出すこともある。</p></div>
+    </div>
+
+    <h3>本書の事例</h3>
+    <div class="case">
+      <p class="who2">今倉正諦さん（中小企業の社長）</p>
+      <p class="fig">図16　40〜47歳　点棒Ⓞ35・Ⓠ37／実棒Ⓣ15・Ⓝ23</p>
+      <button class="try" data-ex="今倉正諦">この事例の画数で計算する</button>
+      <p>奥さんが婦人科の手術を受け、病状が思わしくなく2年も入院しました。退院後もはかばかしくなく、夫婦生活もうまくいきません。愛妻家で浮気もできず、ひとりで悶々と悩んだ末に相談に来た人です。</p>
+      <ol class="tl">
+        <li><b>40歳</b>実棒に、心配の始まりが現れる。</li>
+        <li><b>42歳</b>42歳まで安定していた点棒が急降下。奥さんの病状が悪化し入院。</li>
+        <li><b>44歳</b>実棒は底をついて徐々に上向き、44歳の後半に奥さんが退院。点棒は45歳まで下降を続け、病状が全快していないことを示す。</li>
+        <li><b>45歳</b>実棒の上昇が、退院の喜びをよく表している。しかし点棒は底に達し、相手（奥さんの病状と夫婦生活）が再び悪化。この時期に相談に来た。</li>
+        <li><b>46歳〜</b>点棒・実棒とも上昇し、順調に好転。著者は、もうしばらく奥さんの快復を待てば素晴らしい夫婦生活ができると説明した。</li>
+      </ol>
+    </div>
+    <div class="case">
+      <p class="who2">今倉三枝子さん（正諦さんの奥さん）</p>
+      <p class="fig">図17　33〜40歳　点棒Ⓞ28・Ⓠ29／実棒Ⓣ13・Ⓝ15</p>
+      <button class="try" data-ex="今倉三枝子">この事例の画数で計算する</button>
+      <ol class="tl">
+        <li><b>33〜34歳</b>点棒は33歳、実棒は34歳を頂点に、揃って下降し始める。健康の不安定さの表れ。</li>
+        <li><b>35歳〜</b>両方のグラフが同時に急速な下降（入院）。</li>
+        <li><b>37〜38歳</b>実棒の好転で健康をとりもどし退院。ただし38歳までは点棒・実棒とも低迷しており、夫に満足な務めを果たせなかったことを示す。</li>
+        <li><b>39歳</b>夫と同じく、点棒も実棒も揃って急上昇。退院後のスランプから脱した。</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 人生最大の危機 ============ -->
+<section class="panel" id="kiki" role="tabpanel" hidden>
+  <h2 class="ttl">人生最大の危機</h2>
+  <p class="sub">人生の波を乗り越えるために　<span class="page-ref">pp.169–174</span></p>
+  <div class="gview" data-field="kiki"></div>
+  <div class="prose">
+    <h3>読み方の要点</h3>
+    <p>人生には経済生活の危機と精神生活の危機があり、職業生活の危機もあります。ここでは精神面（点棒Ⓟ—Ⓠ＝精神環境性、実棒Ⓜ—Ⓝ＝精神処理性）と経済面（点棒Ⓞ—Ⓡ＝経済環境性、実棒Ⓢ—Ⓣ＝経済感情性）の二つのグラフを並べ、過去にさかのぼって照らし合わせます。</p>
+    <p>大切なのは、二つの面が同時に最悪になるかどうかです。一方がどん底でも、もう一方が上昇していれば、それが命綱になります。</p>
+    <p>さらに姓名分析の総合判断、すなわち精神面・経済面・社会面の三面の点数と、内部矛盾を生む反発数の有無を重ねると、危機に耐える力の質が見えてきます。</p>
+    <div class="signs">
+      <div class="go"><b>持ちこたえる形</b><p>一方の面の急落を、もう一方の面の上昇が支えている。</p></div>
+      <div class="st"><b>警戒のサイン</b><p>精神・経済の両面が、同時に長く低迷する時期。</p></div>
+    </div>
+
+    <h3>本書の事例</h3>
+    <div class="case">
+      <p class="who2">横井庄一さん（グアム島で28年間の潜伏生活）</p>
+      <p class="fig">図20 精神面・図21 経済面　昭和16〜47年（26〜57歳）　精神 点棒Ⓟ29・Ⓠ29／実棒Ⓜ22・Ⓝ9　経済 点棒Ⓡ31・Ⓞ27／実棒Ⓢ21・Ⓣ10</p>
+      <button class="try" data-ex="横井庄一">この事例の画数で計算する</button>
+      <ol class="tl">
+        <li><b>昭和19年7月</b>グアム島玉砕。精神面は大きく急落したが、経済面は点棒・実棒とも上昇の過程にあった。この激戦で死を免れたのは、経済面の上昇ゆえと推定される。</li>
+        <li><b>〜昭和25年</b>精神・経済の両面とも希望があり、新しいジャングルの生活に打ち勝つ体力もあった。</li>
+        <li><b>昭和26〜29年</b>大変な時期。とくに28年と29年は、両面とも複雑で嫌な問題が続き、苦しい絶望の日々だったと思われる。</li>
+        <li><b>昭和30〜32年</b>やや逆境にも慣れ、生きるための新しい目標に希望を持ち始める。旧軍隊の敗残者としての生活に区切りをつけ、グアム島定住へと生活様式が変わる時期。</li>
+        <li><b>昭和32年</b>志知さん・中畠さんとの別居問題。精神面は大きなショックを受け、淋しさ厳しさを味わう。これに対し経済面は急速な伸展を示し、昭和35年には独り立ちの生活が完成したと推測される。</li>
+        <li><b>〜昭和38年</b>グアム島生活の最良の歳月。</li>
+        <li><b>昭和38〜39年</b>さまざまな出来事（精神面）が、孤独な絶望感に落ち込む転機となる。昭和39年、志知さんと中畠さんが中毒死。前途への生きがいを失い、生ける屍のような精神生活を送ったと思われる。</li>
+        <li><b>昭和39〜47年</b>救出までの精神面は最悪の状態。普通の人なら自殺するほどの逆境で、到底生きてはいられないグラフの波動である。これを辛うじて支えたのは経済面の力で、昭和42年からはむしろ巻き返し気味の上昇を示す。</li>
+        <li><b>昭和47年1月</b>救出。57歳の前半にあたる。</li>
+      </ol>
+      <h4>三人のグラフの比較（図22 中畠悟さん・図23 志知幹夫さん）</h4>
+      <p>米軍のグアム島占領の年には三人とも大きなショックを受けています。その後、横井さんと志知さんは昭和29年まで一途に衰退を示すのに対し、中畠さんだけは26年から上昇に転じています。横井さんと別居した32年は、中畠さん・志知さんにとってもかなりのショックでしたが、その後はむしろ好転につながっています。中毒死する2年前の37年までは、二人ともグアム島上陸以来最も安定した日々だったと想像されます。</p>
+      <p>ただ中畠さんは、別居以来、点棒が下降の一途をたどり、36年以後は精神の処理力まで急速に衰え、39年までは希望もなく、事実上重い病気にかかっていたと想定されます。中畠さんの最後の4年間は、横井さん・志知さんが最良の歳月であったのに比べ、最悪の歳月でした。</p>
+      <h4>姓名分析による総合判断</h4>
+      <table class="ref">
+        <thead><tr><th>面</th><th>数と点</th><th>計</th></tr></thead>
+        <tbody>
+          <tr><td>精神面</td><td>Ⓜ22画＝9点　Ⓝ9画＝7点　Ⓟ29画＝42点　Ⓠ29画＝42点</td><td>100点〈順調〉</td></tr>
+          <tr><td>経済面</td><td>Ⓢ21画＝47点　Ⓣ10画＝13点　Ⓞ27画＝16点　Ⓡ31画＝49点</td><td>125点〈好調〉</td></tr>
+          <tr><td>社会面</td><td>Ⓤ7画＝25点　Ⓥ25画＝31点　Ⓦ28画＝8点　Ⓧ30画＝28点</td><td>92点〈変調〉</td></tr>
+          <tr><td>総計</td><td>317点（3分の1で106点）</td><td>〈順調〉</td></tr>
+        </tbody>
+      </table>
+      <p>経済面が最も高く、社会面が低い数値は、強い個性となって現れます。Ⓤ7画「一念堅持の運」とⓌ28画「難題処理の運」は準相性の関係にあり、一つのことを思いつめ、七難八苦をことごとく吸い寄せる性質を持ちます。志知さん・中畠さんには内部矛盾を生む反発数が多かったのに対し、横井さんには反発数がなかったことが、生還の鍵になったと思われます。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 病気 ============ -->
+<section class="panel" id="byoki" role="tabpanel" hidden>
+  <h2 class="ttl">病気</h2>
+  <p class="sub">どんな時、注意するか　<span class="page-ref">pp.166–168</span></p>
+  <div class="gview" data-field="byoki"></div>
+  <div class="prose">
+    <h3>読み方の要点</h3>
+    <p>病気の予測は、点棒Ⓡ—Ⓦ（社会環境）と実棒Ⓞ—Ⓧ（家庭環境）の組合せで見ます。</p>
+    <p>注意したいのは、日頃から身体を鍛えている人とそうでない人とでは、同じようにグラフが下降していても症状が違ってくることです。また目まぐるしく変わる現代社会で忙しく働いていると、悪性の腫瘍や内臓の病気、公害病などにかかっていても、すっかり悪化するまで見過ごしがちです。本人が気づかないうちに病気が迫っていることを、グラフが示している場合があるのです。</p>
+    <p>点棒が下位に低迷し、実棒が上位で上昇しているときは、環境の悪化を意欲で持ちこたえている状態です。その実棒が頂点をつき、下降し始めるときが発病の危険期です。反対に点棒が上位、実棒が下位にある形は、突発的な交通事故や災害に遭う恐れを示します。</p>
+    <p>いうまでもなく、日頃から心身を鍛えておくことが、病気にかかりにくい第一の条件です。</p>
+    <div class="signs">
+      <div class="go"><b>快復のサイン</b><p>両棒が底をつき、後半から上昇に転じる。とくに点棒の急上昇は、快復を転機にした積極的な活動を示す。</p></div>
+      <div class="st"><b>警戒のサイン</b><p>点棒低迷・実棒高位から、実棒が頂点を打って下降へ（発病）。点棒上位・実棒下位（事故・災害）。</p></div>
+    </div>
+    <h4>補助として見るグラフ</h4>
+    <ul class="aux" id="byoki-aux"></ul>
+
+    <h3>本書の事例</h3>
+    <div class="case">
+      <p class="who2">石原裕次郎さん</p>
+      <p class="fig">図18　34〜40歳　点棒Ⓡ46・Ⓦ44／実棒Ⓞ43・Ⓧ45</p>
+      <button class="try" data-ex="石原裕次郎">この事例の画数で計算する</button>
+      <p>あれほどのタフガイで鳴らした人が、36歳で健康を害し療養生活を送りました。</p>
+      <ol class="tl">
+        <li><b>35歳後半</b>点棒・実棒とも下降に転じる。翌36歳の棒が下降していることから、35歳は後半から下降したと推定する。</li>
+        <li><b>36歳</b>発病。</li>
+        <li><b>37歳前半</b>おおむね底をつき、実棒は上昇に転じる。病気が快復に向かったことを示す。</li>
+        <li><b>〜38歳前半</b>点棒はまだ下降しており、しばらくは社会活動に気をつける必要がある。</li>
+        <li><b>39〜40歳</b>大幅な上昇。快適な健康状態をとりもどす。</li>
+      </ol>
+    </div>
+    <div class="case">
+      <p class="who2">岸洋子さん（本名 小山洋子）</p>
+      <p class="fig">図19　33〜39歳　点棒Ⓡ25・Ⓦ21／実棒Ⓞ20・Ⓧ24</p>
+      <button class="try" data-ex="岸洋子">この事例の画数で計算する</button>
+      <p>昭和45年の秋に難病にかかり、郷里の山形でかなり長い療養生活を送りました。著者はその年の春、マネージャーからの相談を受けて、秋に病気で倒れる恐れがあるので何かと注意しておくよう予測していました。私生活でも岸洋子の名を使っていたため、この名で調べています。</p>
+      <ol class="tl">
+        <li><b>35歳後半</b>点棒・実棒とも急下降。発病の時期。</li>
+        <li><b>36歳</b>前半で底をつき、後半から上昇に転じる。</li>
+        <li><b>37歳</b>点棒が急上昇。病気の快復を転機に、岸音楽事務所を発足させるなど積極的な社会活動に。</li>
+        <li><b>38〜39歳</b>38歳で一時的に苦労しそうだが、39歳からの大幅な好転で順調な発展期を迎える。</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<details class="verify">
+  <summary>十二数の算出式と、本書の分析図との照合</summary>
+  <div class="prose">
+    <p>姓の字数を k、名の字数を m とすると、上の点（霊数）は 4−k 個、下の点は 4−m 個、いずれも1画ずつ置かれます。本書の分析図15名分から次の関係を読み取り、全員で照合しました。</p>
+    <table class="ref">
+      <tbody>
+        <tr><td>Ⓞ</td><td>全画数の合計</td><td>Ⓜ</td><td>上点＋姓の合計</td></tr>
+        <tr><td>Ⓝ</td><td>名の合計＋下点</td><td>Ⓟ</td><td>Ⓞ＋上点</td></tr>
+        <tr><td>Ⓠ</td><td>Ⓞ＋下点</td><td>Ⓡ</td><td>Ⓜ＋Ⓝ</td></tr>
+        <tr><td>Ⓣ</td><td>姓の最後の字＋名の最初の字</td><td>Ⓢ</td><td>Ⓡ−Ⓣ</td></tr>
+        <tr><td>Ⓤ</td><td>1＋名の最初の字</td><td>Ⓥ</td><td>Ⓡ−Ⓤ</td></tr>
+        <tr><td>Ⓦ</td><td>Ⓞ＋1</td><td>Ⓧ</td><td>Ⓡ−1</td></tr>
+      </tbody>
+    </table>
+    <p id="vsum"></p>
+    <h3>原典の校正記録</h3>
+    <table class="ref">
+      <thead><tr><th>箇所</th><th>原典の表記</th><th>正</th><th>根拠</th></tr></thead>
+      <tbody>
+        <tr><td>受験　加藤木守さんの分析図 Ⓢ</td><td>21（上段18＋下段3）</td><td>28（上段25＋下段3）</td><td>同じ図のⓇ38・Ⓣ10・Ⓥ31と整合。上段の式は NAMEMASTER.xls の3字姓の実例で確認済み</td></tr>
+        <tr><td>人生最大の危機　横井庄一さんの総合判断 Ⓥ</td><td>本文「Ⓥ25画」</td><td>24画</td><td>分析図の印刷値・算出式ともに24</td></tr>
+        <tr><td>財運　図14 柴田清秀さんの実棒</td><td>巻末図355（索引14-41）の形</td><td>巻末図72（索引16-20）</td><td>巻末原図との目視照合。本文の記述も図72の動きと一致</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="vwrap"><table id="vtable"></table></div>
+</details>
+
+</main>
+
+<footer>
+  牧正人史先生（昭和33年、姓名科学を発見）の人生グラフ体系を、日昇リサーチ株式会社が再構成しています。本ページの解説は原典の要旨を平易に書き改めたもので、図の年齢・画数は原典の分析図によります。
+</footer>
+
+<!-- 巻末人生グラフのデータ（同じフォルダに置く。fetchではなくscriptで読む） -->
+<script src="maki_wave_data.js"></script>
+<script>
+/* ============================================================
+   十二数（Ⓜ〜Ⓧ）の算出
+   ============================================================ */
+const KEYS = ['M','N','O','P','Q','R','S','T','U','V','W','X'];
+const GROUPS = [
+  {name:'精神面', keys:['M','N','P','Q']},
+  {name:'経済面', keys:['S','T','O','R']},
+  {name:'社会面', keys:['U','V','W','X']},
+];
+const mk = k => `<span class="mk">${k}</span>`;
+
+function calc12(S, G){
+  const top = 4 - S.length, bot = 4 - G.length;   // 上点・下点
+  const sS = S.reduce((a,b)=>a+b,0), sG = G.reduce((a,b)=>a+b,0);
+  const O = sS + sG, M = top + sS, N = sG + bot;
+  const P = O + top, Q = O + bot, R = M + N;
+  const T = S[S.length-1] + G[0], Sx = R - T;
+  const U = 1 + G[0], V = R - U, W = O + 1, X = R - 1;
+  return {M,N,O,P,Q,R,S:Sx,T,U,V,W,X};
+}
+
+/* ============================================================
+   本書の事例（画数は分析図から。printed は分析図の印刷値）
+   ============================================================ */
+const EXAMPLES = [
+  {key:'今居芳夫', label:'今居芳夫（仕事の飛躍）', S:[4,8], G:[8,4], printed:'14,14,24,26,26,28,12,16,9,19,25,27', fig:{field:'shigoto', no:'図12', a0:19, a1:26, marks:{22:'入社',25:'合格'}}},
+  {key:'柴田清秀', label:'柴田清秀（財運）', S:[9,5], G:[11,7], printed:'16,20,32,34,34,36,20,16,12,24,33,35', fig:{field:'zaiun', no:'図14', a0:34, a1:42, marks:{35:'独立',39:'金策',40:'注文'}}},
+  {key:'高橋圭三', label:'高橋圭三（独立）', S:[10,16], G:[6,3], printed:'28,11,35,37,37,39,17,22,7,32,36,38', fig:{field:'dokuritsu', no:'図13', a0:37, a1:50, marks:{43:'NHK退社',44:'プロ設立'}}},
+  {key:'加藤木守', label:'加藤木守（受験）', S:[5,19,4], G:[6], printed:'29,9,34,35,37,38,21,10,7,31,35,37', fig:{field:'juken', no:'図15', a0:26, a1:37, marks:{31:'否',32:'なし',33:'否',34:'否',35:'合格'}}},
+  {key:'継明仁', label:'上皇陛下 継・明仁（結婚）', S:[20], G:[8,4], printed:'23,14,32,35,34,37,9,28,9,28,33,36', fig:{field:'kekkon', no:'図5', a0:21, a1:27, marks:{25:'御成婚'}}},
+  {key:'正田美智子', label:'上皇后陛下 正田美智子（結婚）', S:[5,5], G:[9,12,3], printed:'12,25,34,36,35,37,23,14,10,27,35,36', fig:{field:'kekkon', no:'図6', a0:20, a1:26, marks:{24:'御成婚'}}},
+  {key:'小田敏政', label:'高倉健＝小田敏政（離婚）', S:[3,5], G:[11,8], printed:'10,21,27,29,29,31,15,16,12,19,28,30', fig:{field:'kekkon', no:'図9', a0:36, a1:42, marks:{41:'離婚'}}},
+  {key:'小田智恵美', label:'江利チエミ＝小田智恵美（離婚）', S:[3,5], G:[12,12,9], printed:'10,34,41,43,42,44,27,17,13,31,42,43', fig:{field:'kekkon', no:'図10', a0:30, a1:36, marks:{35:'離婚'}}},
+  {key:'今倉正諦', label:'今倉正諦（セックス）', S:[4,10], G:[5,16], printed:'16,23,35,37,37,39,24,15,6,33,36,38', fig:{field:'sex', no:'図16', a0:40, a1:47, marks:{42:'妻入院',44:'妻退院'}}},
+  {key:'今倉三枝子', label:'今倉三枝子（セックス）', S:[4,10], G:[3,8,3], printed:'16,15,28,30,29,31,18,13,4,27,29,30', fig:{field:'sex', no:'図17', a0:33, a1:40, marks:{35:'入院',37:'退院'}}},
+  {key:'横井庄一', label:'横井庄一（人生最大の危機）', S:[16,4], G:[6,1], printed:'22,9,27,29,29,31,21,10,7,24,28,30', fig:{field:'kiki', no:'図20・21', a0:26, a1:55, marks:{29:'米軍占領',42:'別居',49:'両氏死去'}}},
+  {key:'中畠悟', label:'中畠悟（人生最大の危機）', S:[4,10], G:[10], printed:'16,13,24,26,27,29,9,20,11,18,25,28', fig:{field:'kiki', no:'図22（精神面）', a0:16, a1:39, marks:{}}},
+  {key:'志知幹夫', label:'志知幹夫（人生最大の危機）', S:[7,8], G:[13,4], printed:'17,19,32,34,34,36,15,21,14,22,33,35', fig:{field:'kiki', no:'図23（精神面）', a0:20, a1:43, marks:{}}},
+  {key:'石原裕次郎', label:'石原裕次郎（病気）', S:[5,10], G:[12,6,10], printed:'17,29,43,45,44,46,24,22,13,33,44,45', fig:{field:'byoki', no:'図18', a0:34, a1:40, marks:{36:'発病'}}},
+  {key:'岸洋子', label:'岸洋子（病気）', S:[8], G:[9,3], printed:'11,14,20,23,22,25,8,17,10,15,21,24', fig:{field:'byoki', no:'図19', a0:33, a1:39, marks:{35:'発病'}}},
+];
+
+/* ============================================================
+   分野ごとの組合せ（t＝点棒、j＝実棒。並びは本書の図の表記順）
+   ============================================================ */
+const FIELDS = {
+  shigoto:  [{t:['R','W'], tn:'環境性',          j:['S','U'], jn:'処理感情'}],
+  zaiun:    [{t:['O','R'], tn:'経済環境（支出）', j:['T','S'], jn:'経済感情性（収入）'}],
+  dokuritsu:[{t:['R','W'], tn:'職業環境性',      j:['S','U'], jn:'職業感情性'}],
+  juken:    [{t:['P','Q'], tn:'環境性',          j:['M','N'], jn:'感情性（処理力）'}],
+  kekkon:   [{t:['P','W'], tn:'環境性（好かれる）', j:['M','U'], jn:'感情性（愛する）'}],
+  sex:      [{t:['O','Q'], tn:'愛情環境性',      j:['T','N'], jn:'愛情思考性'}],
+  kiki:     [{cap:'精神面', t:['P','Q'], tn:'精神環境性', j:['M','N'], jn:'精神処理性'},
+             {cap:'経済面', t:['R','O'], tn:'経済環境性', j:['S','T'], jn:'経済感情性'}],
+  byoki:    [{t:['R','W'], tn:'社会環境',        j:['O','X'], jn:'家庭環境'}],
+};
+/* namemaster_v5 の十二分野（内線・外線）との対応。記号の組で引く */
+const NM_LINES = {
+  'MS':'健康（内線）','PR':'健康（外線）','PW':'社交（内線）','MU':'社交（外線）',
+  'RW':'所得（内線）','SU':'所得（外線）','OQ':'幸福（内線）','NT':'幸福（外線）',
+  'NV':'技能（内線）','QX':'技能（外線）','UW':'娯楽（内線）','VX':'娯楽（外線）',
+  'TV':'蓄財（内線）','OX':'蓄財（外線）','MN':'愛情（内線）','PQ':'愛情（外線）',
+  'UV':'職業（内線）','WX':'職業（外線）','MP':'性格（内線）','NQ':'性格（外線）',
+  'RS':'能力（内線）','OT':'能力（外線）','ST':'勝負（内線）','OR':'勝負（外線）',
+};
+const nmLine = p => NM_LINES[[...p].sort().join('')] || '対応なし';
+const BYOKI_AUX = [
+  {p:['S','U'], n:'病中の感情。中心線より上なら快復が早く、下なら手間取る'},
+  {p:['T','V'], n:'同じく病中の感情'},
+  {p:['P','Q'], n:'闘病期の見舞いや援助など、周囲の人々の愛情度'},
+  {p:['M','N'], n:'病気や外傷の苦痛の度合い'},
+];
+
+/* ============================================================
+   波形データの接続部
+   maki_wave_data.js の window.makiLookup(a, b) を使う。
+   戻り値 {status:'ok'|'不収録'|'未取得', key, graph, rows:[{age,hi,lo}]}
+   ============================================================ */
+const HAS_DATA = () => typeof window.makiLookup === 'function';
+function getWave(a, b){
+  if (!HAS_DATA()) return {status:'未接続'};
+  // namemaster_v5 と同じく丸めずに引く。索引の上限は60なので、
+  // 60を超える組は「不収録」として表示される。
+  const r = window.makiLookup(a, b);
+  if (r.status !== 'ok') return r;
+  const w = {}; r.rows.forEach(x => { w[x.age] = [x.lo, x.hi]; });
+  return {status:'ok', key:r.key, graph:r.graph, wave:w};
+}
+function waveNote(r, who){
+  if (r.status === 'ok')   return `${who}：巻末 図${r.graph}（索引 ${r.key}）`;
+  if (r.status === '不収録') return `${who}：索引 ${r.key} は原典に収録がありません`;
+  if (r.status === '未取得') return `${who}：索引 ${r.key}→図${r.graph} の波形が未取得です`;
+  return `${who}：波形データ未接続`;
+}
+
+/* ============================================================
+   人生グラフの描画（縦棒＝1年の最低〜最高、実棒＝実線、点棒＝破線）
+   ============================================================ */
+function svgWave(ten, jitsu, caption, band){
+  const W=860, H=262, L=38, R=10, T=26, B=30, n=41, sw=(W-L-R)/n;
+  const y = v => T + (100-v)/100*(H-T-B);
+  const xc = age => L + sw*(age-15+.5);
+  let s = `<svg class="wave" viewBox="0 0 ${W} ${H}" role="img" aria-label="${caption}の人生グラフ">`;
+  if (band){
+    const a0 = Math.max(band.a0,15), a1 = Math.min(band.a1,55);
+    s += `<rect x="${xc(a0)-sw/2}" y="${T-4}" width="${sw*(a1-a0+1)}" height="${H-T-B+4}" class="band"/>`;
+    s += `<text x="${xc(a0)-sw/2+4}" y="${T+10}" class="bandl">本書 ${band.no}</text>`;
+    Object.entries(band.marks||{}).forEach(([age,t])=>{
+      if (age<15 || age>55) return;
+      s += `<text x="${xc(+age)}" y="${T-9}" class="mark">${t}</text>`;
+    });
+  }
+  [0,25,50,75,100].forEach(v=>{
+    s += `<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" class="${v===50?'base':'grid'}"/>`;
+    s += `<text x="${L-6}" y="${y(v)+4}" class="yl">${v}</text>`;
+  });
+  for (let age=15; age<=55; age++){
+    const cx = xc(age);
+    if (age % 5 === 0) s += `<text x="${cx}" y="${H-9}" class="xl">${age}</text>`;
+    if (jitsu && jitsu[age]) { const [a,b]=jitsu[age]; s += `<line x1="${cx-3}" x2="${cx-3}" y1="${y(Math.max(a,b))}" y2="${y(Math.min(a,b))}" class="jb"/>`; }
+    if (ten && ten[age])     { const [a,b]=ten[age];   s += `<line x1="${cx+3}" x2="${cx+3}" y1="${y(Math.max(a,b))}" y2="${y(Math.min(a,b))}" class="tb"/>`; }
+  }
+  if (!ten && !jitsu){
+    const msg = HAS_DATA() ? 'この組合せの波形は原典にありません' : '波形データ未接続';
+    const sub = HAS_DATA() ? '下の注記をご覧ください' : 'このページと同じフォルダに maki_wave_data.js を置くと、満15〜55歳の波形が描かれます';
+    s += `<text x="${W/2}" y="${H/2-30}" class="na">${msg}</text>`;
+    s += `<text x="${W/2}" y="${H/2-6}" class="na2">${sub}</text>`;
+  }
+  return s + '</svg>';
+}
+
+/* ============================================================
+   画面の組み立て
+   ============================================================ */
+let CUR = null, CUR_NAME = '', CUR_EX = null;
+
+function parseStrokes(str){
+  const a = str.split(/[,\s、，・]+/).filter(Boolean).map(Number);
+  if (!a.length || a.some(x=>!Number.isInteger(x) || x<1 || x>40)) return null;
+  return a;
+}
+
+function renderTwelve(){
+  document.getElementById('twelve').innerHTML = GROUPS.map(g =>
+    `<section><h3>${g.name}</h3><dl>${g.keys.map(k=>`<div><dt>${mk(k)}</dt><dd>${CUR[k]}</dd></div>`).join('')}</dl></section>`
+  ).join('');
+  document.getElementById('who').textContent = CUR_NAME ? `表示中：${CUR_NAME}` : '';
+}
+
+function pairHtml(p){ return `${mk(p[0])}${CUR[p[0]]}・${mk(p[1])}${CUR[p[1]]}`; }
+
+function renderFields(){
+  document.querySelectorAll('.gview').forEach(el=>{
+    const field = el.dataset.field, defs = FIELDS[field];
+    const band = (CUR_EX && CUR_EX.fig && CUR_EX.fig.field === field) ? CUR_EX.fig : null;
+    el.innerHTML = defs.map((d, i)=>{
+      const tr = getWave(CUR[d.t[0]], CUR[d.t[1]]);
+      const jr = getWave(CUR[d.j[0]], CUR[d.j[1]]);
+      const cap = d.cap || 'この分野で見る二本';
+      const bd = (band && (field !== 'kiki' || i === 0 || band.no.startsWith('図20'))) ? band : null;
+      return `<div class="gcard">
+        <div class="gcap">${cap}</div>
+        <div class="pairs">
+          <div class="ten"><span class="lbl">点棒</span>${mk(d.t[0])}—${mk(d.t[1])} ${d.tn}<span class="val">${pairHtml(d.t)}</span></div>
+          <div class="jitsu"><span class="lbl">実棒</span>${mk(d.j[0])}—${mk(d.j[1])} ${d.jn}<span class="val">${pairHtml(d.j)}</span></div>
+        </div>
+        <div class="wscroll">${svgWave(tr.wave||null, jr.wave||null, cap, bd)}</div>
+        <div class="legend"><span class="j"></span>実棒（感情）<span class="t"></span>点棒（環境）　縦棒は1年の変動幅、太線は50点の中心線</div>
+        <div class="src">${waveNote(tr,'点棒')}　／　${waveNote(jr,'実棒')}</div>
+        <div class="src">namemaster では　点棒＝${nmLine(d.t)}　実棒＝${nmLine(d.j)}</div>
+      </div>`;
+    }).join('');
+  });
+  document.getElementById('byoki-aux').innerHTML =
+    BYOKI_AUX.map(a=>`<li>${mk(a.p[0])}—${mk(a.p[1])}　<b>${pairHtml(a.p)}</b>　${a.n}</li>`).join('');
+}
+
+function runCalc(name){
+  const S = parseStrokes(document.getElementById('inS').value);
+  const G = parseStrokes(document.getElementById('inG').value);
+  const err = document.getElementById('calc-err');
+  if (!S || !G || S.length>3 || G.length>3){
+    err.textContent = '姓・名とも1〜3字、各字1〜40画の数字をカンマ区切りで入れてください。';
+    return;
+  }
+  err.textContent = '';
+  CUR = calc12(S, G);
+  CUR_NAME = name || `姓 ${S.join('・')}／名 ${G.join('・')}`;
+  if (!name) CUR_EX = null;
+  renderTwelve(); renderFields();
+}
+
+function loadExample(key){
+  const e = EXAMPLES.find(x=>x.key===key); if(!e) return;
+  document.getElementById('inS').value = e.S.join(',');
+  document.getElementById('inG').value = e.G.join(',');
+  document.getElementById('exSel').value = key;
+  CUR_EX = e;
+  runCalc(e.label);
+}
+
+/* 丸囲み英字（Ⓜ〜Ⓧ）を表示用の丸記号に置き換える */
+function circleMarks(root){
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const hits = [];
+  while (walker.nextNode()) if (/[\u24C2-\u24CD]/.test(walker.currentNode.nodeValue)) hits.push(walker.currentNode);
+  hits.forEach(node=>{
+    const span = document.createElement('span');
+    span.innerHTML = node.nodeValue.replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/[\u24C2-\u24CD]/g, ch => mk(String.fromCharCode(ch.charCodeAt(0) - 0x24B6 + 65)));
+    node.replaceWith(...span.childNodes);
+  });
+}
+
+/* 照合表 */
+function renderVerify(){
+  let bad = 0, all = 0;
+  let h = `<thead><tr><th>事例</th>${KEYS.map(k=>`<th>${mk(k)}</th>`).join('')}</tr></thead><tbody>`;
+  EXAMPLES.forEach(e=>{
+    const c = calc12(e.S, e.G), p = e.printed.split(',').map(Number);
+    h += `<tr><td class="nm">${e.key}</td>` + KEYS.map((k,i)=>{
+      all++; if (c[k]!==p[i]) { bad++; return `<td class="bad" title="分析図の印刷値 ${p[i]}">${c[k]}／図${p[i]}</td>`; }
+      return `<td>${c[k]}</td>`;
+    }).join('') + '</tr>';
+  });
+  document.getElementById('vtable').innerHTML = h + '</tbody>';
+  document.getElementById('vsum').innerHTML =
+    `15名×12数＝${all}項目のうち、${all-bad}項目が分析図の印刷値と一致しました。` +
+    `不一致は加藤木守さんの${mk('S')}の1項目です。原本には21と印刷されています（上段18＋下段3）。しかし同じ図の ${mk('R')}38・${mk('T')}10 からは、他の14名全員で成り立つ ${mk('S')}＝${mk('R')}−${mk('T')} により28になります。${mk('V')}31（28／3）も姓の合計28を使っており、図の中で${mk('S')}だけが食い違っています。上段は 1＋加5＋藤19＝25 となるはずのところが18となっています。上段（点＋姓の末字を除く字）の式は、NAMEMASTER.xls の3字姓の実例（姓3字・名2字）で確かめられており、下段3は印刷値と一致するため、原典側の計算違いか誤植と判断し、${mk('S')}＝28 とします。` +
+    `また横井庄一さんの総合判断の本文は「${mk('V')}25画」としていますが、分析図と算出式ではいずれも24です。`;
+}
+
+/* 分野の切り替え（URLの #分野名 で各ページを直接開けます） */
+function showTab(id, writeHash){
+  if (!document.getElementById(id)) id = 'kyotsu';
+  document.querySelectorAll('.panel').forEach(p=>p.hidden = (p.id!==id));
+  document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected', b.dataset.id===id ? 'true':'false'));
+  if (writeHash && location.hash !== '#'+id) history.replaceState(null,'','#'+id);
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  const sel = document.getElementById('exSel');
+  EXAMPLES.forEach(e=>{ const o=document.createElement('option'); o.value=e.key; o.textContent=e.label; sel.appendChild(o); });
+  sel.addEventListener('change', ()=>{ if(sel.value) loadExample(sel.value); });
+  document.getElementById('calcBtn').addEventListener('click', ()=>{ sel.value=''; runCalc(); });
+  ['inS','inG'].forEach(id=>document.getElementById(id).addEventListener('keydown', e=>{ if(e.key==='Enter'){ sel.value=''; runCalc(); } }));
+  document.querySelectorAll('button.try').forEach(b=>b.addEventListener('click', ()=>{
+    loadExample(b.dataset.ex);
+    document.querySelector('.calc').scrollIntoView({block:'start'});
+  }));
+  document.querySelectorAll('#tabs button').forEach(b=>b.addEventListener('click', ()=>showTab(b.dataset.id, true)));
+  window.addEventListener('hashchange', ()=>showTab(location.hash.slice(1)));
+
+  circleMarks(document.querySelector('main'));
+  runCalc('牧正人史（8／5・2・5）');
+  renderVerify();
+  showTab(location.hash.slice(1) || 'kyotsu');
+});
+</script>
+</body>
+</html>
