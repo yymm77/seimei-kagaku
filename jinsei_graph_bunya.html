@@ -692,6 +692,7 @@ footer{max-width:1080px;margin:0 auto;padding:20px 24px 50px;font-size:13px;colo
 
 <!-- 巻末人生グラフのデータ（同じフォルダに置く。fetchではなくscriptで読む） -->
 <script src="maki_core_data.js"></script>
+<script src="maki_aisho.js"></script>
 <script src="maki_wave_data.js"></script>
 <script>
 /* ============================================================
@@ -706,7 +707,10 @@ const GROUPS = [
 const mk = k => `<span class="mk">${k}</span>`;
 
 function calc12(S, G){
-  const top = 4 - S.length, bot = 4 - G.length;   // 上点・下点
+  // 配置枠（原典pp.133–134）：片側3字まで4、6字まで8、9字まで12、それ以上16。英語名にも使う。
+  const fr = n => n <= 3 ? 4 : n <= 6 ? 8 : n <= 9 ? 12 : 16;
+  const f = fr(Math.max(S.length, G.length));
+  const top = f - S.length, bot = f - G.length;   // 上点・下点
   const sS = S.reduce((a,b)=>a+b,0), sG = G.reduce((a,b)=>a+b,0);
   const O = sS + sG, M = top + sS, N = sG + bot;
   const P = O + top, Q = O + bot, R = M + N;
@@ -722,7 +726,8 @@ function kanjiToStrokes(str){
   const chars = [...(str||'').replace(/[\s　]/g,'')];
   const JK = window.MAKI_JK || {};
   const out = [], miss = [];
-  chars.forEach(c=>{ if (JK[c]) out.push(JK[c]); else miss.push(c); });
+  const AL = (window.MakiAisho && window.MakiAisho.ALPHA) || {};
+  chars.forEach(c=>{ if (JK[c]) out.push(JK[c]); else if (AL[c]) out.push(AL[c]); else miss.push(c); });
   return {chars, strokes:out, miss};
 }
 function syncKanji(fill = true){
@@ -734,8 +739,9 @@ function syncKanji(fill = true){
   if (!s.chars.length || !m.chars.length){ info.textContent = ''; return false; }
   if (miss.length){
     const JK = window.MAKI_JK;
-    if (fill) document.getElementById('inS').value = s.chars.map(c=>JK[c]||'?').join(',');
-    if (fill) document.getElementById('inG').value = m.chars.map(c=>JK[c]||'?').join(',');
+    const AL = (window.MakiAisho && window.MakiAisho.ALPHA) || {};
+    if (fill) document.getElementById('inS').value = s.chars.map(c=>JK[c]||AL[c]||'?').join(',');
+    if (fill) document.getElementById('inG').value = m.chars.map(c=>JK[c]||AL[c]||'?').join(',');
     err.textContent = `字画表にない字があります：${miss.join('、')}。下の画数の欄の「?」を、その字の旧字体の画数に書き換えてから「グラフを見る」を押してください。`;
     info.textContent = ''; return false;
   }
@@ -910,8 +916,8 @@ function runCalc(name){
   const S = parseStrokes(document.getElementById('inS').value);
   const G = parseStrokes(document.getElementById('inG').value);
   const err = document.getElementById('calc-err');
-  if (!S || !G || S.length>3 || G.length>3){
-    err.textContent = '姓・名とも1〜3字、各字1〜40画の数字をカンマ区切りで入れてください。';
+  if (!S || !G || S.length>16 || G.length>16){
+    err.textContent = '姓・名とも1〜16字、各字1〜40画の数字をカンマ区切りで入れてください。';
     return;
   }
   err.textContent = '';

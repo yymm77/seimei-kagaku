@@ -128,7 +128,7 @@ footer{max-width:1080px;margin:0 auto;padding:18px 24px 44px;font-size:13px;colo
 
 <h2>二　家族の名前</h2>
 <div class="panel">
-  <p class="hint" style="margin-top:0">原典は、両親の十二の数を2倍した数と2で割った数（反相性）が、子の十二の数に入らないよう求めています。兄弟姉妹も加えられます。姓と名の間は空白で区切ってください（例：中村 一郎）。</p>
+  <p class="hint" style="margin-top:0">原典は、両親の十二の数と反相性になる数が、子の十二の数に入らないよう求めています。反相性は、第2章の定義どおり2倍・8倍、2分の1・8分の1の数で数えます（二人のⓂどうしは数えません）。兄弟姉妹も加えられます。候補ごとに、家族一人ひとりとの相性度（共昇期・反発期）も出します。姓と名の間は空白で区切ってください（例：中村 一郎）。</p>
   <div id="family"></div>
   <div class="row" style="margin-top:6px">
     <button class="sub" type="button" id="addFam">家族を加える</button>
@@ -158,6 +158,7 @@ footer{max-width:1080px;margin:0 auto;padding:18px 24px 44px;font-size:13px;colo
         <option value="key">原典の重要点（男児・女児で異なる）</option>
         <option value="total">十二の数の総合点</option>
         <option value="dom">選んだ分野の点</option>
+        <option value="famDown">家族との相性度（反発期の合計）</option>
       </select>
     </label>
     <label class="f">10点以下の数をいくつまで許すか
@@ -193,7 +194,7 @@ footer{max-width:1080px;margin:0 auto;padding:18px 24px 44px;font-size:13px;colo
 
 <h2>原典の命名の考え方</h2>
 <div class="prose">
-  <p>原典第4章は、まず命名したい子の姓名分析図を作り、両親の十二の数とその反相性（2倍した数と2で割った数）を書き出して、それが子の十二の数に入らないよう気をつけることから始めます。同じ数が二組以上ある名前は個性が強く、勝負に強い人になるとされ、名前の中で反発し合う数は避けるよう注意されています。</p>
+  <p>原典第4章は、まず命名したい子の姓名分析図を作り、両親の十二の数とその反相性（第4章では2倍した数と2で割った数、第2章の定義では8倍・8分の1も含む）を書き出して、それが子の十二の数に入らないよう気をつけることから始めます。同じ数が二組以上ある名前は個性が強く、勝負に強い人になるとされ、名前の中で反発し合う数は避けるよう注意されています。</p>
   <p>男児の場合は、精神面（Ⓝ Ⓟ Ⓠ）を犠牲にしても、職業面（Ⓤ Ⓥ Ⓦ Ⓧ）に良い数をそろえることが第一とされます。女児の場合は反対に、職業面を犠牲にしても、精神面（愛情面）のⓃ Ⓟ Ⓠに良い数が来るようにします。女児のⓊは結婚しても変わらず、Ⓦは玉の輿にのる数とされます。どちらの場合も、Ⓢ Ⓣ Ⓞ Ⓡは重要点です。</p>
   <p>手順は、最初にⓇ（姓から決まるⓂと下段の補数の和より大きい数）を選び、そこからⓃ・Ⓞ・Ⓦ・Ⓧ、さらにⓅ・Ⓠが機械的に決まります。次に名の頭の字の画数（ロ）を選ぶと、Ⓣ・Ⓤ・Ⓢ・Ⓥが決まります。原典はこれを何度も試しながら、よい数がそろうまで繰り返すよう勧めています。このページはその試行を、あり得るすべての組合せについて一度に行います。</p>
   <p>原典の命名シートは2字姓・2字名の型で書かれていますが、上段と下段の補数（点の数）を字数に合わせて置き換えれば、同じ式が姓1〜3字・名1〜3字のすべてに当てはまります。このページはその一つの式で計算しています。</p>
@@ -210,6 +211,7 @@ footer{max-width:1080px;margin:0 auto;padding:18px 24px 44px;font-size:13px;colo
 
 <script src="maki_core_data.js"></script>
 <script src="maki_wave_data.js"></script>
+<script src="maki_aisho.js"></script>
 <script>
 /* ============================================================
    基本の計算（namemaster_v5 の calc と同じ式）
@@ -341,9 +343,20 @@ function evaluate(S, G, sex, fam, forb, doms){
   }
   const counts = {}; vals.forEach(v=>counts[v]=(counts[v]||0)+1);
   const same = Object.entries(counts).filter(([v,n])=>n>=2).map(([v,n])=>`${v}（${n}つ）`);
-  const famNg = KEYS.filter(k=>forb.has(c[k])).map(k=>({k, v:c[k], why:forb.get(c[k])}));
+  // 家族との相性（原典第2章の採点法。maki_aisho.js）
+  const famScores = [], ngMap = new Map();
+  fam.forEach(f=>{
+    const s = window.MakiAisho.score(c, KEYS, f.c, KEYS);
+    famScores.push({rel:f.rel, name:f.name, aisho:s.aisho, han:s.han, up:s.up, down:s.down});
+    s.types['反'].pairs.forEach(pr=>{
+      if (!ngMap.has(pr.a)) ngMap.set(pr.a, []);
+      ngMap.get(pr.a).push(`${f.rel}の${pr.b}${pr.bv}`);
+    });
+  });
+  const famNg = [...ngMap.entries()].map(([k,why])=>({k, v:c[k], why}));
+  const famDown = famScores.reduce((a,x)=>a+x.down, 0);
   const wayScore = way ? wayPos.length*20 + wayCount : 0;
-  return {S, G, c, total, key, dom, low, over, inner, same, famNg, way, wayCount, wayPos, wayPair, wayScore};
+  return {S, G, c, total, key, dom, low, over, inner, same, famNg, famScores, famDown, way, wayCount, wayPos, wayPair, wayScore};
 }
 
 function generate(){
@@ -355,11 +368,12 @@ function generate(){
   const m = +document.querySelector('input[name=mlen]:checked').value;
   const {list:fam, errs} = readFamily();
   if (errs.length){ e2.textContent = errs.join('／'); return; }
-  const forb = forbiddenSet(fam);
+  const forb = null;
   const doms = DOMAINS.filter((d,i)=>document.getElementById('dom'+i).checked);
   let rank = document.getElementById('rank').value;
   if (rank==='way' && !wayOf()){ e2.textContent = '「望む道の画数」で並べるときは、望む道を選んでください'; return; }
   if (rank==='way') rank = 'wayScore';
+  if (rank==='famDown' && !fam.length){ e2.textContent = '「家族との相性度」で並べるときは、家族の名前を入れてください'; return; }
   if (rank==='dom' && !doms.length){ e2.textContent = '「選んだ分野の点」で並べるときは、分野を一つ以上選んでください'; return; }
   const famMode = document.querySelector('input[name=famMode]:checked').value;
   const lowMax = +document.getElementById('lowMax').value;
@@ -405,7 +419,7 @@ const chip = (r, k) => {
 function renderTable(rows, n){
   document.getElementById('result').hidden = false;
   const keyset = KEYPTS[STATE.sex];
-  const rankName = {key:'重要点', total:'総合点', dom:'分野の点', wayScore:'望む道の画数'}[STATE.rank];
+  const rankName = {key:'重要点', total:'総合点', dom:'分野の点', wayScore:'望む道の画数', famDown:'家族との相性度'}[STATE.rank];
   document.getElementById('summary').innerHTML = STATE.relaxed
     ? `あり得る組合せ ${n} 通りの中に、すべての条件を満たすものはありませんでした。家族との反相性や名前の中の反発を避けながら良い数をそろえるのは、それだけ難しいということです。<b>条件に反する点が少ない順</b>に上位 ${rows.length} 通りを示します（「反する点」の列）。`
     : `あり得る組合せ ${n} 通りのうち、条件に合うもの ${STATE.kept.length} 通り。${rankName}の高い順に上位 ${rows.length} 通りを示します。`;
@@ -506,6 +520,11 @@ function renderDetail(r, fromEval){
        家族との反相性：${r.famNg.length? `<span class="flag">${r.famNg.length}か所</span>` : 'なし'}</p>
     <div class="dgrid">${cells}</div>
     ${wayHtml}
+    ${r.famScores && r.famScores.length ? `<h3>家族との相性度（原典第2章の採点法）</h3>
+      <table class="sheet"><tbody><tr><td>家族</td><td>相性数</td><td>反相性数</td><td>共昇期</td><td>反発期</td><td></td></tr>
+      ${r.famScores.map(x=>{ const b = window.MakiAisho.band(x.down); return `<tr><td>${x.rel}（${x.name}）</td><td>${x.aisho}</td><td>${x.han}</td><td><b>${x.up}</b></td><td><b${x.down<0?' class="flag"':''}>${x.down}</b></td><td class="hint">反発期は${b.label}</td></tr>`; }).join('')}
+      </tbody></table>
+      <p class="hint">相性の詳しい内訳は「相性の研究室」で確かめられます。</p>` : ''}
     <h3>命名シート</h3>
     <table class="sheet"><tbody>${sheet.map(([a,b])=>`<tr><td>${a}</td><td><b>${b}</b></td></tr>`).join('')}</tbody></table>
     <p style="font-size:14.5px">${eqs.join('　／　')}</p>
@@ -527,7 +546,7 @@ function evalName(){
   if (errs.length){ e3.textContent = errs.join('／'); return; }
   const doms = DOMAINS.filter((d,i)=>document.getElementById('dom'+i).checked);
   STATE = Object.assign(STATE||{}, {sex, doms, rank: document.getElementById('rank').value});
-  const r = evaluate(sei.strokes, g.strokes, sex, fam, forbiddenSet(fam), doms);
+  const r = evaluate(sei.strokes, g.strokes, sex, fam, null, doms);
   r.label = document.getElementById('evalName').value.trim();
   renderDetail(r, true);
 }
