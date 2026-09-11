@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>命名・改名の研究室｜牧正人史 姓名科学</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600;700&family=Zen+Old+Mincho:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a1208; --paper:#f5f0e8; --gold:#b8960c; --vermillion:#c0392b; --indigo:#1a3a5c;
+  --rule:#d9ccb2; --wash:#ece4d4; --mute:#6b5d48; --jade:#2d6a4f;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Noto Serif JP","游明朝",serif;font-size:16.5px;line-height:1.9;letter-spacing:.02em}
+a{color:var(--indigo)}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+header.mast{background:var(--indigo);color:var(--paper);border-bottom:6px solid var(--gold)}
+.mast-in{max-width:1080px;margin:0 auto;padding:36px 24px 30px}
+.mast h1{font:900 36px/1.3 "Zen Old Mincho",serif;letter-spacing:.12em;margin:0}
+.mast p{margin:10px 0 0;max-width:40em;color:#efe8d8;font-size:15.5px}
+.mast .back{font-size:13px;color:#e6d9a8;text-decoration:none}
+main{max-width:1080px;margin:0 auto;padding:26px 24px 80px}
+h2{font:700 21px/1.5 "Zen Old Mincho",serif;color:var(--indigo);border-left:6px solid var(--gold);padding-left:12px;margin:44px 0 12px}
+h3{font:700 17px/1.5 "Noto Serif JP",serif;margin:22px 0 6px}
+.prose p{margin:0 0 .9em;max-width:42em}
+.warn{border:2px solid var(--ink);background:#fffdf8;padding:18px 22px;max-width:48em}
+.warn b.t{display:block;font:700 18px "Zen Old Mincho",serif;margin-bottom:6px}
+.warn p{margin:0 0 .6em}
+.panel{border:1px solid var(--rule);background:#fbf8f2;padding:18px 22px;margin:14px 0}
+.row{display:flex;flex-wrap:wrap;gap:12px 22px;align-items:flex-end}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--mute)}
+input[type=text],select{font:16px "Noto Serif JP",serif;padding:7px 10px;border:1px solid #bfae8a;background:#fff;color:var(--ink)}
+input[type=text]{min-width:11em}
+fieldset{border:0;padding:0;margin:0}
+fieldset legend{font-size:14px;color:var(--mute);margin-bottom:4px}
+.radios label{margin-right:14px;font-size:15.5px;white-space:nowrap}
+.checks{display:flex;flex-wrap:wrap;gap:4px 16px}
+.checks label{font-size:15px;white-space:nowrap}
+button{font:700 15px "Noto Serif JP",serif;background:var(--indigo);color:var(--paper);border:0;padding:9px 20px;cursor:pointer;letter-spacing:.08em}
+button:hover{background:#244b73}
+button.sub{background:none;color:var(--indigo);border:1px solid var(--indigo);font-weight:600;padding:5px 12px;font-size:13.5px}
+button.sub:hover{background:var(--indigo);color:var(--paper)}
+.hint{font-size:13.5px;color:var(--mute);margin:6px 0 0}
+.err{color:var(--vermillion);font-size:14px;min-height:1.3em;margin-top:6px}
+.fam-row{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin-bottom:8px}
+.fam-row .who{font-size:14px;color:var(--mute);min-width:15em}
+.mk{display:inline-flex;align-items:center;justify-content:center;width:1.5em;height:1.5em;border:1.4px solid currentColor;border-radius:50%;font:700 .72em/1 "Noto Serif JP",serif;margin:0 .06em;vertical-align:.12em}
+.mk.key{border-radius:3px}
+/* 候補一覧 */
+.summary{font-size:15px;margin:10px 0}
+.tbl-wrap{overflow-x:auto}
+table.cand{border-collapse:collapse;width:100%;font-size:14px;min-width:860px}
+table.cand th,table.cand td{border-bottom:1px solid var(--rule);padding:6px 6px;text-align:center;white-space:nowrap}
+table.cand th{font-size:12.5px;color:var(--mute);border-bottom:2px solid var(--ink);font-weight:700}
+table.cand tr.c{cursor:pointer}
+table.cand tr.c:hover{background:#f1e8d4}
+table.cand tr.sel{background:#f3e7c2}
+.chip{display:inline-block;min-width:1.9em;padding:0 2px;margin:0 1px;border-radius:2px;font-weight:700}
+.chip.hi{background:#efe0a6}
+.chip.lo{background:#f4d3cd;color:var(--vermillion)}
+.chip.ng{outline:2px solid var(--vermillion)}
+.flag{color:var(--vermillion);font-weight:700}
+/* 詳細 */
+#detail{margin-top:18px}
+.dgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(245px,1fr));gap:0;border:1px solid var(--rule)}
+.dcell{padding:9px 12px;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);font-size:14.5px;line-height:1.7}
+.dcell .n{font:700 22px "Zen Old Mincho",serif;margin:0 6px}
+.dcell .p{font-size:12.5px;color:var(--mute)}
+.dcell.bad{background:#fbe9e5}
+.sheet{border-collapse:collapse;font-size:14.5px;margin:6px 0}
+.sheet td{padding:3px 12px 3px 0}
+.kanji{font-size:19px;letter-spacing:.18em;line-height:1.9;max-height:9.5em;overflow-y:auto;border:1px solid var(--rule);background:#fff;padding:6px 10px}
+svg.wave{width:100%;min-width:620px;height:auto;display:block;background:#fffdf8;border:1px solid var(--rule)}
+svg.wave .grid{stroke:#e4dac6;stroke-width:1}
+svg.wave .base{stroke:var(--ink);stroke-width:1.2}
+svg.wave .yl,svg.wave .xl{font:11px "Noto Serif JP",serif;fill:var(--mute)}
+svg.wave .yl{text-anchor:end}
+svg.wave .xl{text-anchor:middle}
+svg.wave .jb{stroke:var(--ink);stroke-width:2.4}
+svg.wave .tb{stroke:var(--indigo);stroke-width:2.4;stroke-dasharray:3.2 2.4}
+svg.wave .na{font:600 14px "Noto Serif JP",serif;fill:var(--mute);text-anchor:middle}
+.wscroll{overflow-x:auto}
+.legend{font-size:12.5px;color:var(--mute)}
+footer{max-width:1080px;margin:0 auto;padding:18px 24px 44px;font-size:13px;color:var(--mute);border-top:1px solid var(--rule)}
+@media (max-width:700px){ body{font-size:15.5px} .mast h1{font-size:28px} main{padding:20px 14px 60px} }
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <div class="mast-in">
+    <a class="back" href="index.html">← 予測技術門にもどる</a>
+    <h1>命名・改名の研究室</h1>
+    <p>原典『姓名（なまえ）』第4章の命名の手順を、計算で手助けする試作版です。姓と家族の名前、望む人生の方向を入れると、原典の式にかなう名前の画数の組合せを、点数の順に並べます。</p>
+  </div>
+</header>
+
+<main>
+
+<div class="warn" role="note">
+  <b class="t">名前は、その人の一生を左右します</b>
+  <p>牧正人史先生は、両親や兄弟姉妹との相性まで含めて命名するのは大変な苦労を伴う作業であり、人の一生にかかわることだけに、頼まれても軽々には引き受けられない、と語っておられました。</p>
+  <p>このページは、その作業の計算の部分だけを受け持つ研究用の道具です。並ぶ候補は考えるための材料です。名前の響きや字の意味、家族の思いを重ねて、時間をかけて決めてください。</p>
+</div>
+
+<!-- ============ 条件 ============ -->
+<h2>一　名前をつける人</h2>
+<div class="panel">
+  <div class="row">
+    <label class="f">姓（漢字、または画数を「4,7」のように）<input type="text" id="sei" value="中村" aria-describedby="err1"></label>
+    <fieldset class="radios"><legend>性別</legend>
+      <label><input type="radio" name="sex" value="m" checked> 男児</label>
+      <label><input type="radio" name="sex" value="f"> 女児</label>
+    </fieldset>
+    <fieldset class="radios"><legend>名の字数</legend>
+      <label><input type="radio" name="mlen" value="1"> 1字</label>
+      <label><input type="radio" name="mlen" value="2" checked> 2字</label>
+      <label><input type="radio" name="mlen" value="3"> 3字</label>
+    </fieldset>
+  </div>
+  <div class="err" id="err1" role="alert"></div>
+  <p class="hint" id="seiInfo"></p>
+</div>
+
+<h2>二　家族の名前</h2>
+<div class="panel">
+  <p class="hint" style="margin-top:0">原典は、両親の十二の数を2倍した数と2で割った数（反相性）が、子の十二の数に入らないよう求めています。兄弟姉妹も加えられます。姓と名の間は空白で区切ってください（例：中村 一郎）。</p>
+  <div id="family"></div>
+  <div class="row" style="margin-top:6px">
+    <button class="sub" type="button" id="addFam">家族を加える</button>
+    <fieldset class="radios"><legend>反相性のある候補を</legend>
+      <label><input type="radio" name="famMode" value="exclude" checked> 外す</label>
+      <label><input type="radio" name="famMode" value="mark"> 印を付けて残す</label>
+    </fieldset>
+  </div>
+  <p class="hint">「印を付けて残す」は、家族との相性より、望む方向を優先して考えたいときのためのものです。</p>
+</div>
+
+<h2>三　どんな人生を望むか</h2>
+<div class="panel">
+  <fieldset><legend class="hint" style="margin:0 0 6px">伸ばしたい分野（複数可）。選んだ分野の二本の線（内線・外線）の点数を重く見ます。</legend>
+    <div class="checks" id="domains"></div>
+  </fieldset>
+  <div class="row" style="margin-top:14px">
+    <label class="f">並べる順
+      <select id="rank">
+        <option value="key">原典の重要点（男児・女児で異なる）</option>
+        <option value="total">十二の数の総合点</option>
+        <option value="dom">選んだ分野の点</option>
+      </select>
+    </label>
+    <label class="f">10点以下の数をいくつまで許すか
+      <select id="lowMax">
+        <option value="0">0</option><option value="1">1</option><option value="2" selected>2</option><option value="12">制限しない</option>
+      </select>
+    </label>
+    <label class="f" style="flex-direction:row;align-items:center;gap:6px;color:var(--ink)"><input type="checkbox" id="noInner" checked> 名前の中で反発し合う数を含む候補を外す</label>
+  </div>
+  <p class="hint">医者や法律家など、職業の名前から選ぶ機能は、原典の「各分野の特徴のある画数」を取り込んでから加える予定です。今は十二分野で選んでください。</p>
+  <div style="margin-top:14px"><button type="button" id="run">候補を出す</button></div>
+  <div class="err" id="err2" role="alert"></div>
+</div>
+
+<!-- ============ 結果 ============ -->
+<section id="result" hidden>
+  <h2>四　候補の画数</h2>
+  <p class="summary" id="summary"></p>
+  <p class="hint">行を押すと、下に詳しい内容が出ます。数の背景は、金色が40点以上、朱が10点以下。朱の枠は家族との反相性です。□の記号は原典で重要点とされる数です。</p>
+  <div class="tbl-wrap"><table class="cand" id="cand"></table></div>
+</section>
+
+<section id="detail"></section>
+
+<h2>五　考えている名前を確かめる</h2>
+<div class="panel">
+  <div class="row">
+    <label class="f">名（漢字。姓と性別は「一」の欄のものを使います）<input type="text" id="evalName" placeholder="例：一郎"></label>
+    <button type="button" id="evalBtn">確かめる</button>
+  </div>
+  <div class="err" id="err3" role="alert"></div>
+</div>
+
+<h2>原典の命名の考え方</h2>
+<div class="prose">
+  <p>原典第4章は、まず命名したい子の姓名分析図を作り、両親の十二の数とその反相性（2倍した数と2で割った数）を書き出して、それが子の十二の数に入らないよう気をつけることから始めます。同じ数が二組以上ある名前は個性が強く、勝負に強い人になるとされ、名前の中で反発し合う数は避けるよう注意されています。</p>
+  <p>男児の場合は、精神面（Ⓝ Ⓟ Ⓠ）を犠牲にしても、職業面（Ⓤ Ⓥ Ⓦ Ⓧ）に良い数をそろえることが第一とされます。女児の場合は反対に、職業面を犠牲にしても、精神面（愛情面）のⓃ Ⓟ Ⓠに良い数が来るようにします。女児のⓊは結婚しても変わらず、Ⓦは玉の輿にのる数とされます。どちらの場合も、Ⓢ Ⓣ Ⓞ Ⓡは重要点です。</p>
+  <p>手順は、最初にⓇ（姓から決まるⓂと下段の補数の和より大きい数）を選び、そこからⓃ・Ⓞ・Ⓦ・Ⓧ、さらにⓅ・Ⓠが機械的に決まります。次に名の頭の字の画数（ロ）を選ぶと、Ⓣ・Ⓤ・Ⓢ・Ⓥが決まります。原典はこれを何度も試しながら、よい数がそろうまで繰り返すよう勧めています。このページはその試行を、あり得るすべての組合せについて一度に行います。</p>
+  <p>原典の命名シートは2字姓・2字名の型で書かれていますが、上段と下段の補数（点の数）を字数に合わせて置き換えれば、同じ式が姓1〜3字・名1〜3字のすべてに当てはまります。このページはその一つの式で計算しています。</p>
+  <p>改名の場合、戸籍名は変えられないため、改名による実質的な変化は70％にとどまり、戸籍名の影響が30％残るとされます。改名の影響が表れるのは、20代で2年後、30代で3年後です。結婚による改姓も同じです。</p>
+  <p class="hint">典拠：牧正人史『姓名（なまえ）』第4章「人生のすべてが決まる命名・改名のポイント」pp.178–181</p>
+</div>
+
+</main>
+
+<footer>
+  牧正人史先生（昭和33年、姓名科学を発見）の体系を、日昇リサーチ株式会社が再構成しています。字画と数意は、原典の鑑定シート（NAMEMASTER.xls）の字画表と数意表によります。
+</footer>
+
+<script src="maki_core_data.js"></script>
+<script src="maki_wave_data.js"></script>
+<script>
+/* ============================================================
+   基本の計算（namemaster_v5 の calc と同じ式）
+   ============================================================ */
+const KEYS = ['M','N','O','P','Q','R','S','T','U','V','W','X'];
+const mk = (k, key) => `<span class="mk${key?' key':''}">${k}</span>`;
+
+function calc12(S, G){
+  const top = 4 - S.length, bot = Math.max(0, 4 - G.length);
+  const sS = S.reduce((a,b)=>a+b,0), sG = G.reduce((a,b)=>a+b,0);
+  const O = sS + sG, M = top + sS, N = sG + bot;
+  const P = O + top, Q = O + bot, R = M + N;
+  const T = S[S.length-1] + G[0], Sx = R - T;
+  const U = 1 + G[0], V = R - U, W = O + 1, X = R - 1;
+  return {M,N,O,P,Q,R,S:Sx,T,U,V,W,X};
+}
+function sq(n){
+  const t = window.MAKI_SQ; if (!t) return {点数:0, 数意:'—'};
+  const k = Math.max(1, Math.min(60, Math.round(n)));
+  return t[String(k)] || {点数:0, 数意:'—'};
+}
+const pt = n => sq(n).点数;
+
+/* 原典の重要点（□）。男児は職業面、女児は精神面を重く見る */
+const KEYPTS = { m:['R','O','W','X','T','U','S','V'], f:['R','N','O','P','Q','T','S'] };
+
+/* 十二分野（namemaster_v5 の GRAPH_DOMAINS と同じ組合せ） */
+const DOMAINS = [
+  {n:'健康', a:['M','S'], b:['P','R']}, {n:'社交', a:['P','W'], b:['M','U']},
+  {n:'所得', a:['R','W'], b:['S','U']}, {n:'幸福', a:['O','Q'], b:['N','T']},
+  {n:'技能', a:['N','V'], b:['Q','X']}, {n:'娯楽', a:['U','W'], b:['V','X']},
+  {n:'蓄財', a:['T','V'], b:['O','X']}, {n:'愛情', a:['M','N'], b:['P','Q']},
+  {n:'職業', a:['U','V'], b:['W','X']}, {n:'性格', a:['M','P'], b:['N','Q']},
+  {n:'能力', a:['R','S'], b:['O','T']}, {n:'勝負', a:['S','T'], b:['O','R']},
+];
+
+/* ============================================================
+   字画
+   ============================================================ */
+const JK = () => window.MAKI_JK || {};
+function toStrokes(str){
+  str = (str||'').trim();
+  if (!str) return {err:'入力がありません'};
+  if (/[0-9０-９]/.test(str)){
+    const a = str.replace(/[０-９]/g, c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0))
+                 .split(/[,\s、，・]+/).filter(Boolean).map(Number);
+    if (a.some(x=>!Number.isInteger(x)||x<1||x>40)) return {err:'画数は1〜40の数で入れてください'};
+    return {strokes:a, text:a.join('・')+'画'};
+  }
+  const chars = [...str.replace(/\s/g,'')], out = [], miss = [];
+  chars.forEach(c=>{ const v = JK()[c]; if (v) out.push(v); else miss.push(c); });
+  if (miss.length) return {err:`字画表にない字があります：${miss.join('、')}（画数を数字で入れてください）`};
+  return {strokes:out, text:chars.map((c,i)=>c+out[i]).join(' ')};
+}
+let HAN_BY_STROKE = null;
+function hanByStroke(){
+  if (HAN_BY_STROKE) return HAN_BY_STROKE;
+  HAN_BY_STROKE = {};
+  Object.entries(JK()).forEach(([c,v])=>{
+    if (/\p{Script=Han}/u.test(c)) (HAN_BY_STROKE[v] = HAN_BY_STROKE[v] || []).push(c);
+  });
+  return HAN_BY_STROKE;
+}
+
+/* ============================================================
+   家族
+   ============================================================ */
+const FAM_DEFAULT = [['父',''],['母','']];
+function famRow(rel, name){
+  const d = document.createElement('div'); d.className = 'fam-row';
+  d.innerHTML = `<select class="rel" aria-label="続柄">${['父','母','兄','姉','弟','妹','祖父','祖母','その他'].map(r=>`<option${r===rel?' selected':''}>${r}</option>`).join('')}</select>
+    <input type="text" class="fname" placeholder="姓 名" value="${name}" aria-label="家族の姓名">
+    <button class="sub" type="button">外す</button><span class="who"></span>`;
+  d.querySelector('button').onclick = ()=>d.remove();
+  document.getElementById('family').appendChild(d);
+}
+function readFamily(){
+  const list = [], errs = [];
+  document.querySelectorAll('.fam-row').forEach(r=>{
+    const rel = r.querySelector('.rel').value, v = r.querySelector('.fname').value.trim(), who = r.querySelector('.who');
+    who.textContent = '';
+    if (!v) return;
+    const parts = v.split(/[\s　・]+/).filter(Boolean);
+    if (parts.length !== 2){ errs.push(`${rel}：姓と名の間を空白で区切ってください`); return; }
+    const s = toStrokes(parts[0]), g = toStrokes(parts[1]);
+    if (s.err || g.err){ errs.push(`${rel}：${s.err||g.err}`); return; }
+    if (s.strokes.length>3 || g.strokes.length>3){ errs.push(`${rel}：姓・名は3字までです`); return; }
+    const c = calc12(s.strokes, g.strokes);
+    who.innerHTML = KEYS.map(k=>`${mk(k)}${c[k]}`).join(' ');
+    list.push({rel, name:v, c});
+  });
+  return {list, errs};
+}
+function forbiddenSet(fam){
+  const m = new Map();   // 数 → [理由]
+  fam.forEach(f=>KEYS.forEach(k=>{
+    const v = f.c[k];
+    [[v*2, `${f.rel}の${k}${v}の2倍`], [v/2, `${f.rel}の${k}${v}の半分`]].forEach(([x,why])=>{
+      if (Number.isInteger(x) && x>=1){ if(!m.has(x)) m.set(x,[]); m.get(x).push(why); }
+    });
+  }));
+  return m;
+}
+
+/* ============================================================
+   候補の評価
+   ============================================================ */
+function evaluate(S, G, sex, fam, forb, doms){
+  const c = calc12(S, G);
+  const vals = KEYS.map(k=>c[k]);
+  const total = vals.reduce((a,v)=>a+pt(v),0);
+  const key = KEYPTS[sex].reduce((a,k)=>a+pt(c[k]),0);
+  const dom = doms.reduce((a,d)=>a+pt(c[d.a[0]])+pt(c[d.a[1]])+pt(c[d.b[0]])+pt(c[d.b[1]]),0);
+  const low = vals.filter(v=>pt(v)<=10).length;
+  const over = vals.some(v=>v>60);
+  const inner = [];                           // 名前の中の反発（2倍の関係）
+  for (let i=0;i<12;i++) for (let j=i+1;j<12;j++){
+    const a = vals[i], b = vals[j];
+    if (a===2*b || b===2*a) inner.push(`${KEYS[i]}${a}と${KEYS[j]}${b}`);
+  }
+  const counts = {}; vals.forEach(v=>counts[v]=(counts[v]||0)+1);
+  const same = Object.entries(counts).filter(([v,n])=>n>=2).map(([v,n])=>`${v}（${n}つ）`);
+  const famNg = KEYS.filter(k=>forb.has(c[k])).map(k=>({k, v:c[k], why:forb.get(c[k])}));
+  return {S, G, c, total, key, dom, low, over, inner, same, famNg};
+}
+
+function generate(){
+  const e2 = document.getElementById('err2'); e2.textContent = '';
+  const sei = toStrokes(document.getElementById('sei').value);
+  if (sei.err){ e2.textContent = '姓：' + sei.err; return; }
+  if (sei.strokes.length>3){ e2.textContent = '姓は3字までです'; return; }
+  const sex = document.querySelector('input[name=sex]:checked').value;
+  const m = +document.querySelector('input[name=mlen]:checked').value;
+  const {list:fam, errs} = readFamily();
+  if (errs.length){ e2.textContent = errs.join('／'); return; }
+  const forb = forbiddenSet(fam);
+  const doms = DOMAINS.filter((d,i)=>document.getElementById('dom'+i).checked);
+  const rank = document.getElementById('rank').value;
+  if (rank==='dom' && !doms.length){ e2.textContent = '「選んだ分野の点」で並べるときは、分野を一つ以上選んでください'; return; }
+  const famMode = document.querySelector('input[name=famMode]:checked').value;
+  const lowMax = +document.getElementById('lowMax').value;
+  const noInner = document.getElementById('noInner').checked;
+
+  const byS = hanByStroke(), maxS = Math.max(...Object.keys(byS).map(Number));
+  const all = [];
+  for (let ro=1; ro<=maxS; ro++){                 // ロ＝名の頭の字の画数
+    if (!byS[ro]) continue;
+    const haList = m===1 ? [0] : [];
+    if (m===2) for (let ha=1; ha<=maxS; ha++) if (byS[ha]) haList.push(ha);
+    if (m===3) for (let ha=2; ha<=maxS*2; ha++) haList.push(ha);
+    haList.forEach(ha=>{
+      const G = m===1 ? [ro] : m===2 ? [ro, ha] : [ro, ha, 0];   // 3字名は残り2字の合計だけが式に効く
+      if (m===3) G.splice(1, 2, ha - Math.floor(ha/2), Math.floor(ha/2));
+      all.push(evaluate(sei.strokes, G, sex, fam, forb, doms));
+    });
+  }
+  // 条件に反する点の数（家族との反相性は「外す」を選んだときだけ数える）
+  all.forEach(r=>{
+    r.viol = (noInner ? r.inner.length : 0) + Math.max(0, r.low - lowMax) + (famMode==='exclude' ? r.famNg.length : 0);
+  });
+  const ok = all.filter(r => !r.over);
+  let kept = ok.filter(r => r.viol===0), relaxed = false;
+  if (kept.length){
+    kept.sort((a,b)=> (b[rank]-a[rank]) || (b.total-a.total) || (a.famNg.length-b.famNg.length));
+  } else {
+    // すべてを満たす組合せがないときは、反する点の少ない順に示す
+    relaxed = true;
+    kept = ok.slice().sort((a,b)=> (a.viol-b.viol) || (b[rank]-a[rank]) || (b.total-a.total));
+  }
+  STATE = {sex, m, sei, fam, forb, doms, rank, kept, relaxed};
+  renderTable(kept.slice(0,40), all.length);
+}
+let STATE = null;
+
+const chip = (r, k) => {
+  const v = r.c[k], p = pt(v);
+  const cls = ['chip', p>=40?'hi':'', p<=10?'lo':'', r.famNg.some(x=>x.k===k)?'ng':''].join(' ');
+  return `<span class="${cls}" title="${k}${v}：${sq(v).数意}（${p}点）">${v}</span>`;
+};
+function renderTable(rows, n){
+  document.getElementById('result').hidden = false;
+  const keyset = KEYPTS[STATE.sex];
+  const rankName = {key:'重要点', total:'総合点', dom:'分野の点'}[STATE.rank];
+  document.getElementById('summary').innerHTML = STATE.relaxed
+    ? `あり得る組合せ ${n} 通りの中に、すべての条件を満たすものはありませんでした。家族との反相性や名前の中の反発を避けながら良い数をそろえるのは、それだけ難しいということです。<b>条件に反する点が少ない順</b>に上位 ${rows.length} 通りを示します（「反する点」の列）。`
+    : `あり得る組合せ ${n} 通りのうち、条件に合うもの ${STATE.kept.length} 通り。${rankName}の高い順に上位 ${rows.length} 通りを示します。`;
+  const head = `<thead><tr><th>順</th><th>名の頭の字</th><th>残りの字</th><th>名の合計</th>${KEYS.map(k=>`<th>${mk(k, keyset.includes(k))}</th>`).join('')}<th>重要点</th><th>総合点</th><th>分野</th><th>同じ数</th><th>反発</th><th>家族</th>${STATE.relaxed?'<th>反する点</th>':''}</tr></thead>`;
+  const body = rows.map((r,i)=>{
+    const rest = STATE.m===1 ? '—' : STATE.m===2 ? `${r.G[1]}画` : `計${r.G[1]+r.G[2]}画`;
+    return `<tr class="c" data-i="${i}"><td>${i+1}</td><td>${r.G[0]}画</td><td>${rest}</td><td>${r.G.reduce((a,b)=>a+b,0)}画</td>
+      ${KEYS.map(k=>`<td>${chip(r,k)}</td>`).join('')}
+      <td><b>${r.key}</b></td><td>${r.total}</td><td>${STATE.doms.length? r.dom : '—'}</td>
+      <td>${r.same.length}</td><td>${r.inner.length? `<span class="flag">${r.inner.length}</span>` : '○'}</td>
+      <td>${r.famNg.length? `<span class="flag">${r.famNg.length}</span>` : '○'}</td>${STATE.relaxed?`<td class="flag">${r.viol}</td>`:''}</tr>`;
+  }).join('');
+  const t = document.getElementById('cand');
+  t.innerHTML = head + `<tbody>${body || '<tr><td colspan="23">組合せがありません。</td></tr>'}</tbody>`;
+  t.querySelectorAll('tr.c').forEach(tr=>tr.onclick = ()=>{
+    t.querySelectorAll('tr.sel').forEach(x=>x.classList.remove('sel')); tr.classList.add('sel');
+    renderDetail(rows[+tr.dataset.i], false);
+  });
+  document.getElementById('detail').innerHTML = '';
+}
+
+/* ============================================================
+   詳細（命名シート・十二の数・字の候補・グラフ）
+   ============================================================ */
+function svgWave(ten, jitsu){
+  const W=860, H=230, L=38, R=10, T=14, B=28, n=41, sw=(W-L-R)/n, y=v=>T+(100-v)/100*(H-T-B);
+  let s = `<svg class="wave" viewBox="0 0 ${W} ${H}" role="img" aria-label="人生グラフ">`;
+  [0,25,50,75,100].forEach(v=>{ s+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" class="${v===50?'base':'grid'}"/><text x="${L-6}" y="${y(v)+4}" class="yl">${v}</text>`; });
+  for (let age=15; age<=55; age++){
+    const cx = L + sw*(age-15+.5);
+    if (age%5===0) s += `<text x="${cx}" y="${H-8}" class="xl">${age}</text>`;
+    if (jitsu && jitsu[age]){ const [a,b]=jitsu[age]; s+=`<line x1="${cx-3}" x2="${cx-3}" y1="${y(b)}" y2="${y(a)}" class="jb"/>`; }
+    if (ten && ten[age]){ const [a,b]=ten[age]; s+=`<line x1="${cx+3}" x2="${cx+3}" y1="${y(b)}" y2="${y(a)}" class="tb"/>`; }
+  }
+  if (!ten && !jitsu) s += `<text x="${W/2}" y="${H/2}" class="na">この組合せの波形は原典に収録がありません</text>`;
+  return s + '</svg>';
+}
+function wave(a, b){
+  if (typeof window.makiLookup !== 'function') return {w:null, note:'波形データ未接続'};
+  const r = window.makiLookup(a, b);
+  if (r.status !== 'ok') return {w:null, note:`索引 ${r.key}：${r.status}`};
+  const w = {}; r.rows.forEach(x=>w[x.age]=[x.lo, x.hi]);
+  return {w, note:`巻末 図${r.graph}（索引 ${r.key}）`};
+}
+
+function renderDetail(r, fromEval){
+  const {c, S, G} = r, sex = (STATE||{}).sex || document.querySelector('input[name=sex]:checked').value;
+  const keyset = KEYPTS[sex];
+  const top = 4 - S.length, bot = Math.max(0, 4 - G.length);
+  const sS = S.reduce((a,b)=>a+b,0), sG = G.reduce((a,b)=>a+b,0);
+  const i = S[S.length-1], ro = G[0], ha = sG - ro, ni = sS, ho = sG;
+  const he = top + sS - i, to = ha + bot, chi = top - 1 + sS;
+  const sheet = [
+    ['上段補数（上の点）', top], ['リ＝下段補数（下の点）', bot], ['イ＝姓の末字', i], ['ニ＝姓の合計', ni],
+    ['ロ＝名の頭の字', ro], ['ハ＝名の残りの字', ha], ['ホ＝名の合計（ロ＋ハ）', ho],
+    ['ヘ＝上段補数＋姓の合計−イ', he], ['ト＝ハ＋リ', to], ['チ＝上段補数−1＋ニ', chi],
+  ];
+  const eqs = [
+    `${mk('R',1)} ${c.R} ＞ ${mk('M')}${c.M}＋リ${bot}`, `${mk('R')}−${mk('M')}＝${mk('N')} ${c.N}`, `ニ＋ホ＝${mk('O')} ${c.O}`,
+    `${mk('O')}＋1＝${mk('W')} ${c.W}`, `${mk('R')}−1＝${mk('X')} ${c.X}`, `${mk('O')}＋上段補数＝${mk('P')} ${c.P}`, `${mk('O')}＋リ＝${mk('Q')} ${c.Q}`,
+    `イ＋ロ＝${mk('T')} ${c.T}`, `1＋ロ＝${mk('U')} ${c.U}`, `ヘ＋ト＝${mk('S')} ${c.S}`, `チ＋ト＝${mk('V')} ${c.V}`,
+  ];
+  const cells = KEYS.map(k=>{
+    const v = c[k], s = sq(v), ng = r.famNg.find(x=>x.k===k);
+    return `<div class="dcell${ng?' bad':''}">${mk(k, keyset.includes(k))}<span class="n">${v}</span>${s.数意}<br><span class="p">${s.点数}点${keyset.includes(k)?'・重要点':''}${ng?`　家族と反相性（${ng.why.join('、')}）`:''}</span></div>`;
+  }).join('');
+  const byS = hanByStroke();
+  const kanjiBox = (n, label) => `<h3>${label}（${n}画）</h3><div class="kanji">${(byS[n]||[]).join('') || '字画表に該当する字がありません'}</div>`;
+  let kanji = '';
+  if (!fromEval){
+    kanji = kanjiBox(ro, '名の頭の字の候補');
+    if (G.length===2) kanji += kanjiBox(ha, '二字目の候補');
+    if (G.length===3) kanji += `<p class="hint">3字名は、二字目と三字目の画数の合計が ${ha} 画になるように選びます（式に効くのは合計だけです）。</p>`;
+  }
+  const doms = (STATE && STATE.doms.length) ? STATE.doms : DOMAINS.filter(d=>d.n === (sex==='m' ? '職業' : '愛情'));
+  const graphs = doms.map(d=>{
+    const a = wave(c[d.a[0]], c[d.a[1]]), b = wave(c[d.b[0]], c[d.b[1]]);
+    return `<h3>${d.n}　内線 ${mk(d.a[0])}${c[d.a[0]]}・${mk(d.a[1])}${c[d.a[1]]}（実線）／外線 ${mk(d.b[0])}${c[d.b[0]]}・${mk(d.b[1])}${c[d.b[1]]}（破線）</h3>
+      <div class="wscroll">${svgWave(b.w, a.w)}</div><p class="legend">内線：${a.note}　外線：${b.note}</p>`;
+  }).join('');
+  const title = fromEval ? `「${r.label}」の十二の数` : `名の頭の字 ${ro}画・残り ${G.length===1?'なし':ha+'画'} の組合せ`;
+  document.getElementById('detail').innerHTML = `
+    <h2>${title}</h2>
+    <p>重要点 <b>${r.key}</b>　総合点 <b>${r.total}</b>${STATE&&STATE.doms.length?`　分野の点 <b>${r.dom}</b>`:''}　
+       同じ数：${r.same.length? r.same.join('、') : 'なし'}　名前の中の反発：${r.inner.length? `<span class="flag">${r.inner.join('、')}</span>` : 'なし'}　
+       家族との反相性：${r.famNg.length? `<span class="flag">${r.famNg.length}か所</span>` : 'なし'}</p>
+    <div class="dgrid">${cells}</div>
+    <h3>命名シート</h3>
+    <table class="sheet"><tbody>${sheet.map(([a,b])=>`<tr><td>${a}</td><td><b>${b}</b></td></tr>`).join('')}</tbody></table>
+    <p style="font-size:14.5px">${eqs.join('　／　')}</p>
+    ${kanji}
+    <h2 style="margin-top:30px">人生グラフ</h2>
+    ${graphs}`;
+  document.getElementById('detail').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function evalName(){
+  const e3 = document.getElementById('err3'); e3.textContent = '';
+  const sei = toStrokes(document.getElementById('sei').value);
+  if (sei.err){ e3.textContent = '姓：' + sei.err; return; }
+  const g = toStrokes(document.getElementById('evalName').value);
+  if (g.err){ e3.textContent = '名：' + g.err; return; }
+  if (g.strokes.length>3){ e3.textContent = '名は3字までです'; return; }
+  const sex = document.querySelector('input[name=sex]:checked').value;
+  const {list:fam, errs} = readFamily();
+  if (errs.length){ e3.textContent = errs.join('／'); return; }
+  const doms = DOMAINS.filter((d,i)=>document.getElementById('dom'+i).checked);
+  STATE = Object.assign(STATE||{}, {sex, doms, rank: document.getElementById('rank').value});
+  const r = evaluate(sei.strokes, g.strokes, sex, fam, forbiddenSet(fam), doms);
+  r.label = document.getElementById('evalName').value.trim();
+  renderDetail(r, true);
+}
+
+/* ============================================================
+   初期化
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', ()=>{
+  document.querySelectorAll('.prose p, .warn p').forEach(p=>{
+    p.innerHTML = p.innerHTML.replace(/[\u24C2-\u24CD]/g, ch => mk(String.fromCharCode(ch.charCodeAt(0)-0x24B6+65)));
+  });
+  document.getElementById('domains').innerHTML = DOMAINS.map((d,i)=>
+    `<label><input type="checkbox" id="dom${i}"> ${d.n}</label>`).join('');
+  FAM_DEFAULT.forEach(([r,n])=>famRow(r,n));
+  document.getElementById('addFam').onclick = ()=>famRow('兄','');
+  document.getElementById('run').onclick = generate;
+  document.getElementById('evalBtn').onclick = evalName;
+  const showSei = ()=>{
+    const s = toStrokes(document.getElementById('sei').value);
+    document.getElementById('err1').textContent = s.err || '';
+    document.getElementById('seiInfo').textContent = s.err ? '' : `姓の画数：${s.text}`;
+  };
+  document.getElementById('sei').addEventListener('input', showSei); showSei();
+  if (!window.MAKI_SQ || !window.MAKI_JK)
+    document.getElementById('err2').textContent = '字画表・数意表（maki_core_data.js）が読み込めていません。このページと同じフォルダに置いてください。';
+});
+</script>
+</body>
+</html>
