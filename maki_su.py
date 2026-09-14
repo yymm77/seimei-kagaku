@@ -226,13 +226,13 @@ def crop_save(a, c, pad_y, pad_x, scale, path):
     if scale != 1: im = im.resize((im.width*scale, im.height*scale), Image.LANCZOS)
     im.save(path)
 
-def parse_page(png, bands=None, nages=5):
+def parse_page(png, bands=None, nages=5, ytop=0.11, ybot=0.955):
     os.makedirs(WORK, exist_ok=True)
     a, bw = load(png); H = a.shape[0]
     if bands is None:
         bands = auto_bands(a, bw, nages)
         if bands is None: raise RuntimeError('列の位置を見つけられません: '+png)
-    segs = row_segments(bw, int(H*0.11), int(H*0.955))
+    segs = row_segments(bw, int(H*ytop), int(H*ybot))
     # 〔A：B〕列
     abp=[]
     for i,(y0,y1) in enumerate(segs):
