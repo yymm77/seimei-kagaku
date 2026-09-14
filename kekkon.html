@@ -189,17 +189,18 @@ footer{max-width:1080px;margin:0 auto;padding:18px 24px 90px;font-size:13px;colo
 (function(){
   'use strict';
   var JK = window.MAKI_JK || {};
+  function A(id){ return document.getElementById(id); }
   var REI = [
     {na:'吉田桂子・相沢隆一（原典の例）', a:{sei:'吉田',mei:'桂子'}, b:{sei:'相沢',mei:'隆一'}},
     {na:'林寛子・黒沢久雄（原典125頁）',   a:{sei:'林',mei:'寛子'},  b:{sei:'黒沢',mei:'久雄'}},
     {na:'岸田今日子・仲谷昇（原典131頁）', a:{sei:'岸田',mei:'今日子'}, b:{sei:'仲谷',mei:'昇'}}
   ];
 
-  function sideHtml(id,label,ph){
+  function sideHtml(id,label,phSei,phMei){
     return '<h3>'+label+'</h3>'+
       '<div class="row">'+
-      '<label class="f">姓<input type="text" id="'+id+'sei" placeholder="'+ph[0]+'" autocomplete="off"></label>'+
-      '<label class="f">名<input type="text" id="'+id+'mei" placeholder="'+ph[1]+'" autocomplete="off"></label>'+
+      '<label class="f">姓<input type="text" id="'+id+'sei" placeholder="'+phSei+'" autocomplete="off"></label>'+
+      '<label class="f">名<input type="text" id="'+id+'mei" placeholder="'+phMei+'" autocomplete="off"></label>'+
       '</div>'+
       '<div class="row" style="margin-top:8px">'+
       '<label class="f">姓の画数（表にない字のとき）<input type="text" id="'+id+'seik" placeholder="例 6,5" autocomplete="off"></label>'+
@@ -210,13 +211,13 @@ footer{max-width:1080px;margin:0 auto;padding:18px 24px 90px;font-size:13px;colo
   document.getElementById('sideB').innerHTML = sideHtml('B','男性','相沢','隆一');
 
   var sel=document.getElementById('exSel');
-  REI.forEach(function(r,i){ var o=document.createElement('option'); o.value=i; o.textContent=r.na; sel.appendChild(o); });
+  REI.forEach(function(r,i){ var o=document.createElement('option'); o.value=String(i+1); o.textContent=r.na; sel.appendChild(o); });
   sel.addEventListener('change', function(){
-    var r=REI[this.value]; if(!r) return;
+    if(!this.value) return;
+    var r=REI[Number(this.value)-1]; if(!r) return;
     A('Asei').value=r.a.sei; A('Amei').value=r.a.mei; A('Bsei').value=r.b.sei; A('Bmei').value=r.b.mei;
     A('Aseik').value=''; A('Ameik').value=''; A('Bseik').value=''; A('Bmeik').value='';
   });
-  function A(id){ return document.getElementById(id); }
 
   /* 画数を出す。手入力があればそちらを優先する */
   function kakusu(moji, nyuryoku){
@@ -325,7 +326,7 @@ footer{max-width:1080px;margin:0 auto;padding:18px 24px 90px;font-size:13px;colo
         jikiHtml('対人運のめぐる時期', r.tai.jiki, [], h.na)+
         (r.kot ? jikiHtml('結婚好適期', r.kot.koteki, mark, h.na) : '<h3>結婚好適期</h3><p class="hint">結婚後の姓名では、結婚好適期は見ません（原典50頁）。</p>')+
         '<p class="moto">数表が返す形：<code>'+r.nai.types.join(' ')+' ／ '+r.tai.types.join(' ')+
-        (r.kot?' ／ '+r.kot.jiki.map(function(k){return (k.star?'＊':'')+k.age}).join('／'):'')+'</code></p>'+
+        (r.kot?' ／ '+r.kot.koteki.map(function(k){return (k.star?'＊':'')+k.age}).join('／'):'')+'</code></p>'+
         '</section>';
     }
     document.getElementById('hitoA').innerHTML = hitoHtml(a, ra, ba, kasa);
