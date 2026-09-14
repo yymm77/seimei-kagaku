@@ -10,6 +10,45 @@ BANDS5 = {'ab':(230,405), 1:(455,685), 2:(688,915), 3:(918,1145),
           4:(1148,1375), 5:(1378,1605), 'type':(1615,2360)}
 WORK = '/tmp/su'
 
+
+def auto_bands(a, bw, nages=5):
+    """頁ごとに列の位置を見つける。走査のずれに追随するため。"""
+    H, W = a.shape
+    d = bw[int(H*0.12):int(H*0.95), :]
+    cs = d.sum(axis=0)
+    # 全行にわたって墨のない帯＝列の切れ目
+    runs=[]; s=None
+    for x in range(W):
+        if cs[x]==0 and s is None: s=x
+        elif cs[x]!=0 and s is not None:
+            runs.append([s,x]); s=None
+    if s is not None: runs.append([s,W])
+    # 細い墨をはさんだ帯はつなぐ
+    merged=[]
+    for r in runs:
+        if merged and r[0]-merged[-1][1] < 12: merged[-1][1]=r[1]
+        else: merged.append(list(r))
+    gaps=[g for g in merged if g[1]-g[0] >= 18 and 120 < g[0] < W-200]
+    # 連続する切れ目から作った列が、幅も間隔もそろう並びを探す
+    best=None
+    for i in range(len(gaps)-nages):
+        cols=[(gaps[i+k][1], gaps[i+k+1][0]) for k in range(nages)]
+        wid=[c[1]-c[0] for c in cols]
+        st =[c[0] for c in cols]
+        dif=[st[k+1]-st[k] for k in range(nages-1)]
+        if not all(130 <= w <= 215 for w in wid): continue
+        if not all(205 <= t <= 250 for t in dif): continue
+        score = max(wid)-min(wid) + max(dif)-min(dif)
+        if best is None or score < best[0]: best=(score, i, cols)
+    if best is None: return None
+    _, i, cols = best
+    b = {k+1:(cols[k][0]-4, cols[k][1]+4) for k in range(nages)}
+    # 〔A：B〕列は最初の切れ目の手前。頁の端の汚れを拾わないよう幅で切る
+    b['ab'] = (max(0, gaps[i][0]-215), gaps[i][0]+4)
+    # 性格タイプ列は最後の切れ目から、タイプ4個ぶんの幅まで
+    b['type'] = (gaps[i+nages][1]-6, min(W, gaps[i+nages][1]+780))
+    return b
+
 def load(png):
     a = np.array(Image.open(png).convert('L'))
     return a, (a < 128).astype(np.uint8)
@@ -33,16 +72,18 @@ def blobs_of(sub):
 
 def split_asterisk(bw, y0, y1, x0, x1):
     sub = bw[y0:y1, x0:x1]
-    if sub.sum() == 0: return False, x0
+    if sub.sum() == 0: return False, x0, x1
     bl = blobs_of(sub)
-    if len(bl) < 2: return False, x0
+    if len(bl) < 2: return False, x0 + (bl[0][0]-4 if bl else 0), x0 + (bl[-1][1]+4 if bl else x1-x0)
     full = np.where(sub.sum(axis=1) > 0)[0]
     top, bot = full[0], full[-1]; H = bot-top+1
     bs, be = bl[0]
     rs = np.where(sub[:, bs:be].sum(axis=1) > 0)[0]
     h = rs[-1]-rs[0]+1
     ast = (h < H*0.90) and (rs[0] > top + H*0.06)
-    return ast, (x0 + be if ast else x0)
+    if ast:
+        return True, x0 + bl[1][0] - 4, x0 + bl[-1][1] + 4   # 数字だけに詰める
+    return False, x0 + bl[0][0] - 4, x0 + bl[-1][1] + 4
 
 def batch_ocr(paths, whitelist, psm=7):
     """tesseractを1回だけ起動して複数画像を読む"""
@@ -185,9 +226,12 @@ def crop_save(a, c, pad_y, pad_x, scale, path):
     if scale != 1: im = im.resize((im.width*scale, im.height*scale), Image.LANCZOS)
     im.save(path)
 
-def parse_page(png, bands=BANDS5, nages=5):
+def parse_page(png, bands=None, nages=5):
     os.makedirs(WORK, exist_ok=True)
     a, bw = load(png); H = a.shape[0]
+    if bands is None:
+        bands = auto_bands(a, bw, nages)
+        if bands is None: raise RuntimeError('列の位置を見つけられません: '+png)
     segs = row_segments(bw, int(H*0.11), int(H*0.955))
     # 〔A：B〕列
     abp=[]
@@ -200,8 +244,8 @@ def parse_page(png, bands=BANDS5, nages=5):
     for i,(y0,y1) in enumerate(segs):
         for col in range(1, nages+1):
             x0,x1 = bands[col]
-            ast, nx = split_asterisk(bw,y0,y1,x0,x1)
-            cells.append(Cell(i,col,y0,y1,nx,x1,ast))
+            ast, nx, ex = split_asterisk(bw,y0,y1,x0,x1)
+            cells.append(Cell(i,col,y0,y1,nx,ex,ast))
     # 設定を変えながら、約束事に合うまで読み直す
     plans = [(10,10,1),(6,4,2),(14,14,1),(4,2,3),(10,2,2),('full',10,2),('full',6,3)]
     todo = cells
@@ -238,12 +282,24 @@ def parse_page(png, bands=BANDS5, nages=5):
         im = Image.fromarray(a[y0-8:y1+8, x0-8:x1])
         im = im.resize((im.width*2, im.height*2), Image.LANCZOS); im.save(p); tp2.append(p)
     types2 = batch_ocr(tp2, 'SK0123456789- ')
+    tp3=[]
+    for i,(y0,y1) in enumerate(segs):
+        p=f'{WORK}/v{i}.png'; x0,x1=bands['type']
+        im = Image.fromarray(a[y0-4:y1+4, x0:x1])
+        im = im.resize((im.width*3, im.height*3), Image.LANCZOS); im.save(p); tp3.append(p)
+    types3 = batch_ocr(tp3, 'SK0123456789- ')
+    tp4=[]
+    for i,(y0,y1) in enumerate(segs):
+        p=f'{WORK}/w{i}.png'; x0,x1=bands['type']
+        im = Image.fromarray(a[y0-12:y1+12, x0-12:x1])
+        im = im.resize((im.width*2, im.height*2), Image.NEAREST); im.save(p); tp4.append(p)
+    types4 = batch_ocr(tp4, 'SK0123456789- ', psm=6)
     rows=[]
     for i,(y0,y1) in enumerate(segs):
         ages=[c.val for c in cells if c.row==i]
-        tt, why = merge_types(types[i], types2[i])
+        tt, why = merge_types(types[i], types2[i], types3[i], types4[i])
         rows.append({'ab':abs_[i], 'ages':ages, 'types':tt, 'type_why':why,
-                     'types_raw':types[i]+' || '+types2[i]})
+                     'types_raw':' || '.join([types[i],types2[i],types3[i],types4[i]])})
     return rows
 
 def check(rows):
