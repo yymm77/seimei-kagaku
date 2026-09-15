@@ -153,6 +153,7 @@ footer{max-width:1080px;margin:0 auto;padding:18px 24px 90px;font-size:13px;colo
     <div id="hitoB"></div>
     <div id="kasane"></div>
     <div id="aisho"></div>
+    <div id="teire"></div>
   </section>
 
   <h2>この道具が使っているもの</h2>
@@ -254,8 +255,11 @@ footer{max-width:1080px;margin:0 auto;padding:18px 24px 90px;font-size:13px;colo
     var r=REI[Number(this.value)-1]; if(!r) return;
     A('Asei').value=r.a.sei; A('Amei').value=r.a.mei;
     if(MODE==='futari'){ A('Bsei').value=r.b.sei; A('Bmei').value=r.b.mei; }
-    A('Aseik').value=''; A('Ameik').value=''; A('Bseik').value=''; A('Bmeik').value='';
+    ['Aseik','Ameik','Bseik','Bmeik'].forEach(function(k){
+      var el=A(k); el.value=''; el.dataset.teire=''; el.dataset.auto='';
+    });
     A('Aumare').value=''; A('Bumare').value='';
+    jidou();
   });
 
   /* ── 生年（任意）─────────────────────────────
@@ -334,18 +338,30 @@ footer{max-width:1080px;margin:0 auto;padding:18px 24px 90px;font-size:13px;colo
   }
 
   /* 画数を出す。手入力があればそちらを優先する */
+  var TEIRE = false;   /* 画数を手で補った鑑定かどうか */
   function kakusu(moji, nyuryoku){
-    if (nyuryoku && nyuryoku.trim()){
-      var v = nyuryoku.split(/[,、\s]+/).filter(Boolean).map(Number);
-      if (v.some(isNaN)) return {err:'画数は数字で入れてください'};
-      return {list:v};
-    }
+    var v = (nyuryoku||'').split(/[,、\s]+/).filter(Boolean);
     var list=[], nai=[];
-    moji.split('').forEach(function(c){
-      if (JK[c] === undefined) nai.push(c); else list.push(JK[c]);
+    moji.split('').forEach(function(c, i){
+      if (JK[c] !== undefined){ list.push(JK[c]); return; }
+      var t = Number(v[i]);
+      if (v[i] !== undefined && v[i] !== '?' && !isNaN(t) && t > 0){ list.push(t); TEIRE = true; }
+      else nai.push(c);
     });
     if (nai.length) return {err:'字画表にない字があります（'+nai.join('、')+'）。画数の欄に数字で入れてください'};
     return {list:list};
+  }
+
+  /* ── 名前を入れると画数が入る ───────────────────
+     表にある字はその画数を、無い字は「?」を置く。
+     「?」を数字に書き換えていただければ、そのまま鑑定に進む。 */
+  function autoKaku(id, moji){
+    var el = A(id);
+    if (el.dataset.teire === '1') return;        /* 手を入れた欄は書き換えない */
+    el.value = moji.split('').map(function(c){
+      return JK[c] === undefined ? '?' : JK[c];
+    }).join(',');
+    el.dataset.auto = '1';
   }
 
   function hiku(A_, B_, C_, meiJisu, seiJisu){
@@ -387,8 +403,10 @@ footer{max-width:1080px;margin:0 auto;padding:18px 24px 90px;font-size:13px;colo
       '<ul class="obi">'+li+'</ul>';
   }
 
-  document.getElementById('run').addEventListener('click', function(){
-    var err=document.getElementById('err'); err.textContent='';
+  document.getElementById('run').addEventListener('click', function(){ run(true); });
+
+  function run(tejun){          /* tejun … ボタンを押して走らせたときは true */
+    var err=document.getElementById('err'); err.textContent=''; TEIRE=false;
     var out=document.getElementById('out');
     function hito(id, label){
       var sei=A(id+'sei').value.trim(), mei=A(id+'mei').value.trim();
@@ -483,7 +501,9 @@ footer{max-width:1080px;margin:0 auto;padding:18px 24px 90px;font-size:13px;colo
         '<div class="kasane"><h3>お相手も見るときは</h3>'+
         '<p>上の「二人で見る」に切り替えると、二人の好適期が重なる時期と、'+
         '原典の二十五の相性タイプが出ます。</p></div>';
-      out.hidden=false; out.scrollIntoView({behavior:'smooth', block:'start'});
+      teireNote();
+      out.hidden=false;
+      if(tejun) out.scrollIntoView({behavior:'smooth', block:'start'});
       return;
     }
     var ai = makiKekkonAisho({naimen:ra.nai.types, taijin:ra.tai.types},
@@ -497,11 +517,54 @@ footer{max-width:1080px;margin:0 auto;padding:18px 24px 90px;font-size:13px;colo
       '女性の内面性格と男性の対人性格の結びつき＝'+fmt(ai.hyou1)+'<br>'+
       '女性の対人性格と男性の内面性格の結びつき＝'+fmt(ai.hyou2)+'</p>'+
       '</div>';
+    teireNote();
     function fmt(h){ return '＋'+h.plusRaw+' と −'+h.minusRaw+' で合計 '+(h.goukei>0?'＋':'')+h.goukei+' → '+h.kigou+'（'+h.imi+'）'; }
 
     out.hidden=false;
-    out.scrollIntoView({behavior:'smooth', block:'start'});
+    if(tejun) out.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
+  /* ── 名前を入れると、画数が入り、そのまま鑑定に進む ──────
+     日本語入力の途中では走らせない。指が止まって半秒たってから走らせる。 */
+  var machi=null, henkanChu=false;
+  function jidou(){
+    clearTimeout(machi);
+    machi = setTimeout(function(){
+      if(henkanChu) return;
+      autoKaku('Aseik', A('Asei').value.trim());
+      autoKaku('Ameik', A('Amei').value.trim());
+      autoKaku('Bseik', A('Bsei').value.trim());
+      autoKaku('Bmeik', A('Bmei').value.trim());
+      var sorotta = A('Asei').value.trim() && A('Amei').value.trim() &&
+        (MODE!=='futari' || (A('Bsei').value.trim() && A('Bmei').value.trim()));
+      if(!sorotta){ A('out').hidden=true; A('err').textContent=''; return; }
+      run(false);
+    }, 500);
+  }
+  ['Asei','Amei','Bsei','Bmei','Aseik','Ameik','Bseik','Bmeik','Aumare','Bumare'].forEach(function(id){
+    var el=A(id); if(!el) return;
+    el.addEventListener('compositionstart', function(){ henkanChu=true; });
+    el.addEventListener('compositionend', function(){ henkanChu=false; jidou(); });
+    el.addEventListener('input', function(){
+      if(/k$/.test(id)){ this.dataset.teire='1'; this.dataset.auto=''; }
+      else if(/(sei|mei)$/.test(id)){
+        /* 名前が変われば、手で入れた画数は捨てて入れ直す */
+        var k=A(id+'k'); if(k){ k.dataset.teire=''; k.dataset.auto=''; }
+      }
+      jidou();
+    });
   });
+  A('phase').addEventListener('change', jidou);
+
+  function teireNote(){
+    var el=document.getElementById('teire');
+    if(!el) return;
+    if(!TEIRE){ el.innerHTML=''; return; }
+    el.innerHTML='<div class="kasane"><h3>この結果についてのお断り</h3>'+
+      '<p>画数の欄に入れていただいた数を用いています。その字は牧正人史先生の字画表に無く、'+
+      '当方で画数を確かめたものではありません。字画表そのものに載る日まで、'+
+      'この結果は当方の補いによるものとしてお読みください。</p></div>';
+  }
 
   var tt=document.getElementById('toTop');
   addEventListener('scroll', function(){ tt.classList.toggle('show', scrollY>500); });
