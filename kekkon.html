@@ -34,6 +34,11 @@ h3{font:700 17px/1.5 "Noto Serif JP",serif;margin:22px 0 6px}
 .prose p{margin:0 0 .9em;max-width:44em}
 .panel{border:1px solid var(--rule);background:#fbf8f2;padding:18px 22px;margin:14px 0}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.two.solo{grid-template-columns:1fr;max-width:30em}
+/* 見かたの切り替え（一人で見る／二人で見る） */
+.mode{display:flex;gap:0;margin:18px 0 0;border:1px solid var(--indigo);width:max-content}
+.mode button{background:transparent;color:var(--indigo);border:0;padding:9px 20px;font:700 15px "Noto Serif JP",serif;letter-spacing:.06em}
+.mode button.on{background:var(--indigo);color:var(--paper)}
 .side{border:1px solid var(--rule);background:#fff;padding:14px 16px}
 .side h3{margin:0 0 8px;font-family:"Zen Old Mincho",serif}
 .row{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:flex-end}
@@ -117,24 +122,29 @@ footer{max-width:1080px;margin:0 auto;padding:18px 24px 90px;font-size:13px;colo
 <header class="mast"><div class="mast-in">
   <p class="mast-links"><a href="https://yymm77.github.io/">← 玄関</a><a href="index.html">← 予測技術門（トップ）</a></p>
   <h1>結婚の研究室</h1>
-  <p>牧正人史先生の『結婚姓名占術』（昭和56年）を原典とします。姓名から三つの数値を出し、巻末の数表を引いて、愛の心と愛の行動のタイプ、情熱運と対人運のめぐる時期、結婚好適期、そして二人の相性を出します。『姓名（なまえ）』の二十四のポイントとは別の、三点だけを使う体系です。</p>
+  <p>名前から、結婚に縁のめぐる時期が出ます。相手がいなくても、自分の名前だけで見られます。牧正人史先生の『結婚姓名占術』（昭和56年）を原典とし、巻末の数表を引いて、結婚好適期、愛の心と愛の行動のタイプ、情熱運と対人運のめぐる時期、そして二人の相性を出します。『姓名（なまえ）』の二十四のポイントとは別の、三点だけを使う体系です。</p>
 </div></header>
 
 <main>
-  <h2>二つの名前を入れる</h2>
+  <div class="mode" role="group" aria-label="見かたを選ぶ">
+    <button type="button" id="mHitori" class="on">一人で見る</button>
+    <button type="button" id="mFutari">二人で見る</button>
+  </div>
+  <h2 id="inputH2">あなたの名前を入れる</h2>
   <div class="panel">
-    <div class="two">
+    <div class="two solo" id="twoBox">
       <div class="side" id="sideA"></div>
       <div class="side" id="sideB"></div>
     </div>
     <div class="row" style="margin-top:14px">
-      <label class="f">結婚の前後
+      <label class="f" id="phaseLab">結婚の前後
         <select id="phase"><option value="mae">結婚前（いまの姓名）</option><option value="ato">結婚後（女性が男性の姓に改めた場合）</option></select>
       </label>
       <label class="f">本書の実例から<select id="exSel"><option value="">選ぶ</option></select></label>
-      <button type="button" id="run">結婚運を見る</button>
+      <button type="button" id="run">結婚好適期を見る</button>
     </div>
     <div class="err" id="err" role="alert"></div>
+    <p class="hint" id="hintFutari" hidden>結婚後を選ぶと、女性の姓を男性の姓に改めて計算します。</p>
     <p class="hint">日常で名乗っている姓名で見ます。画数は旧字体で数えます。字画表にない字は、画数の欄に数字で入れてください。濁音は清音に2画、半濁音は1画を加えます（原典187頁）。姓と名が3字を超える姓名は、原典の数表の範囲外です。生年を入れると、めぐる時期を西暦でも言い添えます。月まで入れると月まで出ます。</p>
   </div>
 
@@ -211,15 +221,39 @@ footer{max-width:1080px;margin:0 auto;padding:18px 24px 90px;font-size:13px;colo
       '<label class="f">生年（任意。西暦でも和暦でも）<input type="text" id="'+id+'umare" placeholder="例 昭和28年3月／1953" autocomplete="off"></label>'+
       '</div>';
   }
-  document.getElementById('sideA').innerHTML = sideHtml('A','女性','吉田','桂子');
+  document.getElementById('sideA').innerHTML = sideHtml('A','あなた','吉田','桂子');
   document.getElementById('sideB').innerHTML = sideHtml('B','男性','相沢','隆一');
+
+  /* ── 見かたの切り替え ───────────────────────
+     一人で見る … 自分の名前だけ。結婚好適期を先頭に出す。
+     二人で見る … 相手も入れて、重なりと相性まで出す。 */
+  var MODE='hitori';
+  function setMode(m){
+    MODE=m;
+    var h=A('mHitori'), f=A('mFutari');
+    h.classList.toggle('on', m==='hitori'); f.classList.toggle('on', m==='futari');
+    A('sideB').style.display = (m==='futari') ? '' : 'none';
+    A('twoBox').className = 'two' + (m==='futari' ? '' : ' solo');
+    A('phaseLab').style.display = (m==='futari') ? '' : 'none';
+    A('hintFutari').hidden = (m!=='futari');
+    A('inputH2').textContent = (m==='futari') ? '二つの名前を入れる' : 'あなたの名前を入れる';
+    A('run').textContent = (m==='futari') ? '結婚運を見る' : '結婚好適期を見る';
+    A('sideA').querySelector('h3').textContent = (m==='futari') ? '女性' : 'あなた';
+    if(m!=='futari') A('phase').value='mae';
+    A('out').hidden = true;
+    A('err').textContent = '';
+  }
+  A('mHitori').addEventListener('click', function(){ setMode('hitori'); });
+  A('mFutari').addEventListener('click', function(){ setMode('futari'); });
+  setMode('hitori');   /* 初めは一人で見る */
 
   var sel=document.getElementById('exSel');
   REI.forEach(function(r,i){ var o=document.createElement('option'); o.value=String(i+1); o.textContent=r.na; sel.appendChild(o); });
   sel.addEventListener('change', function(){
     if(!this.value) return;
     var r=REI[Number(this.value)-1]; if(!r) return;
-    A('Asei').value=r.a.sei; A('Amei').value=r.a.mei; A('Bsei').value=r.b.sei; A('Bmei').value=r.b.mei;
+    A('Asei').value=r.a.sei; A('Amei').value=r.a.mei;
+    if(MODE==='futari'){ A('Bsei').value=r.b.sei; A('Bmei').value=r.b.mei; }
     A('Aseik').value=''; A('Ameik').value=''; A('Bseik').value=''; A('Bmeik').value='';
     A('Aumare').value=''; A('Bumare').value='';
   });
@@ -369,15 +403,18 @@ footer{max-width:1080px;margin:0 auto;padding:18px 24px 90px;font-size:13px;colo
               A:sum(ks.list)+sum(km.list), B:sum(km.list), C:km.list[0],
               seiJisu:ks.list.length, meiJisu:km.list.length};
     }
-    var a=hito('A','女性'), b=hito('B','男性');
+    var hitori = (MODE!=='futari');
+    var a=hito('A', hitori?'あなた':'女性');
+    var b=hitori ? null : hito('B','男性');
     if(a.err){ err.textContent=a.err; out.hidden=true; return; }
-    if(b.err){ err.textContent=b.err; out.hidden=true; return; }
+    if(b && b.err){ err.textContent=b.err; out.hidden=true; return; }
+    if(!b) b = {meiJisu:1, seiJisu:1};
     if(a.meiJisu>3||b.meiJisu>3||a.seiJisu>3||b.seiJisu>3){
       err.textContent='姓と名が3字を超える姓名は、原典の数表の範囲外です'; out.hidden=true; return;
     }
 
     /* 結婚後は、女性の姓を男性の姓に改める */
-    if(document.getElementById('phase').value==='ato'){
+    if(!hitori && document.getElementById('phase').value==='ato'){
       var ks=kakusu(b.sei, A('Bseik').value);
       a = {na:b.sei+a.mei, sei:b.sei, mei:a.mei, umare:a.umare,
            A:ks.list.reduce(function(x,y){return x+y},0)+a.B, B:a.B, C:a.C,
@@ -385,39 +422,44 @@ footer{max-width:1080px;margin:0 auto;padding:18px 24px 90px;font-size:13px;colo
     }
 
     var ra=hiku(a.A,a.B,a.C,a.meiJisu, a.ato?0:a.seiJisu);
-    var rb=hiku(b.A,b.B,b.C,b.meiJisu, b.seiJisu);
+    var rb=hitori ? null : hiku(b.A,b.B,b.C,b.meiJisu, b.seiJisu);
+    var mine = hitori ? 'あなたの' : '女性の';
     var tarinai=[];
-    if(!ra.nai) tarinai.push('女性の内面性格（'+a.A+'：'+a.B+'）');
-    if(!ra.tai) tarinai.push('女性の対人性格（'+a.A+'：'+a.C+'）');
-    if(!rb.nai) tarinai.push('男性の内面性格（'+b.A+'：'+b.B+'）');
-    if(!rb.tai) tarinai.push('男性の対人性格（'+b.A+'：'+b.C+'）');
+    if(!ra.nai) tarinai.push(mine+'内面性格（'+a.A+'：'+a.B+'）');
+    if(!ra.tai) tarinai.push(mine+'対人性格（'+a.A+'：'+a.C+'）');
+    if(rb && !rb.nai) tarinai.push('男性の内面性格（'+b.A+'：'+b.B+'）');
+    if(rb && !rb.tai) tarinai.push('男性の対人性格（'+b.A+'：'+b.C+'）');
     if(tarinai.length){
       err.textContent='原典の数表の範囲外です：'+tarinai.join('、');
       out.hidden=true; return;
     }
 
     var ba = ra.kot ? makiBands(ra.kot.koteki) : [];
-    var bb = rb.kot ? makiBands(rb.kot.koteki) : [];
+    var bb = (rb && rb.kot) ? makiBands(rb.kot.koteki) : [];
     var kasa = (ba.length&&bb.length) ? kasanariCalc(a.umare, ba, b.umare, bb) : [];
 
-    function hitoHtml(h, r, bands, mark){
+    function hitoHtml(h, r, bands, mark, saki){
+      var koteki = r.kot
+        ? jikiHtml('結婚好適期', r.kot.koteki, mark, h.na, h.umare)
+        : '<h3>結婚好適期</h3><p class="hint">結婚後の姓名では、結婚好適期は見ません（原典50頁）。</p>';
+      var seikaku =
+        '<h3>愛の心（内面性格）</h3>'+typeHtml(r.nai.types,'naimen')+
+        jikiHtml('情熱運のめぐる時期', r.nai.jiki, [], h.na, h.umare)+
+        '<h3>愛の行動（対人性格）</h3>'+typeHtml(r.tai.types,'taijin')+
+        jikiHtml('対人運のめぐる時期', r.tai.jiki, [], h.na, h.umare);
       return '<section class="jinbutsu"><h2>'+h.na+'</h2>'+
         '<p class="hint">Ａ＝'+h.A+'　Ｂ＝'+h.B+'　Ｃ＝'+h.C+
         (h.umare?'　生年 '+h.umare.y+'年'+(h.umare.m?h.umare.m+'月':''):'')+
         (h.ato?'　（結婚後の姓名）':'')+'</p>'+
-        '<h3>愛の心（内面性格）</h3>'+typeHtml(r.nai.types,'naimen')+
-        jikiHtml('情熱運のめぐる時期', r.nai.jiki, [], h.na, h.umare)+
-        '<h3>愛の行動（対人性格）</h3>'+typeHtml(r.tai.types,'taijin')+
-        jikiHtml('対人運のめぐる時期', r.tai.jiki, [], h.na, h.umare)+
-        (r.kot ? jikiHtml('結婚好適期', r.kot.koteki, mark, h.na, h.umare) : '<h3>結婚好適期</h3><p class="hint">結婚後の姓名では、結婚好適期は見ません（原典50頁）。</p>')+
+        (saki ? koteki + seikaku : seikaku + koteki)+
         '<p class="moto">数表が返す形：<code>'+r.nai.types.join(' ')+' ／ '+r.tai.types.join(' ')+
         (r.kot?' ／ '+r.kot.koteki.map(function(k){return (k.star?'＊':'')+k.age}).join('／'):'')+'</code></p>'+
         '</section>';
     }
     document.getElementById('hitoA').innerHTML =
-      hitoHtml(a, ra, ba, kasa.map(function(x){ return x.aAge; }));
-    document.getElementById('hitoB').innerHTML =
-      hitoHtml(b, rb, bb, kasa.map(function(x){ return x.bAge; }));
+      hitoHtml(a, ra, ba, kasa.map(function(x){ return x.aAge; }), hitori);
+    document.getElementById('hitoB').innerHTML = rb ?
+      hitoHtml(b, rb, bb, kasa.map(function(x){ return x.bAge; }), false) : '';
 
     document.getElementById('kasane').innerHTML = kasa.length ?
       '<div class="kasane"><h3>二人の結婚好適期が重なる時期</h3><p>'+
@@ -436,6 +478,14 @@ footer{max-width:1080px;margin:0 auto;padding:18px 24px 90px;font-size:13px;colo
         'お二人の生年を入れると、暦のうえで重なる時期に直します。</p>')+
       '</div>' : '';
 
+    if(!rb){
+      document.getElementById('aisho').innerHTML =
+        '<div class="kasane"><h3>お相手も見るときは</h3>'+
+        '<p>上の「二人で見る」に切り替えると、二人の好適期が重なる時期と、'+
+        '原典の二十五の相性タイプが出ます。</p></div>';
+      out.hidden=false; out.scrollIntoView({behavior:'smooth', block:'start'});
+      return;
+    }
     var ai = makiKekkonAisho({naimen:ra.nai.types, taijin:ra.tai.types},
                              {naimen:rb.nai.types, taijin:rb.tai.types});
     document.getElementById('aisho').innerHTML =
