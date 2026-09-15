@@ -762,6 +762,14 @@ _cntBanner(); cntVisit();
 
     <button class="analyze-btn" id="analyze-btn" onclick="dispatchAnalyze()">解　　析</button>
     <div class="error-msg" id="err"></div>
+    <div id="hokan-box" style="display:none;margin:12px 0 0;padding:14px 16px;border:1px solid #b8960c;background:#fbf8f2">
+      <div style="font-size:14px;line-height:1.9;color:#3a3228">
+        次の字は、牧正人史先生の字画表にありません。旧字体の画数をお調べのうえ、入れてください。
+        牧先生の数え方は、旧字体の字形で数え、部首の読み替えはしません（さんずいは3画のまま）。
+      </div>
+      <div id="hokan-fields" style="display:flex;flex-wrap:wrap;gap:10px 18px;margin:12px 0"></div>
+      <button type="button" id="hokan-btn" style="font:700 14px 'Noto Serif JP',serif;background:#1a3a5c;color:#f5f0e8;border:0;padding:8px 20px;cursor:pointer;letter-spacing:.06em">この画数で鑑定する</button>
+    </div>
 
     <!-- 組織と人の相性へのリンク -->
     <div style="text-align:center;margin-top:14px">
@@ -776,6 +784,7 @@ _cntBanner(); cntVisit();
       <div class="results-name" id="r-name"></div>
       <div class="results-strokes" id="r-strokes"></div>
       <div class="results-template" id="r-tmpl"></div>
+      <div id="r-hokan" style="display:none;margin-top:10px;padding:10px 14px;border-left:4px solid #8b2e2e;background:#fbf6f2;font-size:13.5px;line-height:1.9;color:#5c4a3a;text-align:left"></div>
     </div>
     <div class="legend">
       <div class="legend-item"><div class="legend-dot" style="background:var(--jade)"></div>吉（60点以上）</div>
@@ -2708,14 +2717,18 @@ function analyzeCompat() {
     const sSei = document.getElementById('ca-sei').value.trim();
     const sMei = document.getElementById('ca-mei').value.trim();
     if(!sSei||!sMei){ alert('Aの姓名を入力してください'); return; }
-    const sS = [...sSei].map(c=>JK[c]||1), sM = [...sMei].map(c=>JK[c]||1);
+    const unkA=[...(sSei+sMei)].filter(c=>!JK[c]);
+    if(unkA.length){ alert('Aの姓名に字画表にない字があります（'+unkA.join('、')+'）。この字は旧字体の画数が確かめられていないため、鑑定できません。'); return; }
+    const sS = [...sSei].map(c=>JK[c]), sM = [...sMei].map(c=>JK[c]);
     ptsA = calc(sS, sM);
     nameA = sSei+' '+sMei;
   } else {
     const upper = document.getElementById('ca-upper').value.trim();
     const legal = document.getElementById('ca-legal').value;
     if(!upper){ alert('Aの社名を入力してください'); return; }
-    const upperS = [...upper].map(c=>JK[c]||1);
+    const unkAc=[...upper].filter(c=>!JK[c]);
+    if(unkAc.length){ alert('Aの社名に字画表にない字があります（'+unkAc.join('、')+'）。鑑定できません。'); return; }
+    const upperS = [...upper].map(c=>JK[c]);
     const legalS = legal && LEGAL_STROKES[legal] ? LEGAL_STROKES[legal] : [];
     const sS = compatKabuA==='ko' ? upperS : legalS;
     const sM = compatKabuA==='ko' ? legalS : upperS;
@@ -2728,14 +2741,18 @@ function analyzeCompat() {
     const sSei = document.getElementById('cb-sei').value.trim();
     const sMei = document.getElementById('cb-mei').value.trim();
     if(!sSei||!sMei){ alert('Bの姓名を入力してください'); return; }
-    const sS = [...sSei].map(c=>JK[c]||1), sM = [...sMei].map(c=>JK[c]||1);
+    const unkB=[...(sSei+sMei)].filter(c=>!JK[c]);
+    if(unkB.length){ alert('Bの姓名に字画表にない字があります（'+unkB.join('、')+'）。この字は旧字体の画数が確かめられていないため、鑑定できません。'); return; }
+    const sS = [...sSei].map(c=>JK[c]), sM = [...sMei].map(c=>JK[c]);
     ptsB = calc(sS, sM);
     nameB = sSei+' '+sMei;
   } else {
     const upper = document.getElementById('cb-upper').value.trim();
     const legal = document.getElementById('cb-legal').value;
     if(!upper){ alert('Bの社名を入力してください'); return; }
-    const upperS = [...upper].map(c=>JK[c]||1);
+    const unkBc=[...upper].filter(c=>!JK[c]);
+    if(unkBc.length){ alert('Bの社名に字画表にない字があります（'+unkBc.join('、')+'）。鑑定できません。'); return; }
+    const upperS = [...upper].map(c=>JK[c]);
     const legalS = legal && LEGAL_STROKES[legal] ? LEGAL_STROKES[legal] : [];
     const sS = compatKabuB==='ko' ? upperS : legalS;
     const sM = compatKabuB==='ko' ? legalS : upperS;
@@ -3101,7 +3118,12 @@ function onCompanyInput() {
     : [...lowerText].map(c => JK[c] || 0);
   const B = upperStrokes.reduce((a, b) => a + b, 0);
   const C = lowerStrokes.reduce((a, b) => a + b, 0);
-  if (B > 0 || C > 0) {
+  // 字画表にない字が混じっているときは、合計を出さない（誤った数を見せないため）
+  const lowerCheck2 = (legalKey && LEGAL_STROKES[legalKey]) ? '' : lowerText;
+  const unknownPrev = [...(upperText + lowerCheck2)].filter(c => !JK[c]);
+  if (unknownPrev.length) {
+    splitInfo.textContent = '字画表にない字（' + unknownPrev.join('、') + '）があるため、合計は出せません';
+  } else if (B > 0 || C > 0) {
     splitInfo.textContent = `上段（姓）合計：${B}画　／　下段（名）合計：${C}画　／　総計：${B+C}画`;
   } else {
     splitInfo.textContent = '';
@@ -3128,19 +3150,23 @@ function analyzeCompany() {
   if (!lowerText) { err.style.display='block'; err.textContent='法人格（下段）を入力してください'; return; }
   err.style.display = 'none';
 
+  // 不明文字チェック。字画表にない字があるときは計算しない。
+  // 以前は 1 画として続行していたため、誤った鑑定結果が出ていた（2026-09-15 修正）。
+  const lowerCheck = (legalKey && LEGAL_STROKES[legalKey]) ? '' : lowerText;
+  const unknown = [...(upperText + lowerCheck)].filter(c => !JK[c]);
+  if (unknown.length) {
+    err.style.display = 'block';
+    err.textContent = '字画表にない字があります（' + unknown.join('、')
+      + '）。この字は旧字体の画数が確かめられていないため、鑑定できません。';
+    const res = document.getElementById('result'); if (res) res.style.display = 'none';
+    return;
+  }
+
   // 字画配列を構築
-  const sStrokes = [...upperText].map(c => JK[c] || 1);
+  const sStrokes = [...upperText].map(c => JK[c]);
   const mStrokes = legalKey && LEGAL_STROKES[legalKey]
     ? LEGAL_STROKES[legalKey]
-    : [...lowerText].map(c => JK[c] || 1);
-
-  // 不明文字チェック
-  const upperUnknown = [...upperText].filter(c => !JK[c]);
-  if (upperUnknown.length) {
-    err.style.display = 'block';
-    err.textContent = '字画表にない文字: ' + upperUnknown.join('　') + '（1画として計算します）';
-    // 警告のみで続行
-  }
+    : [...lowerText].map(c => JK[c]);
 
   const pts = calcCompany(sStrokes, mStrokes);
 
@@ -3207,6 +3233,44 @@ function updateTmpl(){
   document.getElementById('tmpl-label').textContent='　'+'X'.repeat(ns||1)+'－'+'X'.repeat(nm||1)+'　テンプレート　';
 }
 
+/* ── 字画表にない字を補う ───────────────────────
+   牧先生の字画表（2,412字）に無い字は、当方で補った画数として扱う。
+   補った字があるときは、結果に必ずその旨を書き添える。
+   補った数が原典や辞書で確かめられたら、字画表そのものに入れて、
+   ここから外すこと。 */
+var HOKAN = {};
+function hokanGet(c){ return (JK[c] !== undefined) ? JK[c] : HOKAN[c]; }
+function hokanShow(chars, saki){
+  var box=document.getElementById('hokan-box'), f=document.getElementById('hokan-fields');
+  f.innerHTML = chars.map(function(c){
+    return '<label style="font-size:14px">'+c+
+      '　<input type="number" min="1" max="60" class="hokan-in" data-c="'+c+'" value="'+(HOKAN[c]||'')+'" '+
+      'style="width:5em;padding:5px 8px;border:1px solid #d9ccb2;font:inherit"> 画</label>';
+  }).join('');
+  box.style.display='block';
+  document.getElementById('hokan-btn').onclick=function(){
+    var nokori=[];
+    [].forEach.call(f.querySelectorAll('.hokan-in'), function(el){
+      var v=Number(el.value);
+      if(v>0) HOKAN[el.getAttribute('data-c')]=v; else nokori.push(el.getAttribute('data-c'));
+    });
+    if(nokori.length){ alert('画数が入っていない字があります（'+nokori.join('、')+'）'); return; }
+    box.style.display='none';
+    document.getElementById('err').style.display='none';
+    saki();
+  };
+}
+function hokanNote(chars){
+  var el=document.getElementById('r-hokan');
+  if(!el) return;
+  if(!chars.length){ el.style.display='none'; el.textContent=''; return; }
+  el.style.display='block';
+  el.innerHTML='この鑑定には、牧先生の字画表に無い字が含まれています（'+
+    chars.map(function(c){ return c+'　'+HOKAN[c]+'画'; }).join('、')+
+    '）。画数は入力された数を用いており、当方で確かめたものではありません。'+
+    '牧先生の字画表そのものに載る日まで、この結果は当方の補いによるものとしてお読みください。';
+}
+
 function analyze(){
   if(typeof FooterCounter!=='undefined')FooterCounter.increment();
   const sv=[...(document.getElementById('sei-input').value.trim())].filter(c=>c);
@@ -3215,10 +3279,21 @@ function analyze(){
   if(!sv.length||!mv.length){err.style.display='block';err.textContent='姓と名をそれぞれ入力してください';return}
   if(sv.length>4||mv.length>4){err.style.display='block';err.textContent='姓・名はそれぞれ最大4字までです';return}
   err.style.display='none';
-  const ss=sv.map(c=>JK[c]),ms=mv.map(c=>JK[c]);
+  const ss=sv.map(c=>hokanGet(c)),ms=mv.map(c=>hokanGet(c));
   document.getElementById('sei-unk').textContent=sv.filter((_,i)=>!ss[i]).length?'字画表にない字: '+sv.filter((_,i)=>!ss[i]).join('　'):'';
   document.getElementById('mei-unk').textContent=mv.filter((_,i)=>!ms[i]).length?'字画表にない字: '+mv.filter((_,i)=>!ms[i]).join('　'):'';
-  const sS=ss.map(v=>v||1),mS=ms.map(v=>v||1);
+  // 字画表にない字があるときは計算しない。
+  // 以前はここで 1 画として扱っていたため、誤った鑑定結果が出ていた（2026-09-15 修正）。
+  const unk=[...new Set([...sv, ...mv])].filter(c=>hokanGet(c)===undefined);
+  if(unk.length){
+    err.style.display='block';
+    err.textContent='字画表にない字があります（'+unk.join('、')+'）。下の欄に画数を入れてください。';
+    hokanShow(unk, analyze);
+    return;
+  }
+  document.getElementById('hokan-box').style.display='none';
+  const sS=sv.map(hokanGet), mS=mv.map(hokanGet);
+  hokanNote([...new Set([...sv, ...mv])].filter(c=>JK[c]===undefined));
   const pts=calc(sS,mS);
   pts.seiChars=sv.slice(); pts.meiChars=mv.slice();
   document.getElementById('r-name').textContent=sv.join('')+'　'+mv.join('');
