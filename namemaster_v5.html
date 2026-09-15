@@ -582,13 +582,13 @@ _cntBanner(); cntVisit();
       <div class="name-row">
         <div class="name-group">
           <label>姓（せい）</label>
-          <input type="text" class="name-text-input" id="sei-input" placeholder="例：山川" maxlength="8" oninput="onNameInput()" onkeydown="if(event.key==='Enter')document.getElementById('mei-input').focus()">
+          <input type="text" class="name-text-input" id="sei-input" placeholder="例：山川／Kennedy" maxlength="16" oninput="onNameInput()" onkeydown="if(event.key==='Enter')document.getElementById('mei-input').focus()">
           <div class="stroke-preview" id="sei-preview"></div>
           <div class="unknown-char" id="sei-unk"></div>
         </div>
         <div class="name-group">
           <label>名（めい）</label>
-          <input type="text" class="name-text-input" id="mei-input" placeholder="例：一美" maxlength="8" oninput="onNameInput()" onkeydown="if(event.key==='Enter')analyze()">
+          <input type="text" class="name-text-input" id="mei-input" placeholder="例：一美／John" maxlength="16" oninput="onNameInput()" onkeydown="if(event.key==='Enter')analyze()">
           <div class="stroke-preview" id="mei-preview"></div>
           <div class="unknown-char" id="mei-unk"></div>
         </div>
@@ -2556,11 +2556,20 @@ function renderGraphs(pts,originYear,birthAge){
 //     Ⓡ K9  … 旧注記は A9+C9 を正としていたが、原典は I5+I13。
 //              三原嘉明・牧正人史の二例では両者が偶然一致するため
 //              誤りが表面化していなかった。
+/* 配置枠（原典21頁 図2〜図4）
+   片側の字数が多いほうで決まる。日本人の姓名は3字までなので4点。
+   外国名・団体名・企業名では 8・12・16 点の枠を使う。
+   ケネディ大統領（Kennedy 7字・John 4字）は枠12で、補数は5と8。原典の分析図と一致。 */
+function haichiWaku(n){
+  return n<=3 ? 4 : n<=6 ? 8 : n<=9 ? 12 : 16;
+}
+
 function calc(s,m){
   const SS = s.reduce((a,b)=>a+b,0);   // 姓の画数合計
   const MS = m.reduce((a,b)=>a+b,0);   // 名の画数合計
-  const P  = 4 - s.length;             // 姓の頭の定数
-  const Q  = 4 - m.length;             // 名の尾の定数
+  const W  = haichiWaku(Math.max(s.length, m.length));  // 配置枠
+  const P  = W - s.length;             // 姓の頭の定数（上の補数）
+  const Q  = W - m.length;             // 名の尾の定数（下の補数）
 
   const I5  = P + SS;                  // Ⓜ
   const I9  = SS + MS;                 // Ⓞ
@@ -2577,10 +2586,10 @@ function calc(s,m){
   const D24 = (I5 - 1) + C14;          // Ⓥ
   const F24 = K9 - 1;                  // Ⓧ
 
-  const cells = {SS,MS,P,Q,C4,C14,I5,C9,K3,I9,K9,A9,D20,I13,D24,F20,F24,K15};
+  const cells = {SS,MS,P,Q,W,C4,C14,I5,C9,K3,I9,K9,A9,D20,I13,D24,F20,F24,K15};
   const template = 'X'.repeat(s.length) + '-' + 'X'.repeat(m.length);
   // 字画図を描くために、各字の画数も持たせておく
-  return {I5,C9,K3,I9,K9,A9,D20,I13,D24,F20,F24,K15,cells,template,
+  return {I5,C9,K3,I9,K9,A9,D20,I13,D24,F20,F24,K15,cells,template,waku:W,
           sStrokes:s.slice(), mStrokes:m.slice()};
 }
 
@@ -3273,11 +3282,14 @@ function hokanNote(chars){
 
 function analyze(){
   if(typeof FooterCounter!=='undefined')FooterCounter.increment();
-  const sv=[...(document.getElementById('sei-input').value.trim())].filter(c=>c);
-  const mv=[...(document.getElementById('mei-input').value.trim())].filter(c=>c);
+  /* 空白・中黒・ピリオド・ハイフンは数えない
+     （原典の分析図でも、Kennedy・John の中黒はⓉに数えていない） */
+  const HAZUSU = /[\s\u3000\u30fb.,\-'’"]/;
+  const sv=[...(document.getElementById('sei-input').value.trim())].filter(c=>c&&!HAZUSU.test(c));
+  const mv=[...(document.getElementById('mei-input').value.trim())].filter(c=>c&&!HAZUSU.test(c));
   const err=document.getElementById('err');
   if(!sv.length||!mv.length){err.style.display='block';err.textContent='姓と名をそれぞれ入力してください';return}
-  if(sv.length>4||mv.length>4){err.style.display='block';err.textContent='姓・名はそれぞれ最大4字までです';return}
+  if(sv.length>12||mv.length>12){err.style.display='block';err.textContent='姓・名はそれぞれ最大12字までです（原典21頁の配置枠は12字まで）';return}
   err.style.display='none';
   const ss=sv.map(c=>hokanGet(c)),ms=mv.map(c=>hokanGet(c));
   document.getElementById('sei-unk').textContent=sv.filter((_,i)=>!ss[i]).length?'字画表にない字: '+sv.filter((_,i)=>!ss[i]).join('　'):'';
