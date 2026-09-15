@@ -135,7 +135,7 @@ footer{max-width:1080px;margin:0 auto;padding:18px 24px 90px;font-size:13px;colo
       <button type="button" id="run">結婚運を見る</button>
     </div>
     <div class="err" id="err" role="alert"></div>
-    <p class="hint">日常で名乗っている姓名で見ます。画数は旧字体で数えます。字画表にない字は、画数の欄に数字で入れてください。濁音は清音に2画、半濁音は1画を加えます（原典187頁）。姓と名が3字を超える姓名は、原典の数表の範囲外です。</p>
+    <p class="hint">日常で名乗っている姓名で見ます。画数は旧字体で数えます。字画表にない字は、画数の欄に数字で入れてください。濁音は清音に2画、半濁音は1画を加えます（原典187頁）。姓と名が3字を超える姓名は、原典の数表の範囲外です。生年を入れると、めぐる時期を西暦でも言い添えます。月まで入れると月まで出ます。</p>
   </div>
 
   <section id="out" hidden>
@@ -150,6 +150,7 @@ footer{max-width:1080px;margin:0 auto;padding:18px 24px 90px;font-size:13px;colo
     <p>姓名のすべての字の画数を合計したものをＡ、名のすべての字の画数を合計したものをＢ、名の最初の字の画数をＣとします（原典42〜43頁）。補数は使いません。Ａは『姓名（なまえ）』のⓄと同じ値です。</p>
     <p>〔Ａ：Ｂ〕で内面性格（愛の心）と情熱運を、〔Ａ：Ｃ〕で対人性格（愛の行動）と対人運を、〔Ａ〕で結婚好適期を引きます。名の字数によって引く数表が変わります。</p>
     <p>年齢の数字は幅ではなく、どれも長さ一年の山の位置です。「19」は19歳の誕生日から20歳の誕生日まで、「19-20」は19歳6か月から20歳6か月まで。＊印は特別に盛りあがりの大きい山です（原典61頁・174〜177頁）。</p>
+    <p>生年は入れても入れなくてもかまいません。入れると、年齢を西暦に直して言い添えます。誕生月まで入れれば月まで出ます。年だけのときは「ごろ」とし、半年ぶんの幅を残します。お二人とも生年が入っているときは、結婚好適期の重なりを年齢どうしではなく暦のうえで数え直します。生年の無いときは年齢どうしの重なりです。</p>
     <p>相性は、二人の性格タイプを突き合わせ、同じ記号どうしを＋、ＳとＫの同番号を−として強さを足し合わせ、合計点を記号に直して25タイプのどれかに当てはめます（原典136〜151頁）。原典の実例11組と照合済みです。</p>
   </div>
 
@@ -205,6 +206,9 @@ footer{max-width:1080px;margin:0 auto;padding:18px 24px 90px;font-size:13px;colo
       '<div class="row" style="margin-top:8px">'+
       '<label class="f">姓の画数（表にない字のとき）<input type="text" id="'+id+'seik" placeholder="例 6,5" autocomplete="off"></label>'+
       '<label class="f">名の画数（同）<input type="text" id="'+id+'meik" placeholder="例 10,3" autocomplete="off"></label>'+
+      '</div>'+
+      '<div class="row" style="margin-top:8px">'+
+      '<label class="f">生年（任意。西暦でも和暦でも）<input type="text" id="'+id+'umare" placeholder="例 昭和28年3月／1953" autocomplete="off"></label>'+
       '</div>';
   }
   document.getElementById('sideA').innerHTML = sideHtml('A','女性','吉田','桂子');
@@ -217,7 +221,83 @@ footer{max-width:1080px;margin:0 auto;padding:18px 24px 90px;font-size:13px;colo
     var r=REI[Number(this.value)-1]; if(!r) return;
     A('Asei').value=r.a.sei; A('Amei').value=r.a.mei; A('Bsei').value=r.b.sei; A('Bmei').value=r.b.mei;
     A('Aseik').value=''; A('Ameik').value=''; A('Bseik').value=''; A('Bmeik').value='';
+    A('Aumare').value=''; A('Bumare').value='';
   });
+
+  /* ── 生年（任意）─────────────────────────────
+     西暦でも和暦でも受ける。月まで入っていれば月まで、
+     入っていなければ年だけを「ごろ」として扱う。
+     "1953" "1953年3月" "1953/3" "昭和28" "昭和28年3月" "S28.3" */
+  var GENGO = {'令和':2018,'平成':1988,'昭和':1925,'大正':1911,'明治':1867,
+               'R':2018,'H':1988,'S':1925,'T':1911,'M':1867};
+  var UMARE_ERR = '生年が読めません（例 昭和28年3月、1953）';
+  function umareYomu(s){
+    if(!s) return {u:null};
+    s = String(s).replace(/\s+/g,'').replace(/[０-９]/g, function(c){
+      return String.fromCharCode(c.charCodeAt(0)-0xFEE0);
+    });
+    if(!s) return {u:null};
+    var y=null, mo=null;
+    var m = s.match(/^(\d{4})(?:年|[-\/.])?(?:(\d{1,2})月?)?$/);
+    if(m){ y=Number(m[1]); mo=m[2]?Number(m[2]):null; }
+    else {
+      m = s.match(/^(令和|平成|昭和|大正|明治|[RrHhSsTtMm])(\d{1,2})年?(?:[-\/.]?(\d{1,2})月?)?$/);
+      if(!m) return {err:UMARE_ERR};
+      var base = GENGO[m[1].toUpperCase()];
+      if(base===undefined) return {err:UMARE_ERR};
+      y = base + Number(m[2]); mo = m[3]?Number(m[3]):null;
+    }
+    if(mo!==null && (mo<1||mo>12)) return {err:'生年の月は1〜12で入れてください'};
+    if(y<1868||y>2100) return {err:UMARE_ERR};
+    return {u:{y:y, m:mo}};
+  }
+
+  /* 年齢を、暦のうえの位置（西暦を小数で表したもの）に直す */
+  function zettai(u, age){ return u.y + (u.m ? (u.m-1)/12 : 0) + age; }
+
+  /* 暦のうえの位置を言葉にする。月が分かっているときだけ月まで出す */
+  function toSeireki(v, tsuki){
+    if(tsuki){ var t = Math.round(v*12); return Math.floor(t/12)+'年'+(t%12+1)+'月'; }
+    return Math.floor(v + 1e-9)+'年';
+  }
+  function toAgeKuwashiku(v){
+    var y = Math.floor(v + 1e-9), m = Math.round((v-y)*12);
+    if(m===12){ y+=1; m=0; }
+    return y+'歳'+(m?m+'か月':'');
+  }
+  /* 帯ひとつを西暦で言い添える */
+  function obiSeireki(u, from, to){
+    if(!u) return '';
+    var t = !!u.m;
+    return '（'+toSeireki(zettai(u,from),t)+'〜'+toSeireki(zettai(u,to),t)+(t?'':'ごろ')+'）';
+  }
+
+  /* 二人の帯を重ねる。生年が両方そろえば暦のうえで、無ければ年齢どうしで。 */
+  function kasanariCalc(ua, ba, ub, bb){
+    if(!(ua && ub)){
+      return makiKasanari(ba,bb).map(function(x){
+        return {from:x.from, to:x.to, years:x.years, bothStrong:x.bothStrong,
+                aAge:{from:x.from,to:x.to}, bAge:{from:x.from,to:x.to}, koyomi:false};
+      });
+    }
+    var out=[], tsuki = !!(ua.m && ub.m);
+    ba.forEach(function(a){ bb.forEach(function(b){
+      var f = Math.max(zettai(ua,a.from), zettai(ub,b.from));
+      var t = Math.min(zettai(ua,a.to),   zettai(ub,b.to));
+      if(t-f <= 0.04) return;
+      var bs = false;
+      if(a.hasStrong && b.hasStrong){
+        var sf = Math.max(zettai(ua,a.strongFrom), zettai(ub,b.strongFrom));
+        var st = Math.min(zettai(ua,a.strongTo),   zettai(ub,b.strongTo));
+        bs = (st - sf) > 0.04;
+      }
+      out.push({from:f, to:t, years:Math.round((t-f)*12)/12, bothStrong:bs,
+                aAge:{from:f-zettai(ua,0), to:t-zettai(ua,0)},
+                bAge:{from:f-zettai(ub,0), to:t-zettai(ub,0)},
+                koyomi:true, tsuki:tsuki});
+    })});
+    return out.sort(function(x,y){ return x.from - y.from; });
+  }
 
   /* 画数を出す。手入力があればそちらを優先する */
   function kakusu(moji, nyuryoku){
@@ -251,14 +331,16 @@ footer{max-width:1080px;margin:0 auto;padding:18px 24px 90px;font-size:13px;colo
     }).join('');
   }
 
-  function jikiHtml(midashi, jiki, marks, label){
+  function jikiHtml(midashi, jiki, marks, label, u){
     if(!jiki) return '';
     var bands = makiBands(jiki);
     var svg = makiKotekiSVG([{label:label, bands:bands, marks:marks||[]}], {aria:label+'の'+midashi});
     var li = bands.map(function(b){
       return '<li class="'+(b.hasStrong?'tsuyoi':'')+'">'+makiToAge(b.from)+' 〜 '+makiToAge(b.to)+
+        (u?' '+obiSeireki(u,b.from,b.to):'')+
         '<span class="memo">'+makiSpanText(b.years)+
-        (b.hasStrong?'／とくに強いのは '+makiToAge(b.strongFrom)+' 〜 '+makiToAge(b.strongTo):'')+'</span></li>';
+        (b.hasStrong?'／とくに強いのは '+makiToAge(b.strongFrom)+' 〜 '+makiToAge(b.strongTo)+
+                     (u?' '+obiSeireki(u,b.strongFrom,b.strongTo):''):'')+'</span></li>';
     }).join('');
     return '<h3>'+midashi+'</h3>'+
       '<div class="hanrei">'+
@@ -280,8 +362,10 @@ footer{max-width:1080px;margin:0 auto;padding:18px 24px 90px;font-size:13px;colo
       var ks=kakusu(sei, A(id+'seik').value), km=kakusu(mei, A(id+'meik').value);
       if(ks.err) return {err:label+'の姓：'+ks.err};
       if(km.err) return {err:label+'の名：'+km.err};
+      var um=umareYomu(A(id+'umare').value);
+      if(um.err) return {err:label+'の'+um.err};
       var sum=function(a){return a.reduce(function(x,y){return x+y},0)};
-      return {na:sei+mei, sei:sei, mei:mei,
+      return {na:sei+mei, sei:sei, mei:mei, umare:um.u,
               A:sum(ks.list)+sum(km.list), B:sum(km.list), C:km.list[0],
               seiJisu:ks.list.length, meiJisu:km.list.length};
     }
@@ -295,7 +379,7 @@ footer{max-width:1080px;margin:0 auto;padding:18px 24px 90px;font-size:13px;colo
     /* 結婚後は、女性の姓を男性の姓に改める */
     if(document.getElementById('phase').value==='ato'){
       var ks=kakusu(b.sei, A('Bseik').value);
-      a = {na:b.sei+a.mei, sei:b.sei, mei:a.mei,
+      a = {na:b.sei+a.mei, sei:b.sei, mei:a.mei, umare:a.umare,
            A:ks.list.reduce(function(x,y){return x+y},0)+a.B, B:a.B, C:a.C,
            seiJisu:ks.list.length, meiJisu:a.meiJisu, ato:true};
     }
@@ -314,29 +398,43 @@ footer{max-width:1080px;margin:0 auto;padding:18px 24px 90px;font-size:13px;colo
 
     var ba = ra.kot ? makiBands(ra.kot.koteki) : [];
     var bb = rb.kot ? makiBands(rb.kot.koteki) : [];
-    var kasa = (ba.length&&bb.length) ? makiKasanari(ba,bb) : [];
+    var kasa = (ba.length&&bb.length) ? kasanariCalc(a.umare, ba, b.umare, bb) : [];
 
     function hitoHtml(h, r, bands, mark){
       return '<section class="jinbutsu"><h2>'+h.na+'</h2>'+
         '<p class="hint">Ａ＝'+h.A+'　Ｂ＝'+h.B+'　Ｃ＝'+h.C+
+        (h.umare?'　生年 '+h.umare.y+'年'+(h.umare.m?h.umare.m+'月':''):'')+
         (h.ato?'　（結婚後の姓名）':'')+'</p>'+
         '<h3>愛の心（内面性格）</h3>'+typeHtml(r.nai.types,'naimen')+
-        jikiHtml('情熱運のめぐる時期', r.nai.jiki, [], h.na)+
+        jikiHtml('情熱運のめぐる時期', r.nai.jiki, [], h.na, h.umare)+
         '<h3>愛の行動（対人性格）</h3>'+typeHtml(r.tai.types,'taijin')+
-        jikiHtml('対人運のめぐる時期', r.tai.jiki, [], h.na)+
-        (r.kot ? jikiHtml('結婚好適期', r.kot.koteki, mark, h.na) : '<h3>結婚好適期</h3><p class="hint">結婚後の姓名では、結婚好適期は見ません（原典50頁）。</p>')+
+        jikiHtml('対人運のめぐる時期', r.tai.jiki, [], h.na, h.umare)+
+        (r.kot ? jikiHtml('結婚好適期', r.kot.koteki, mark, h.na, h.umare) : '<h3>結婚好適期</h3><p class="hint">結婚後の姓名では、結婚好適期は見ません（原典50頁）。</p>')+
         '<p class="moto">数表が返す形：<code>'+r.nai.types.join(' ')+' ／ '+r.tai.types.join(' ')+
         (r.kot?' ／ '+r.kot.koteki.map(function(k){return (k.star?'＊':'')+k.age}).join('／'):'')+'</code></p>'+
         '</section>';
     }
-    document.getElementById('hitoA').innerHTML = hitoHtml(a, ra, ba, kasa);
-    document.getElementById('hitoB').innerHTML = hitoHtml(b, rb, bb, kasa);
+    document.getElementById('hitoA').innerHTML =
+      hitoHtml(a, ra, ba, kasa.map(function(x){ return x.aAge; }));
+    document.getElementById('hitoB').innerHTML =
+      hitoHtml(b, rb, bb, kasa.map(function(x){ return x.bAge; }));
 
     document.getElementById('kasane').innerHTML = kasa.length ?
       '<div class="kasane"><h3>二人の結婚好適期が重なる時期</h3><p>'+
-      kasa.map(function(x){ return makiToAge(x.from)+' 〜 '+makiToAge(x.to)+'（'+makiSpanText(x.years)+'）'+
-        (x.bothStrong?'　双方とも強い':''); }).join('<br>')+
-      '</p></div>' : '';
+      kasa.map(function(x){
+        if(x.koyomi){
+          return toSeireki(x.from,x.tsuki)+' 〜 '+toSeireki(x.to,x.tsuki)+(x.tsuki?'':'ごろ')+
+                 '（'+makiSpanText(x.years)+'）'+(x.bothStrong?'　双方とも強い':'')+
+                 '<span class="memo">'+a.na+' '+toAgeKuwashiku(x.aAge.from)+'〜'+toAgeKuwashiku(x.aAge.to)+
+                 '／'+b.na+' '+toAgeKuwashiku(x.bAge.from)+'〜'+toAgeKuwashiku(x.bAge.to)+'</span>';
+        }
+        return makiToAge(x.from)+' 〜 '+makiToAge(x.to)+'（'+makiSpanText(x.years)+'）'+
+               (x.bothStrong?'　双方とも強い':'');
+      }).join('<br>')+
+      '</p>'+(kasa[0].koyomi?'':
+        '<p class="hint" style="margin:8px 0 0">いまは年齢どうしの重なりです。'+
+        'お二人の生年を入れると、暦のうえで重なる時期に直します。</p>')+
+      '</div>' : '';
 
     var ai = makiKekkonAisho({naimen:ra.nai.types, taijin:ra.tai.types},
                              {naimen:rb.nai.types, taijin:rb.tai.types});
