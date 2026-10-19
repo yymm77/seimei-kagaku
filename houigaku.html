@@ -860,6 +860,171 @@ footer ul li a:hover{opacity:1;color:var(--gold-light);}
   body { font-size: 10pt; padding-bottom: 0 !important; }
 }
 </style>
+<style>
+/* 地図の登録パネル・リアルタイム方位ナビ（以前は印刷用テンプレートの中に入っていて効いていなかった） */
+/* ===== 改善：現在地・目的地登録パネル ===== */
+#mapLocPanel {
+  display: flex; flex-wrap: wrap; gap: .6rem;
+  padding: .8rem 1.2rem;
+  background: linear-gradient(135deg, #0c1428, #1a2f5a);
+  border-bottom: 1px solid rgba(201,168,76,.25);
+  align-items: center;
+}
+.map-loc-status {
+  display: flex; align-items: center; gap: .5rem;
+  padding: .45rem 1rem; border-radius: 3px;
+  font-size: .8rem; font-family: 'Noto Serif JP', serif;
+  border: 1px solid rgba(201,168,76,.3);
+  background: rgba(255,255,255,.05);
+  color: rgba(255,255,255,.45);
+  flex: 1; min-width: 170px; transition: .25s;
+}
+.map-loc-status.set { color: #c9a84c; border-color: rgba(201,168,76,.65); background: rgba(201,168,76,.09); }
+.map-loc-status.set-dest { color: #f0a090; border-color: rgba(220,80,60,.55); background: rgba(200,60,40,.09); }
+.map-loc-status .dot { width: 9px; height: 9px; border-radius: 50%; background: #444; flex-shrink: 0; transition: .3s; }
+.map-loc-status.set .dot { background: #10a368; box-shadow: 0 0 6px #10a368; }
+.map-loc-status.set-dest .dot { background: #c0392b; box-shadow: 0 0 6px #c0392b; }
+.map-gps-btn {
+  padding: .45rem 1.1rem; background: var(--gold); color: var(--indigo);
+  border: none; border-radius: 3px;
+  font-family: 'Zen Old Mincho', serif; font-size: .8rem;
+  letter-spacing: .1em; cursor: pointer; font-weight: 700;
+  white-space: nowrap; transition: .2s; box-shadow: 0 2px 8px rgba(160,124,32,.3);
+}
+.map-gps-btn:hover { background: var(--gold-light); box-shadow: 0 4px 14px rgba(160,124,32,.4); }
+.map-swap-btn {
+  padding: .45rem 1.1rem; font-size: 1rem; cursor: pointer;
+  background: rgba(201,168,76,.12); color: var(--gold-light);
+  border: 1px solid rgba(201,168,76,.4); border-radius: 3px;
+  transition: transform .35s ease, background .2s;
+  white-space: nowrap; font-family: 'Noto Serif JP', serif;
+}
+.map-swap-btn:hover { background: rgba(201,168,76,.28); transform: rotate(180deg); }
+.map-step-hint {
+  padding: .3rem .8rem; font-size: .72rem;
+  color: rgba(201,168,76,.85); letter-spacing: .08em;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(201,168,76,.2); border-radius: 3px;
+  animation: hint-pulse 2.2s ease-in-out infinite;
+}
+@keyframes hint-pulse { 0%,100%{opacity:.65} 50%{opacity:1} }
+
+/* ===== リアルタイム方位ナビ ===== */
+#naviPanel {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 10000;
+  background: linear-gradient(180deg, rgba(8,12,28,.97) 0%, rgba(12,20,40,.99) 100%);
+  border-top: 2px solid rgba(201,168,76,.5);
+  padding: .7rem 1rem .8rem;
+  box-shadow: 0 -4px 24px rgba(0,0,0,.5);
+  font-family: 'Noto Serif JP', serif;
+}
+#naviPanel.show { display: block; animation: slideUp .3s ease; }
+@keyframes slideUp { from{transform:translateY(100%);opacity:0} to{transform:translateY(0);opacity:1} }
+
+.navi-top {
+  display: flex; align-items: center; gap: .8rem; flex-wrap: wrap;
+  margin-bottom: .5rem;
+}
+.navi-badge {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: .68rem; letter-spacing: .2em;
+  color: rgba(201,168,76,.7);
+  background: rgba(201,168,76,.08);
+  border: 1px solid rgba(201,168,76,.3);
+  padding: .2rem .6rem; border-radius: 2px;
+}
+.navi-close {
+  margin-left: auto;
+  background: none; border: 1px solid rgba(201,168,76,.3);
+  color: rgba(201,168,76,.7); font-size: .75rem;
+  padding: .25rem .7rem; cursor: pointer; border-radius: 2px;
+  font-family: 'Noto Serif JP', serif;
+}
+.navi-close:hover { background: rgba(201,168,76,.12); color: var(--gold-light); }
+
+.navi-compass-wrap {
+  display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;
+}
+.navi-compass {
+  width: 110px; height: 110px; flex-shrink: 0;
+  position: relative;
+}
+.navi-compass svg { width: 100%; height: 100%; }
+
+.navi-info {
+  flex: 1; min-width: 200px;
+}
+.navi-dir-label {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: 1.8rem; font-weight: 900;
+  letter-spacing: .05em;
+  line-height: 1;
+  margin-bottom: .25rem;
+}
+.navi-kichi-label {
+  font-size: 1.1rem; font-weight: 700;
+  margin-bottom: .3rem;
+}
+.navi-kichi-label.k-kichi    { color: #10a368; }
+.navi-kichi-label.k-futsu    { color: #8899bb; }
+.navi-kichi-label.k-syokyo   { color: #e6a01e; }
+.navi-kichi-label.k-kyo      { color: #dc3c3c; }
+.navi-kichi-label.k-daikyo   { color: #ff6060; }
+.navi-kichi-label.k-saidaikyo{ color: #ff4090; }
+.navi-sub {
+  font-size: .72rem; color: rgba(201,168,76,.65);
+  line-height: 1.8;
+}
+.navi-dest-info {
+  display: flex; gap: 1rem; flex-wrap: wrap;
+  margin-top: .5rem; padding-top: .5rem;
+  border-top: 1px solid rgba(201,168,76,.15);
+  font-size: .75rem; color: rgba(255,255,255,.6);
+}
+.navi-dest-item { display: flex; flex-direction: column; gap: .1rem; }
+.navi-dest-item .di-label { font-size: .62rem; color: rgba(201,168,76,.5); letter-spacing: .12em; }
+.navi-dest-item .di-val { font-family: 'Zen Old Mincho', serif; font-size: .92rem; color: var(--gold-light); }
+
+.navi-alert {
+  display: none;
+  margin-top: .5rem; padding: .45rem .8rem;
+  border-radius: 3px; font-size: .78rem; font-weight: 700;
+  letter-spacing: .05em; text-align: center;
+  animation: alert-flash 1s ease-in-out infinite alternate;
+}
+@keyframes alert-flash { from{opacity:.7} to{opacity:1} }
+.navi-alert.danger {
+  display: block;
+  background: repeating-linear-gradient(135deg,#1a0a0a 0,#1a0a0a 6px,#2a0808 6px,#2a0808 12px);
+  color: #ff6090; border: 1px solid #880e4f;
+}
+.navi-alert.warning {
+  display: block;
+  background: rgba(220,60,60,.15);
+  color: #ff8080; border: 1px solid rgba(220,60,60,.4);
+}
+
+/* ナビ起動ボタン（地図セクション内） */
+#naviStartBtn {
+  padding: .5rem 1.2rem;
+  background: linear-gradient(135deg, #1a3a5c, #0c1630);
+  color: var(--gold-light);
+  border: 1px solid rgba(201,168,76,.5);
+  border-radius: 3px;
+  font-family: 'Zen Old Mincho', serif;
+  font-size: .82rem; letter-spacing: .15em;
+  cursor: pointer; transition: .2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,.2);
+}
+#naviStartBtn:hover { background: linear-gradient(135deg,#254a6c,#1a2640); box-shadow: 0 4px 14px rgba(160,124,32,.25); }
+#naviStartBtn.active {
+  background: linear-gradient(135deg,#0a3020,#041810);
+  border-color: #10a368; color: #10a368;
+}
+</style>
 </head>
 <body>
 
@@ -1199,7 +1364,7 @@ footer ul li a:hover{opacity:1;color:var(--gold-light);}
 
     <!-- カレンダー -->
     <div id="cal-sec" class="sec-head" style="margin-top:2.5rem;">
-      <div class="sec-no">伍</div>
+      <div class="sec-no">弐</div>
       <div><h3>吉 方 カ レ ン ダ ー</h3><p style="font-size:.72rem;color:var(--smoke)">日付をクリックすると方位別の詳細が表示されます</p></div>
     </div>
     <div class="card" style="padding:0;overflow:hidden;">
@@ -1515,6 +1680,9 @@ footer ul li a:hover{opacity:1;color:var(--gold-light);}
           </div>
         </div>
 
+        <!-- 暦の目印（干支・節入り・遁） -->
+        <div id="verifyKoyomi" style="background:#fdfaf3;padding:.7rem 1rem;margin-top:1px;font-size:.78rem;line-height:1.9;color:var(--indigo);"></div>
+
         <!-- 照合欄 -->
         <div style="background:#f5f0e8;padding:1rem;border-radius:0 0 4px 4px;margin-top:1px;">
           <div style="font-size:.72rem;color:var(--smoke);letter-spacing:.1em;margin-bottom:.7rem;">暦の鏡との照合</div>
@@ -1580,7 +1748,7 @@ footer ul li a:hover{opacity:1;color:var(--gold-light);}
   <!-- ===== 地図判定 ===== -->
   <div id="map-sec">
     <div class="sec-head">
-      <div class="sec-no">弐</div>
+      <div class="sec-no">肆</div>
       <div>
         <h3>地 図 で 方 位 を 判 定</h3>
         <p>現在地をクリック → 目的地をクリック で吉凶を即時判定</p>
@@ -1670,7 +1838,7 @@ footer ul li a:hover{opacity:1;color:var(--gold-light);}
   <!-- ===== 吉方位スポット案内 ===== -->
   <div id="spot-sec" style="margin-top:2.5rem;">
     <div class="sec-head">
-      <div class="sec-no">参</div>
+      <div class="sec-no">伍</div>
       <div>
         <h3>吉 方 位 ス ポ ッ ト 案 内</h3>
         <p style="font-size:.72rem;color:var(--smoke)">温泉・神社寺・城郭・保養地・世界遺産を吉方位から提案（116か所）</p>
@@ -1712,7 +1880,7 @@ footer ul li a:hover{opacity:1;color:var(--gold-light);}
   <!-- ===== 方違え・旅程最適化 ===== -->
   <div id="houi-chigae-sec" style="margin-top:2.5rem;">
     <div class="sec-head">
-      <div class="sec-no">肆</div>
+      <div class="sec-no">陸</div>
       <div><h3>方 違 え ・ 旅 程 最 適 化</h3><p style="font-size:.72rem;color:var(--smoke)">訪問地を複数入力 → 吉方位スコアが最大になるルートを提案</p></div>
     </div>
     <div class="card">
@@ -1794,7 +1962,7 @@ footer ul li a:hover{opacity:1;color:var(--gold-light);}
 
     <!-- 二人旅・幸運最大化 -->
     <div id="futari-sec" class="sec-head" style="margin-top:2.5rem;">
-      <div class="sec-no">陸</div>
+      <div class="sec-no">漆</div>
       <div>
         <h3>二 人 旅 ・ 幸 運 最 大 化</h3>
         <p style="font-size:.72rem;color:var(--smoke)">相性＋共通吉方位で、二人に最適な旅を提案します</p>
@@ -1888,7 +2056,7 @@ footer ul li a:hover{opacity:1;color:var(--gold-light);}
   <!-- ===== 九星解説 ===== -->
   <div id="kyusei-sec" style="margin-top:3rem;">
     <div class="sec-head">
-      <div class="sec-no">伍</div>
+      <div class="sec-no">捌</div>
       <div><h3>九 星 の 解 説</h3><p>あなたの九星が持つ特性と方位との関係</p></div>
     </div>
     <div class="card" id="kyuseiCards">
@@ -1901,7 +2069,7 @@ footer ul li a:hover{opacity:1;color:var(--gold-light);}
   <!-- ===== 方位学とは ===== -->
   <div id="about-sec" style="margin-top:3rem;">
     <div class="sec-head">
-      <div class="sec-no">陸</div>
+      <div class="sec-no">玖</div>
       <div><h3>方 位 学 と は 何 か</h3><p>九星気学の原理とその歴史的背景</p></div>
     </div>
     <div class="card">
@@ -2090,6 +2258,7 @@ footer ul li a:hover{opacity:1;color:var(--gold-light);}
 </div>
 </footer>
 
+<script src="kyusei_koyomi.js"></script>
 <script>
 let _calYear = new Date().getFullYear();
 let _calMonth = new Date().getMonth() + 1;
@@ -2131,120 +2300,24 @@ const DIRS = [
 ];
 
 // ========== 九星計算 ==========
-// 節入り（立春）簡易計算：2月4日を基準
-function adjustForSetsuiri(y, m, d) {
-  // 立春（節入り）前の1月・2月は前年扱い
-  const SETSU = {1:4,2:4,3:6,4:5,5:6,6:6,7:7,8:8,9:8,10:8,11:7,12:7}; // 概算
-  const nodeDay = SETSU[m] || 6;
-  if (m === 1 || (m === 2 && d < 4)) return y - 1;
-  return y;
+// 計算はすべて kyusei_koyomi.js（予定帖と共通）に任せる。
+// 節入り・夏至・冬至は天文計算の時刻表、日盤は冬至・夏至に最も近い甲子と閏の規則による。
+const KK = window.KyuseiKoyomi;
+function _birthTime(hour) {
+  // 出生時刻の選択値（刻の始まりの時）→ 刻の中ほどの時刻。不明（-1）や未指定は null
+  if (hour == null || isNaN(hour) || hour < 0) return [null, null];
+  return hour === 23 ? [23, 59] : [hour + 1, 0];
 }
-
-function honmeisei(y, m, d) {
-  const yr = adjustForSetsuiri(y, m, d);
-  // 2024年=三碧(3)を基準に逆行計算（九星は年が進むと逆行：3→2→1→9→8…）
-  const diff = yr - 2024;
-  const r = ((3 - diff) % 9 + 9) % 9;  // 負の余り対策
-  return r === 0 ? 9 : r;
-}
-
-function getsumeisei(y, m, d, hour) {
-  // 月命星：本命星と出生月から算出
-  const yr = adjustForSetsuiri(y, m, d);
-  const hon = honmeisei(y, m, d);
-  // 月命星の計算（九星術標準法）
-  // 年の九星グループによって月の起算点が異なる
-  let adjustedM = m;
-  // 節入り前は前月扱い（簡易）
-  if (d < 6) adjustedM = m - 1;
-  if (adjustedM <= 0) adjustedM += 12;
-  
-  // 年九星のグループ別月命星起算
-  const group = ((yr - 1) % 3 + 3) % 3; // 0,1,2
-  const startMonth = [8, 2, 5][group]; // 各グループの1月の月命星
-  const offset = (adjustedM - 1);
-  let msei = ((startMonth - offset - 1 + 99) % 9) + 1;
-  return msei;
-}
-
-function nisseiFor(y, m, d) {
-  // 日の九星計算（陽遁・陰遁）
-  // 暦日大鑑に基づく正確な計算
-  // 【陽遁】冬至に最も近い丙午の日〜：順行 base=一白(1)
-  // 【陰遁】夏至に最も近い丙午の日〜：逆行 base=九紫(9)
-  // 丙午=干支番号42（2000/1/1=庚辰=36を基準に60日周期）
-
-  const base = new Date(2000, 0, 1);
-  const target = new Date(y, m - 1, d);
-  const diff = Math.round((target - base) / 86400000);
-
-  // 夏至・冬至に最も近い丙午を求める
-  function kanshiNum(dt) {
-    const df = Math.round((dt - base) / 86400000);
-    return ((df + 36) % 60 + 60) % 60;
-  }
-  function nearestHeigo(refDate) {
-    const n = kanshiNum(refDate);
-    const d42 = ((42 - n) % 60 + 60) % 60;
-    const next = new Date(refDate); next.setDate(next.getDate() + d42);
-    const prev = new Date(refDate); prev.setDate(prev.getDate() - ((60 - d42) % 60));
-    if (d42 === 0) return new Date(refDate);
-    return Math.abs(next - refDate) <= Math.abs(prev - refDate) ? next : prev;
-  }
-
-  // 当年の陰遁開始日（夏至近傍丙午）・陽遁開始日（冬至近傍丙午）
-  const indon = nearestHeigo(new Date(y, 5, 21));   // 夏至概算6/21
-  const yoton = nearestHeigo(new Date(y, 11, 22));  // 冬至概算12/22
-
-  // 前年の陽遁開始日（前年冬至近傍丙午）
-  const yotonPrev = nearestHeigo(new Date(y - 1, 11, 22));
-
-  // 陽遁期間：前年冬至近傍丙午 〜 当年陰遁開始前日
-  //         または 当年冬至近傍丙午 〜 翌年陰遁開始前日
-  // 判定：target が陰遁開始日より前 → 陽遁
-  //       target が陰遁開始日以降 かつ 陽遁開始日より前 → 陰遁
-  //       target が陽遁開始日以降 → 陽遁
-  let isYoton;
-  if (target >= yoton) {
-    isYoton = true;  // 当年冬至近傍丙午以降 → 陽遁
-  } else if (target >= indon) {
-    isYoton = false; // 陰遁開始〜冬至近傍丙午前日 → 陰遁
-  } else {
-    isYoton = true;  // 陰遁開始前 → 前年冬至からの陽遁期間
-  }
-
-  let n;
-  if (isYoton) {
-    n = ((1 + diff - 1) % 9 + 9) % 9 + 1; // 陽遁：順行 base=一白
-  } else {
-    n = ((9 - diff - 1) % 9 + 9) % 9 + 1; // 陰遁：逆行 base=九紫
-  }
-  return n;
-}
-
-function nenseiFor(y) {
-  // 2024年=三碧(3)を基準に逆行計算（九星は年が進むと逆行：3→2→1→9→8…）
-  const diff = y - 2024;
-  const r = ((3 - diff) % 9 + 9) % 9;  // 負の余りを防ぐ
-  return r === 0 ? 9 : r;
-}
-
-function getseiFor(y, m) {
-  // 月の九星（月盤）
-  // 九星気学では月は節入り（立春・啓蟄…）で切り替わる
-  // グループ0（一白・四緑・七赤年）：2月=八白から逆行
-  // グループ1（二黒・五黄・八白年）：2月=二黒から逆行
-  // グループ2（三碧・六白・九紫年）：2月=五黄から逆行
-  // ※ 配列は1月始まり（インデックス0=1月）
-  const nen = nenseiFor(y);
-  const grp = ((nen - 1) % 3);
-  const starts = [[6,8,7,6,5,4,3,2,1,9,8,7],
-                  [3,2,1,9,8,7,6,5,4,3,2,1],
-                  [9,5,4,3,2,1,9,8,7,6,5,4]];
-  return starts[grp][m - 1];
-}
-
-
+function adjustForSetsuiri(y, m, d) { return KK.koyomiYear(y, m, d); }
+function honmeisei(y, m, d, hour) { const t = _birthTime(hour); return KK.honmei(y, m, d, t[0], t[1]); }
+function getsumeisei(y, m, d, hour) { const t = _birthTime(hour); return KK.getsumei(y, m, d, t[0], t[1]); }
+function nisseiFor(y, m, d) { return KK.nichiStar(y, m, d); }
+// 年盤：日付を渡すと立春で切り替え。年だけのときは、その年の立春以降の星
+function nenseiFor(y, m, d) { return KK.nenStar(y, m, d); }
+// 月盤：日付を渡すと節入りで切り替え。月までのときは、その月の節入り以降の星
+function getseiFor(y, m, d) { return KK.getsuStar(y, m, d); }
+// 暦月 m の節入り日（日にち）
+function setsuDay(y, m) { return KK.setsuiri(y, m).d; }
 
 // ===== 生まれ星クイック計算 =====
 function quickStarCalc(y) {
@@ -2717,7 +2790,7 @@ function doCalcFromMap(dirLabel) {
   const [by,bm,bd] = birthVal.split('-').map(Number);
   const [ty,tm,td] = targetVal.split('-').map(Number);
   const hour = parseInt(document.getElementById('iHour').value);
-  const hon  = honmeisei(by, bm, bd);
+  const hon  = honmeisei(by, bm, bd, hour);
   const get  = getsumeisei(by, bm, bd, hour);
   const niss = nisseiFor(ty, tm, td);
 
@@ -2945,7 +3018,7 @@ function runAdvice2() {
         <div class="adv2-kichi-bar"><div class="adv2-kichi-fill" style="width:${pct}%;background:${color};"></div></div>
         <span class="adv2-kichi-word" style="color:${color};">${word}</span>
       </div>
-      <div class="adv2-summary">${getDetailText(hon, dirKey, sc)}</div>`;
+      <div class="adv2-summary">${getDetailText(hon, dirKey, sc, banStar)}</div>`;
     }
     html += `</div>`;
   });
@@ -3045,8 +3118,8 @@ async function genAiComment() {
   const jd = new Date(targetVal);
   const hon = _calHon;
   const ks = KYUSEI[hon - 1];
-  const nsei = nenseiFor(jd.getFullYear());
-  const msei = getseiFor(jd.getFullYear(), jd.getMonth()+1);
+  const nsei = nenseiFor(jd.getFullYear(), jd.getMonth()+1, jd.getDate());
+  const msei = getseiFor(jd.getFullYear(), jd.getMonth()+1, jd.getDate());
   const dsei = nisseiFor(jd.getFullYear(), jd.getMonth()+1, jd.getDate());
 
   const DIRS8 = [{key:'N',l:'北'},{key:'NE',l:'北東'},{key:'E',l:'東'},{key:'SE',l:'南東'},
@@ -3156,8 +3229,8 @@ function houiRunBestDates() {
     for (let d = new Date(today); d <= end; d.setDate(d.getDate()+1)) {
       if (checkedDays.length > 0 && !checkedDays.includes(d.getDay())) continue;
       const y = d.getFullYear(), m = d.getMonth()+1, dd = d.getDate();
-      const nsei = nenseiFor(y);
-      const msei = getseiFor(y, m);
+      const nsei = nenseiFor(y, m, dd);
+      const msei = getseiFor(y, m, dd);
       const dsei = nisseiFor(y, m, dd);
 
       let bestScore = 0, bestDir = '';
@@ -3675,7 +3748,18 @@ function drawRadarChart(scores) {
 
 
 // ========== 詳細テキスト ==========
-function getDetailText(honmei, dirKey, score) {
+function getDetailText(honmei, dirKey, score, center) {
+  // 盤の中宮が分かるときは、判定の根拠（五黄殺・暗剣殺・本命殺・本命的殺・五行の関係）を添える
+  let reason = '';
+  if (center && dirKey !== 'C') {
+    try {
+      const j = KK.judge(honmei, center)[dirKey];
+      reason = `<span style="display:block;margin-top:.35rem;font-size:.85em;opacity:.85;">根拠：${KK.NAMES[j.star-1]}が回る。${j.reasons.join('・')}</span>`;
+    } catch (e) {}
+  }
+  return _detailTextBase(honmei, dirKey, score) + reason;
+}
+function _detailTextBase(honmei, dirKey, score) {
   const PURPOSE_MAP = {travel:'旅行・移動',business:'商談・仕事',move:'引越し・転居',marriage:'婚姻・契約',health:'療養・回復',other:'各種行動'};
   const purpose = PURPOSE_MAP[document.getElementById('iPurpose').value] || '行動';
   const dir = getDirLabel(dirKey);
@@ -3723,7 +3807,7 @@ function doCalc() {
   const [ty, tm, td] = targetVal.split('-').map(Number);
   const hour = parseInt(document.getElementById('iHour').value);
 
-  const hon = honmeisei(by, bm, bd);
+  const hon = honmeisei(by, bm, bd, hour);
   const get = getsumeisei(by, bm, bd, hour);
   const niss = nisseiFor(ty, tm, td);
 
@@ -3783,7 +3867,7 @@ function doCalc() {
     item.innerHTML = `<div class="detail-dir">${d.label}</div>
       <div class="detail-body">
         <h5>${kichiStr}　スコア：${sc}</h5>
-        <p>${getDetailText(hon, d.key, sc)}</p>
+        <p>${getDetailText(hon, d.key, sc, niss)}</p>
       </div>`;
     detailList.appendChild(item);
   });
@@ -3883,8 +3967,8 @@ function buildTodayDash(hon, get, ty, tm, td) {
   const y=ty, m=tm, d=td;
   const dw = ['日','月','火','水','木','金','土'][new Date(y,m-1,d).getDay()];
   const niss = nisseiFor(y, m, d);
-  const tsei = getseiFor(y, m);
-  const ysei = nenseiFor(y);
+  const tsei = getseiFor(y, m, d);
+  const ysei = nenseiFor(y, m, d);
 
   document.getElementById('dashDate').textContent =
     `${y}年${m}月${d}日（${dw}）　本命星：${KYUSEI[hon-1].n}　月命星：${KYUSEI[get-1].n}`;
@@ -3960,8 +4044,8 @@ const DIR_LABEL = {N:'北',NE:'北東',E:'東',SE:'南東',S:'南',SW:'南西',W
 
 // アドバイスの盤選択
 function getBanStar(mode, y, m, d) {
-  if (mode==='nen')   return nenseiFor(y);
-  if (mode==='tsuki') return getseiFor(y, m);
+  if (mode==='nen')   return nenseiFor(y, m, d);
+  if (mode==='tsuki') return getseiFor(y, m, d);
   return nisseiFor(y, m, d);
 }
 
@@ -4243,7 +4327,7 @@ function toJapaneseEra(y) {
 }
 
 // 節入り日（その月の気が変わる日）の簡易テーブル（月→概算日）
-const SETSU_DAY = [6,4,6,5,6,6,7,8,8,8,7,7]; // 1月〜12月の節入り概算日
+// 節入り日は setsuDay(年, 月) で正確に求める（旧：概算表）
 
 function calRedraw() {
   const banMode = document.querySelector('input[name="calBan"]:checked')?.value || 'nichi';
@@ -4260,9 +4344,9 @@ function calRedraw() {
     if (tsukiEl) tsukiEl.textContent = `${_calMonth}月　月盤：${KYUSEI_N[msei-1]}`;
     // 節入り前（月初4〜5日まで）の断り書き
     // 節入り日は月ごとに異なるが、概ね各月4〜8日。簡易表示として「〜4日頃は前月の星」を案内
-    const SETSU_DAY = {1:5,2:4,3:6,4:5,5:6,6:6,7:7,8:8,9:8,10:8,11:7,12:7};
-    const setsuD = SETSU_DAY[_calMonth] || 6;
-    if (noteEl2) noteEl2.textContent = `※ ${_calMonth}月${setsuD}日頃の節入り前は前月の星（${KYUSEI_N[getseiFor(_calYear, _calMonth<=1?12:_calMonth-1)-1]}）が適用されます`;
+    const _st = KK.setsuiri(_calYear, _calMonth);
+    const _prevStar = getseiFor(_calYear, _calMonth, _st.d - 1 > 0 ? _st.d - 1 : 1);
+    if (noteEl2) noteEl2.textContent = `※ ${_calMonth}月${_st.d}日 ${_st.h}時${String(_st.mi).padStart(2,'0')}分が${_st.name}（節入り）。${_st.d-1}日までは前月の星（${KYUSEI_N[_prevStar-1]}）です`;
   })();
   if (!_calHon) {
     if (banMode === 'tsuki') {
@@ -4305,8 +4389,8 @@ function calRedraw() {
     }
     for (let d = 1; d <= lastDay; d++) {
       const niss = nisseiFor(_calYear, _calMonth, d);
-      const tsei = getseiFor(_calYear, _calMonth);
-      const ysei = nenseiFor(_calYear);
+      const tsei = getseiFor(_calYear, _calMonth, d);
+      const ysei = nenseiFor(_calYear, _calMonth, d);
       const banStar = niss;
       let total = 0, cnt = 0, minSc = 999;
       const dirScores = {};
@@ -4489,7 +4573,7 @@ function calRedraw() {
       row.title = isPast ? titleBase + '　← クリックで過去の方位盤を確認' : titleBase;
       (function(yy, bs, sc, past) {
         row.addEventListener('click', () => {
-          const tsei = getseiFor(yy, 6);
+          const tsei = getseiFor(yy, 6, 1);
           // 過去年の場合は6月の月盤も開く（検証しやすいように）
           openCalModal(yy, 6, 1, bs, hon, get, nisseiFor(yy, 6, 1), tsei, bs, sc.scores, sc.avg, sc.min, 'nen');
           if (past) {
@@ -4660,7 +4744,7 @@ function buildTsukiView(hon, get, calYear) {
   // ---- 12ヶ月カレンダー ----
   for (var m2 = 1; m2 <= 12; m2++) {
     var ts2 = getseiFor(calYear, m2);
-    var sd  = SETSU_DAY[m2-1];
+    var sd  = setsuDay(calYear, m2);
     var ld  = new Date(calYear, m2, 0).getDate();
     var block = document.createElement('div');
     block.className = 'cal-month-block';
@@ -4690,7 +4774,7 @@ function buildTsukiView(hon, get, calYear) {
       emp.className='cal-day empty';emp.style.background='white';dg.appendChild(emp);
     }
     for (var d2=1; d2<=ld; d2++){
-      var at=(d2<sd)?getseiFor(calYear,m2<=1?12:m2-1):ts2;
+      var at=getseiFor(calYear,m2,d2);
       var tot=0,cnt=0,mn=999,sc2={};
       if (hon > 0) DIRS.forEach(function(dir){
         if(dir.key==='C')return;
@@ -5623,9 +5707,9 @@ document.addEventListener('DOMContentLoaded', function(){
     const noteEl2 = document.getElementById('calSetsuNote');
     if (nenEl)   nenEl.textContent   = `今年（${_calYear}年）　年盤：${KYUSEI_N[ysei-1]}`;
     if (tsukiEl) tsukiEl.textContent = `${_calMonth}月　月盤：${KYUSEI_N[msei-1]}`;
-    const SETSU_DAY = {1:5,2:4,3:6,4:5,5:6,6:6,7:7,8:8,9:8,10:8,11:7,12:7};
-    const setsuD = SETSU_DAY[_calMonth] || 6;
-    if (noteEl2) noteEl2.textContent = `※ ${_calMonth}月${setsuD}日頃の節入り前は前月の星（${KYUSEI_N[getseiFor(_calYear, _calMonth<=1?12:_calMonth-1)-1]}）が適用されます`;
+    const _st = KK.setsuiri(_calYear, _calMonth);
+    const _prevStar = getseiFor(_calYear, _calMonth, _st.d - 1 > 0 ? _st.d - 1 : 1);
+    if (noteEl2) noteEl2.textContent = `※ ${_calMonth}月${_st.d}日 ${_st.h}時${String(_st.mi).padStart(2,'0')}分が${_st.name}（節入り）。${_st.d-1}日までは前月の星（${KYUSEI_N[_prevStar-1]}）です`;
   })();
 
   // ===== 前回の本命星を復元してすぐ使えるようにする =====
@@ -5674,17 +5758,14 @@ function runVerify() {
   if (!val) { alert('日付を入力してください'); return; }
   const [y, m, d] = val.split('-').map(Number);
 
-  const nen   = nenseiFor(y);
-  const tsuki = getseiFor(y, m);
+  const nen   = nenseiFor(y, m, d);
+  const tsuki = getseiFor(y, m, d);
   const nichi = nisseiFor(y, m, d);
 
   // 陽遁・陰遁判定
-  const target   = new Date(y, m-1, d);
-  const geshi    = new Date(y, 5, 21);
-  const toji     = new Date(y, 11, 22);
-  const prevToji = new Date(y-1, 11, 22);
-  const isYoton  = (target >= prevToji && target <= geshi) || target >= toji;
-  const tonStr   = isYoton ? '陽遁（冬至〜夏至）' : '陰遁（夏至〜冬至）';
+  const _ton     = KK.ton(y, m, d);
+  const isYoton  = _ton.reversed ? (_ton.type !== '陽遁') : (_ton.type === '陽遁');
+  const tonStr   = _ton.type + '（' + _ton.start.replace(/-/g,'/') + ' 甲子から）' + (_ton.uru ? '・閏の期間' + (_ton.reversed ? '（後半：向きが逆）' : '') : '');
 
   const dw = ['日','月','火','水','木','金','土'][new Date(y,m-1,d).getDay()];
   document.getElementById('verifyDateLabel').textContent =
@@ -5705,6 +5786,22 @@ function runVerify() {
     const memo = document.getElementById('v'+k.charAt(0).toUpperCase()+k.slice(1)+'Memo');
     if(memo){ memo.style.display='none'; memo.value=''; }
   });
+
+  // 暦の目印
+  (function(){
+    const info = KK.dayInfo(y, m, d);
+    const st = KK.setsuiri(y, m);
+    const sm = ['寅（立春）','卯（啓蟄）','辰（清明）','巳（立夏）','午（芒種）','未（小暑）','申（立秋）','酉（白露）','戌（寒露）','亥（立冬）','子（大雪）','丑（小寒）'][info.setsuMonthIndex];
+    const hm = (t) => t.m + '月' + t.d + '日 ' + t.h + '時' + String(t.mi).padStart(2,'0') + '分';
+    const lines = [
+      '日の干支：' + info.kanshi + '　九星の年：' + info.koyomiYear + '年（立春 ' + hm(KK.term(info.koyomiYear, 1)) + ' から）',
+      '節月：' + sm + '月　この月の節入り：' + st.name + ' ' + hm(st) + (info.setsuiriToday ? '　<b>← この日が節入り</b>' : ''),
+      '日盤：' + info.ton.type + '　' + info.ton.start.replace(/-/g,'/') + '（甲子）から。次の切替 ' + info.ton.next.replace(/-/g,'/') + '（' + info.ton.nextType + '）' +
+        (info.ton.uru ? '　<b>閏の期間</b>' + (info.ton.reversed ? '（後半：向きが逆）' : '（前半）') : ''),
+    ];
+    if (info.shiToday) lines.push('この日は' + info.shiToday.name + '（' + hm(info.shiToday) + '）');
+    document.getElementById('verifyKoyomi').innerHTML = lines.join('<br>');
+  })();
 
   document.getElementById('verifyResult').style.display = '';
 
@@ -5734,8 +5831,8 @@ function addVerifyLog() {
   const [y, m, d] = val.split('-').map(Number);
   const dw = ['日','月','火','水','木','金','土'][new Date(y,m-1,d).getDay()];
 
-  const nen   = VERIFY_KYUSEI[nenseiFor(y)-1];
-  const tsuki = VERIFY_KYUSEI[getseiFor(y,m)-1];
+  const nen   = VERIFY_KYUSEI[nenseiFor(y,m,d)-1];
+  const tsuki = VERIFY_KYUSEI[getseiFor(y,m,d)-1];
   const nichi = VERIFY_KYUSEI[nisseiFor(y,m,d)-1];
 
   function getCheck(ban) {
@@ -5810,8 +5907,8 @@ function initTodayStarBanner(hon, get) {
   const y = t.getFullYear(), m = t.getMonth()+1, d = t.getDate();
   const dw = ['日','月','火','水','木','金','土'][t.getDay()];
   const niss = typeof nisseiFor === 'function' ? nisseiFor(y, m, d) : null;
-  const tsei = typeof getseiFor === 'function' ? getseiFor(y, m) : null;
-  const ysei = typeof nenseiFor === 'function' ? nenseiFor(y) : null;
+  const tsei = typeof getseiFor === 'function' ? getseiFor(y, m, d) : null;
+  const ysei = typeof nenseiFor === 'function' ? nenseiFor(y, m, d) : null;
 
   const dateEl = document.getElementById('tsb-date');
   const starsEl = document.getElementById('tsb-stars');
@@ -6100,8 +6197,8 @@ function hcCalcRoute() {
   const hon = _calHon, get = _calGet;
   const judgeDate = getJudgeDateVal();
   const jd = judgeDate ? new Date(judgeDate) : new Date();
-  const nsei = nenseiFor(jd.getFullYear());
-  const msei = getseiFor(jd.getFullYear(), jd.getMonth()+1);
+  const nsei = nenseiFor(jd.getFullYear(), jd.getMonth()+1, jd.getDate());
+  const msei = getseiFor(jd.getFullYear(), jd.getMonth()+1, jd.getDate());
   const dsei = nisseiFor(jd.getFullYear(), jd.getMonth()+1, jd.getDate());
 
   // 各訪問地のスコアを計算
@@ -6583,8 +6680,8 @@ function hc2CalcTrip() {
   const purpose = HC2_PURPOSES.find(p => p.key === _hc2Purpose);
   const judgeDate = getJudgeDateVal() || new Date().toISOString().slice(0,10);
   const jd = new Date(judgeDate);
-  const nsei = nenseiFor(jd.getFullYear());
-  const msei = getseiFor(jd.getFullYear(), jd.getMonth()+1);
+  const nsei = nenseiFor(jd.getFullYear(), jd.getMonth()+1, jd.getDate());
+  const msei = getseiFor(jd.getFullYear(), jd.getMonth()+1, jd.getDate());
   const dsei = nisseiFor(jd.getFullYear(), jd.getMonth()+1, jd.getDate());
 
   // 全方位のスコアを両者で計算
@@ -6879,8 +6976,8 @@ function spotSearch() {
 
   const judgeDate = getJudgeDateVal() || new Date().toISOString().slice(0,10);
   const jd = new Date(judgeDate);
-  const nsei = nenseiFor(jd.getFullYear());
-  const msei = getseiFor(jd.getFullYear(), jd.getMonth()+1);
+  const nsei = nenseiFor(jd.getFullYear(), jd.getMonth()+1, jd.getDate());
+  const msei = getseiFor(jd.getFullYear(), jd.getMonth()+1, jd.getDate());
   const dsei = nisseiFor(jd.getFullYear(), jd.getMonth()+1, jd.getDate());
 
   const maxDist = parseInt(document.getElementById('spotMaxDist')?.value || '500');
@@ -6914,7 +7011,7 @@ function forceInitMap() {
   background:rgba(255,255,255,.9);padding:.15rem .45rem;border-radius:3px;
   font-family:monospace;z-index:9999;pointer-events:none;border:1px solid #e8e8e8;
   letter-spacing:.03em;">
-  houigaku.html &nbsp;v1.2.0 \&nbsp;2026-03-17
+  houigaku.html &nbsp;v1.3.0 \&nbsp;2026-10-19
 </div>
 
 <!-- ======== 基点・行先登録 ＋ 印刷機能 ======== -->
@@ -7078,168 +7175,6 @@ border-bottom:1px solid #b8960c;padding-bottom:6px;margin-bottom:12px;
 display:flex;justify-content:space-between;}
 .pd{font-size:9pt;color:#6b5c45;}
 
-/* ===== 改善：現在地・目的地登録パネル ===== */
-#mapLocPanel {
-  display: flex; flex-wrap: wrap; gap: .6rem;
-  padding: .8rem 1.2rem;
-  background: linear-gradient(135deg, #0c1428, #1a2f5a);
-  border-bottom: 1px solid rgba(201,168,76,.25);
-  align-items: center;
-}
-.map-loc-status {
-  display: flex; align-items: center; gap: .5rem;
-  padding: .45rem 1rem; border-radius: 3px;
-  font-size: .8rem; font-family: 'Noto Serif JP', serif;
-  border: 1px solid rgba(201,168,76,.3);
-  background: rgba(255,255,255,.05);
-  color: rgba(255,255,255,.45);
-  flex: 1; min-width: 170px; transition: .25s;
-}
-.map-loc-status.set { color: #c9a84c; border-color: rgba(201,168,76,.65); background: rgba(201,168,76,.09); }
-.map-loc-status.set-dest { color: #f0a090; border-color: rgba(220,80,60,.55); background: rgba(200,60,40,.09); }
-.map-loc-status .dot { width: 9px; height: 9px; border-radius: 50%; background: #444; flex-shrink: 0; transition: .3s; }
-.map-loc-status.set .dot { background: #10a368; box-shadow: 0 0 6px #10a368; }
-.map-loc-status.set-dest .dot { background: #c0392b; box-shadow: 0 0 6px #c0392b; }
-.map-gps-btn {
-  padding: .45rem 1.1rem; background: var(--gold); color: var(--indigo);
-  border: none; border-radius: 3px;
-  font-family: 'Zen Old Mincho', serif; font-size: .8rem;
-  letter-spacing: .1em; cursor: pointer; font-weight: 700;
-  white-space: nowrap; transition: .2s; box-shadow: 0 2px 8px rgba(160,124,32,.3);
-}
-.map-gps-btn:hover { background: var(--gold-light); box-shadow: 0 4px 14px rgba(160,124,32,.4); }
-.map-swap-btn {
-  padding: .45rem 1.1rem; font-size: 1rem; cursor: pointer;
-  background: rgba(201,168,76,.12); color: var(--gold-light);
-  border: 1px solid rgba(201,168,76,.4); border-radius: 3px;
-  transition: transform .35s ease, background .2s;
-  white-space: nowrap; font-family: 'Noto Serif JP', serif;
-}
-.map-swap-btn:hover { background: rgba(201,168,76,.28); transform: rotate(180deg); }
-.map-step-hint {
-  padding: .3rem .8rem; font-size: .72rem;
-  color: rgba(201,168,76,.85); letter-spacing: .08em;
-  background: rgba(255,255,255,.05);
-  border: 1px solid rgba(201,168,76,.2); border-radius: 3px;
-  animation: hint-pulse 2.2s ease-in-out infinite;
-}
-@keyframes hint-pulse { 0%,100%{opacity:.65} 50%{opacity:1} }
-
-/* ===== リアルタイム方位ナビ ===== */
-#naviPanel {
-  display: none;
-  position: fixed;
-  bottom: 0; left: 0; right: 0;
-  z-index: 10000;
-  background: linear-gradient(180deg, rgba(8,12,28,.97) 0%, rgba(12,20,40,.99) 100%);
-  border-top: 2px solid rgba(201,168,76,.5);
-  padding: .7rem 1rem .8rem;
-  box-shadow: 0 -4px 24px rgba(0,0,0,.5);
-  font-family: 'Noto Serif JP', serif;
-}
-#naviPanel.show { display: block; animation: slideUp .3s ease; }
-@keyframes slideUp { from{transform:translateY(100%);opacity:0} to{transform:translateY(0);opacity:1} }
-
-.navi-top {
-  display: flex; align-items: center; gap: .8rem; flex-wrap: wrap;
-  margin-bottom: .5rem;
-}
-.navi-badge {
-  font-family: 'Zen Old Mincho', serif;
-  font-size: .68rem; letter-spacing: .2em;
-  color: rgba(201,168,76,.7);
-  background: rgba(201,168,76,.08);
-  border: 1px solid rgba(201,168,76,.3);
-  padding: .2rem .6rem; border-radius: 2px;
-}
-.navi-close {
-  margin-left: auto;
-  background: none; border: 1px solid rgba(201,168,76,.3);
-  color: rgba(201,168,76,.7); font-size: .75rem;
-  padding: .25rem .7rem; cursor: pointer; border-radius: 2px;
-  font-family: 'Noto Serif JP', serif;
-}
-.navi-close:hover { background: rgba(201,168,76,.12); color: var(--gold-light); }
-
-.navi-compass-wrap {
-  display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;
-}
-.navi-compass {
-  width: 110px; height: 110px; flex-shrink: 0;
-  position: relative;
-}
-.navi-compass svg { width: 100%; height: 100%; }
-
-.navi-info {
-  flex: 1; min-width: 200px;
-}
-.navi-dir-label {
-  font-family: 'Zen Old Mincho', serif;
-  font-size: 1.8rem; font-weight: 900;
-  letter-spacing: .05em;
-  line-height: 1;
-  margin-bottom: .25rem;
-}
-.navi-kichi-label {
-  font-size: 1.1rem; font-weight: 700;
-  margin-bottom: .3rem;
-}
-.navi-kichi-label.k-kichi    { color: #10a368; }
-.navi-kichi-label.k-futsu    { color: #8899bb; }
-.navi-kichi-label.k-syokyo   { color: #e6a01e; }
-.navi-kichi-label.k-kyo      { color: #dc3c3c; }
-.navi-kichi-label.k-daikyo   { color: #ff6060; }
-.navi-kichi-label.k-saidaikyo{ color: #ff4090; }
-.navi-sub {
-  font-size: .72rem; color: rgba(201,168,76,.65);
-  line-height: 1.8;
-}
-.navi-dest-info {
-  display: flex; gap: 1rem; flex-wrap: wrap;
-  margin-top: .5rem; padding-top: .5rem;
-  border-top: 1px solid rgba(201,168,76,.15);
-  font-size: .75rem; color: rgba(255,255,255,.6);
-}
-.navi-dest-item { display: flex; flex-direction: column; gap: .1rem; }
-.navi-dest-item .di-label { font-size: .62rem; color: rgba(201,168,76,.5); letter-spacing: .12em; }
-.navi-dest-item .di-val { font-family: 'Zen Old Mincho', serif; font-size: .92rem; color: var(--gold-light); }
-
-.navi-alert {
-  display: none;
-  margin-top: .5rem; padding: .45rem .8rem;
-  border-radius: 3px; font-size: .78rem; font-weight: 700;
-  letter-spacing: .05em; text-align: center;
-  animation: alert-flash 1s ease-in-out infinite alternate;
-}
-@keyframes alert-flash { from{opacity:.7} to{opacity:1} }
-.navi-alert.danger {
-  display: block;
-  background: repeating-linear-gradient(135deg,#1a0a0a 0,#1a0a0a 6px,#2a0808 6px,#2a0808 12px);
-  color: #ff6090; border: 1px solid #880e4f;
-}
-.navi-alert.warning {
-  display: block;
-  background: rgba(220,60,60,.15);
-  color: #ff8080; border: 1px solid rgba(220,60,60,.4);
-}
-
-/* ナビ起動ボタン（地図セクション内） */
-#naviStartBtn {
-  padding: .5rem 1.2rem;
-  background: linear-gradient(135deg, #1a3a5c, #0c1630);
-  color: var(--gold-light);
-  border: 1px solid rgba(201,168,76,.5);
-  border-radius: 3px;
-  font-family: 'Zen Old Mincho', serif;
-  font-size: .82rem; letter-spacing: .15em;
-  cursor: pointer; transition: .2s;
-  box-shadow: 0 2px 8px rgba(0,0,0,.2);
-}
-#naviStartBtn:hover { background: linear-gradient(135deg,#254a6c,#1a2640); box-shadow: 0 4px 14px rgba(160,124,32,.25); }
-#naviStartBtn.active {
-  background: linear-gradient(135deg,#0a3020,#041810);
-  border-color: #10a368; color: #10a368;
-}
 </style></head><body>
 <div class="ph"><span>◈ 方位学 — ${title}</span><span class="pd">${ds} 印刷</span></div>
 ${el.outerHTML}
