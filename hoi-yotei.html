@@ -346,6 +346,15 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .intro { font-size: 13px; color: var(--fg-muted); margin-bottom: 10px; max-width: 65ch; }
 .lic-state { font-size: 13px; margin-bottom: 14px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .lic-state:empty { display: none; }
+.time-row { align-items: center; }
+.form-row .time-lb { flex: 0 0 auto; display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--fg-muted); }
+.form-row .time-lb input { flex: 0 0 auto; min-width: 0; width: 8.5em; }
+.time-note { font-size: 12px; color: var(--fg-muted); flex: 1 1 200px; }
+.chip-t { font-variant-numeric: tabular-nums; font-weight: 700; margin-right: 3px; }
+.yotei-time { font-size: 13px; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; margin-bottom: 2px; }
+.nudge { border: 2px solid var(--accent); background: var(--accent-light); border-radius: 10px; padding: 14px 16px; margin-bottom: 18px; display: grid; gap: 8px; }
+.nudge-t { font-size: 15px; font-weight: 700; color: var(--fg); }
+.nudge-b { font-size: 13px; color: var(--fg-muted); max-width: 65ch; }
 .pill-ok, .pill-off { font-size: 11px; font-weight: 700; border-radius: 10px; padding: 1px 9px; }
 .pill-ok { background: var(--done-bg); color: var(--done-fg); }
 .pill-off { background: var(--tag-bg); color: var(--tag-fg); }
@@ -363,6 +372,8 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .koyomi-note h2 { font-size: 13px; font-weight: 700; color: var(--fg); letter-spacing: .05em; }
 .koyomi-note ul { padding-left: 1.2em; display: grid; gap: 3px; max-width: 70ch; }
 .koyomi-note a { color: var(--accent); }
+.request { border: 1px solid var(--border); background: var(--surface); border-radius: 10px; padding: 14px 16px; display: grid; gap: 8px; justify-items: start; }
+.koyomi-note .request a.btn-link { color: var(--fg); font-size: 13px; padding: 7px 16px; }
 header h1 { letter-spacing: .12em; }
 
 </style>
@@ -383,6 +394,7 @@ header h1 { letter-spacing: .12em; }
 
   <p class="intro">予定を書き込むと、その日の方位盤が重なります。予定の記録と今日の日盤は無料です。ほかの日の方位盤・月盤・年盤・吉凶の色分けは、購入（1,000円・購入日から1年間）で開きます。</p>
   <div class="lic-state" id="lic-state"></div>
+  <div class="nudge" id="birth-nudge" role="status" hidden></div>
 
   <!-- 方位の設定 -->
   <div class="kset" id="kset" hidden>
@@ -465,6 +477,11 @@ header h1 { letter-spacing: .12em; }
       <input type="date" id="f-date" required aria-label="日付">
       <input type="text" id="f-title" placeholder="予定のタイトル（必須）" style="flex:2 1 160px;" aria-label="予定のタイトル">
     </div>
+    <div class="form-row time-row">
+      <label class="time-lb">時刻<input type="time" id="f-time" aria-label="開始時刻（任意）"></label>
+      <label class="time-lb">〜<input type="time" id="f-end" aria-label="終了時刻（任意）"></label>
+      <span class="time-note">時刻は任意です。入れなければ終日の予定になります。</span>
+    </div>
     <div class="form-row">
       <input type="text" id="f-place" placeholder="場所（任意）" aria-label="場所">
       <select id="f-repeat" aria-label="繰り返し">
@@ -510,6 +527,11 @@ header h1 { letter-spacing: .12em; }
       <li>日盤は冬至・夏至に最も近い甲子の日で陽遁・陰遁を切り替え、閏の年（次は2031年）も暦どおりに扱います。</li>
       <li>方位の吉凶は高木彬光『改訂版 方位学入門』の方位表と同じ規則で判定しています（648通りすべて一致）。</li>
     </ul>
+    <div class="request">
+      <h2>ご要望をお聞かせください</h2>
+      <p>使ってみて欲しくなった機能や、気づいた点をお寄せください。いただいた声をもとに手を入れていきます。</p>
+      <a class="btn-cancel btn-link" href="https://docs.google.com/forms/d/e/1FAIpQLSf9h_OH-plZEZkxM5yGhiO8c09U8yWMzmlTgBcvZI5m2SwgfQ/viewform" target="_blank" rel="noopener">ご要望を送る（Google フォーム）</a>
+    </div>
     <p>方位の吉凶は暮らしの目安としてお使いください。<a href="houigaku.html">方位学のページ</a>では、地図の上で実際の方位を測ることもできます。</p>
   </section>
 </div>
@@ -521,6 +543,10 @@ header h1 { letter-spacing: .12em; }
     <div class="form-row">
       <input type="date" id="e-date" required aria-label="日付">
       <input type="text" id="e-title" placeholder="タイトル" style="flex:2 1 160px;" aria-label="タイトル">
+    </div>
+    <div class="form-row time-row">
+      <label class="time-lb">時刻<input type="time" id="e-time" aria-label="開始時刻（任意）"></label>
+      <label class="time-lb">〜<input type="time" id="e-end" aria-label="終了時刻（任意）"></label>
     </div>
     <div class="form-row">
       <input type="text" id="e-place" placeholder="場所" aria-label="場所">
@@ -653,6 +679,10 @@ function occurrences(from, to) {
   return out;
 }
 
+function timeKey(x) { return x.time || '99:99'; }   // 終日の予定は最後
+function byTime(p, q) { return (p.done - q.done) || timeKey(p).localeCompare(timeKey(q)) || (p.title||'').localeCompare(q.title||''); }
+function timeLabel(x) { return x.time ? (x.end ? `${x.time}〜${x.end}` : x.time) : ''; }
+
 // ── 九星 ──────────────────────────────────────────
 function kBirthStars() {
   if (!KK || !kProfile || !kProfile.birth) return null;
@@ -677,7 +707,19 @@ function renderAll() {
   renderList();
 }
 
+function renderBirthNudge() {
+  const el = document.getElementById('birth-nudge');
+  if (!el) return;
+  if (kBirthStars()) { el.hidden = true; el.innerHTML = ''; return; }
+  el.hidden = false;
+  el.innerHTML = `<div class="nudge-t">${isOpen() ? 'ご購入ありがとうございます。最後に、生年月日を登録してください' : 'はじめに、生年月日を登録してください'}</div>
+    <div class="nudge-b">方位の吉凶は、ご本人の本命星から見て決まります。登録すると、${isOpen() ? 'すべての日の方位盤が' : '今日の方位盤が'}吉凶で色分けされ、凶の方位にはその理由が出ます。生年月日はこの端末の中にだけ保存します。</div>
+    <div><button type="button" class="btn-primary" id="nudge-btn">生年月日を登録する</button></div>`;
+  document.getElementById('nudge-btn').addEventListener('click', () => openPanel('kset', true));
+}
+
 function renderLicState() {
+  renderBirthNudge();
   const el = document.getElementById('lic-state');
   if (isOpen()) {
     const [y,m,d] = lic.expires.split('-').map(Number);
@@ -701,7 +743,7 @@ function renderMonth() {
   const occ = occurrences(toISO(start), toISO(end));
   const byDay = {};
   occ.forEach(x => (byDay[x.date] = byDay[x.date] || []).push(x));
-  Object.values(byDay).forEach(a => a.sort((p,q) => (p.done - q.done) || (p.title||'').localeCompare(q.title||'')));
+  Object.values(byDay).forEach(a => a.sort(byTime));
 
   let html = WEEKDAYS.map((w,i) => `<div class="cal-wd ${i===0?'sun':i===6?'sat':''}">${w}</div>`).join('');
   for (let i = 0; i < cells; i++) {
@@ -709,7 +751,7 @@ function renderMonth() {
     const iso = toISO(d), wd = d.getDay(), hol = holidayOf(iso), list = byDay[iso] || [];
     const cls = ['cal-day', d.getMonth() !== curM ? 'other' : '', iso === today ? 'is-today' : '', iso === selDate ? 'is-sel' : ''].join(' ');
     const numCls = hol ? 'hol' : wd === 0 ? 'sun' : wd === 6 ? 'sat' : '';
-    const shown = list.slice(0, 3).map(x => `<div class="chip ${x.done?'done':''}">${esc(x.title||'')}</div>`).join('');
+    const shown = list.slice(0, 3).map(x => `<div class="chip ${x.done?'done':''}">${x.time ? `<span class="chip-t">${x.time}</span>` : ''}${esc(x.title||'')}</div>`).join('');
     const more = list.length > 3 ? `<div class="chip-more">ほか${list.length-3}件</div>` : '';
     html += `<button type="button" class="${cls}" data-date="${iso}" aria-label="${d.getMonth()+1}月${d.getDate()}日（${WEEKDAYS[wd]}）${hol?' '+hol:''} 予定${list.length}件">
       <span class="cal-num ${numCls}">${d.getDate()}${hol ? `<span class="cal-hol">${hol}</span>` : ''}${starOf(d)}</span>${shown}${more}</button>`;
@@ -726,7 +768,7 @@ function renderMonth() {
 
   const panel = document.getElementById('day-panel');
   const f = fmtDate(selDate), hol = holidayOf(selDate);
-  const dayItems = occurrences(selDate, selDate).sort((p,q) => (p.done - q.done));
+  const dayItems = occurrences(selDate, selDate).sort(byTime);
   panel.innerHTML = houiHTML(selDate) + `<div class="section-head">${f.month}${f.day}日（${f.wd}）${hol ? '・' + hol : ''}の予定</div>`
     + (dayItems.length
       ? `<ul class="yotei-list">${dayItems.map(x => renderItem(x, today)).join('')}</ul>`
@@ -741,7 +783,7 @@ function renderList() {
   const doneArea = document.getElementById('done-area');
   const lo = all.reduce((m,x) => x.date && x.date < m ? x.date : m, today);
   const expanded = occurrences(lo, addDays(today, 90));
-  const active = expanded.filter(x => !x.done).sort((a,b) => a.date.localeCompare(b.date));
+  const active = expanded.filter(x => !x.done).sort((a,b) => a.date.localeCompare(b.date) || timeKey(a).localeCompare(timeKey(b)));
   const done = all.filter(x => x.done).sort((a,b) => b.date.localeCompare(a.date)).slice(0,10);
   if (active.length === 0) {
     listArea.innerHTML = '<div class="empty-msg">予定はまだありません。上の欄に日付とタイトルを入れて「追加する」を押してください。</div>';
@@ -779,6 +821,7 @@ function renderItem(item, today) {
   return `<li class="yotei-item ${cls}">
     <div class="yotei-date-col"><div class="yotei-month">${month}</div><div class="yotei-day">${day}</div><div class="yotei-weekday">(${wd})</div></div>
     <div class="yotei-body">
+      ${item.time ? `<div class="yotei-time">${timeLabel(item)}</div>` : ''}
       <div class="yotei-title">${esc(item.title || '')}</div>
       ${item.place ? `<div class="yotei-sub">場所：${esc(item.place)}</div>` : ''}
       ${item.memo ? `<div class="yotei-memo">${esc(item.memo)}</div>` : ''}
@@ -978,7 +1021,7 @@ document.getElementById('k-save').addEventListener('click', () => {
   if (y < 1900 || y > 2100) { showMsg('k-msg', '1900〜2100年の生年月日で入れてください。'); return; }
   kProfile = { birth, hour };
   showMsg('k-msg', lsSet(ST_KYUSEI, kProfile) ? '登録しました。' : 'この端末に保存できませんでした。', true);
-  showWho(); renderMonth();
+  showWho(); renderBirthNudge(); renderMonth();
 });
 
 // ── 購入・解錠 ─────────────────────────────────────
@@ -1025,7 +1068,7 @@ document.getElementById('lic-resend').addEventListener('click', async () => {
     if (r.ok) {
       setLic(r.key, r.expires);
       document.getElementById('lic-key').value = r.key;
-      showMsg('lic-msg', `ご購入ありがとうございます。解錠しました（${r.expires.replace(/-/g,'/')}まで）。解錠番号 ${r.key} は控えておいてください。メールでもお送りしました。`, true);
+      showMsg('lic-msg', `ご購入ありがとうございます。解錠しました（${r.expires.replace(/-/g,'/')}まで）。解錠番号 ${r.key} は控えておいてください。メールでもお送りしました。${kBirthStars() ? '' : '続けて「方位の設定」で生年月日を登録すると、方位盤に吉凶の色が付きます。'}`, true);
     } else showMsg('lic-msg', r.message || 'お支払いを確かめられませんでした。お手数ですが、届いたメールの解錠番号を入れてください。');
   } catch (e) { showMsg('lic-msg', '通信できませんでした。届いたメールの解錠番号を入れてください。'); }
 })();
@@ -1072,8 +1115,11 @@ document.getElementById('btn-add').addEventListener('click', () => {
   const date = document.getElementById('f-date').value, title = document.getElementById('f-title').value.trim();
   if (!date || !title) { showMsg('f-msg', '日付とタイトルを入れてください。'); return; }
   showMsg('f-msg', '');
-  addItem({ date, title, place: document.getElementById('f-place').value.trim(), repeat: document.getElementById('f-repeat').value, memo: document.getElementById('f-memo').value.trim() });
-  ['f-title','f-place','f-memo'].forEach(id => document.getElementById(id).value = '');
+  const time = document.getElementById('f-time').value, end = document.getElementById('f-end').value;
+  if (end && !time) { showMsg('f-msg', '終了時刻だけでは登録できません。開始時刻も入れてください。'); return; }
+  if (time && end && end < time) { showMsg('f-msg', '終了時刻が開始時刻より前になっています。'); return; }
+  addItem({ date, title, time, end, place: document.getElementById('f-place').value.trim(), repeat: document.getElementById('f-repeat').value, memo: document.getElementById('f-memo').value.trim() });
+  ['f-title','f-place','f-memo','f-time','f-end'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('f-repeat').value = 'none';
   selDate = date; renderMonth();
   document.getElementById('f-title').focus();
@@ -1086,6 +1132,8 @@ function openEdit(id) {
   editId = id;
   document.getElementById('e-date').value = item.date;
   document.getElementById('e-title').value = item.title || '';
+  document.getElementById('e-time').value = item.time || '';
+  document.getElementById('e-end').value = item.end || '';
   document.getElementById('e-place').value = item.place || '';
   document.getElementById('e-repeat').value = item.repeat || 'none';
   document.getElementById('e-memo').value = item.memo || '';
@@ -1096,6 +1144,7 @@ document.getElementById('btn-edit-cancel').addEventListener('click', () => { doc
 document.getElementById('btn-edit-save').addEventListener('click', () => {
   if (!editId) return;
   updateItem(editId, { date: document.getElementById('e-date').value, title: document.getElementById('e-title').value.trim(),
+    time: document.getElementById('e-time').value, end: document.getElementById('e-time').value ? document.getElementById('e-end').value : '',
     place: document.getElementById('e-place').value.trim(), repeat: document.getElementById('e-repeat').value, memo: document.getElementById('e-memo').value.trim() });
   document.getElementById('edit-modal').hidden = true; editId = null;
 });
