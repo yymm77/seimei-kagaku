@@ -221,6 +221,18 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   cursor: pointer; text-align: left; border-radius: 0; font-weight: 400;
 }
 .cal-day:hover { opacity: 1; background: var(--accent-light); }
+.cal-day:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.cal .chip { cursor: grab; touch-action: none; }
+.cal.dragging, .cal.dragging * { cursor: grabbing; user-select: none; }
+.cal-day.drop-target { outline: 2px dashed var(--accent); outline-offset: -3px; background: var(--accent-light); }
+.chip-ghost { position: fixed; z-index: 300; pointer-events: none; font-size: 11px; background: var(--chip-bg); color: var(--chip-fg); border-radius: 3px; padding: 2px 6px; box-shadow: 0 4px 14px rgba(0,0,0,.2); max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ctx-menu { position: fixed; z-index: 310; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 8px 28px rgba(0,0,0,.2); padding: 4px; display: grid; min-width: 168px; }
+.ctx-menu .ctx-t { font-size: 11px; color: var(--fg-muted); padding: 4px 10px 2px; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ctx-menu button { background: transparent; color: var(--fg); text-align: left; padding: 7px 10px; font-size: 13px; font-weight: 500; border-radius: 5px; }
+.ctx-menu button:hover { background: var(--accent-light); opacity: 1; }
+.ctx-menu button.del { color: var(--del); }
+.toast { position: fixed; z-index: 320; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--fg); color: var(--bg); font-size: 13px; border-radius: 8px; padding: 9px 14px; display: flex; gap: 12px; align-items: center; box-shadow: 0 6px 22px rgba(0,0,0,.25); }
+.toast button { background: transparent; color: var(--bg); text-decoration: underline; padding: 0; font-size: 13px; }
 .cal-day.other { background: var(--bg); }
 .cal-day.other .cal-num { opacity: .45; }
 .cal-day.is-today { background: var(--today-bg); }
@@ -861,14 +873,17 @@ function renderMonth() {
     const kd = d.getMonth() === curM ? kasaDirs(dInfo, bsM) : [];
     const cls = ['cal-day', d.getMonth() !== curM ? 'other' : '', iso === today ? 'is-today' : '', iso === selDate ? 'is-sel' : '', luckClass(iso, dInfo, bsM), kd.length ? 'kasa' : ''].join(' ');
     const numCls = hol ? 'hol' : wd === 0 ? 'sun' : wd === 6 ? 'sat' : '';
-    const shown = list.slice(0, 3).map(x => `<div class="chip ${x.done?'done':''}">${x.time ? `<span class="chip-t">${x.time}</span>` : ''}${esc(x.title||'')}</div>`).join('');
+    const shown = list.slice(0, 3).map(x => `<div class="chip ${x.done?'done':''}" data-item="${esc(x._virtual ? x.id.replace(/_[wm]\d+$/, '') : x.id)}" title="ドラッグで別の日へ移動・右クリックで完了／削除">${x.time ? `<span class="chip-t">${x.time}</span>` : ''}${esc(x.title||'')}</div>`).join('');
     const more = list.length > 3 ? `<div class="chip-more">ほか${list.length-3}件</div>` : '';
-    html += `<button type="button" class="${cls}" data-date="${iso}" aria-label="${d.getMonth()+1}月${d.getDate()}日（${WEEKDAYS[wd]}）${hol?' '+hol:''} 予定${list.length}件">
-      <span class="cal-num ${numCls}">${d.getDate()}${hol ? `<span class="cal-hol">${hol}</span>` : ''}${lvTextHTML(luckLv(iso, dInfo, bsM))}${starOf(d)}</span>${switchHTML(dInfo)}${kd.length ? `<span class="kasa-badge" title="吉の重なる方位">吉 ${kd.join('・')}</span>` : ''}${shown}${more}</button>`;
+    html += `<div role="button" tabindex="0" class="${cls}" data-date="${iso}" aria-label=""${d.getMonth()+1}月${d.getDate()}日（${WEEKDAYS[wd]}）${hol?' '+hol:''} 予定${list.length}件">
+      <span class="cal-num ${numCls}">${d.getDate()}${hol ? `<span class="cal-hol">${hol}</span>` : ''}${lvTextHTML(luckLv(iso, dInfo, bsM))}${starOf(d)}</span>${switchHTML(dInfo)}${kd.length ? `<span class="kasa-badge" title="吉の重なる方位">吉 ${kd.join('・')}</span>` : ''}${shown}${more}</div>`;
   }
   const cal = document.getElementById('cal');
   cal.innerHTML = html;
   cal.classList.toggle('filtering', kasaMode !== 'off' && isOpen() && !!bsM);
+  cal.querySelectorAll('.cal-day').forEach(b => b.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); b.click(); }
+  }));
   cal.querySelectorAll('.cal-day').forEach(b => b.addEventListener('click', () => {
     selDate = b.dataset.date;
     document.getElementById('f-date').value = selDate;
@@ -1091,6 +1106,100 @@ function hbMove(e) {
   hbEl.style.left = x + 'px'; hbEl.style.top = y + 'px';
 }
 function hbHide() { if (hbEl) hbEl.classList.remove('on'); hbIso = null; }
+
+// ── 予定の札：ドラッグで別の日へ、右クリックで完了・削除 ──────────
+let toastTimer = null;
+function toast(text, undo) {
+  let el = document.getElementById('toast');
+  if (!el) { el = document.createElement('div'); el.id = 'toast'; el.className = 'toast'; el.setAttribute('role', 'status'); document.body.appendChild(el); }
+  el.innerHTML = `<span>${esc(text)}</span>${undo ? '<button type="button" id="toast-undo">元に戻す</button>' : ''}`;
+  el.hidden = false;
+  if (undo) document.getElementById('toast-undo').addEventListener('click', () => { undo(); el.hidden = true; });
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true; }, 6000);
+}
+function snapshotItem(id) { const it = items[id]; return it ? JSON.parse(JSON.stringify(it)) : null; }
+function restoreItem(snap) { if (snap) { items[snap.id] = snap; saveItems(); renderAll(); } }
+
+let drag = null, dragJustEnded = false;
+(function () {
+  const cal = document.getElementById('cal');
+  const cellAt = (x, y) => { const el = document.elementFromPoint(x, y); return el ? el.closest('#cal .cal-day') : null; };
+  cal.addEventListener('pointerdown', e => {
+    if (e.button !== 0 || e.pointerType === 'touch') return;      // 指で触る端末は画面のスクロールを優先
+    const chip = e.target.closest('.chip[data-item]');
+    if (!chip) return;
+    drag = { id: chip.dataset.item, from: chip.closest('.cal-day').dataset.date, x: e.clientX, y: e.clientY, on: false, ghost: null, over: null, chip };
+  });
+  window.addEventListener('pointermove', e => {
+    if (!drag) return;
+    if (!drag.on) {
+      if (Math.hypot(e.clientX - drag.x, e.clientY - drag.y) < 6) return;
+      const it = items[drag.id];
+      if (!it) { drag = null; return; }
+      if (it.repeat === 'weekly' || it.repeat === 'monthly') {
+        toast('繰り返しの予定は、一覧の「編集」から日付を変えてください'); drag = null; return;
+      }
+      drag.on = true; hbHide(); cal.classList.add('dragging');
+      drag.ghost = document.createElement('div'); drag.ghost.className = 'chip-ghost'; drag.ghost.textContent = (it.time ? it.time + ' ' : '') + (it.title || '');
+      document.body.appendChild(drag.ghost);
+    }
+    drag.ghost.style.left = (e.clientX + 12) + 'px'; drag.ghost.style.top = (e.clientY + 10) + 'px';
+    const c = cellAt(e.clientX, e.clientY);
+    if (drag.over && drag.over !== c) drag.over.classList.remove('drop-target');
+    if (c && c.dataset.date !== drag.from) { c.classList.add('drop-target'); drag.over = c; } else drag.over = null;
+  });
+  const endDrag = (e, cancel) => {
+    if (!drag) return;
+    const d = drag; drag = null;
+    if (!d.on) return;
+    cal.classList.remove('dragging'); d.ghost.remove(); if (d.over) d.over.classList.remove('drop-target');
+    dragJustEnded = true; setTimeout(() => { dragJustEnded = false; }, 0);
+    if (cancel || !d.over) return;
+    const to = d.over.dataset.date, snap = snapshotItem(d.id);
+    updateItem(d.id, { date: to });
+    const t = parseDate(to);
+    toast(`「${snap.title || '予定'}」を${t.getMonth()+1}月${t.getDate()}日（${WEEKDAYS[t.getDay()]}）へ移しました`, () => restoreItem(snap));
+  };
+  window.addEventListener('pointerup', e => endDrag(e, false));
+  window.addEventListener('pointercancel', e => endDrag(e, true));
+  window.addEventListener('keydown', e => { if (e.key === 'Escape') { endDrag(e, true); closeCtx(); } });
+  // ドラッグを終えた直後のクリックで日付が選ばれないようにする
+  cal.addEventListener('click', e => { if (dragJustEnded) { e.stopPropagation(); e.preventDefault(); } }, true);
+
+  // 右クリックの小さなメニュー
+  cal.addEventListener('contextmenu', e => {
+    const chip = e.target.closest('.chip[data-item]');
+    if (!chip) return;
+    const it = items[chip.dataset.item];
+    if (!it) return;
+    e.preventDefault(); hbHide(); closeCtx();
+    const rep = it.repeat === 'weekly' || it.repeat === 'monthly';
+    const m = document.createElement('div'); m.className = 'ctx-menu'; m.id = 'ctx-menu'; m.setAttribute('role', 'menu');
+    m.innerHTML = `<div class="ctx-t">${esc(it.title || '予定')}${rep ? '（繰り返し全体）' : ''}</div>
+      <button type="button" role="menuitem" data-ctx="done">${it.done ? '未完了に戻す' : '完了にする'}</button>
+      <button type="button" role="menuitem" data-ctx="del" class="del">削除する</button>`;
+    document.body.appendChild(m);
+    const w = m.offsetWidth || 170, h = m.offsetHeight || 110;
+    m.style.left = Math.min(e.clientX, window.innerWidth - w - 8) + 'px';
+    m.style.top = Math.min(e.clientY, window.innerHeight - h - 8) + 'px';
+    m.querySelector('[data-ctx="done"]').focus();
+    m.addEventListener('click', ev => {
+      const a = ev.target.closest('[data-ctx]'); if (!a) return;
+      const snap = snapshotItem(it.id);
+      closeCtx();
+      if (a.dataset.ctx === 'done') {
+        updateItem(it.id, { done: !snap.done });
+        toast(snap.done ? `「${snap.title || '予定'}」を未完了に戻しました` : `「${snap.title || '予定'}」を完了にしました`, () => restoreItem(snap));
+      } else {
+        deleteItem(it.id);
+        toast(`「${snap.title || '予定'}」を削除しました`, () => restoreItem(snap));
+      }
+    });
+  });
+  document.addEventListener('pointerdown', e => { if (!e.target.closest('#ctx-menu')) closeCtx(); });
+  window.addEventListener('scroll', closeCtx, true);
+})();
+function closeCtx() { const m = document.getElementById('ctx-menu'); if (m) m.remove(); }
 (function () {
   const cal = document.getElementById('cal');
   cal.addEventListener('pointermove', e => {
