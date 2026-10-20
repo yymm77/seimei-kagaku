@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-V0EMF3WHLM"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-V0EMF3WHLM');</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>方位予定帖 改良の記録 — 日昇リサーチ</title>
+<meta name="description" content="方位予定帖の改良と研究の記録。日付ごとに、何を加え、どう確かめたかを書き足していきます。">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;700&family=Noto+Serif+JP:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+/* 全体図（index.html）の「研究の歩み」と同じ組み方。日付・状態・内容の三列 */
+:root {
+  --ink: #1a1208; --ink-light: #3d2b0e; --paper: #f2ead8; --paper-dark: #e8dcc4;
+  --gold: #8a6914; --jade: #2d5a3d; --indigo: #1a3a5c; --vermillion: #8b2020;
+  --border: rgba(138,105,20,0.25);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Shippori Mincho', 'Noto Serif JP', '游明朝', serif; background: var(--paper); color: var(--ink);
+  line-height: 1.9; padding: 0 max(16px, env(safe-area-inset-left, 0px)) 64px max(16px, env(safe-area-inset-right, 0px)); }
+.wrap { max-width: 860px; margin: 0 auto; }
+.crumb { font-size: 0.8rem; padding: 20px 0 0; color: var(--ink-light); }
+.crumb a { color: var(--indigo); text-decoration: none; }
+header { text-align: center; padding: 34px 0 26px; border-bottom: 1px solid var(--border); margin-bottom: 26px; }
+.eyebrow { font-size: 0.8rem; letter-spacing: 0.3em; color: var(--gold); margin-bottom: 10px; }
+h1 { font-size: 1.6rem; letter-spacing: 0.12em; text-wrap: balance; }
+.lead { max-width: 640px; margin: 14px auto 0; font-size: 0.9rem; color: var(--ink-light); }
+.links { display: flex; flex-wrap: wrap; gap: 10px 18px; justify-content: center; margin-top: 16px; font-size: 0.86rem; }
+.links a { color: var(--indigo); }
+h2 { font-size: 1.05rem; letter-spacing: 0.14em; color: var(--indigo); margin: 34px 0 10px; }
+.ayumi { border-top: 1px solid var(--border); list-style: none; }
+.ayumi li { display: grid; grid-template-columns: 6em 4.8em minmax(0, 1fr); gap: 14px; align-items: baseline;
+  padding: 13px 4px; border-bottom: 1px solid var(--border); font-size: 0.88rem; line-height: 1.85; color: var(--ink-light); }
+.ayumi .when { font-size: 0.76rem; color: var(--gold); letter-spacing: 0.08em; font-variant-numeric: tabular-nums; }
+.ayumi .st { font-size: 0.68rem; letter-spacing: 0.15em; text-align: center; padding: 1px 0; border: 1px solid var(--jade); color: var(--jade); }
+.ayumi .st.now { border-color: var(--vermillion); color: var(--paper); background: var(--vermillion); }
+.ayumi .st.next { border-color: var(--indigo); color: var(--indigo); }
+.ayumi b { color: var(--ink); }
+.ayumi a { color: var(--indigo); }
+.note { margin-top: 14px; font-size: 0.8rem; color: var(--ink-light); opacity: 0.8; }
+footer { text-align: center; margin-top: 40px; font-size: 0.84rem; }
+footer a { color: var(--indigo); margin: 0 6px; }
+@media (max-width: 680px) {
+  .ayumi li { grid-template-columns: 1fr; gap: 4px; }
+  .ayumi .st { justify-self: start; padding: 1px 10px; }
+}
+</style>
+</head>
+<body><div class="wrap">
+<div class="crumb"><a href="index.html">予測技術ポータル</a> ＞ <a href="hoi-yotei.html">方位予定帖</a> ＞ 改良の記録</div>
+
+<header>
+  <div class="eyebrow">方 位 予 定 帖</div>
+  <h1>改良の記録</h1>
+  <p class="lead">方位予定帖に何を加え、どう確かめたかを、日付ごとに書き足していきます。暦や判定にかかわる変更は、別に組んだ計算や公開の暦と突き合わせてから公開しています。</p>
+  <div class="links"><a href="hoi-yotei.html">▶ 方位予定帖を開く</a><a href="tokusho.html">特定商取引法に基づく表記</a></div>
+</header>
+
+<h2>これからの改良</h2>
+<ol class="ayumi">
+  <li><span class="when">進行中</span><span class="st now">進行中</span><span><b>地図で起点と行き先を拾う。</b>自宅・勤務先ともう一か所を起点に登録し、行き先を地図の上で選ぶと、方位と距離が出る仕組みです。流派（四正30度・四隅60度／八方位45度）、真北と磁北、南半球の扱いを選べるようにし、海外への出張にも対応します。方位と距離、磁気偏角の計算はできあがり、米国海洋大気庁（NOAA）の公式検証値12点と0.005度以内で一致すること、別の測地計算と14都市で一致することを確かめました。</span></li>
+  <li><span class="when">検討中</span><span class="st next">検討中</span><span>流派によって扱いが分かれる定位対冲・土用・月命星を、選んで判定に加えられるようにするか検討しています。</span></li>
+  <li><span class="when">次の修正</span><span class="st next">修正予定</span><span>閏の後半の30日（次は2031年12月20日〜2032年1月18日）に、浮かぶ方位盤の見出しが「陽遁」のまま出る表示の誤りを直します。星の位置は正しく出ています。</span></li>
+  <li><span class="when">次の修正</span><span class="st next">修正予定</span><span>子の刻（23時〜1時）生まれを23時59分として扱っているため、立春や節入りの当日0時台に生まれた方の本命星が一つずれることがあります。生まれ時刻の扱いを改めます。</span></li>
+</ol>
+
+<h2>2026年10月20日（火）</h2>
+<ol class="ayumi">
+  <li><span class="when">10.20</span><span class="st">済</span><span><b>日々の吉凶を背景の色で。</b>月の暦の日付ごとに、その日の八方位の吉凶の平均で枠を塗り分けました。日盤・月盤・年盤のどれで見るかを選べます。色は方位盤と同じ色味で、一年の日々がほぼ四等分になるように四段階に区切っています。</span></li>
+  <li><span class="when">10.20</span><span class="st">済</span><span><b>色の見分けにくい方のための文字。</b>日付の星（二黒など）の左に「吉・普・凶・大凶」の文字を添えました。消すこともできます。</span></li>
+  <li><span class="when">10.20</span><span class="st">済</span><span><b>吉の重なる日。</b>月盤と日盤、または年盤・月盤・日盤のすべてで同じ方位が吉になる日を、ボタンで浮かび上がらせ、その方位を札で示します。</span></li>
+  <li><span class="when">10.20</span><span class="st">済</span><span><b>押すたびに盤が替わる。</b>日付に乗せて浮かぶ方位盤を、押すたびに日盤→月盤→年盤と切り替え、星が順路どおりに回るようにしました。</span></li>
+  <li><span class="when">10.20</span><span class="st">済</span><span><b>予定をつかんで動かす。</b>月の暦の予定を別の日へ動かせるようにし、右クリックで完了・削除できるようにしました。操作のあと6秒間は元に戻せます。</span></li>
+  <li><span class="when">10.20</span><span class="st">済</span><span><b>立春と節入りの知らせ。</b>年盤は元日ではなく立春で、月盤は毎月の節入りで切り替わります。その日に印を付け、1月・2月は暦の上にも知らせを出します。</span></li>
+  <li><span class="when">10.20</span><span class="st">済</span><span><b>歳破・月破・日破を加えました。</b>一般の九星気学で誰にとっても凶とされる三つの破を判定に加え、破に当たる方位は他の判定が軽くても「凶」としました。高木彬光『改訂版 方位学入門』の方位表には含まれないため、画面に但し書きを添えています。破の方位は別の計算と10年分（3,653日）を照合し、すべて一致しました。</span></li>
+  <li><span class="when">10.20</span><span class="st">済</span><span><b>歴史上の出来事で確かめる。</b>出発地・行き先・日付・生年月日のはっきりした6件で破を調べました。不幸な結果の4件のうち2件が破に当たり、うまくいった2件は当たっていませんでした。ただ、でたらめな日と方角でも35％ほどは当たるため、6件では関連があるとは言えません。</span></li>
+  <li><span class="when">10.20</span><span class="st">済</span><span><b>暦と表示の総点検。</b>年盤・月盤・日盤の中宮を天文計算で別に組んだ暦と2,923日分、公開の九星暦と33日分照合し、すべて一致しました。吉凶の規則648通り、画面の表示102,483項目（本命星9通り×15か月）も、不一致はありませんでした。</span></li>
+  <li><span class="when">10.20</span><span class="st">済</span><span><b>古い計算ファイルが残っても止まらないように。</b>ブラウザが古い暦の計算ファイルを覚えていると、新しい画面と食い違うことがありました。読み込みに版番号を付けて防ぎました。</span></li>
+  <li><span class="when">10.20</span><span class="st">済</span><span><b>販売用と自分用を同じ一つのファイルに。</b>claude.ai の中で開いたときは、予定と生年月日を端末間で同期する自分用として動き、それ以外では販売用として動きます。片方を直せば、もう片方も同じになります。</span></li>
+</ol>
+
+<h2>2026年10月19日（月）</h2>
+<ol class="ayumi">
+  <li><span class="when">10.19</span><span class="st">済</span><span><b>暦の照合。</b>節入り・夏至・冬至の時刻を天文計算で1900〜2100年分求め、国立天文台の『暦要項』と1分以内で一致させました。日盤の陽遁・陰遁は冬至・夏至に最も近い甲子の日で切り替え、閏の年も暦どおりに扱います。</span></li>
+  <li><span class="when">10.19</span><span class="st">済</span><span><b>吉凶の判定。</b>高木彬光『改訂版 方位学入門』の方位表と同じ規則で判定し、表の648通りすべてと一致することを確かめました。</span></li>
+  <li><span class="when">10.19</span><span class="st">済</span><span><b>なぞると星が回る盤。</b>月の暦をなぞると方位盤が付いてきて、九つの星が飛泊の順路どおりに一升ずつ移るようにしました。</span></li>
+  <li><span class="when">10.19</span><span class="st">済</span><span><b>販売の仕組み。</b>1,000円・購入日から1年間・自動更新なしの利用権として、決済と解錠番号の発行の仕組みを設け、試験購入と返金まで確かめました。</span></li>
+</ol>
+<p class="note">改良が進むたびに、ここに書き足していきます。ご要望は、方位予定帖の画面からお寄せください。</p>
+
+<footer>
+  <a href="hoi-yotei.html">方位予定帖</a>｜<a href="houigaku.html">方位学ポータル</a>｜<a href="index.html">予測技術ポータル</a>｜<a href="https://yymm77.github.io/kiroku/">記録</a>
+  <div style="margin-top:12px;font-size:0.78rem;color:var(--ink-light);">生かされて今を存在する</div>
+</footer>
+</div></body>
+</html>
