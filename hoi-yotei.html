@@ -1020,6 +1020,9 @@ const HB_PATH = ['C','NW','W','NE','S','N','SW','E','SE'];
 const HB_XY = { NW:[0,0], N:[1,0], NE:[2,0], W:[0,1], C:[1,1], E:[2,1], SW:[0,2], S:[1,2], SE:[2,2] };
 const HB_STEP = 67;
 let hbEl = null, hbCenter = null, hbTarget = null, hbTimer = null, hbIso = null;
+// 浮かぶ方位盤：日付に乗せると日盤、クリックするたびに月盤→年盤→日盤と切り替わる
+const HB_ORDER = ['nichi', 'getsu', 'nen'];
+let hbBan = 'nichi', hbBanIso = null;
 function hbBuild() {
   hbEl = document.createElement('div');
   hbEl.className = 'hban'; hbEl.setAttribute('aria-hidden', 'true');
@@ -1062,15 +1065,17 @@ function hbShow(iso) {
     hbIso = iso;
     const [y,m,d] = iso.split('-').map(Number);
     let info; try { info = KK.dayInfo(y,m,d); } catch (e) { return; }
-    const ban = isOpen() ? kBan : 'nichi';
+    if (iso !== hbBanIso) { hbBan = 'nichi'; hbBanIso = iso; }   // 別の日に移ったら日盤から
+    const ban = isOpen() ? hbBan : 'nichi';
     const c = ban === 'nen' ? info.nen : ban === 'getsu' ? info.getsu : info.nichi;
     document.getElementById('hb-date').textContent = `${m}月${d}日（${WEEKDAYS[new Date(y,m-1,d).getDay()]}）`;
-    document.getElementById('hb-ban').textContent = `${BAN_NAME[ban]}・${info.ton.type}`;
+    document.getElementById('hb-ban').textContent = ban === 'nichi' ? `${BAN_NAME[ban]}・${info.ton.type}` : BAN_NAME[ban];
     const bs = kBirthStars(), foot = document.getElementById('hb-foot');
     if (!isOpen()) foot.textContent = '購入すると吉凶の色と凶方位が出ます';
     else if (bs) {
       const kyou = KK.DIRS.map(k => KK.judge(bs.hon, c)[k]).filter(r => r.kyou).map(r => r.dir + r.label);
-      foot.textContent = kyou.length ? '凶：' + kyou.join('・') : '凶方位なし';
+      const next = BAN_NAME[HB_ORDER[(HB_ORDER.indexOf(ban) + 1) % 3]];
+      foot.textContent = (kyou.length ? '凶：' + kyou.join('・') : '凶方位なし') + `　［クリックで${next}へ］`;
     } else foot.textContent = '生年月日を登録すると吉凶の色が付きます';
     const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (hbCenter == null || reduce) { hbCenter = hbTarget = c; hbPlace(c); }
@@ -1095,6 +1100,17 @@ function hbHide() { if (hbEl) hbEl.classList.remove('on'); hbIso = null; }
     hbShow(cell.dataset.date); hbMove(e);
   });
   cal.addEventListener('pointerleave', hbHide);
+  // クリックで盤を順に切り替える（マウスのときだけ。日付の選択はこれまでどおり）
+  cal.addEventListener('click', e => {
+    if (e.pointerType && e.pointerType !== 'mouse') return;
+    const cell = e.target.closest('.cal-day');
+    if (!cell || !hbEl || !hbEl.classList.contains('on')) return;
+    const iso = cell.dataset.date;
+    if (iso !== hbBanIso) { hbBanIso = iso; hbBan = 'nichi'; }
+    else if (isOpen()) hbBan = HB_ORDER[(HB_ORDER.indexOf(hbBan) + 1) % 3];
+    hbIso = null; hbShow(iso);
+    if (!isOpen()) document.getElementById('hb-foot').textContent = '月盤・年盤は購入後にご覧になれます';
+  });
 })();
 
 // ── 開閉パネル ─────────────────────────────────────
