@@ -8,6 +8,7 @@
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-V0EMF3WHLM"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-V0EMF3WHLM');</script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="vendor/leaflet.css">
 <style>
 :root { padding-top: env(safe-area-inset-top,0px); padding-bottom: env(safe-area-inset-bottom,0px); }
 [hidden] { display: none !important; }
@@ -415,6 +416,33 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .koyomi-note .request a.btn-link { color: var(--fg); font-size: 13px; padding: 7px 16px; }
 header h1 { letter-spacing: .12em; }
 
+/* 地図・起点・行き先 */
+.geo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 8px; }
+.geo-org { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; display: grid; gap: 6px; background: var(--bg); min-width: 0; }
+.geo-org .nm { font-weight: 700; font-size: 13px; display: flex; gap: 6px; align-items: center; }
+.geo-org .nm input { flex: 1; min-width: 0; font-size: 13px; padding: 3px 6px; border: 1px solid var(--border); border-radius: 5px; background: var(--surface); color: var(--fg); font-family: inherit; }
+.geo-org .at { font-size: 12px; color: var(--fg-muted); overflow-wrap: anywhere; }
+.geo-set { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 8px 12px; }
+.geo-set label { display: grid; gap: 3px; font-size: 12px; color: var(--fg-muted); }
+.geo-set select, .geo-set input { border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px; font-size: 13px; font-family: inherit; background: var(--bg); color: var(--fg); }
+.dest-row { align-items: center; }
+.dest-label { font-size: 12px; color: var(--fg-muted); flex: 1 1 160px; min-width: 0; overflow-wrap: anywhere; }
+.map-box { max-width: 720px; max-height: calc(100vh - 32px); overflow-y: auto; display: grid; gap: 10px; }
+.map-search { display: flex; gap: 6px; flex-wrap: wrap; }
+.map-search input { flex: 1 1 180px; min-width: 0; border: 1px solid var(--border); border-radius: 6px; padding: 7px 9px; font-size: 14px; font-family: inherit; background: var(--bg); color: var(--fg); }
+.map-results { display: grid; gap: 2px; font-size: 13px; }
+.map-results button { text-align: left; background: var(--surface2); color: var(--fg); font-weight: 500; padding: 6px 10px; }
+#geoMap { height: 340px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); }
+.map-pick { font-size: 13px; line-height: 1.7; }
+.map-pick b { font-size: 14px; }
+.map-msg { font-size: 12px; color: var(--fg-muted); line-height: 1.7; }
+.dir-line { font-size: 12px; line-height: 1.8; margin-top: 4px; display: flex; flex-wrap: wrap; gap: 2px 8px; align-items: baseline; }
+.dir-line .dl-dir { font-weight: 700; color: var(--fg); }
+.dir-line .tag { font-size: 11px; font-weight: 700; border-radius: 4px; padding: 0 6px; }
+.dir-line .dl-note { color: var(--fg-muted); flex-basis: 100%; }
+.ban-cell.is-dest { box-shadow: inset 0 0 0 3px var(--accent); }
+.ban-cell .dest-mk { font-size: 10px; font-weight: 700; color: var(--accent); }
+.leaflet-container { font-family: inherit; }
 </style>
 </head>
 <body>
@@ -424,6 +452,7 @@ header h1 { letter-spacing: .12em; }
   <h1>方位予定帖</h1>
   <div class="head-right">
     <button type="button" id="btn-kset" class="btn-export" aria-expanded="false" aria-controls="kset">方位の設定</button>
+    <button type="button" id="btn-geo" class="btn-export" aria-expanded="false" aria-controls="geoPanel">地図・起点</button>
     <button type="button" id="btn-lic" class="btn-export" aria-expanded="false" aria-controls="lic">購入・解錠</button>
     <button type="button" id="btn-data" class="btn-export" aria-expanded="false" aria-controls="dataPanel">データ</button>
   </div>
@@ -492,6 +521,22 @@ header h1 { letter-spacing: .12em; }
     </div>
   </div>
 
+  <!-- 地図・起点 -->
+  <div class="kset" id="geoPanel" hidden>
+    <h2>地図と起点</h2>
+    <div class="kset-note">方位を測る起点を三か所まで登録できます。予定に行き先を付けると、起点からの方位と距離を出し、その日の方位盤の吉凶と合わせて示します。起点と行き先はこの端末の中にだけ保存します。</div>
+    <div class="geo-grid" id="geo-origins"></div>
+    <div class="geo-set">
+      <label>流派（方位の区切り）<select id="g-school"><option value="30-60">四正30度・四隅60度</option><option value="45">八方位45度均等</option></select></label>
+      <label>北の基準<select id="g-north"><option value="true">真北</option><option value="magnetic">磁北</option></select></label>
+      <label>計算法<select id="g-method"><option value="auto">自動（近くは一致、遠くは大圏）</option><option value="gc">大圏（正距方位）</option><option value="rhumb">等角航路（メルカトル）</option></select></label>
+      <label>南半球の扱い（起点が南半球のとき）<select id="g-southern"><option value="none">入れ替えない</option><option value="ns">南北を入れ替える</option><option value="nsew">南北・東西とも入れ替える</option></select></label>
+      <label>境界の近くで判定しない幅（度）<input type="number" id="g-margin" min="0" max="10" step="0.5"></label>
+      <label>判定日の基準<select id="g-basis"><option value="jst">日本時間</option><option value="local">行き先の現地時間</option></select></label>
+    </div>
+    <div class="btn-row"><span class="form-msg" id="g-msg"></span><button type="button" class="btn-cancel" id="g-close">閉じる</button></div>
+  </div>
+
   <!-- データ -->
   <div class="kset" id="dataPanel" hidden>
     <h2>データの書き出し・読み込み</h2>
@@ -528,6 +573,12 @@ header h1 { letter-spacing: .12em; }
         <option value="weekly">毎週</option>
         <option value="monthly">毎月</option>
       </select>
+    </div>
+    <div class="form-row dest-row">
+      <select id="f-origin" aria-label="方位を測る起点"></select>
+      <button type="button" class="btn-sm btn-cancel" id="f-dest-btn">行き先を選ぶ</button>
+      <span class="dest-label" id="f-dest-label">行き先：なし</span>
+      <button type="button" class="btn-sm btn-cancel" id="f-dest-clear" hidden>外す</button>
     </div>
     <div class="form-row">
       <textarea id="f-memo" placeholder="メモ（任意）" aria-label="メモ"></textarea>
@@ -600,6 +651,12 @@ header h1 { letter-spacing: .12em; }
         <option value="monthly">毎月</option>
       </select>
     </div>
+    <div class="form-row dest-row">
+      <select id="e-origin" aria-label="方位を測る起点"></select>
+      <button type="button" class="btn-sm btn-cancel" id="e-dest-btn">行き先を選ぶ</button>
+      <span class="dest-label" id="e-dest-label">行き先：なし</span>
+      <button type="button" class="btn-sm btn-cancel" id="e-dest-clear" hidden>外す</button>
+    </div>
     <div class="form-row">
       <textarea id="e-memo" placeholder="メモ" aria-label="メモ"></textarea>
     </div>
@@ -610,6 +667,34 @@ header h1 { letter-spacing: .12em; }
   </div>
 </div>
 
+<!-- 地図の窓 -->
+<div class="modal-overlay" id="map-modal" hidden>
+  <div class="modal-box map-box" role="dialog" aria-modal="true" aria-labelledby="map-h">
+    <h3 id="map-h">地点を選ぶ</h3>
+    <div class="map-search">
+      <input type="text" id="map-q" placeholder="住所・駅名・建物名・地名（海外も可）" aria-label="住所や地名で探す">
+      <button type="button" class="btn-sm btn-primary" id="map-go">探す</button>
+      <button type="button" class="btn-sm btn-cancel" id="map-here">現在地</button>
+    </div>
+    <div class="map-results" id="map-results"></div>
+    <div id="geoMap" role="application" aria-label="地図。押した地点を選びます"></div>
+    <div class="map-search">
+      <input type="text" id="map-ll" placeholder="座標を貼る（例：35.6812, 139.7671）" aria-label="緯度と経度">
+      <button type="button" class="btn-sm btn-cancel" id="map-ll-go">座標で決める</button>
+    </div>
+    <div class="map-pick" id="map-pick"></div>
+    <div class="map-msg" id="map-msg"></div>
+    <div class="btn-row">
+      <button type="button" class="btn-cancel" id="map-cancel">取消</button>
+      <button type="button" class="btn-primary" id="map-ok" disabled>この地点にする</button>
+    </div>
+  </div>
+</div>
+
+<script src="vendor/leaflet.js"></script>
+<script src="vendor/geographiclib-geodesic.min.js"></script>
+<script src="vendor/tz-lookup.js"></script>
+<script src="houi_calc.js?v=20261020a"></script>
 <script src="kyusei_koyomi.js?v=20261020b"></script>
 <script>
 // ====================================================
@@ -982,6 +1067,7 @@ function renderItem(item, today) {
       ${item.place ? `<div class="yotei-sub">場所：${esc(item.place)}</div>` : ''}
       ${item.memo ? `<div class="yotei-memo">${esc(item.memo)}</div>` : ''}
       ${item.repeat && item.repeat !== 'none' ? `<span class="yotei-repeat">${item.repeat==='weekly'?'毎週':'毎月'}</span>` : ''}
+      ${item.dest ? dirLineHTML(item) : ''}
     </div>
     ${actions}
   </li>`;
@@ -1008,12 +1094,15 @@ function houiHTML(iso) {
 
   const center = kBan === 'nen' ? info.nen : kBan === 'getsu' ? info.getsu : info.nichi;
   const bs = kBirthStars(), ban = KK.ban(center), j = bs ? jBan(bs.hon, info, kBan) : null;
+  const destDirs = new Set();   // この日の予定の行き先の方位（境界付近で判定しないものは除く）
+  occurrences(iso, iso).forEach(x => { const g = x.dest ? itemGeo(x) : null; if (g && g.r && g.r.sector && g.r.judged) destDirs.add(KK.DIRS[g.r.sector.index]); });
   let cells = '';
   BAN_GRID.flat().forEach(k => {
     if (k === 'C') { cells += `<div class="ban-cell c"><span class="ban-dir">中宮</span><span class="ban-st">${KK.SHORT[center-1]}</span></div>`; return; }
     const r = j ? j[k] : null;
-    cells += `<div class="ban-cell ${r ? 'k-' + r.label : 'k-none'}" title="${KK.DIR_JA[k]}：${KK.NAMES[ban[k]-1]}${r ? '（' + r.label + '）' : ''}">
-      <span class="ban-dir">${KK.DIR_JA[k]}</span><span class="ban-st">${KK.SHORT[ban[k]-1]}</span>${r ? `<span class="ban-lb">${r.label}${r.ha ? '・' + r.ha : ''}</span>` : ''}</div>`;
+    const isDest = destDirs.has(k);
+    cells += `<div class="ban-cell ${r ? 'k-' + r.label : 'k-none'}${isDest ? ' is-dest' : ''}" title="${KK.DIR_JA[k]}：${KK.NAMES[ban[k]-1]}${r ? '（' + r.label + '）' : ''}">
+      <span class="ban-dir">${KK.DIR_JA[k]}</span><span class="ban-st">${KK.SHORT[ban[k]-1]}</span>${r ? `<span class="ban-lb">${r.label}${r.ha ? '・' + r.ha : ''}</span>` : ''}${isDest ? '<span class="dest-mk">行き先</span>' : ''}</div>`;
   });
   const hm = t => `${t.m}月${t.d}日 ${t.h}:${String(t.mi).padStart(2,'0')}`;
   const st = KK.setsuiri(y, m);
@@ -1255,7 +1344,7 @@ function closeCtx() { const m = document.getElementById('ctx-menu'); if (m) m.re
 })();
 
 // ── 開閉パネル ─────────────────────────────────────
-const PANELS = { kset: 'btn-kset', lic: 'btn-lic', dataPanel: 'btn-data' };
+const PANELS = { kset: 'btn-kset', geoPanel: 'btn-geo', lic: 'btn-lic', dataPanel: 'btn-data' };
 function openPanel(id, open) {
   Object.keys(PANELS).forEach(p => {
     const show = p === id && open;
@@ -1267,12 +1356,14 @@ function openPanel(id, open) {
     document.getElementById('k-hour').value = String(kProfile?.hour ?? -1);
     showWho();
   }
+  if (open && id === 'geoPanel') renderGeoPanel();
   if (open) document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 Object.keys(PANELS).forEach(p => document.getElementById(PANELS[p]).addEventListener('click', () => openPanel(p, document.getElementById(p).hidden)));
 document.getElementById('k-close').addEventListener('click', () => openPanel('kset', false));
 document.getElementById('lic-close').addEventListener('click', () => openPanel('lic', false));
 document.getElementById('d-close').addEventListener('click', () => openPanel('dataPanel', false));
+document.getElementById('g-close').addEventListener('click', () => openPanel('geoPanel', false));
 
 // ── 方位の設定 ─────────────────────────────────────
 function showWho() {
@@ -1353,6 +1444,260 @@ document.getElementById('lic-resend').addEventListener('click', async () => {
   } catch (e) {}
 })();
 
+
+// ====================================================
+// 地図・起点・行き先（計算は houi_calc.js、大圏は GeographicLib）
+// ====================================================
+const HC = window.HouiCalc || null;
+const GEOD = window.geodesic && window.geodesic.Geodesic ? window.geodesic.Geodesic.WGS84 : null;
+const judgeGeo = HC && GEOD ? HC.createHoui(GEOD) : null;
+const TZL = typeof window.tzlookup === 'function' ? window.tzlookup : null;
+const ST_GEO = 'hoi_yotei_geo';
+const ORIGIN_KEYS = ['home', 'work', 'other'];
+let geo = lsGet(ST_GEO, null) || {};
+geo = { school: '30-60', north: 'true', method: 'auto', southern: 'none', margin: 2,
+        dayBasis: HC ? HC.defaultDayBasis() : 'jst', otherName: 'その他', ...geo };
+geo.origins = { home: null, work: null, other: null, ...(geo.origins || {}) };
+function originName(k) { return k === 'home' ? '自宅' : k === 'work' ? '勤務先' : (geo.otherName || 'その他'); }
+function saveGeo() { lsSet(ST_GEO, geo); geoCache.clear(); hbIso = null; }
+const geoCache = new Map();
+
+// 予定の行き先の方位・距離・三盤の吉凶
+function itemGeo(item) {
+  if (!item.dest || !judgeGeo || !KK) return null;
+  const okey = item.origin && ORIGIN_KEYS.includes(item.origin) ? item.origin : 'home';
+  const org = geo.origins[okey];
+  if (!org) return { err: `起点「${originName(okey)}」が未登録です。「地図・起点」で登録してください。`, okey };
+  const key = [item.date, item.time || '', item.dest.lat, item.dest.lon, okey, org.lat, org.lon, geo.school, geo.north, geo.method, geo.southern, geo.margin, geo.dayBasis].join('|');
+  if (geoCache.has(key)) return geoCache.get(key);
+  const [y, m, d] = item.date.split('-').map(Number);
+  const [hh, mi] = (item.time || '12:00').split(':').map(Number);
+  const when = new Date(y, m - 1, d, hh, mi);
+  const r = judgeGeo(org, item.dest, { school: geo.school, north: geo.north, method: geo.method, southern: geo.southern, margin: Number(geo.margin), date: when });
+  let jd = { day: item.date, timeZone: 'Asia/Tokyo' };
+  if (TZL) { try { jd = HC.judgmentDay(when, geo.dayBasis, item.dest, TZL); } catch (e) {} }
+  const out = { r, okey, org, jday: jd.day, tz: jd.timeZone, labels: null };
+  const bs = kBirthStars();
+  if (bs && r.sector && r.judged) {
+    const [jy, jm, jdd] = jd.day.split('-').map(Number);
+    try {
+      const info = KK.dayInfo(jy, jm, jdd), k = KK.DIRS[r.sector.index];
+      out.labels = ['nichi', 'getsu', 'nen'].map(b => ({ ban: b, ...jBan(bs.hon, info, b)[k] }));
+    } catch (e) {}
+  }
+  geoCache.set(key, out);
+  return out;
+}
+function fmtKm(km) { return km < 10 ? km.toFixed(1) + 'km' : Math.round(km).toLocaleString('ja-JP') + 'km'; }
+function dirLineHTML(item) {
+  const g = itemGeo(item);
+  const name = esc(item.dest.name || '行き先');
+  if (!g) return `<div class="dir-line"><span>行き先：${name}</span></div>`;
+  if (g.err) return `<div class="dir-line"><span>行き先：${name}</span><span class="dl-note">${esc(g.err)}</span></div>`;
+  const r = g.r;
+  if (r.undefined) return `<div class="dir-line"><span>行き先：${name}（${originName(g.okey)}から）</span><span class="dl-note">${esc(r.undefined)}</span></div>`;
+  const az = r.azimuth.toFixed(1) + '°';
+  let judge = '';
+  if (!r.judged) judge = '<span class="tag k-吉凶">境界のため判定しない</span>';
+  else if (!isOpen() && g.jday !== todayISO()) judge = '<span>吉凶は購入後にご覧になれます</span>';
+  else if (!g.labels) judge = '<span>生年月日を登録すると吉凶が出ます</span>';
+  else judge = g.labels.map(l => `<span class="tag k-${l.label}">${BAN_NAME[l.ban]} ${l.label}${l.ha ? '（' + l.ha + '）' : ''}</span>`).join('');
+  const notes = [...r.notes.filter(n => !/判定しない/.test(n))];
+  if (geo.north === 'magnetic' && r.declination) notes.push(`磁北で判定（偏角 ${Math.abs(r.declination.value).toFixed(1)}°${r.declination.value < 0 ? '西' : '東'}）`);
+  if (g.jday !== item.date) notes.push(`判定日は${geo.dayBasis === 'local' ? '現地時間' : '日本時間'}の${Number(g.jday.slice(5,7))}月${Number(g.jday.slice(8))}日`);
+  return `<div class="dir-line"><span>行き先：${name}（${originName(g.okey)}から）</span><span class="dl-dir">${r.sector.dir} ${az}・${fmtKm(r.distanceKm)}</span>${judge}${notes.length ? `<span class="dl-note">${esc(notes.join('。'))}</span>` : ''}</div>`;
+}
+
+// 起点と設定のパネル
+function renderGeoPanel() {
+  const box = document.getElementById('geo-origins');
+  box.innerHTML = ORIGIN_KEYS.map(k => {
+    const o = geo.origins[k];
+    const nm = k === 'other' ? `<input type="text" id="g-other-name" value="${esc(geo.otherName || 'その他')}" aria-label="三つ目の起点の名前" maxlength="12">` : originName(k);
+    return `<div class="geo-org"><div class="nm">${nm}</div>
+      <div class="at">${o ? esc(o.name || '') + `<br>${o.lat.toFixed(5)}, ${o.lon.toFixed(5)}` : '未登録'}</div>
+      <div class="btn-row" style="justify-content:flex-start;margin:0"><button type="button" class="btn-sm btn-primary" data-org-set="${k}">${o ? '変える' : '登録する'}</button>${o ? `<button type="button" class="btn-sm btn-cancel" data-org-del="${k}">消す</button>` : ''}</div></div>`;
+  }).join('');
+  box.querySelectorAll('[data-org-set]').forEach(b => b.addEventListener('click', () => openMap({ kind: 'origin', key: b.dataset.orgSet })));
+  box.querySelectorAll('[data-org-del]').forEach(b => b.addEventListener('click', () => { geo.origins[b.dataset.orgDel] = null; saveGeo(); renderGeoPanel(); renderAll(); }));
+  const on = document.getElementById('g-other-name');
+  if (on) on.addEventListener('change', () => { geo.otherName = on.value.trim() || 'その他'; saveGeo(); fillOriginSelects(); renderAll(); });
+  document.getElementById('g-school').value = geo.school;
+  document.getElementById('g-north').value = geo.north;
+  document.getElementById('g-method').value = geo.method;
+  document.getElementById('g-southern').value = geo.southern;
+  document.getElementById('g-margin').value = geo.margin;
+  document.getElementById('g-basis').value = geo.dayBasis;
+}
+[['g-school','school'],['g-north','north'],['g-method','method'],['g-southern','southern'],['g-basis','dayBasis']].forEach(([id, k]) =>
+  document.getElementById(id).addEventListener('change', e => { geo[k] = e.target.value; saveGeo(); renderAll(); showMsg('g-msg', '変えました。', true); }));
+document.getElementById('g-margin').addEventListener('change', e => {
+  const v = Number(e.target.value);
+  if (!(v >= 0 && v <= 10)) { showMsg('g-msg', '0〜10度の範囲で入れてください。'); e.target.value = geo.margin; return; }
+  geo.margin = v; saveGeo(); renderAll(); showMsg('g-msg', '変えました。', true);
+});
+
+// 追加欄・編集欄の行き先
+const destDraft = { f: null, e: null };
+function fillOriginSelects() {
+  ['f', 'e'].forEach(p => {
+    const sel = document.getElementById(p + '-origin'), cur = sel.value || 'home';
+    sel.innerHTML = ORIGIN_KEYS.map(k => `<option value="${k}">起点：${esc(originName(k))}${geo.origins[k] ? '' : '（未登録）'}</option>`).join('');
+    sel.value = cur;
+  });
+}
+function showDraft(p) {
+  const d = destDraft[p];
+  document.getElementById(p + '-dest-label').textContent = d ? `行き先：${d.name || ''}（${d.lat.toFixed(4)}, ${d.lon.toFixed(4)}）` : '行き先：なし';
+  document.getElementById(p + '-dest-clear').hidden = !d;
+}
+['f', 'e'].forEach(p => {
+  document.getElementById(p + '-dest-btn').addEventListener('click', () => openMap({ kind: 'dest', prefix: p }));
+  document.getElementById(p + '-dest-clear').addEventListener('click', () => { destDraft[p] = null; showDraft(p); });
+});
+
+// 地図の窓
+let lmap = null, lTiles = null, lTileKind = '', lPick = null, lOrg = null, lLine = null, lRays = [];
+let mapMode = null, pick = null, lastSearch = 0;
+const MAP_OK = !PERSONAL && !!window.L;   // claude.ai の中では外の地図画像を読めないため、座標の入力だけにする
+const inJP = (lat, lon) => lat >= 20 && lat <= 46 && lon >= 122 && lon <= 154;
+function setTiles(lat, lon) {
+  const kind = inJP(lat, lon) ? 'gsi' : 'osm';
+  if (kind === lTileKind) return;
+  if (lTiles) lmap.removeLayer(lTiles);
+  lTiles = kind === 'gsi'
+    ? L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank">国土地理院</a>' })
+    : L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>' });
+  lTiles.addTo(lmap); lTileKind = kind;
+}
+function geodesicPath(a, b, n) {   // 大圏の道筋（経度は連続させる）
+  const line = GEOD.InverseLine(a.lat, a.lon, b.lat, b.lon), pts = [];
+  for (let i = 0; i <= n; i++) { const p = line.Position(line.s13 * i / n, window.geodesic.Geodesic.STANDARD | window.geodesic.Geodesic.LONG_UNROLL); pts.push([p.lat2, p.lon2]); }
+  return pts;
+}
+function drawGuides() {
+  if (!lmap) return;
+  if (lLine) { lmap.removeLayer(lLine); lLine = null; }
+  lRays.forEach(x => lmap.removeLayer(x)); lRays = [];
+  if (lOrg) { lmap.removeLayer(lOrg); lOrg = null; }
+  if (!mapMode || mapMode.kind !== 'dest') return;
+  const okey = document.getElementById(mapMode.prefix + '-origin').value;
+  const org = geo.origins[okey];
+  if (!org) return;
+  lOrg = L.circleMarker([org.lat, org.lon], { radius: 7, color: '#1a3a5c', fillColor: '#1a3a5c', fillOpacity: 0.9 }).addTo(lmap).bindTooltip(originName(okey));
+  // 方位の境界線（流派の区切り。磁北のときは偏角の分だけ回す）
+  const dist = pick ? Math.max(30000, Math.min(4e6, GEOD.Inverse(org.lat, org.lon, pick.lat, pick.lon).s12 * 1.3)) : 60000;
+  let rot = 0;
+  if (geo.north === 'magnetic' && HC) { try { rot = HC.declination(org.lat, org.lon).value; } catch (e) {} }
+  HC.SCHOOLS[geo.school].start.forEach(b => {
+    const line = GEOD.DirectLine(org.lat, org.lon, b + rot, dist), pts = [];
+    for (let i = 0; i <= 24; i++) { const p = line.Position(dist * i / 24, window.geodesic.Geodesic.STANDARD | window.geodesic.Geodesic.LONG_UNROLL); pts.push([p.lat2, p.lon2]); }
+    lRays.push(L.polyline(pts, { color: '#b8960c', weight: 1.5, dashArray: '5 6', opacity: 0.9 }).addTo(lmap));
+  });
+  if (pick) lLine = L.polyline(geodesicPath(org, pick, 64), { color: '#8b2e2e', weight: 3 }).addTo(lmap);
+}
+function setPick(p, pan) {
+  pick = p;
+  document.getElementById('map-ok').disabled = !pick;
+  if (lmap && pick) {
+    if (!lPick) { lPick = L.marker([pick.lat, pick.lon], { draggable: true }).addTo(lmap); lPick.on('dragend', () => { const ll = lPick.getLatLng(); setPick({ lat: ll.lat, lon: L.Util.wrapNum(ll.lng, [-180, 180], true), name: '地図で選んだ地点' }, false); }); }
+    else lPick.setLatLng([pick.lat, pick.lon]);
+    if (pan) lmap.setView([pick.lat, pick.lon], Math.max(lmap.getZoom(), 13));
+    setTiles(pick.lat, pick.lon);
+  }
+  drawGuides(); showPick();
+}
+function showPick() {
+  const el = document.getElementById('map-pick');
+  if (!pick) { el.innerHTML = ''; return; }
+  let line = `<b>${esc(pick.name || '選んだ地点')}</b>　${pick.lat.toFixed(5)}, ${pick.lon.toFixed(5)}`;
+  if (mapMode && mapMode.kind === 'dest' && judgeGeo) {
+    const okey = document.getElementById(mapMode.prefix + '-origin').value, org = geo.origins[okey];
+    if (!org) line += `<br>起点「${esc(originName(okey))}」が未登録です。先に「地図・起点」で登録すると、方位と距離が出ます。`;
+    else {
+      const r = judgeGeo(org, pick, { school: geo.school, north: geo.north, method: geo.method, southern: geo.southern, margin: Number(geo.margin) });
+      line += r.undefined ? `<br>${esc(r.undefined)}` : `<br>${esc(originName(okey))}から <b>${r.sector.dir}</b> ${r.azimuth.toFixed(1)}°・${fmtKm(r.distanceKm)}${r.judged ? '' : '（境界の近くのため判定しない）'}`;
+    }
+  }
+  el.innerHTML = line;
+}
+function openMap(mode) {
+  mapMode = mode;
+  const cur = mode.kind === 'origin' ? geo.origins[mode.key] : destDraft[mode.prefix];
+  document.getElementById('map-h').textContent = mode.kind === 'origin' ? `起点「${originName(mode.key)}」を選ぶ` : '行き先を選ぶ';
+  document.getElementById('map-results').innerHTML = '';
+  document.getElementById('map-q').value = '';
+  document.getElementById('map-ll').value = '';
+  document.getElementById('map-msg').textContent = MAP_OK ? '地図を押すか、住所・地名で探してください。印は動かせます。'
+    : (PERSONAL ? 'この画面（claude.ai の中）では、外の地図や住所検索を読み込めません。座標を貼って決めてください。Google マップなどで地点を右クリックすると、座標を写せます。'
+                : '地図を読み込めませんでした。座標を貼って決めてください。');
+  document.getElementById('geoMap').hidden = !MAP_OK;
+  document.querySelector('#map-modal .map-search').hidden = !MAP_OK;
+  document.getElementById('map-modal').hidden = false;
+  const start = cur || (mode.kind === 'dest' && geo.origins[document.getElementById(mode.prefix + '-origin').value]) || geo.origins.home || { lat: 35.6812, lon: 139.7671 };
+  if (MAP_OK) {
+    if (!lmap) {
+      lmap = L.map('geoMap', { worldCopyJump: true }).setView([start.lat, start.lon], 13);
+      lmap.on('click', e => setPick({ lat: e.latlng.lat, lon: L.Util.wrapNum(e.latlng.lng, [-180, 180], true), name: '地図で選んだ地点' }, false));
+      lmap.on('moveend', () => { const c = lmap.getCenter(); setTiles(c.lat, c.lng); });
+    }
+    setTimeout(() => { lmap.invalidateSize(); lmap.setView([start.lat, start.lon], cur ? 14 : 12); setTiles(start.lat, start.lon); }, 0);
+  }
+  if (lPick && lmap) { lmap.removeLayer(lPick); lPick = null; }
+  setPick(cur ? { ...cur } : null, false);
+  (MAP_OK ? document.getElementById('map-q') : document.getElementById('map-ll')).focus();
+}
+function closeMap() { document.getElementById('map-modal').hidden = true; mapMode = null; }
+document.getElementById('map-cancel').addEventListener('click', closeMap);
+document.getElementById('map-ok').addEventListener('click', () => {
+  if (!pick || !mapMode) return;
+  const p = { lat: +pick.lat.toFixed(6), lon: +pick.lon.toFixed(6), name: (pick.name || '').slice(0, 80) };
+  if (mapMode.kind === 'origin') { geo.origins[mapMode.key] = p; saveGeo(); renderGeoPanel(); fillOriginSelects(); renderAll(); }
+  else { destDraft[mapMode.prefix] = p; showDraft(mapMode.prefix); }
+  closeMap();
+});
+document.getElementById('map-ll-go').addEventListener('click', () => {
+  const m = document.getElementById('map-ll').value.match(/(-?\d+(?:\.\d+)?)\s*[,，、\s]\s*(-?\d+(?:\.\d+)?)/);
+  if (!m || Math.abs(+m[1]) > 90 || Math.abs(+m[2]) > 180) { document.getElementById('map-msg').textContent = '「緯度, 経度」の形で入れてください（例：35.6812, 139.7671）。'; return; }
+  setPick({ lat: +m[1], lon: +m[2], name: '座標で選んだ地点' }, true);
+});
+async function searchPlace() {
+  const q = document.getElementById('map-q').value.trim(), out = document.getElementById('map-results'), msg = document.getElementById('map-msg');
+  if (!q) return;
+  const wait = 1100 - (Date.now() - lastSearch);   // 地名検索の決まり（1秒に1回まで）を守る
+  if (wait > 0) await new Promise(r => setTimeout(r, wait));
+  lastSearch = Date.now();
+  msg.textContent = '探しています…'; out.innerHTML = '';
+  let hits = [];
+  try {   // 国内：国土地理院の住所検索
+    const r = await fetch('https://msearch.gsi.go.jp/address-search/AddressSearch?q=' + encodeURIComponent(q));
+    const j = await r.json();
+    hits = (j || []).slice(0, 6).map(x => ({ lat: x.geometry.coordinates[1], lon: x.geometry.coordinates[0], name: x.properties.title }));
+  } catch (e) {}
+  if (!hits.length) {
+    try {   // 海外や施設名：OpenStreetMap の Nominatim
+      const r = await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6&accept-language=ja&q=' + encodeURIComponent(q));
+      const j = await r.json();
+      hits = (j || []).map(x => ({ lat: +x.lat, lon: +x.lon, name: x.display_name }));
+    } catch (e) {}
+  }
+  if (!hits.length) { msg.textContent = '見つかりませんでした。言い方を変えるか、地図を押して選んでください。'; return; }
+  msg.textContent = '候補から選んでください。';
+  out.innerHTML = hits.map((h, i) => `<button type="button" data-hit="${i}">${esc(h.name)}</button>`).join('');
+  out.querySelectorAll('[data-hit]').forEach(b => b.addEventListener('click', () => { setPick(hits[+b.dataset.hit], true); out.innerHTML = ''; }));
+}
+document.getElementById('map-go').addEventListener('click', searchPlace);
+document.getElementById('map-q').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); searchPlace(); } });
+document.getElementById('map-here').addEventListener('click', () => {
+  const msg = document.getElementById('map-msg');
+  if (!navigator.geolocation) { msg.textContent = 'この端末では現在地を使えません。'; return; }
+  msg.textContent = '現在地を確かめています…';
+  navigator.geolocation.getCurrentPosition(p => { setPick({ lat: p.coords.latitude, lon: p.coords.longitude, name: '現在地' }, true); msg.textContent = '現在地に印を置きました。'; },
+    () => { msg.textContent = '現在地を取れませんでした。ブラウザの位置情報の許可をご確認ください。'; }, { enableHighAccuracy: true, timeout: 10000 });
+});
+['f', 'e'].forEach(p => document.getElementById(p + '-origin').addEventListener('change', () => { if (mapMode && mapMode.prefix === p) { drawGuides(); showPick(); } }));
+fillOriginSelects();
+
 // ── データの書き出し・読み込み ─────────────────────
 document.getElementById('btn-export').addEventListener('click', async () => {
   const data = { app: '方位予定帖', version: 1, exportedAt: new Date().toISOString(), items, kyusei: kProfile, license: lic };
@@ -1397,7 +1742,9 @@ document.getElementById('btn-add').addEventListener('click', () => {
   const time = document.getElementById('f-time').value, end = document.getElementById('f-end').value;
   if (end && !time) { showMsg('f-msg', '終了時刻だけでは登録できません。開始時刻も入れてください。'); return; }
   if (time && end && end < time) { showMsg('f-msg', '終了時刻が開始時刻より前になっています。'); return; }
-  addItem({ date, title, time, end, place: document.getElementById('f-place').value.trim(), repeat: document.getElementById('f-repeat').value, memo: document.getElementById('f-memo').value.trim() });
+  addItem({ date, title, time, end, place: document.getElementById('f-place').value.trim(), repeat: document.getElementById('f-repeat').value, memo: document.getElementById('f-memo').value.trim(),
+    ...(destDraft.f ? { dest: destDraft.f, origin: document.getElementById('f-origin').value } : {}) });
+  destDraft.f = null; showDraft('f');
   ['f-title','f-place','f-memo','f-time','f-end'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('f-repeat').value = 'none';
   selDate = date; renderMonth();
@@ -1416,6 +1763,8 @@ function openEdit(id) {
   document.getElementById('e-place').value = item.place || '';
   document.getElementById('e-repeat').value = item.repeat || 'none';
   document.getElementById('e-memo').value = item.memo || '';
+  destDraft.e = item.dest ? { ...item.dest } : null; showDraft('e');
+  fillOriginSelects(); document.getElementById('e-origin').value = item.origin || 'home';
   document.getElementById('edit-modal').hidden = false;
   document.getElementById('e-title').focus();
 }
@@ -1424,7 +1773,8 @@ document.getElementById('btn-edit-save').addEventListener('click', () => {
   if (!editId) return;
   updateItem(editId, { date: document.getElementById('e-date').value, title: document.getElementById('e-title').value.trim(),
     time: document.getElementById('e-time').value, end: document.getElementById('e-time').value ? document.getElementById('e-end').value : '',
-    place: document.getElementById('e-place').value.trim(), repeat: document.getElementById('e-repeat').value, memo: document.getElementById('e-memo').value.trim() });
+    place: document.getElementById('e-place').value.trim(), repeat: document.getElementById('e-repeat').value, memo: document.getElementById('e-memo').value.trim(),
+    dest: destDraft.e || null, origin: destDraft.e ? document.getElementById('e-origin').value : null });
   document.getElementById('edit-modal').hidden = true; editId = null;
 });
 
