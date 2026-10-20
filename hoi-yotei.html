@@ -239,17 +239,24 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .day-panel { margin-top: 16px; }
 .cal-legend { font-size: 11px; color: var(--fg-muted); margin-top: 6px; }
 /* 吉凶の平均（日の下の3本線：上から年盤・月盤・日盤） */
-.luck { display: grid; gap: 1px; margin-top: auto; padding-top: 2px; }
-.luck i { display: block; height: 4px; border-radius: 1px; }
-.luck i.l-良, .luck-legend .sw.l-良 { background: var(--k-kichi-fg); }
-.luck i.l-並, .luck-legend .sw.l-並 { background: var(--k-futsu-fg); opacity: .55; }
-.luck i.l-やや注意, .luck-legend .sw.l-やや注意 { background: var(--k-kk-fg); }
-.luck i.l-注意, .luck-legend .sw.l-注意 { background: var(--k-sho-fg); }
+.cal-day.lv-良 { background: var(--k-kichi-bg); }
+.cal-day.lv-やや注意 { background: var(--k-kk-bg); }
+.cal-day.lv-注意 { background: var(--k-sho-bg); }
+.cal-day.is-today { box-shadow: inset 0 0 0 2px var(--k-star); }
+.cal.filtering .cal-day:not(.kasa):not(.other) { opacity: .35; }
+.cal.filtering .cal-day.kasa { box-shadow: inset 0 0 0 2px var(--k-kichi-fg); }
+.kasa-badge { font-size: 9px; font-weight: 700; line-height: 1.3; color: var(--k-kichi-fg); background: var(--surface); border: 1px solid var(--k-kichi-fg); border-radius: 3px; padding: 0 3px; align-self: flex-start; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.luck-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin-bottom: 8px; font-size: 12px; color: var(--fg-muted); }
+.luck-ctl .ban-tabs button:disabled { opacity: .45; cursor: not-allowed; }
 .cal-sw { font-size: 9px; font-weight: 700; line-height: 1.2; color: var(--k-kk-fg); }
 .cal-sw.risshun { color: var(--del); }
 .sw-note { font-size: 12px; line-height: 1.6; background: var(--tag-bg); color: var(--tag-fg); border-left: 3px solid var(--del); border-radius: 6px; padding: 7px 10px; margin-bottom: 8px; }
 .luck-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; font-size: 11px; color: var(--fg-muted); margin-top: 6px; }
-.luck-legend .sw { display: inline-block; width: 18px; height: 4px; border-radius: 1px; vertical-align: middle; margin-right: 4px; }
+.luck-legend .sw { display: inline-block; width: 14px; height: 10px; border-radius: 2px; border: 1px solid var(--border); vertical-align: middle; margin-right: 4px; }
+.luck-legend .sw.l-良 { background: var(--k-kichi-bg); }
+.luck-legend .sw.l-並 { background: var(--surface); }
+.luck-legend .sw.l-やや注意 { background: var(--k-kk-bg); }
+.luck-legend .sw.l-注意 { background: var(--k-sho-bg); }
 @media (max-width: 520px) {
   .cal-day { min-height: 64px; padding: 3px 2px 4px; }
   .chip { font-size: 10px; padding: 0 2px; }
@@ -520,6 +527,7 @@ header h1 { letter-spacing: .12em; }
       <button type="button" class="nav-btn" id="m-today">今月</button>
     </div>
     <div id="sw-note"></div>
+    <div id="luck-ctl"></div>
     <div class="cal" id="cal"></div>
     <div id="luck-legend"></div>
     <div class="cal-legend">日付を押すと、その日の方位盤と予定が下に出ます。日付の横の星はその日の日盤（中宮の星）です。マウスで日付をなぞると、方位盤が付いてきて星が飛泊の順に回ります。</div>
@@ -716,10 +724,35 @@ function starOf(d) {
 const LUCK_LEVELS = ['良', '並', 'やや注意', '注意'];
 function luckAvg(hon, center) { const j = KK.judge(hon, center); return KK.DIRS.reduce((t, k) => t + j[k].score, 0) / 8; }
 function luckLevel(avg) { return avg >= 55 ? '良' : avg >= 48 ? '並' : avg >= 44 ? 'やや注意' : '注意'; }
-function luckHTML(iso, info, bs) {
-  if (!bs || !info || !(isOpen() || iso === todayISO())) return '';
-  const row = (k, c) => { const a = luckAvg(bs.hon, c), l = luckLevel(a); return `<i class="l-${l}" title="${BAN_NAME[k]}の平均 ${a.toFixed(1)}点（${l}）"></i>`; };
-  return `<span class="luck" aria-hidden="true">${row('nen', info.nen)}${row('getsu', info.getsu)}${row('nichi', info.nichi)}</span>`;
+const ST_LUCKBAN = 'hoi_yotei_luckban', ST_KASA = 'hoi_yotei_kasa';
+let luckBan = lsGet(ST_LUCKBAN, 'nichi'); if (!['nichi','getsu','nen','off'].includes(luckBan)) luckBan = 'nichi';
+let kasaMode = lsGet(ST_KASA, 'off'); if (!['off','gm','all'].includes(kasaMode)) kasaMode = 'off';
+const KASA_NAME = { off: 'なし', gm: '月盤・日盤', all: '年盤・月盤・日盤' };
+// 背景色：選んだ盤の八方位の平均で色分け（未購入は今日だけ）
+function luckClass(iso, info, bs) {
+  if (!bs || !info || luckBan === 'off' || !(isOpen() || iso === todayISO())) return '';
+  const c = luckBan === 'nen' ? info.nen : luckBan === 'getsu' ? info.getsu : info.nichi;
+  return 'lv-' + luckLevel(luckAvg(bs.hon, c));
+}
+// 吉の重なる方位（同じ方位が、選んだ階層のすべての盤で「吉」）
+function kasaDirs(info, bs) {
+  if (!bs || !info || kasaMode === 'off' || !isOpen()) return [];
+  const boards = [KK.judge(bs.hon, info.nichi), KK.judge(bs.hon, info.getsu)];
+  if (kasaMode === 'all') boards.push(KK.judge(bs.hon, info.nen));
+  return KK.DIRS.filter(k => boards.every(j => j[k].label === '吉')).map(k => KK.DIR_JA[k]);
+}
+function renderLuckCtl() {
+  const el = document.getElementById('luck-ctl');
+  if (!KK || !kBirthStars()) { el.innerHTML = ''; return; }
+  const open = isOpen();
+  const seg = (name, cur, opts, attr, dis) => `<span>${name}</span><div class="ban-tabs" role="group" aria-label="${name}">${opts.map(([v, t]) =>
+    `<button type="button" ${attr}="${v}" aria-pressed="${v === cur}" ${dis && v !== 'off' ? 'disabled' : ''}>${t}</button>`).join('')}</div>`;
+  el.innerHTML = `<div class="luck-ctl">
+    ${seg('背景色', luckBan, [['nichi','日盤'],['getsu','月盤'],['nen','年盤'],['off','なし']], 'data-luckban', false)}
+    ${seg('吉の重なる日', kasaMode, [['off','なし'],['gm','月・日'],['all','年・月・日']], 'data-kasa', !open)}
+    ${open ? '' : '<span>吉の重なる日は購入後に使えます</span>'}</div>`;
+  el.querySelectorAll('[data-luckban]').forEach(b => b.addEventListener('click', () => { luckBan = b.dataset.luckban; lsSet(ST_LUCKBAN, luckBan); renderMonth(); }));
+  el.querySelectorAll('[data-kasa]').forEach(b => b.addEventListener('click', () => { kasaMode = b.dataset.kasa; lsSet(ST_KASA, kasaMode); renderMonth(); }));
 }
 // 節入りの日の印（立春は年盤も切り替わるので強調）
 function switchHTML(info) {
@@ -743,9 +776,10 @@ function renderSwitchNote() {
     el.innerHTML = st ? `<div class="kset-note" style="margin-bottom:6px">この月の月盤は${st.d}日（${st.name}）で切り替わります。</div>` : '';
   }
   const bs = kBirthStars();
-  lg.innerHTML = bs ? `<div class="luck-legend"><span>日付の下の3本線：上から年盤・月盤・日盤の八方位の吉凶の平均</span>
+  lg.innerHTML = bs && luckBan !== 'off' ? `<div class="luck-legend"><span>背景色：${BAN_NAME[luckBan]}の八方位の吉凶の平均</span>
     ${LUCK_LEVELS.map(l => `<span><span class="sw l-${l}"></span>${l}</span>`).join('')}
-    <span>${isOpen() ? '平均なので、凶の方位がある日も「良」になり得ます。行き先の方位は方位盤で確かめてください。' : '今日の分だけ表示しています。購入すると全部の日に出ます。'}</span></div>` : '';
+    <span>${isOpen() ? '平均なので、凶の方位がある日も「良」になり得ます。行き先の方位は方位盤で確かめてください。' : '今日の分だけ色が付きます。購入すると全部の日に付きます。'}</span>
+    ${kasaMode !== 'off' && isOpen() ? `<span>枠で囲んだ日：${KASA_NAME[kasaMode]}のすべてで同じ方位が「吉」になる日。札の方位がその吉方位です。</span>` : ''}</div>` : '';
 }
 
 // ── 描画 ──────────────────────────────────────────
@@ -798,21 +832,24 @@ function renderMonth() {
   Object.values(byDay).forEach(a => a.sort(byTime));
 
   renderSwitchNote();
+  renderLuckCtl();
   const bsM = KK ? kBirthStars() : null;
   let html = WEEKDAYS.map((w,i) => `<div class="cal-wd ${i===0?'sun':i===6?'sat':''}">${w}</div>`).join('');
   for (let i = 0; i < cells; i++) {
     const d = new Date(start); d.setDate(start.getDate() + i);
     const iso = toISO(d), wd = d.getDay(), hol = holidayOf(iso), list = byDay[iso] || [];
-    const cls = ['cal-day', d.getMonth() !== curM ? 'other' : '', iso === today ? 'is-today' : '', iso === selDate ? 'is-sel' : ''].join(' ');
+    let dInfo = null; if (KK) { try { dInfo = KK.dayInfo(d.getFullYear(), d.getMonth()+1, d.getDate()); } catch (e) {} }
+    const kd = d.getMonth() === curM ? kasaDirs(dInfo, bsM) : [];
+    const cls = ['cal-day', d.getMonth() !== curM ? 'other' : '', iso === today ? 'is-today' : '', iso === selDate ? 'is-sel' : '', luckClass(iso, dInfo, bsM), kd.length ? 'kasa' : ''].join(' ');
     const numCls = hol ? 'hol' : wd === 0 ? 'sun' : wd === 6 ? 'sat' : '';
     const shown = list.slice(0, 3).map(x => `<div class="chip ${x.done?'done':''}">${x.time ? `<span class="chip-t">${x.time}</span>` : ''}${esc(x.title||'')}</div>`).join('');
     const more = list.length > 3 ? `<div class="chip-more">ほか${list.length-3}件</div>` : '';
-    let dInfo = null; if (KK) { try { dInfo = KK.dayInfo(d.getFullYear(), d.getMonth()+1, d.getDate()); } catch (e) {} }
     html += `<button type="button" class="${cls}" data-date="${iso}" aria-label="${d.getMonth()+1}月${d.getDate()}日（${WEEKDAYS[wd]}）${hol?' '+hol:''} 予定${list.length}件">
-      <span class="cal-num ${numCls}">${d.getDate()}${hol ? `<span class="cal-hol">${hol}</span>` : ''}${starOf(d)}</span>${switchHTML(dInfo)}${shown}${more}${luckHTML(iso, dInfo, bsM)}</button>`;
+      <span class="cal-num ${numCls}">${d.getDate()}${hol ? `<span class="cal-hol">${hol}</span>` : ''}${starOf(d)}</span>${switchHTML(dInfo)}${kd.length ? `<span class="kasa-badge" title="吉の重なる方位">吉 ${kd.join('・')}</span>` : ''}${shown}${more}</button>`;
   }
   const cal = document.getElementById('cal');
   cal.innerHTML = html;
+  cal.classList.toggle('filtering', kasaMode !== 'off' && isOpen() && !!bsM);
   cal.querySelectorAll('.cal-day').forEach(b => b.addEventListener('click', () => {
     selDate = b.dataset.date;
     document.getElementById('f-date').value = selDate;
