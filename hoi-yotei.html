@@ -246,6 +246,14 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .cal.filtering .cal-day:not(.kasa):not(.other) { opacity: .35; }
 .cal.filtering .cal-day.kasa { box-shadow: inset 0 0 0 2px var(--k-kichi-fg); }
 .kasa-badge { font-size: 9px; font-weight: 700; line-height: 1.3; color: var(--k-kichi-fg); background: var(--surface); border: 1px solid var(--k-kichi-fg); border-radius: 3px; padding: 0 3px; align-self: flex-start; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cal-lv { font-size: 9px; font-weight: 700; line-height: 1.2; margin-left: auto; padding: 0 2px; border-radius: 2px; border: 1px solid currentColor; }
+.cal-lv + .cal-star { margin-left: 2px; }
+.cal-lv.lv-良 { color: var(--k-kichi-fg); }
+.cal-lv.lv-並 { color: var(--k-futsu-fg); }
+.cal-lv.lv-やや注意 { color: var(--k-kyo-fg); }
+.cal-lv.lv-注意 { color: var(--k-sai-bg); }
+:root[data-theme="dark"] .cal-lv.lv-注意 { color: var(--k-dai-fg); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .cal-lv.lv-注意 { color: var(--k-dai-fg); } }
 .luck-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin-bottom: 8px; font-size: 12px; color: var(--fg-muted); }
 .luck-ctl .ban-tabs button:disabled { opacity: .45; cursor: not-allowed; }
 .cal-sw { font-size: 9px; font-weight: 700; line-height: 1.2; color: var(--k-kk-fg); }
@@ -727,8 +735,17 @@ function luckLevel(avg) { return avg >= 55 ? '良' : avg >= 48 ? '並' : avg >= 
 const ST_LUCKBAN = 'hoi_yotei_luckban', ST_KASA = 'hoi_yotei_kasa';
 let luckBan = lsGet(ST_LUCKBAN, 'nichi'); if (!['nichi','getsu','nen','off'].includes(luckBan)) luckBan = 'nichi';
 let kasaMode = lsGet(ST_KASA, 'off'); if (!['off','gm','all'].includes(kasaMode)) kasaMode = 'off';
+const ST_LVTEXT = 'hoi_yotei_lvtext';
+let lvText = lsGet(ST_LVTEXT, true) !== false;
+const LV_TEXT = { '良': '吉', '並': '普', 'やや注意': '凶', '注意': '大凶' };   // 色に頼らず読める四段階の文字
 const KASA_NAME = { off: 'なし', gm: '月盤・日盤', all: '年盤・月盤・日盤' };
 // 背景色：選んだ盤の八方位の平均で色分け（未購入は今日だけ）
+function luckLv(iso, info, bs) {
+  if (!bs || !info || luckBan === 'off' || !(isOpen() || iso === todayISO())) return '';
+  const c = luckBan === 'nen' ? info.nen : luckBan === 'getsu' ? info.getsu : info.nichi;
+  return luckLevel(luckAvg(bs.hon, c));
+}
+function lvTextHTML(lv) { return lvText && lv ? `<span class="cal-lv lv-${lv}" title="${BAN_NAME[luckBan]}の平均">${LV_TEXT[lv]}</span>` : ''; }
 function luckClass(iso, info, bs) {
   if (!bs || !info || luckBan === 'off' || !(isOpen() || iso === todayISO())) return '';
   const c = luckBan === 'nen' ? info.nen : luckBan === 'getsu' ? info.getsu : info.nichi;
@@ -749,9 +766,11 @@ function renderLuckCtl() {
     `<button type="button" ${attr}="${v}" aria-pressed="${v === cur}" ${dis && v !== 'off' ? 'disabled' : ''}>${t}</button>`).join('')}</div>`;
   el.innerHTML = `<div class="luck-ctl">
     ${seg('背景色', luckBan, [['nichi','日盤'],['getsu','月盤'],['nen','年盤'],['off','なし']], 'data-luckban', false)}
+    ${seg('文字表記', lvText ? 'on' : 'off', [['on','あり'],['off','なし']], 'data-lvtext', false)}
     ${seg('吉の重なる日', kasaMode, [['off','なし'],['gm','月・日'],['all','年・月・日']], 'data-kasa', !open)}
     ${open ? '' : '<span>吉の重なる日は購入後に使えます</span>'}</div>`;
   el.querySelectorAll('[data-luckban]').forEach(b => b.addEventListener('click', () => { luckBan = b.dataset.luckban; lsSet(ST_LUCKBAN, luckBan); renderMonth(); }));
+  el.querySelectorAll('[data-lvtext]').forEach(b => b.addEventListener('click', () => { lvText = b.dataset.lvtext === 'on'; lsSet(ST_LVTEXT, lvText); renderMonth(); }));
   el.querySelectorAll('[data-kasa]').forEach(b => b.addEventListener('click', () => { kasaMode = b.dataset.kasa; lsSet(ST_KASA, kasaMode); renderMonth(); }));
 }
 // 節入りの日の印（立春は年盤も切り替わるので強調）
@@ -777,7 +796,7 @@ function renderSwitchNote() {
   }
   const bs = kBirthStars();
   lg.innerHTML = bs && luckBan !== 'off' ? `<div class="luck-legend"><span>背景色：${BAN_NAME[luckBan]}の八方位の吉凶の平均</span>
-    ${LUCK_LEVELS.map(l => `<span><span class="sw l-${l}"></span>${l}</span>`).join('')}
+    ${LUCK_LEVELS.map(l => `<span><span class="sw l-${l}"></span>${lvText ? `「${LV_TEXT[l]}」` : ''}${l}</span>`).join('')}
     <span>${isOpen() ? '平均なので、凶の方位がある日も「良」になり得ます。行き先の方位は方位盤で確かめてください。' : '今日の分だけ色が付きます。購入すると全部の日に付きます。'}</span>
     ${kasaMode !== 'off' && isOpen() ? `<span>枠で囲んだ日：${KASA_NAME[kasaMode]}のすべてで同じ方位が「吉」になる日。札の方位がその吉方位です。</span>` : ''}</div>` : '';
 }
@@ -845,7 +864,7 @@ function renderMonth() {
     const shown = list.slice(0, 3).map(x => `<div class="chip ${x.done?'done':''}">${x.time ? `<span class="chip-t">${x.time}</span>` : ''}${esc(x.title||'')}</div>`).join('');
     const more = list.length > 3 ? `<div class="chip-more">ほか${list.length-3}件</div>` : '';
     html += `<button type="button" class="${cls}" data-date="${iso}" aria-label="${d.getMonth()+1}月${d.getDate()}日（${WEEKDAYS[wd]}）${hol?' '+hol:''} 予定${list.length}件">
-      <span class="cal-num ${numCls}">${d.getDate()}${hol ? `<span class="cal-hol">${hol}</span>` : ''}${starOf(d)}</span>${switchHTML(dInfo)}${kd.length ? `<span class="kasa-badge" title="吉の重なる方位">吉 ${kd.join('・')}</span>` : ''}${shown}${more}</button>`;
+      <span class="cal-num ${numCls}">${d.getDate()}${hol ? `<span class="cal-hol">${hol}</span>` : ''}${lvTextHTML(luckLv(iso, dInfo, bsM))}${starOf(d)}</span>${switchHTML(dInfo)}${kd.length ? `<span class="kasa-badge" title="吉の重なる方位">吉 ${kd.join('・')}</span>` : ''}${shown}${more}</button>`;
   }
   const cal = document.getElementById('cal');
   cal.innerHTML = html;
