@@ -739,11 +739,18 @@ function starOf(d) {
 }
 
 // ── 吉凶の平均（八方位の点数の平均）──────────────────
-// 点数は暦モジュールの SCORE（吉80・普通50 … 超最大凶1）。本命星×中宮の81通りで平均は40.6〜68.8、
-// 中央値47.5。区分の境目は81通りがほぼ均等に分かれる位置に置いた（良15・並21・やや注意25・注意20）。
+// 点数は暦モジュールの SCORE（吉80・普通50 … 超最大凶1）に歳破・月破・日破を重ねたもの。
+// 区分の境目は、2025〜2028年の全日×本命星9×三盤で、ほぼ均等に分かれる位置に置いた
+// （良24%・並20%・やや注意31%・注意25%。2026-10-20 破を加えたときに見直し）。
 const LUCK_LEVELS = ['良', '並', 'やや注意', '注意'];
-function luckAvg(hon, center) { const j = KK.judge(hon, center); return KK.DIRS.reduce((t, k) => t + j[k].score, 0) / 8; }
-function luckLevel(avg) { return avg >= 55 ? '良' : avg >= 48 ? '並' : avg >= 44 ? 'やや注意' : '注意'; }
+// 盤の判定に歳破・月破・日破を重ねたもの（ban: 'nen' | 'getsu' | 'nichi'、info は KK.dayInfo の戻り値）
+function jBan(hon, info, ban) {
+  const c = ban === 'nen' ? info.nen : ban === 'getsu' ? info.getsu : info.nichi;
+  return KK.judgeHa(hon, c, ban, info.y, info.m, info.d);
+}
+const HA_NOTE = '歳破・月破・日破は、一般の九星気学で誰にとっても凶とされるため判定に加えています（高木彬光『方位学入門』の方位表には含まれません）。破に当たる方位は、ほかの判定が「凶」より軽くても「凶」とします。流派によって扱いが異なります。';
+function luckAvg(hon, info, ban) { const j = jBan(hon, info, ban); return KK.DIRS.reduce((t, k) => t + j[k].score, 0) / 8; }
+function luckLevel(avg) { return avg >= 49 ? '良' : avg >= 45 ? '並' : avg >= 41 ? 'やや注意' : '注意'; }
 const ST_LUCKBAN = 'hoi_yotei_luckban', ST_KASA = 'hoi_yotei_kasa';
 let luckBan = lsGet(ST_LUCKBAN, 'nichi'); if (!['nichi','getsu','nen','off'].includes(luckBan)) luckBan = 'nichi';
 let kasaMode = lsGet(ST_KASA, 'off'); if (!['off','gm','all'].includes(kasaMode)) kasaMode = 'off';
@@ -754,20 +761,18 @@ const KASA_NAME = { off: 'なし', gm: '月盤・日盤', all: '年盤・月盤�
 // 背景色：選んだ盤の八方位の平均で色分け（未購入は今日だけ）
 function luckLv(iso, info, bs) {
   if (!bs || !info || luckBan === 'off' || !(isOpen() || iso === todayISO())) return '';
-  const c = luckBan === 'nen' ? info.nen : luckBan === 'getsu' ? info.getsu : info.nichi;
-  return luckLevel(luckAvg(bs.hon, c));
+  return luckLevel(luckAvg(bs.hon, info, luckBan));
 }
 function lvTextHTML(lv) { return lvText && lv ? `<span class="cal-lv lv-${lv}" title="${BAN_NAME[luckBan]}の平均">${LV_TEXT[lv]}</span>` : ''; }
 function luckClass(iso, info, bs) {
   if (!bs || !info || luckBan === 'off' || !(isOpen() || iso === todayISO())) return '';
-  const c = luckBan === 'nen' ? info.nen : luckBan === 'getsu' ? info.getsu : info.nichi;
-  return 'lv-' + luckLevel(luckAvg(bs.hon, c));
+  return 'lv-' + luckLevel(luckAvg(bs.hon, info, luckBan));
 }
 // 吉の重なる方位（同じ方位が、選んだ階層のすべての盤で「吉」）
 function kasaDirs(info, bs) {
   if (!bs || !info || kasaMode === 'off' || !isOpen()) return [];
-  const boards = [KK.judge(bs.hon, info.nichi), KK.judge(bs.hon, info.getsu)];
-  if (kasaMode === 'all') boards.push(KK.judge(bs.hon, info.nen));
+  const boards = [jBan(bs.hon, info, 'nichi'), jBan(bs.hon, info, 'getsu')];
+  if (kasaMode === 'all') boards.push(jBan(bs.hon, info, 'nen'));
   return KK.DIRS.filter(k => boards.every(j => j[k].label === '吉')).map(k => KK.DIR_JA[k]);
 }
 function renderLuckCtl() {
@@ -810,6 +815,7 @@ function renderSwitchNote() {
   lg.innerHTML = bs && luckBan !== 'off' ? `<div class="luck-legend"><span>背景色：${BAN_NAME[luckBan]}の八方位の吉凶の平均</span>
     ${LUCK_LEVELS.map(l => `<span><span class="sw l-${l}"></span>${lvText ? `「${LV_TEXT[l]}」` : ''}${l}</span>`).join('')}
     <span>${isOpen() ? '平均なので、凶の方位がある日も「良」になり得ます。行き先の方位は方位盤で確かめてください。' : '今日の分だけ色が付きます。購入すると全部の日に付きます。'}</span>
+    <span>※${HA_NOTE}</span>
     ${kasaMode !== 'off' && isOpen() ? `<span>枠で囲んだ日：${KASA_NAME[kasaMode]}のすべてで同じ方位が「吉」になる日。札の方位がその吉方位です。</span>` : ''}</div>` : '';
 }
 
@@ -977,13 +983,13 @@ function houiHTML(iso) {
   }
 
   const center = kBan === 'nen' ? info.nen : kBan === 'getsu' ? info.getsu : info.nichi;
-  const bs = kBirthStars(), ban = KK.ban(center), j = bs ? KK.judge(bs.hon, center) : null;
+  const bs = kBirthStars(), ban = KK.ban(center), j = bs ? jBan(bs.hon, info, kBan) : null;
   let cells = '';
   BAN_GRID.flat().forEach(k => {
     if (k === 'C') { cells += `<div class="ban-cell c"><span class="ban-dir">中宮</span><span class="ban-st">${KK.SHORT[center-1]}</span></div>`; return; }
     const r = j ? j[k] : null;
     cells += `<div class="ban-cell ${r ? 'k-' + r.label : 'k-none'}" title="${KK.DIR_JA[k]}：${KK.NAMES[ban[k]-1]}${r ? '（' + r.label + '）' : ''}">
-      <span class="ban-dir">${KK.DIR_JA[k]}</span><span class="ban-st">${KK.SHORT[ban[k]-1]}</span>${r ? `<span class="ban-lb">${r.label}</span>` : ''}</div>`;
+      <span class="ban-dir">${KK.DIR_JA[k]}</span><span class="ban-st">${KK.SHORT[ban[k]-1]}</span>${r ? `<span class="ban-lb">${r.label}${r.ha ? '・' + r.ha : ''}</span>` : ''}</div>`;
   });
   const hm = t => `${t.m}月${t.d}日 ${t.h}:${String(t.mi).padStart(2,'0')}`;
   const st = KK.setsuiri(y, m);
@@ -1004,7 +1010,8 @@ function houiHTML(iso) {
       <div class="houi-info">吉方位：${kichi.length ? '<b>' + kichi.join('・') + '</b>' : 'なし'}</div>
       ${kyou.length ? `<ul class="houi-reasons" aria-label="凶方位とその理由">${kyou.map(r =>
         `<li><span class="tag k-${r.label}">${r.dir}</span><span><b>${r.label}</b>　${r.starName}が回る。${r.reasons.join('・')}</span></li>`).join('')}</ul>` : ''}
-      <div class="houi-legend">${LABEL_ORDER.map(l => `<span class="k-${l}">${l}</span>`).join('')}</div>`;
+      <div class="houi-legend">${LABEL_ORDER.map(l => `<span class="k-${l}">${l}</span>`).join('')}</div>
+      <div class="kset-note">※${HA_NOTE}</div>`;
   }
   return `<div class="houi">${head}
     <div class="houi-body"><div class="ban" role="img" aria-label="${BAN_NAME[kBan]}の八方位">${cells}</div><div style="display:grid;gap:10px;min-width:0">${side}</div></div>
@@ -1037,7 +1044,7 @@ const HB_STEP = 67;
 let hbEl = null, hbCenter = null, hbTarget = null, hbTimer = null, hbIso = null;
 // 浮かぶ方位盤：日付に乗せると日盤、クリックするたびに月盤→年盤→日盤と切り替わる
 const HB_ORDER = ['nichi', 'getsu', 'nen'];
-let hbBan = 'nichi', hbBanIso = null;
+let hbBan = 'nichi', hbBanIso = null, hbJT = null;   // hbJT：行き着く盤の判定（破を含む）
 function hbBuild() {
   hbEl = document.createElement('div');
   hbEl.className = 'hban'; hbEl.setAttribute('aria-hidden', 'true');
@@ -1052,7 +1059,7 @@ function hbBuild() {
 }
 function hbPlace(center) {
   const bs = isOpen() ? kBirthStars() : null;
-  const j = bs ? KK.judge(bs.hon, center) : null;
+  const j = bs ? (center === hbTarget && hbJT ? hbJT : KK.judge(bs.hon, center)) : null;   // 回っている途中の盤には破を重ねない
   hbEl.querySelectorAll('.hban-star').forEach(el => {
     const n = Number(el.dataset.star), key = HB_PATH[((n - center) % 9 + 9) % 9], [x,y] = HB_XY[key];
     el.style.transform = `translate(${x*HB_STEP}px, ${y*HB_STEP}px)`;
@@ -1086,14 +1093,15 @@ function hbShow(iso) {
     document.getElementById('hb-date').textContent = `${m}月${d}日（${WEEKDAYS[new Date(y,m-1,d).getDay()]}）`;
     document.getElementById('hb-ban').textContent = ban === 'nichi' ? `${BAN_NAME[ban]}・${info.ton.type}` : BAN_NAME[ban];
     const bs = kBirthStars(), foot = document.getElementById('hb-foot');
+    hbJT = bs && isOpen() ? jBan(bs.hon, info, ban) : null;
     if (!isOpen()) foot.textContent = '購入すると吉凶の色と凶方位が出ます';
     else if (bs) {
-      const kyou = KK.DIRS.map(k => KK.judge(bs.hon, c)[k]).filter(r => r.kyou).map(r => r.dir + r.label);
+      const kyou = KK.DIRS.map(k => hbJT[k]).filter(r => r.kyou).map(r => r.dir + r.label + (r.ha ? '（' + r.ha + '）' : ''));
       const next = BAN_NAME[HB_ORDER[(HB_ORDER.indexOf(ban) + 1) % 3]];
       foot.textContent = (kyou.length ? '凶：' + kyou.join('・') : '凶方位なし') + `　［クリックで${next}へ］`;
     } else foot.textContent = '生年月日を登録すると吉凶の色が付きます';
     const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (hbCenter == null || reduce) { hbCenter = hbTarget = c; hbPlace(c); }
+    if (hbCenter == null || reduce || hbCenter === c) { clearTimeout(hbTimer); hbTimer = null; hbCenter = hbTarget = c; hbPlace(c); }
     else { hbTarget = c; if (!hbTimer) hbStep(); }
   }
   hbEl.classList.add('on');

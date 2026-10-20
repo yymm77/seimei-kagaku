@@ -25,6 +25,12 @@
  *   五黄殺と本命殺／本命的殺が重なる＝最大凶
  *   暗剣殺と本命殺が重なる＝超最大凶
  *   暗剣殺と本命的殺が重なる＝相生なら大凶・相剋なら超最大凶
+ *
+ * ■ 歳破・月破・日破（2026-10-20 追加）
+ *  年・月・日の十二支の方位の反対側。一般の九星気学で誰にとっても凶とされるため、
+ *  judgeHa() で上の判定に重ねる（高木彬光『方位学入門』の表には含まれない）。
+ *  破に当たる方位は、上の判定が「凶」より軽ければ「凶」に改め、重ければそのままとする。
+ *  十二支の方位：子＝北、丑寅＝北東、卯＝東、辰巳＝南東、午＝南、未申＝南西、酉＝西、戌亥＝北西。
  */
 (function (root) {
   'use strict';
@@ -224,6 +230,29 @@
     return out;
   }
 
+  // ---- 歳破・月破・日破 ----
+  var SHI_DIR = ['N','NE','NE','E','SE','SE','S','SW','SW','W','NW','NW'];   // 子丑寅卯辰巳午未申酉戌亥
+  /** その日の破の方位 {nen: 歳破, getsu: 月破, nichi: 日破}（いずれも方位記号）と十二支 */
+  function hasatsu(y, m, d) {
+    var yb = ((koyomiYear(y, m, d) - 4) % 12 + 12) % 12;
+    var mb = (setsuMonth(y, m, d).idx + 2) % 12;       // idx 0＝寅月
+    var db = kanshi(y, m, d) % 12;
+    return { nen: OPP[SHI_DIR[yb]], getsu: OPP[SHI_DIR[mb]], nichi: OPP[SHI_DIR[db]],
+      shi: { nen: SHI[yb], getsu: SHI[mb], nichi: SHI[db] } };
+  }
+  var HA_NAME = { nen: '歳破', getsu: '月破', nichi: '日破' };
+  var HA_TEXT = { nen: '年の十二支', getsu: '月の十二支', nichi: '日の十二支' };
+  /** judge に破を重ねる。ban は 'nen' | 'getsu' | 'nichi'、y,m,d はその日 */
+  function judgeHa(hon, center, ban, y, m, d) {
+    var out = judge(hon, center), h = hasatsu(y, m, d), k = h[ban];
+    var r = out[k];
+    r.reasons.push(HA_NAME[ban] + '（' + HA_TEXT[ban] + '「' + h.shi[ban] + '」の反対側）');
+    r.ha = HA_NAME[ban];
+    if (r.score > SCORE['凶']) { r.label = '凶'; r.score = SCORE['凶']; }
+    r.kyou = true;
+    return out;
+  }
+
   /** ある日の三盤の中宮と暦の情報 */
   function dayInfo(y, m, d) {
     var ky = koyomiYear(y, m, d), sm = setsuMonth(y, m, d), t = ton(y, m, d), k = kanshi(y, m, d);
@@ -238,7 +267,7 @@
     term: term, setsuiri: setsuiri, koyomiYear: koyomiYear, setsuMonth: setsuMonth,
     nenStar: nenStar, nenStarOfYear: nenStarOfYear, getsuStar: getsuStar, nichiStar: nichiStar, ton: ton,
     kanshi: kanshi, kanshiName: kanshiName, honmei: honmei, getsumei: getsumei,
-    ban: ban, relation: relation, judge: judge, dayInfo: dayInfo };
+    ban: ban, relation: relation, judge: judge, dayInfo: dayInfo, hasatsu: hasatsu, judgeHa: judgeHa };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.KyuseiKoyomi = api;
 })(typeof window !== 'undefined' ? window : globalThis);
