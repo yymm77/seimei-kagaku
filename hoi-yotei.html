@@ -620,6 +620,10 @@ const PAY_URL = 'https://buy.stripe.com/4gMeVfbo15SA5j5eHMbEA03';   // Stripe �
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbzhYgaDLiSe0l-dzjEGWoCtbehCW2pF9SYYPKu9f6jDl55UjIznHL7HKxSmhsiqcyuo/exec';   // 解錠の仕組み（GAS）
 
 const KK = window.KyuseiKoyomi || null;
+// 自分用：claude.ai の中で開いたとき（window.claude がある）。予定と生年月日を同期し、購入の鍵は付けない。
+// 販売用（GitHub Pages）では window.claude がないので、これまでどおり端末保存＋解錠番号で動く。
+const PERSONAL = !!(window.claude && typeof window.claude.use === 'function');
+let pdb = null, kDocRef = null;   // 自分用の同期先（予定：yotei コレクション、生年月日：本人専用の場所）
 const WEEKDAYS = ['日','月','火','水','木','金','土'];
 const ST_ITEMS = 'hoi_yotei_items', ST_KYUSEI = 'hoi_yotei_kyusei', ST_LIC = 'hoi_yotei_license';
 const ST_VIEW = 'hoi_yotei_view', ST_BAN = 'hoi_yotei_ban';
@@ -678,18 +682,26 @@ const BAN_NAME = { nichi: '日盤', getsu: '月盤', nen: '年盤' };
 const BAN_GRID = [['NW','N','NE'],['W','C','E'],['SW','S','SE']];
 const LABEL_ORDER = ['吉','普通','吉凶','小凶','凶','大凶','最大凶','超最大凶'];
 
-function isOpen() { return !!(lic && lic.key && lic.expires && lic.expires >= todayISO()); }
+function isOpen() { return PERSONAL || !!(lic && lic.key && lic.expires && lic.expires >= todayISO()); }
 function saveItems() { if (!lsSet(ST_ITEMS, items)) showMsg('f-msg', 'この端末に保存できませんでした。ブラウザの設定をご確認ください。'); }
 function showMsg(id, text, ok) { const el = document.getElementById(id); el.textContent = text; el.style.color = ok ? 'var(--done-fg)' : ''; }
 
 // ── 予定の追加・更新・削除 ─────────────────────────
+// 自分用では、一件ずつ同期先へ送る（id と画面用の印は保存しない）
+function pushItem(id) {
+  if (!pdb) return;
+  const it = items[id];
+  const ref = pdb.collection('yotei').doc(id);
+  const p = it ? ref.set(Object.fromEntries(Object.entries(it).filter(([k]) => k !== 'id' && !k.startsWith('_')))) : ref.delete();
+  Promise.resolve(p).catch(() => setSync('err'));
+}
 function addItem(data) {
   const id = Date.now().toString(36) + Math.random().toString(36).slice(2,6);
   items[id] = { id, ...data, done: false, createdAt: Date.now() };
-  saveItems(); renderAll();
+  saveItems(); pushItem(id); renderAll();
 }
-function updateItem(id, data) { items[id] = { ...items[id], ...data }; saveItems(); renderAll(); }
-function deleteItem(id) { delete items[id]; saveItems(); renderAll(); }
+function updateItem(id, data) { items[id] = { ...items[id], ...data }; saveItems(); pushItem(id); renderAll(); }
+function deleteItem(id) { delete items[id]; saveItems(); pushItem(id); renderAll(); }
 function toggleDone(id) { if (items[id]) updateItem(id, { done: !items[id].done }); }
 
 function occurrences(from, to) {
@@ -836,15 +848,24 @@ function renderBirthNudge() {
   if (!el) return;
   if (kBirthStars()) { el.hidden = true; el.innerHTML = ''; return; }
   el.hidden = false;
-  el.innerHTML = `<div class="nudge-t">${isOpen() ? 'ご購入ありがとうございます。最後に、生年月日を登録してください' : 'はじめに、生年月日を登録してください'}</div>
+  el.innerHTML = `<div class="nudge-t">${PERSONAL ? '生年月日を登録してください' : isOpen() ? 'ご購入ありがとうございます。最後に、生年月日を登録してください' : 'はじめに、生年月日を登録してください'}</div>
     <div class="nudge-b">方位の吉凶は、ご本人の本命星から見て決まります。登録すると、${isOpen() ? 'すべての日の方位盤が' : '今日の方位盤が'}吉凶で色分けされ、凶の方位にはその理由が出ます。生年月日はこの端末の中にだけ保存します。</div>
     <div><button type="button" class="btn-primary" id="nudge-btn">生年月日を登録する</button></div>`;
   document.getElementById('nudge-btn').addEventListener('click', () => openPanel('kset', true));
 }
 
+let syncText = '同期の準備中…';
+function setSync(state) {
+  syncText = state === 'ok' ? '予定と生年月日を端末間で同期しています。' : state === 'err' ? '同期できませんでした。この端末の中だけで動いています。' : '同期の準備中…';
+  const el = document.getElementById('sync-label'); if (el) el.textContent = syncText;
+}
 function renderLicState() {
   renderBirthNudge();
   const el = document.getElementById('lic-state');
+  if (PERSONAL) {
+    el.innerHTML = `<span class="pill-ok">自分用</span> <span id="sync-label">${syncText}</span>`;
+    return;
+  }
   if (isOpen()) {
     const [y,m,d] = lic.expires.split('-').map(Number);
     el.innerHTML = `<span class="pill-ok">解錠済み</span> ${y}年${m}月${d}日まで、すべての方位盤をご覧になれます。`;
@@ -1127,7 +1148,7 @@ function toast(text, undo) {
   clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true; }, 6000);
 }
 function snapshotItem(id) { const it = items[id]; return it ? JSON.parse(JSON.stringify(it)) : null; }
-function restoreItem(snap) { if (snap) { items[snap.id] = snap; saveItems(); renderAll(); } }
+function restoreItem(snap) { if (snap) { items[snap.id] = snap; saveItems(); pushItem(snap.id); renderAll(); } }
 
 let drag = null, dragJustEnded = false;
 (function () {
@@ -1265,7 +1286,9 @@ document.getElementById('k-save').addEventListener('click', () => {
   const y = Number(birth.slice(0,4));
   if (y < 1900 || y > 2100) { showMsg('k-msg', '1900〜2100年の生年月日で入れてください。'); return; }
   kProfile = { birth, hour };
-  showMsg('k-msg', lsSet(ST_KYUSEI, kProfile) ? '登録しました。' : 'この端末に保存できませんでした。', true);
+  if (kDocRef) Promise.resolve(kDocRef.set({ birth, hour, updatedAt: Date.now() })).then(
+    () => showMsg('k-msg', '登録しました（どの端末でも使えます）。', true), () => showMsg('k-msg', '同期先に保存できませんでした。もう一度お試しください。'));
+  else showMsg('k-msg', lsSet(ST_KYUSEI, kProfile) ? '登録しました。' : 'この端末に保存できませんでした。', true);
   showWho(); renderBirthNudge(); renderMonth();
 });
 
@@ -1329,9 +1352,18 @@ document.getElementById('lic-resend').addEventListener('click', async () => {
 })();
 
 // ── データの書き出し・読み込み ─────────────────────
-document.getElementById('btn-export').addEventListener('click', () => {
+document.getElementById('btn-export').addEventListener('click', async () => {
   const data = { app: '方位予定帖', version: 1, exportedAt: new Date().toISOString(), items, kyusei: kProfile, license: lic };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  if (PERSONAL) {
+    try {
+      const dl = await window.claude.use('downloads');
+      if (!dl) throw new Error();
+      await dl.save({ filename: `hoi-yotei_${todayISO()}.json`, data: blob });
+      showMsg('d-msg', '書き出しました。', true);
+    } catch (e) { showMsg('d-msg', '書き出しを取りやめたか、この画面では保存できませんでした。'); }
+    return;
+  }
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob); a.download = `hoi-yotei_${todayISO()}.json`;
   document.body.appendChild(a); a.click(); a.remove();
@@ -1346,7 +1378,7 @@ document.getElementById('f-import').addEventListener('change', async e => {
     const inItems = data.items || (Array.isArray(data) ? Object.fromEntries(data.map(x => [x.id, x])) : null);
     if (!inItems) throw new Error();
     let n = 0;
-    Object.values(inItems).forEach(x => { if (x && x.id && x.date && !items[x.id]) { items[x.id] = x; n++; } });
+    Object.values(inItems).forEach(x => { if (x && x.id && x.date && !items[x.id]) { items[x.id] = x; pushItem(x.id); n++; } });
     if (data.kyusei && data.kyusei.birth && !kProfile) { kProfile = data.kyusei; lsSet(ST_KYUSEI, kProfile); }
     if (data.license && data.license.key && !isOpen()) { lic = data.license; lic.checkedAt = ''; lsSet(ST_LIC, lic); }
     saveItems(); renderAll();
@@ -1409,6 +1441,34 @@ window.addEventListener('storage', e => {
   renderAll();
 });
 
+if (PERSONAL) {
+  document.getElementById('btn-lic').hidden = true;
+  document.querySelector('header h1').textContent = '方位予定帖（自分用）';
+  const note = document.querySelector('#dataPanel .kset-note');
+  if (note) note.textContent = '予定と生年月日は同期先に保存し、どの端末でも同じものが見られます。書き出しは控えとしてお使いください。';
+  (async () => {
+    try {
+      const [dbx, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]);
+      if (!dbx) { setSync('err'); return; }
+      pdb = dbx; items = {};
+      pdb.collection('yotei').onSnapshot(snap => {
+        snap.docChanges().forEach(ch => {
+          if (ch.type === 'removed') delete items[ch.doc.id];
+          else items[ch.doc.id] = { id: ch.doc.id, ...ch.doc.data() };
+        });
+        saveItems(); setSync('ok'); renderAll();
+      }, () => setSync('err'));
+      const uid = user ? await user.id() : null;
+      if (uid) {
+        kDocRef = pdb.doc('data/users/' + uid + '/kyusei');
+        kDocRef.onSnapshot(snap => {
+          const v = snap && snap.exists ? snap.data() : null;
+          if (v && v.birth) { kProfile = { birth: v.birth, hour: v.hour ?? -1 }; hbIso = null; renderAll(); }
+        }, () => {});
+      }
+    } catch (e) { setSync('err'); }
+  })();
+}
 if (!KK) document.getElementById('lic-state').textContent = '暦の計算ファイルを読み込めませんでした。ページを開き直してください。';
 renderAll();
 
