@@ -608,7 +608,7 @@ header h1 { letter-spacing: .12em; }
   </div>
 </div>
 
-<script src="kyusei_koyomi.js"></script>
+<script src="kyusei_koyomi.js?v=20261020b"></script>
 <script>
 // ====================================================
 // 方位予定帖 — 予定は端末に保存、方位盤は解錠番号で開く
@@ -746,7 +746,8 @@ const LUCK_LEVELS = ['良', '並', 'やや注意', '注意'];
 // 盤の判定に歳破・月破・日破を重ねたもの（ban: 'nen' | 'getsu' | 'nichi'、info は KK.dayInfo の戻り値）
 function jBan(hon, info, ban) {
   const c = ban === 'nen' ? info.nen : ban === 'getsu' ? info.getsu : info.nichi;
-  return KK.judgeHa(hon, c, ban, info.y, info.m, info.d);
+  // 古い暦モジュールがブラウザに残っていても止まらないように（その場合は破を重ねない）
+  return typeof KK.judgeHa === 'function' ? KK.judgeHa(hon, c, ban, info.y, info.m, info.d) : KK.judge(hon, c);
 }
 const HA_NOTE = '歳破・月破・日破は、一般の九星気学で誰にとっても凶とされるため判定に加えています（高木彬光『方位学入門』の方位表には含まれません）。破に当たる方位は、ほかの判定が「凶」より軽くても「凶」とします。流派によって扱いが異なります。';
 function luckAvg(hon, info, ban) { const j = jBan(hon, info, ban); return KK.DIRS.reduce((t, k) => t + j[k].score, 0) / 8; }
