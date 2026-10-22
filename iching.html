@@ -2228,5 +2228,22 @@ buildMatrix();
 renderRecords();
 </script>
 <script src="footer-counter.js"></script>
+<script>
+// 方位予定帖の「易で確かめる」から来たときは、問いを書き入れておく（同じ端末の中だけの受け渡し。10分以内のものだけ）
+(function () {
+  try {
+    const v = JSON.parse(localStorage.getItem('iching_prefill') || 'null');
+    localStorage.removeItem('iching_prefill');
+    const ta = document.getElementById('question-text');
+    if (v && v.q && ta && Date.now() - v.at < 600000 && !ta.value) {
+      ta.value = v.q;
+      const note = document.createElement('div');
+      note.style.cssText = 'font-size:12px;opacity:.75;margin:6px 0 8px';
+      note.textContent = '方位予定帖から問いを移しました。言葉は自由に直してください。';
+      ta.insertAdjacentElement('afterend', note);
+    }
+  } catch (e) {}
+})();
+</script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script src="hoi_en.js?v=202610221357"></script>
+<script src="hoi_en.js?v=202610221436"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Hōi Yotei-chō — Nine Star Ki Planner</title>
@@ -378,6 +378,8 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .ym-d .dot { position: absolute; left: 50%; bottom: 1px; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--accent); }
 .ym-d .t { display: block; font-size: 8px; font-weight: 700; line-height: 1; border: none !important; padding: 0 !important; background: none !important; margin: 1px 0 0 !important; }
 .ym-d:hover { outline: 1px solid var(--accent); outline-offset: -1px; }
+.eki-row { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+.eki-row .kset-note { margin: 0; }
 .yr-click { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; font-size: 12px; color: var(--fg-muted); margin-top: 10px; }
 .yr-click label { display: inline-flex; gap: 6px; align-items: center; }
 .yr-click select { font-size: 12px; padding: 2px 4px; max-width: 100%; }
@@ -1008,6 +1010,26 @@ function jBan(hon, info, ban) {
   return typeof KK.judgeHa === 'function' ? KK.judgeHa(hon, c, ban, info.y, info.m, info.d) : KK.judge(hon, c);
 }
 const HA_NOTE = '歳破・月破・日破は、一般の九星気学で誰にとっても凶とされるため判定に加えています（高木彬光『方位学入門』の方位表には含まれません）。破に当たる方位は、ほかの判定が「凶」より軽くても「凶」とします。流派によって扱いが異なります。';
+// 方位盤の説明の下に添える、本体の方位サイトへの案内
+const EKI_BTN = iso => `<div class="eki-row"><button type="button" class="btn-sm btn-cancel" data-eki="${iso}">易で確かめる</button><span class="kset-note">方位の吉凶に加えて、易の卦でも確かめたい方へ（易経門が開きます）。</span></div>`;
+const HOUI_MORE = `<div class="kset-note houi-more">方位の見方や、五黄殺・暗剣殺・破などの凶方位の意味を詳しく知りたい方は、次へ。<a href="houigaku.html">▶ 方位学の殿堂（九星気学方位判定システム）</a></div>`;
+// 易で確かめる：問いの文を易経門へ渡して開く（同じサイトの中なので、端末の中だけで受け渡す。外へは送らない）
+const EKI_URL = 'iching.html';
+function ekiOpen(q) {
+  if (!PERSONAL) { try { localStorage.setItem('iching_prefill', JSON.stringify({ q, at: Date.now(), from: 'hoi-yotei' })); } catch (e) {} }
+  window.open(PERSONAL ? 'https://yymm77.github.io/seimei-kagaku/' + EKI_URL : EKI_URL, '_blank', 'noopener');
+}
+function ekiQuestion(item) {
+  const [y, m, d] = item.date.split('-').map(Number);
+  const w = WEEKDAYS[new Date(y, m - 1, d).getDay()];
+  let where = '';
+  if (item.dest) {
+    const g = itemGeo(item), dn = item.dest.name || '行き先';
+    const dir = g && g.r && g.r.sector && g.r.judged ? KK.DIR_JA[KK.DIRS[g.r.sector.index]] : '';
+    where = `、${dn}${dir ? '（' + dir + '）' : ''}へ向かう`;
+  } else if (item.place) where = `、${item.place}で`;
+  return `${m}月${d}日（${w}）${item.time ? item.time + '、' : '、'}「${item.title || '予定'}」${where}。この予定を進めてよいでしょうか。`;
+}
 function luckAvg(hon, info, ban) { const j = jBan(hon, info, ban); return KK.DIRS.reduce((t, k) => t + j[k].score, 0) / 8; }
 function luckLevel(avg) { return avg >= 49 ? '良' : avg >= 45 ? '並' : avg >= 41 ? 'やや注意' : '注意'; }
 const ST_LUCKBAN = 'hoi_yotei_luckban', ST_KASA = 'hoi_yotei_kasa';
@@ -1219,6 +1241,7 @@ function renderItem(item, today) {
       : `<div class="yotei-actions">
            <button type="button" class="btn-sm ${item.done ? 'btn-cancel' : 'btn-done'}" data-act="done" data-id="${item.id}">${item.done ? '戻す' : '完了'}</button>
            <button type="button" class="btn-sm btn-cancel" data-act="edit" data-id="${item.id}">編集</button>
+           <button type="button" class="btn-sm btn-cancel" data-act="eki" data-id="${item.id}" title="この予定について、易経門で卦を立てます">易で確かめる</button>
            <button type="button" class="btn-sm btn-del" data-act="ask" data-id="${item.id}">削除</button></div>`;
   }
   return `<li class="yotei-item ${cls}">
@@ -1280,7 +1303,7 @@ function houiHTML(iso) {
   let side;
   if (!j) {
     side = `<div class="houi-info">${infoLines.join('<br>')}</div>
-      <div class="kset-note">生年月日を登録すると、各方位の吉凶と凶の理由が出ます。<button type="button" class="btn-sm btn-cancel" data-kopen>登録する</button></div>`;
+      <div class="kset-note">生年月日を登録すると、各方位の吉凶と凶の理由が出ます。<button type="button" class="btn-sm btn-cancel" data-kopen>登録する</button></div>${EKI_BTN(iso)}${HOUI_MORE}`;
   } else {
     const rows = KK.DIRS.map(k => j[k]).sort((a,b) => a.score - b.score);
     const kyou = rows.filter(r => r.kyou), kichi = rows.filter(r => r.label === '吉').map(r => r.dir);
@@ -1289,7 +1312,7 @@ function houiHTML(iso) {
       ${kyou.length ? `<ul class="houi-reasons" aria-label="凶方位とその理由">${kyou.map(r =>
         `<li><span class="tag k-${r.label}">${r.dir}</span><span><b>${r.label}</b>　${r.starName}が回る。${r.reasons.join('・')}</span></li>`).join('')}</ul>` : ''}
       <div class="houi-legend">${LABEL_ORDER.map(l => `<span class="k-${l}">${l}</span>`).join('')}</div>
-      <div class="kset-note">※${HA_NOTE}</div>`;
+      <div class="kset-note">※${HA_NOTE}</div>${EKI_BTN(iso)}${HOUI_MORE}`;
   }
   return `<div class="houi">${head}
     <div class="houi-body"><div class="ban" role="img" aria-label="${BAN_NAME[kBan]}の八方位">${cells}</div><div style="display:grid;gap:10px;min-width:0">${side}</div></div>
@@ -1301,6 +1324,10 @@ function wirePanel(root) {
     kBan = b.dataset.ban; lsSet(ST_BAN, kBan); renderMonth();
   }));
   root.querySelectorAll('[data-kopen]').forEach(b => b.addEventListener('click', () => openPanel('kset', true)));
+  root.querySelectorAll('[data-eki]').forEach(b => b.addEventListener('click', () => {
+    const [y, m, d] = b.dataset.eki.split('-').map(Number);
+    ekiOpen(`${m}月${d}日（${WEEKDAYS[new Date(y, m - 1, d).getDay()]}）、この日に動くことについて、易の示すところを伺います。`);
+  }));
   root.querySelectorAll('[data-open-lic]').forEach(b => b.addEventListener('click', () => openPanel('lic', true)));
   root.querySelectorAll('[data-go-today]').forEach(b => b.addEventListener('click', () => {
     kBan = 'nichi'; selDate = todayISO(); curY = new Date().getFullYear(); curM = new Date().getMonth(); renderMonth();
@@ -1312,6 +1339,7 @@ function wirePanel(root) {
     else if (a === 'ask') { pendingDelete = id; renderAll(); }
     else if (a === 'nodel') { pendingDelete = null; renderAll(); }
     else if (a === 'del') { pendingDelete = null; deleteItem(id); }
+    else if (a === 'eki' && items[id]) ekiOpen(ekiQuestion(items[id]));
     else if (a === 'ics1' && items[id]) saveICS([items[id]], `${items[id].date}_${(items[id].title || 'yotei').replace(/[\\/:*?"<>|\s]+/g, '_').slice(0, 30)}.ics`, null);
   }));
 }
@@ -2256,7 +2284,7 @@ function yearBoardHTML(y, bs) {
     const kyou = rows.filter(r => r.kyou), kichi = rows.filter(r => r.label === '吉').map(r => r.dir);
     side += `<div class="houi-info">本命星 <b>${KK.NAMES[bs.hon-1]}</b>　この年の吉方位：${kichi.length ? '<b>' + kichi.join('・') + '</b>' : 'なし'}</div>
       ${kyou.length ? `<ul class="houi-reasons">${kyou.map(r => `<li><span class="tag k-${r.label}">${r.dir}</span><span><b>${r.label}</b>　${r.starName}が回る。${r.reasons.join('・')}</span></li>`).join('')}</ul>` : ''}
-      <div class="kset-note">引っ越し・家の新築・就職など、一年以上続く動きは年盤の吉方位を重く見ます。</div>`;
+      <div class="kset-note">引っ越し・家の新築・就職など、一年以上続く動きは年盤の吉方位を重く見ます。</div>${HOUI_MORE}`;
   } else side += `<div class="kset-note">生年月日を登録すると、年ごとの吉凶と凶の理由が出ます。</div>`;
   return `<div class="houi" style="margin-top:12px"><div class="houi-top"><h3>${y}年の年盤</h3></div>
     <div class="houi-body"><div class="ban" role="img" aria-label="${y}年の年盤">${cells}</div><div style="display:grid;gap:10px;min-width:0">${side}</div></div></div>`;
