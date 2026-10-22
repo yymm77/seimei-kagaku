@@ -111,7 +111,7 @@
     '平均なので、凶の方位がある年・月・日も「良」になり得ます。行き先の方位は方位盤で確かめてください。': 'This is an average, so a "good" year, month or day can still have bad directions. Check your destination on the chart.',
     'PCでは、月の見出しにマウスを乗せるとその月の月盤が、日付に乗せるとその日の日盤が浮かびます。日付を押したときの動きは、下で選べます。': 'On a computer, hover over a month heading to see that month’s chart, or over a date to see that day’s chart. You can choose below what clicking a date does.',
     '方位の見方や、五黄殺・暗剣殺・破などの凶方位の意味を詳しく知りたい方は、次へ。': 'To learn more about reading directions and what the Five Yellow, Dark Sword and Breakers mean, go here: ', '▶ 方位学の殿堂（九星気学方位判定システム）': '▶ Hall of Directions (Nine Star Ki direction system, in Japanese)',
-    '易で確かめる': 'Ask the I Ching', '方位の吉凶に加えて、易の卦でも確かめたい方へ（易経門が開きます）。': 'For a second opinion from an I Ching reading (opens our I Ching page, in Japanese).', 'この予定について、易経門で卦を立てます': 'Cast an I Ching hexagram about this plan (Japanese page)',
+    '易で確かめる': 'Ask the I Ching', '☯ 易で確かめる': '☯ Ask the I Ching', '方位の吉凶に加えて、易の卦でも確かめたい方へ（易経門が開きます）': 'For a second opinion from an I Ching reading (opens our I Ching page, in Japanese)', '方位の吉凶に加えて、易の卦でも確かめたい方へ（易経門が開きます）。': 'For a second opinion from an I Ching reading (opens our I Ching page, in Japanese).', 'この予定について、易経門で卦を立てます': 'Cast an I Ching hexagram about this plan (Japanese page)',
     '日付を押したときの動き': 'When you click or tap a date', 'スマホ': 'Phone', 'PC': 'Computer',
     '一回で月表示・ダブルクリックで予定': 'Click: month view · double-click: plans', '一回で予定・ダブルクリックで月表示': 'Click: plans · double-click: month view',
     '押すと月表示': 'Tap: month view', '押すと予定（月表示へは予定の窓から）': 'Tap: plans (open the month view from there)',
