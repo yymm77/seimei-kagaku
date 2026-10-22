@@ -367,7 +367,7 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .ym-head .lvt { font-size: 11px; font-weight: 700; }
 .ym-cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 1px; background: var(--border); }
 .ym-wd { background: var(--surface2); font-size: 9px; text-align: center; color: var(--fg-muted); padding: 1px 0; }
-.ym-d { background: var(--surface); font-size: 11px; text-align: center; padding: 3px 0 2px; cursor: pointer; position: relative; font-variant-numeric: tabular-nums; line-height: 1.3; }
+.ym-d { user-select: none; -webkit-user-select: none; background: var(--surface); font-size: 11px; text-align: center; padding: 3px 0 2px; cursor: pointer; position: relative; font-variant-numeric: tabular-nums; line-height: 1.3; }
 .ym-d.sun, .ym-d.hol { color: var(--sun); }
 .ym-d.sat { color: var(--sat); }
 .ym-d.blank { background: var(--bg); cursor: default; }
@@ -377,6 +377,19 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .ym-d .dot { position: absolute; left: 50%; bottom: 1px; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--accent); }
 .ym-d .t { display: block; font-size: 8px; font-weight: 700; line-height: 1; border: none !important; padding: 0 !important; background: none !important; margin: 1px 0 0 !important; }
 .ym-d:hover { outline: 1px solid var(--accent); outline-offset: -1px; }
+.yr-click { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; font-size: 12px; color: var(--fg-muted); margin-top: 10px; }
+.yr-click label { display: inline-flex; gap: 6px; align-items: center; }
+.yr-click select { font-size: 12px; padding: 2px 4px; max-width: 100%; }
+.yr-pop { position: fixed; z-index: 305; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,.22);
+  padding: 10px 12px; width: min(320px, calc(100vw - 24px)); max-height: min(60vh, 420px); overflow: auto; font-size: 13px; }
+.yr-pop h4 { margin: 0 0 6px; font-size: 14px; }
+.yr-pop ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.yr-pop li { border-left: 3px solid var(--accent); padding: 2px 0 2px 8px; }
+.yr-pop li.is-done { opacity: .6; text-decoration: line-through; }
+.yr-pop .tm { font-variant-numeric: tabular-nums; color: var(--fg-muted); margin-right: 6px; }
+.yr-pop .pl { display: block; font-size: 11px; color: var(--fg-muted); }
+.yr-pop .none { color: var(--fg-muted); }
+.yr-pop .acts { display: flex; gap: 8px; justify-content: flex-end; margin-top: 10px; }
 .cal-star { font-size: 9px; color: var(--k-star); font-weight: 500; margin-left: auto; letter-spacing: .02em; }
 .kset { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 18px; display: grid; gap: 10px; }
 .kset h2 { font-size: 13px; font-weight: 700; color: var(--fg-muted); letter-spacing: .05em; }
@@ -1345,17 +1358,19 @@ function hbStep() {
   hbPlace(hbCenter);
   if (hbCenter !== hbTarget) hbTimer = setTimeout(hbStep, 115);
 }
-function hbShow(iso) {
+// force：年表示から呼ぶとき、盤を決めて出す（{ ban, label }。押すと月表示へ移るので、クリックの案内は出さない）
+function hbShow(iso, force) {
   if (!KK) return;
   if (!hbEl) hbBuild();
-  if (iso !== hbIso) {
-    hbIso = iso;
+  const key = force ? iso + '|' + force.ban : iso;
+  if (key !== hbIso) {
+    hbIso = key;
     const [y,m,d] = iso.split('-').map(Number);
     let info; try { info = KK.dayInfo(y,m,d); } catch (e) { return; }
-    if (iso !== hbBanIso) { hbBan = 'nichi'; hbBanIso = iso; }   // 別の日に移ったら日盤から
-    const ban = isOpen() ? hbBan : 'nichi';
+    if (!force && iso !== hbBanIso) { hbBan = 'nichi'; hbBanIso = iso; }   // 別の日に移ったら日盤から
+    const ban = force ? force.ban : isOpen() ? hbBan : 'nichi';
     const c = ban === 'nen' ? info.nen : ban === 'getsu' ? info.getsu : info.nichi;
-    document.getElementById('hb-date').textContent = `${m}月${d}日（${WEEKDAYS[new Date(y,m-1,d).getDay()]}）`;
+    document.getElementById('hb-date').textContent = force && force.label ? force.label : `${m}月${d}日（${WEEKDAYS[new Date(y,m-1,d).getDay()]}）`;
     document.getElementById('hb-ban').textContent = ban === 'nichi' ? `${BAN_NAME[ban]}・${info.ton.motion || info.ton.type}` : BAN_NAME[ban];
     const bs = kBirthStars(), foot = document.getElementById('hb-foot');
     hbJT = bs && isOpen() ? jBan(bs.hon, info, ban) : null;
@@ -1363,7 +1378,7 @@ function hbShow(iso) {
     else if (bs) {
       const kyou = KK.DIRS.map(k => hbJT[k]).filter(r => r.kyou).map(r => r.dir + r.label + (r.ha ? '（' + r.ha + '）' : ''));
       const next = BAN_NAME[HB_ORDER[(HB_ORDER.indexOf(ban) + 1) % 3]];
-      foot.textContent = (kyou.length ? '凶：' + kyou.join('・') : '凶方位なし') + `　［クリックで${next}へ］`;
+      foot.textContent = (kyou.length ? '凶：' + kyou.join('・') : '凶方位なし') + (force ? '' : `　［クリックで${next}へ］`);
     } else foot.textContent = '生年月日を登録すると吉凶の色が付きます';
     const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (hbCenter == null || reduce || hbCenter === c) { clearTimeout(hbTimer); hbTimer = null; hbCenter = hbTarget = c; hbPlace(c); }
@@ -2194,6 +2209,32 @@ document.getElementById('btn-edit-save').addEventListener('click', () => {
 const ST_YRBAN = 'hoi_yotei_yrban';
 let yrBan = lsGet(ST_YRBAN, 'getsu'); if (!['nichi','getsu','nen'].includes(yrBan)) yrBan = 'getsu';
 let yrSel = new Date().getFullYear(), yrStart = yrSel - 2;
+// 年表示の日付を押したときの動き（PC と スマホで別に選べる）
+//   pc：'month'＝一回で月表示・ダブルクリックで予定／'items'＝一回で予定・ダブルクリックで月表示
+//   sp：'month'＝押すと月表示／'items'＝押すと予定
+const ST_YRCLICK = 'hoi_yotei_yrclick';
+let yrClick = Object.assign({ pc: 'month', sp: 'month' }, lsGet(ST_YRCLICK, {}) || {});
+function yrPopClose() { const el = document.getElementById('yr-pop'); if (el) el.remove(); }
+function yrPopShow(iso, x, y) {
+  yrPopClose(); hbHide();
+  const [yy, mm, dd] = iso.split('-').map(Number);
+  const list = occurrences(iso, iso).filter(it => it.date === iso).sort(byTime);
+  const el = document.createElement('div');
+  el.id = 'yr-pop'; el.className = 'yr-pop'; el.setAttribute('role', 'dialog');
+  el.innerHTML = `<h4>${mm}月${dd}日（${WEEKDAYS[new Date(yy, mm - 1, dd).getDay()]}）の予定</h4>` +
+    (list.length ? `<ul>${list.map(it => `<li class="${it.done ? 'is-done' : ''}">${it.time ? `<span class="tm">${timeLabel(it)}</span>` : ''}${ue(it.title || '')}${it.place ? `<span class="pl">${ue(it.place)}</span>` : ''}</li>`).join('')}</ul>`
+      : '<div class="none">予定はありません。</div>') +
+    `<div class="acts"><button type="button" class="btn-sm btn-cancel" data-pop="close">閉じる</button><button type="button" class="btn-sm" data-pop="month">月表示で開く</button></div>`;
+  document.body.appendChild(el);
+  const w = el.offsetWidth, h = el.offsetHeight;
+  let left = Math.min(Math.max(8, x + 12), window.innerWidth - w - 8), top = y + 12;
+  if (top + h > window.innerHeight - 8) top = Math.max(8, y - h - 12);
+  el.style.left = left + 'px'; el.style.top = top + 'px';
+  el.querySelector('[data-pop="close"]').addEventListener('click', yrPopClose);
+  el.querySelector('[data-pop="month"]').addEventListener('click', () => { yrPopClose(); curY = yy; curM = mm - 1; selDate = iso; document.getElementById('f-date').value = iso; setView('month'); });
+}
+document.addEventListener('pointerdown', e => { if (!e.target.closest('#yr-pop') && !e.target.closest('[data-ymd]')) yrPopClose(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') yrPopClose(); });
 function yrInfo(y, m, d) { try { return KK.dayInfo(y, m, d); } catch (e) { return null; } }
 function lvOf(bs, info, ban) { return bs && info ? luckLevel(luckAvg(bs.hon, info, ban)) : ''; }
 function kichiOf(bs, info, ban) { if (!bs || !info) return []; const j = jBan(bs.hon, info, ban); return KK.DIRS.filter(k => j[k].label === '吉').map(k => KK.DIR_JA[k]); }
@@ -2271,16 +2312,57 @@ function renderYear() {
   grid.innerHTML = html;
   const toMonth = (y, m, iso) => { curY = y; curM = m - 1; if (iso) { selDate = iso; document.getElementById('f-date').value = iso; } setView('month'); };
   grid.querySelectorAll('[data-ym]').forEach(b => b.addEventListener('click', () => toMonth(yrSel, +b.dataset.ym, null)));
+  let lastPT = 'mouse', clickTimer = null;
+  grid.addEventListener('pointerdown', e => { lastPT = e.pointerType || 'mouse'; });
   grid.querySelectorAll('[data-ymd]').forEach(b => {
-    const go = () => { const [y, m] = b.dataset.ymd.split('-').map(Number); toMonth(y, m, b.dataset.ymd); };
-    b.addEventListener('click', go);
+    const go = () => { yrPopClose(); const [y, m] = b.dataset.ymd.split('-').map(Number); toMonth(y, m, b.dataset.ymd); };
+    const pop = e => yrPopShow(b.dataset.ymd, e.clientX, e.clientY);
+    b.addEventListener('click', e => {
+      if (e.detail === 0) { go(); return; }   // キーボードなどから
+      if (lastPT !== 'mouse') { yrClick.sp === 'items' ? pop(e) : go(); return; }
+      // PC：ダブルクリックを待つため、一回押しの動きは少し遅らせる
+      clearTimeout(clickTimer);
+      if (e.detail > 1) return;
+      clickTimer = setTimeout(() => { yrClick.pc === 'items' ? pop(e) : go(); }, 280);
+    });
+    b.addEventListener('dblclick', e => {
+      if (lastPT !== 'mouse') return;
+      clearTimeout(clickTimer);
+      yrClick.pc === 'items' ? go() : pop(e);
+    });
     b.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
   });
+  // マウスを乗せると、月の見出しではその月の月盤、日付ではその日の日盤が浮かぶ（押すと月表示へ）
+  if (!grid.dataset.hb) {
+    grid.dataset.hb = '1';
+    grid.addEventListener('pointermove', e => {
+      if (e.pointerType !== 'mouse') return;
+      const day = e.target.closest('[data-ymd]'), head = e.target.closest('[data-ym]');
+      if (day) { hbShow(day.dataset.ymd, { ban: 'nichi' }); hbMove(e); return; }
+      if (head && isOpen()) {
+        const m = +head.dataset.ym, st = KK.setsuiri(yrSel, m);
+        hbShow(`${yrSel}-${String(m).padStart(2,'0')}-20`, { ban: 'getsu', label: `${m}月（${st.name} ${st.d}日〜）` }); hbMove(e); return;
+      }
+      hbHide();
+    });
+    grid.addEventListener('pointerleave', hbHide);
+  }
   document.getElementById('yr-legend').innerHTML = col ? `<div class="luck-legend"><span>色：八方位の吉凶の平均</span>
     ${LUCK_LEVELS.map(l => `<span><span class="sw l-${l}"></span>「${LV_TEXT[l]}」${l}</span>`).join('')}
     <span>日付の左の線は節入り（月盤の切替）、赤い線は立春（年盤も切替）。点は予定のある日。日付を押すと、その日の月表示へ移ります。</span>
+    <span>PCでは、月の見出しにマウスを乗せるとその月の月盤が、日付に乗せるとその日の日盤が浮かびます。日付を押したときの動きは、下で選べます。</span>
     <span>平均なので、凶の方位がある年・月・日も「良」になり得ます。行き先の方位は方位盤で確かめてください。</span>
     <span>※${HA_NOTE}</span></div>` : '';
+  const ck = document.createElement('div');
+  ck.className = 'yr-click';
+  ck.innerHTML = `<span>日付を押したときの動き</span>
+    <label>PC <select data-yrclick="pc"><option value="month">一回で月表示・ダブルクリックで予定</option><option value="items">一回で予定・ダブルクリックで月表示</option></select></label>
+    <label>スマホ <select data-yrclick="sp"><option value="month">押すと月表示</option><option value="items">押すと予定（月表示へは予定の窓から）</option></select></label>`;
+  document.getElementById('yr-legend').appendChild(ck);
+  ck.querySelectorAll('[data-yrclick]').forEach(sel => {
+    sel.value = yrClick[sel.dataset.yrclick];
+    sel.addEventListener('change', () => { yrClick[sel.dataset.yrclick] = sel.value; lsSet(ST_YRCLICK, yrClick); });
+  });
 }
 document.getElementById('yr-prev10').addEventListener('click', () => { yrStart -= 10; renderYear(); });
 document.getElementById('yr-next10').addEventListener('click', () => { yrStart += 10; renderYear(); });
