@@ -459,6 +459,10 @@ select option{background:#1a2f5a;color:#e8e0cc;}
       <button id="applyBtn" onclick="applySettings()">この設定で判定する</button>
     </div>
 
+    <!-- 月額プランの受付休止（2026-10-22）：トライアルの登録欄は出さない -->
+    <style>#trialDone,#trialPanel{display:none!important}</style>
+    <div style="max-width:480px;margin:14px auto 0;padding:12px 18px;border:1px solid rgba(201,168,76,.35);background:rgba(201,168,76,.06);font-size:13px;line-height:1.9;text-align:center;">方位ナビは、いまはすべての機能を無料でお使いいただけます。<br><span style="font-size:11px;opacity:.75">月額プランの新規受付は休止しています。</span></div>
+
     <!-- 登録済みバッジ -->
     <div id="trialDone">
       ✅ トライアル登録済み<br>
@@ -939,7 +943,7 @@ function checkTrialStatus(){
       if(done) done.style.background='rgba(201,168,76,.08)';
       if(done) done.style.borderColor='rgba(201,168,76,.3)';
       if(done) done.style.color='var(--gold)';
-      done.innerHTML = '⭐ トライアル期間が終了しました。<br>引き続きご利用いただくには月額プランへのご登録をお願いします。<br><a href="https://buy.stripe.com/7sY7sN3Vza8Q3aX0QWbEA02" style="color:var(--gold);font-weight:700;">プレミアム登録 ¥580/月 →</a>';
+      done.innerHTML = '⭐ トライアル期間が終了しました。<br>引き続き無料でお使いいただけます（月額プランの新規受付は休止しています）。';
     }
   }
 }
