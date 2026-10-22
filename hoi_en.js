@@ -213,6 +213,8 @@
     [/^‹ 前の(\d+)年$/, (m, n) => `‹ Previous ${n} years`], [/^次の(\d+)年 ›$/, (m, n) => `Next ${n} years ›`], [/^前の(\d+)年$/, (m, n) => `Previous ${n} years`], [/^次の(\d+)年$/, (m, n) => `Next ${n} years`],
     [/^(\d+)月(\d+)日に予定を追加$/, (m, a, b) => `Add a plan on ${md(a, b)}`],
     [/^(\d+)月(\d+)日（(.)）(?:\s(.+))? 予定(\d+)件$/, (m, a, b, w, h, n) => `${WD[w]}, ${md(a, b)}${h ? ' ' + hol(h) : ''}, ${n} plan(s)`],
+    [/^子の刻（その日の(\d+)〜(\d+)時）$/, (m, a, b) => `Rat hour (${a}:00\u2013${b}:00 on that date)`],
+    [/^日盤は閏の後半（(\d+)\/(\d+)から(陰遁|陽遁)の向きに回り、(\d+)\/(\d+)の甲子から(陰遁|陽遁)）$/, (m, a, b, t, c, d, t2) => `Day chart: second half of a leap period (moving in the ${t === '陽遁' ? 'yang' : 'yin'} direction from ${md(a, b)}; the ${t2 === '陽遁' ? 'yang' : 'yin'} cycle begins on the Kinoe-Ne day, ${md(c, d)})`],
     [/^(.)の刻（(\d+)〜(\d+)時）$/, (m, h, a, b) => `${HOUR[h]} (${a}:00–${b}:00)`],
     [/^([\d,]+)円$/, (m, n) => `¥${n}`],
     [/^購入日から(\d+)年間。自動更新はありません$/, (m, n) => `${n} year from the purchase date. No automatic renewal`],

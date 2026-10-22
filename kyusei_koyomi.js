@@ -157,7 +157,9 @@
         var len = L[i + 1].n - L[i].n, k = n - L[i].n;
         var uru = len === 240 && k >= 180;
         var rev = len === 240 && k >= 210;     // 閏の後半は向きが逆
-        return { type: L[i].type, start: iso(fromDayNum(L[i].n)), next: iso(fromDayNum(L[i + 1].n)),
+        // motion：星の実際の回り方。閏の後半30日は次の遁の向きに回るので、見出しにはこちらを使う
+        return { type: L[i].type, motion: rev ? L[i + 1].type : L[i].type, revStart: rev ? iso(fromDayNum(L[i].n + 210)) : null,
+          start: iso(fromDayNum(L[i].n)), next: iso(fromDayNum(L[i + 1].n)),
           nextType: L[i + 1].type, uru: uru, reversed: rev, dayIndex: k, length: len };
       }
     }

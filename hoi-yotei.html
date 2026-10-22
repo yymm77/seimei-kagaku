@@ -529,7 +529,7 @@ header h1 { letter-spacing: .12em; }
       <input type="date" id="k-birth" min="1900-01-01" max="2100-12-31" aria-label="生年月日">
       <select id="k-hour" aria-label="生まれた時刻">
         <option value="-1">生まれ時刻：不明</option>
-        <option value="23">子の刻（23〜01時）</option><option value="1">丑の刻（01〜03時）</option>
+        <option value="0">子の刻（その日の0〜1時）</option><option value="23">子の刻（その日の23〜24時）</option><option value="1">丑の刻（01〜03時）</option>
         <option value="3">寅の刻（03〜05時）</option><option value="5">卯の刻（05〜07時）</option>
         <option value="7">辰の刻（07〜09時）</option><option value="9">巳の刻（09〜11時）</option>
         <option value="11">午の刻（11〜13時）</option><option value="13">未の刻（13〜15時）</option>
@@ -834,7 +834,7 @@ header h1 { letter-spacing: .12em; }
 <script src="vendor/geographiclib-geodesic.min.js"></script>
 <script src="vendor/tz-lookup.js"></script>
 <script src="houi_calc.js?v=20261020a"></script>
-<script src="kyusei_koyomi.js?v=20261020b"></script>
+<script src="kyusei_koyomi.js?v=20261022a"></script>
 <script src="hoi_ics.js?v=20261022a"></script>
 <script>
 // ====================================================
@@ -973,7 +973,8 @@ function kBirthStars() {
   if (!KK || !kProfile || !kProfile.birth) return null;
   const [y,m,d] = kProfile.birth.split('-').map(Number);
   const h = Number(kProfile.hour);
-  const t = h >= 0 ? (h === 23 ? [23,59] : [h+1, 0]) : [null, null];
+  // 刻の真ん中の時刻で判定する。子の刻は日付をまたぐので、その日の0時台と23時台に分ける
+  const t = h < 0 || isNaN(h) ? [null, null] : h === 0 ? [0, 30] : h === 23 ? [23, 30] : [h + 1, 0];
   try { return { hon: KK.honmei(y,m,d,t[0],t[1]), get: KK.getsumei(y,m,d,t[0],t[1]) }; } catch (e) { return null; }
 }
 function starOf(d) {
@@ -1256,7 +1257,9 @@ function houiHTML(iso) {
   const st = KK.setsuiri(y, m);
   const infoLines = [
     `${info.kanshi}の日　年盤 ${KK.SHORT[info.nen-1]}・月盤 ${KK.SHORT[info.getsu-1]}・日盤 ${KK.SHORT[info.nichi-1]}`,
-    `日盤は${info.ton.type}（${info.ton.start.slice(5).replace('-','/')}の甲子から）${info.ton.uru ? '・閏の期間' : ''}`,
+    info.ton.reversed
+      ? `日盤は閏の後半（${info.ton.revStart.slice(5).replace('-','/')}から${info.ton.motion}の向きに回り、${info.ton.next.slice(5).replace('-','/')}の甲子から${info.ton.nextType}）`
+      : `日盤は${info.ton.type}（${info.ton.start.slice(5).replace('-','/')}の甲子から）${info.ton.uru ? '・閏の期間' : ''}`,
     info.setsuiriToday ? `この日が${st.name}（${hm(st)}）。この日から新しい月盤` : `この月の節入り：${st.name} ${hm(st)}`,
   ];
   if (info.shiToday) infoLines.push(`この日は${info.shiToday.name}（${hm(info.shiToday)}）`);
@@ -1353,7 +1356,7 @@ function hbShow(iso) {
     const ban = isOpen() ? hbBan : 'nichi';
     const c = ban === 'nen' ? info.nen : ban === 'getsu' ? info.getsu : info.nichi;
     document.getElementById('hb-date').textContent = `${m}月${d}日（${WEEKDAYS[new Date(y,m-1,d).getDay()]}）`;
-    document.getElementById('hb-ban').textContent = ban === 'nichi' ? `${BAN_NAME[ban]}・${info.ton.type}` : BAN_NAME[ban];
+    document.getElementById('hb-ban').textContent = ban === 'nichi' ? `${BAN_NAME[ban]}・${info.ton.motion || info.ton.type}` : BAN_NAME[ban];
     const bs = kBirthStars(), foot = document.getElementById('hb-foot');
     hbJT = bs && isOpen() ? jBan(bs.hon, info, ban) : null;
     if (!isOpen()) foot.textContent = '購入すると吉凶の色と凶方位が出ます';
