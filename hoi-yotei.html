@@ -1014,7 +1014,10 @@ const HA_NOTE = '歳破・月破・日破は、一般の九星気学で誰にと
 const EKI_BTN = iso => `<button type="button" class="eki-btn" data-eki="${iso}" title="方位の吉凶に加えて、易の卦でも確かめたい方へ（易経門が開きます）">☯ 易で確かめる</button>`;
 const HOUI_MORE = `<div class="kset-note houi-more">方位の見方や、五黄殺・暗剣殺・破などの凶方位の意味を詳しく知りたい方は、次へ。<a href="houigaku.html">▶ 方位学の殿堂（九星気学方位判定システム）</a></div>`;
 // 易で確かめる：問いの文を易経門へ渡して開く（同じサイトの中なので、端末の中だけで受け渡す。外へは送らない）
-const EKI_URL = 'iching.html';
+const EKI_URL = window.HOI_LANG === 'en' ? 'iching-en.html' : 'iching.html';   // 英語の画面からは英語の易経門へ
+const EKI_EN = window.HOI_LANG === 'en';
+const DIR_EN = { 北: 'north', 北東: 'northeast', 東: 'east', 南東: 'southeast', 南: 'south', 南西: 'southwest', 西: 'west', 北西: 'northwest' };
+const MON_EN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'], WD_EN = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 function ekiOpen(q) {
   if (!PERSONAL) { try { localStorage.setItem('iching_prefill', JSON.stringify({ q, at: Date.now(), from: 'hoi-yotei' })); } catch (e) {} }
   window.open(PERSONAL ? 'https://yymm77.github.io/seimei-kagaku/' + EKI_URL : EKI_URL, '_blank', 'noopener');
@@ -1022,6 +1025,15 @@ function ekiOpen(q) {
 function ekiQuestion(item) {
   const [y, m, d] = item.date.split('-').map(Number);
   const w = WEEKDAYS[new Date(y, m - 1, d).getDay()];
+  if (EKI_EN) {
+    let wh = '';
+    if (item.dest) {
+      const g = itemGeo(item), dn = item.dest.name || 'my destination';
+      const dir = g && g.r && g.r.sector && g.r.judged ? DIR_EN[KK.DIR_JA[KK.DIRS[g.r.sector.index]]] : '';
+      wh = `, heading ${dir ? dir + ' ' : ''}to ${dn}`;
+    } else if (item.place) wh = ` at ${item.place}`;
+    return `${WD_EN[new Date(y, m - 1, d).getDay()]}, ${MON_EN[m - 1]} ${d}${item.time ? ', ' + item.time : ''}: "${item.title || 'my plan'}"${wh}. Should I go ahead with this plan?`;
+  }
   let where = '';
   if (item.dest) {
     const g = itemGeo(item), dn = item.dest.name || '行き先';
@@ -1326,7 +1338,8 @@ function wirePanel(root) {
   root.querySelectorAll('[data-kopen]').forEach(b => b.addEventListener('click', () => openPanel('kset', true)));
   root.querySelectorAll('[data-eki]').forEach(b => b.addEventListener('click', () => {
     const [y, m, d] = b.dataset.eki.split('-').map(Number);
-    ekiOpen(`${m}月${d}日（${WEEKDAYS[new Date(y, m - 1, d).getDay()]}）、この日に動くことについて、易の示すところを伺います。`);
+    ekiOpen(EKI_EN ? `${WD_EN[new Date(y, m - 1, d).getDay()]}, ${MON_EN[m - 1]} ${d}: what does the I Ching say about acting on this day?`
+      : `${m}月${d}日（${WEEKDAYS[new Date(y, m - 1, d).getDay()]}）、この日に動くことについて、易の示すところを伺います。`);
   }));
   root.querySelectorAll('[data-open-lic]').forEach(b => b.addEventListener('click', () => openPanel('lic', true)));
   root.querySelectorAll('[data-go-today]').forEach(b => b.addEventListener('click', () => {
