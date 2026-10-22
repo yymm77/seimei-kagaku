@@ -578,12 +578,13 @@ header h1 { letter-spacing: .12em; }
             <option value="all">すべて</option>
             <option value="future">これからの予定だけ</option>
           </select></label>
-        <label class="btn-cancel btn-file btn-sm">カレンダー → 予定帖に取り込む<input type="file" id="cx-import" accept=".ics,text/calendar" hidden></label>
+        <label class="btn-cancel btn-file btn-sm">カレンダー → 予定帖に取り込む<input type="file" id="cx-import" accept=".ics,.zip,text/calendar,application/zip" multiple hidden></label>
       </div>
       <div class="form-msg" id="cx-msg"></div>
       <details class="cx-help"><summary>カレンダー側の操作</summary>
         <div><b>Google カレンダーへ入れる</b>：パソコンで Google カレンダーを開き、右上の歯車 →「設定」→「インポート / エクスポート」→「インポート」で、書き出したファイルを選びます。</div>
-        <div><b>Google カレンダーから出す</b>：同じ画面の「エクスポート」で zip ファイルが届きます。開くと中に .ics があるので、それを予定帖で取り込みます。</div>
+        <div><b>Google カレンダーから出す</b>：同じ画面の「エクスポート」で zip ファイルが届きます。そのアカウントのカレンダーが全部入っているので、zip のまま予定帖で取り込めます。</div>
+        <div><b>アカウントがいくつもある場合</b>：アカウントごとに書き出した zip を、取り込むときにまとめて選んでください（Ctrl キーや ⌘ キーを押しながら選ぶと、いくつも選べます）。どのカレンダーから来た予定かは、予定の横に札で出ます。同じ予定が二つのアカウントに入っていても、一つにまとめます。</div>
         <div><b>iPhone・Mac のカレンダーへ入れる</b>：書き出したファイルを開くと、カレンダーに追加するか尋ねられます。</div>
         <div><b>Mac のカレンダーから出す</b>：カレンダーの一覧で書き出したいカレンダーを選び、「ファイル」→「書き出す」→「書き出す」で .ics ができます。iPhone だけをお使いの場合は、iCloud のカレンダーを Mac か Google カレンダーに読み込んでから書き出してください。</div>
         <div>一度取り込んだ予定は、もう一度取り込んでも重ねません。過去の予定は「済」として入り、その日の方位盤と見比べられます。毎週・毎月の予定は予定帖の繰り返しに、それ以外の繰り返しは1年先までを一件ずつ入れます。</div>
@@ -593,17 +594,21 @@ header h1 { letter-spacing: .12em; }
       <h3>Google カレンダーと直接やり取りする（自分用）</h3>
       <div class="kset-note">claude.ai につないである Google カレンダーと、ファイルを使わずに直接やり取りします。</div>
       <div class="cx-row">
-        <label>カレンダー <select id="gx-cal"><option value="">（主なカレンダー）</option></select></label>
-        <button type="button" class="btn-cancel btn-sm" id="gx-cals">一覧を読む</button>
+        <button type="button" class="btn-cancel btn-sm" id="gx-cals">カレンダーの一覧を読む</button>
       </div>
+      <div class="cx-row" id="gx-list"></div>
       <div class="cx-row">
-        <button type="button" class="btn-primary btn-sm" id="gx-import">Google → 予定帖に取り込む</button>
+        <button type="button" class="btn-primary btn-sm" id="gx-import">選んだカレンダー → 予定帖に取り込む</button>
         <span class="kset-note">範囲は上の「取り込む範囲」に従います</span>
       </div>
       <div class="cx-row">
+        <label>送り先 <select id="gx-cal"><option value="">（主なカレンダー）</option></select></label>
         <button type="button" class="btn-primary btn-sm" id="gx-push">予定帖 → Google に送る</button>
         <span class="kset-note" id="gx-count"></span>
       </div>
+      <details class="cx-help"><summary>ほかのアカウントのカレンダーも並べるには</summary>
+        <div>ここで読めるのは、claude.ai につないだ Google アカウントから見えるカレンダーです。ほかのアカウントのカレンダーは、そのアカウントで Google カレンダーを開き、カレンダー名の「︙」→「設定と共有」→「特定のユーザーまたはグループと共有する」に、つないだアカウントのメールアドレスを加えてください。次に「一覧を読む」を押すと並びます。共有しづらいときは、上のファイルでの取り込み（zip をまとめて選ぶ）もお使いいただけます。</div>
+      </details>
       <div class="form-msg" id="gx-msg"></div>
     </div>
     <div class="btn-row"><button type="button" class="btn-cancel" id="d-close">閉じる</button></div>
@@ -1126,7 +1131,7 @@ function renderItem(item, today) {
     <div class="yotei-date-col"><div class="yotei-month">${month}</div><div class="yotei-day">${day}</div><div class="yotei-weekday">(${wd})</div></div>
     <div class="yotei-body">
       ${item.time ? `<div class="yotei-time">${timeLabel(item)}</div>` : ''}
-      <div class="yotei-title">${esc(item.title || '')}${item.src ? `<span class="cal-src">${item.src === 'google' ? 'Google' : 'カレンダー'}から</span>` : ''}</div>
+      <div class="yotei-title">${esc(item.title || '')}${item.src ? `<span class="cal-src">${esc(item.cal || (item.src === 'google' ? 'Google' : 'カレンダー'))}</span>` : ''}</div>
       ${item.place ? `<div class="yotei-sub">場所：${esc(item.place)}</div>` : ''}
       ${item.memo ? `<div class="yotei-memo">${esc(item.memo)}</div>` : ''}
       ${item.repeat && item.repeat !== 'none' ? `<span class="yotei-repeat">${item.repeat==='weekly'?'毎週':'毎月'}</span>` : ''}
@@ -1835,7 +1840,7 @@ function importItems(list) {
   const added = [];
   list.forEach(x => {
     const u = x.icsUid;
-    if (seen.has(u) || (u.startsWith('g:') && gids.some(g => u.startsWith('g:' + g + '_')))) { dup++; return; }
+    if (seen.has(u) || (x.gid && gids.some(g => x.gid === g || x.gid.startsWith(g + '_')))) { dup++; return; }
     seen.add(u);
     const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
     items[id] = { id, ...x, done: !!x.done, createdAt: Date.now() };
@@ -1860,15 +1865,32 @@ if (HX) {
     saveICS(list, `hoi-yotei_${todayISO()}.ics`, 'cx-msg');
   });
   document.getElementById('cx-import').addEventListener('change', async e => {
-    const file = e.target.files[0]; e.target.value = '';
-    if (!file) return;
-    try {
-      const text = await file.text();
-      if (!/BEGIN:VCALENDAR/i.test(text)) throw new Error('not ics');
-      const today = todayISO(), from = HX.rangeFrom(document.getElementById('cx-range').value, today);
-      const res = HX.toItems(HX.parseICS(text), { from, today, src: 'ics' });
-      showMsg('cx-msg', importReport(importItems(res.items), res.skipped), true);
-    } catch (err) { showMsg('cx-msg', 'このファイルは読み込めませんでした。カレンダーから書き出した .ics ファイルを選んでください（Google の場合は zip を開いた中にあります）。'); }
+    const files = [...e.target.files]; e.target.value = '';
+    if (!files.length) return;
+    showMsg('cx-msg', '読んでいます…', true);
+    // zip（Google の書き出し）は中の .ics を一つずつ取り出す。複数のアカウント・カレンダーをまとめて選べる
+    const cals = [], bad = [];
+    for (const f of files) {
+      try {
+        if (/\.zip$/i.test(f.name) || f.type === 'application/zip') {
+          const inner = await HX.readZip(await f.arrayBuffer());
+          if (!inner.length) bad.push(f.name);
+          inner.forEach(x => cals.push(x));
+        } else cals.push({ name: f.name, text: await f.text() });
+      } catch (err) { bad.push(f.name); }
+    }
+    const today = todayISO(), from = HX.rangeFrom(document.getElementById('cx-range').value, today);
+    const lines = [], tot = { n: 0, dup: 0 };
+    cals.forEach(c => {
+      if (!/BEGIN:VCALENDAR/i.test(c.text)) { bad.push(c.name); return; }
+      const cal = HX.calNameOf(c.text) || c.name.replace(/\.ics$/i, '');
+      const res = HX.toItems(HX.parseICS(c.text), { from, today, src: 'ics', cal });
+      const r = importItems(res.items);
+      tot.n += r.n; tot.dup += r.dup;
+      lines.push(`「${cal}」${r.n}件` + (r.dup ? `（重なり${r.dup}件は除く）` : ''));
+    });
+    if (!lines.length) { showMsg('cx-msg', 'このファイルは読み込めませんでした。カレンダーから書き出した .ics か、Google の書き出しの zip を選んでください。'); return; }
+    showMsg('cx-msg', `${cals.length - bad.length}つのカレンダーから、合わせて${tot.n}件を取り込みました。` + lines.join('、') + '。' + (bad.length ? `読めなかったもの：${bad.join('、')}` : ''), true);
   });
 } else {
   document.querySelectorAll('.cx-sec').forEach(x => x.hidden = true);
@@ -1908,10 +1930,13 @@ if (PERSONAL && HX) {
     try {
       const mcp = await gxUse(); if (!mcp) throw { code: 'not_granted' };
       const res = gxPayload(await mcp.callTool(GX_SERVER, 'list_calendars', {}));
+      const list = (res && res.calendars) || [];
       const sel = document.getElementById('gx-cal'), cur = sel.value;
-      sel.innerHTML = '<option value="">（主なカレンダー）</option>' + ((res && res.calendars) || []).map(c => `<option value="${esc(c.id)}">${esc(c.summary || c.id)}</option>`).join('');
+      sel.innerHTML = '<option value="">（主なカレンダー）</option>' + list.filter(c => !/#holiday@|#contacts@|#weeknum@/.test(c.id)).map(c => `<option value="${esc(c.id)}">${esc(c.summary || c.id)}</option>`).join('');
       sel.value = cur;
-      showMsg('gx-msg', 'カレンダーの一覧を読みました。', true);
+      // 祝日のカレンダーは予定帖に祝日があるので、最初は外しておく
+      document.getElementById('gx-list').innerHTML = list.map(c => `<label><input type="checkbox" data-gcal="${esc(c.id)}" data-gname="${esc(c.summary || c.id)}"${/#holiday@|#contacts@|#weeknum@/.test(c.id) ? '' : ' checked'}> ${esc(c.summary || c.id)}</label>`).join('');
+      showMsg('gx-msg', `${list.length}つのカレンダーが見えます。取り込むものに印を付けてください。`, true);
     } catch (e) { showMsg('gx-msg', gxErr(e)); }
   });
   document.getElementById('gx-import').addEventListener('click', async () => {
@@ -1921,20 +1946,27 @@ if (PERSONAL && HX) {
       const mcp = await gxUse(); if (!mcp) throw { code: 'not_granted' };
       const today = todayISO(), key = document.getElementById('cx-range').value;
       const from = HX.rangeFrom(key, today), horizon = HX.addDaysISO(today, 366);
-      const cal = document.getElementById('gx-cal').value;
-      const evs = [];
-      let token = '', pages = 0;
-      do {
-        const input = { startTime: (from < '1970-01-01' ? '1970-01-01' : from) + 'T00:00:00', endTime: horizon + 'T00:00:00', pageSize: 250 };
-        if (cal) input.calendarId = cal;
-        if (token) input.pageToken = token;
-        const res = gxPayload(await mcp.callTool(GX_SERVER, 'list_events', input));
-        ((res && res.events) || []).forEach(g => { const x = HX.fromGoogle(g); if (x) evs.push(x); });
-        token = res && res.nextPageToken; pages++;
-        if (token) showMsg('gx-msg', `Google カレンダーを読んでいます…（${evs.length}件）`, true);
-      } while (token && pages < 40);
-      const res = HX.toItems(evs, { from, today, src: 'google' });
-      showMsg('gx-msg', importReport(importItems(res.items), res.skipped), true);
+      const boxes = [...document.querySelectorAll('#gx-list [data-gcal]')];
+      const cals = boxes.length ? boxes.filter(b => b.checked).map(b => ({ id: b.dataset.gcal, name: b.dataset.gname })) : [{ id: '', name: 'Google' }];
+      if (!cals.length) { showMsg('gx-msg', '取り込むカレンダーに印を付けてください。'); btn.disabled = false; return; }
+      const lines = []; let total = 0;
+      for (const c of cals) {
+        const evs = [];
+        let token = '', pages = 0;
+        do {
+          const input = { startTime: (from < '1970-01-01' ? '1970-01-01' : from) + 'T00:00:00', endTime: horizon + 'T00:00:00', pageSize: 250 };
+          if (c.id) input.calendarId = c.id;
+          if (token) input.pageToken = token;
+          const res = gxPayload(await mcp.callTool(GX_SERVER, 'list_events', input));
+          ((res && res.events) || []).forEach(g => { const x = HX.fromGoogle(g); if (x) evs.push(x); });
+          token = res && res.nextPageToken; pages++;
+          showMsg('gx-msg', `「${c.name}」を読んでいます…（${evs.length}件）`, true);
+        } while (token && pages < 40);
+        const res = HX.toItems(evs, { from, today, src: 'google', cal: c.name });
+        const r = importItems(res.items); total += r.n;
+        lines.push(`「${c.name}」${r.n}件` + (r.dup ? `（重なり${r.dup}件は除く）` : ''));
+      }
+      showMsg('gx-msg', `合わせて${total}件を取り込みました。` + lines.join('、') + '。', true);
     } catch (e) { showMsg('gx-msg', gxErr(e)); }
     btn.disabled = false; gxRefreshCount();
   });

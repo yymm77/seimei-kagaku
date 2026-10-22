@@ -87,6 +87,42 @@
     s.replace(/^RRULE:/i, '').split(';').forEach(kv => { const [k, v] = kv.split('='); if (k && v !== undefined) r[k.toUpperCase()] = v; });
     return r.FREQ ? r : null;
   }
+  // .ics のカレンダー名（X-WR-CALNAME）
+  function calNameOf(text) {
+    const l = parseLines(text.slice(0, 4000)).find(x => x.name === 'X-WR-CALNAME');
+    return l ? unescapeText(l.value).trim() : '';
+  }
+  // zip（Google カレンダーの書き出し）から .ics を取り出す
+  async function readZip(buf) {
+    const u8 = new Uint8Array(buf), dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+    let eocd = -1;
+    for (let i = u8.length - 22; i >= Math.max(0, u8.length - 70000); i--) if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+    if (eocd < 0) throw new Error('zip ではありません');
+    const n = dv.getUint16(eocd + 10, true);
+    let p = dv.getUint32(eocd + 16, true);
+    const out = [];
+    for (let k = 0; k < n; k++) {
+      if (dv.getUint32(p, true) !== 0x02014b50) break;
+      const flag = dv.getUint16(p + 8, true), method = dv.getUint16(p + 10, true), csize = dv.getUint32(p + 20, true);
+      const nlen = dv.getUint16(p + 28, true), xlen = dv.getUint16(p + 30, true), clen = dv.getUint16(p + 32, true), off = dv.getUint32(p + 42, true);
+      const nameBytes = u8.subarray(p + 46, p + 46 + nlen);
+      const name = new TextDecoder((flag & 0x800) ? 'utf-8' : 'utf-8').decode(nameBytes);
+      p += 46 + nlen + xlen + clen;
+      if (!/\.ics$/i.test(name)) continue;
+      const lo = off + 30 + dv.getUint16(off + 26, true) + dv.getUint16(off + 28, true);
+      const data = u8.subarray(lo, lo + csize);
+      let bytes;
+      if (method === 0) bytes = data;
+      else if (method === 8) {
+        if (typeof DecompressionStream === 'undefined') throw new Error('この端末では zip を開けません');
+        const ds = new Response(data).body.pipeThrough(new DecompressionStream('deflate-raw'));
+        bytes = new Uint8Array(await new Response(ds).arrayBuffer());
+      } else continue;
+      out.push({ name: name.split('/').pop(), text: new TextDecoder('utf-8').decode(bytes) });
+    }
+    return out;
+  }
+
   // .ics の本文 → 予定の一覧（共通の形）
   function parseICS(text, toTZ) {
     toTZ = toTZ || localTZ();
@@ -145,7 +181,7 @@
       if (l) l.value.split(',').forEach(v => { const x = parseDT({ value: v, params: l.params }, toTZ); if (x) ex.push(x.date); });
     });
     return {
-      uid: 'g:' + g.id, gid: g.id, recurringId: g.recurringEventId || '',
+      uid: g.iCalUID || ('g:' + g.id), gid: g.id,   // iCalUID はアカウントをまたいでも同じ予定なら同じ recurringId: g.recurringEventId || '',
       title: (g.summary || '').trim(), place: (g.location || '').trim(),
       memo: (g.description || '').replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').trim(),
       start, end: conv(g.end), rrule: parseRRule(rule), exdates: ex,
@@ -241,6 +277,8 @@
     const out = [], skipped = { cancelled: 0, old: 0, unsupported: 0 };
     const base = e => {
       const it = { title: e.title || '（無題）', place: e.place, memo: e.memo.slice(0, 1000), repeat: 'none', src: opt.src };
+      if (opt.cal) it.cal = String(opt.cal).slice(0, 60);
+      if (e.gid) it.gid = e.gid;
       if (!e.start.allDay) {
         it.time = e.start.time;
         if (e.end && !e.end.allDay && e.end.date === e.start.date && e.end.time > e.start.time) it.end = e.end.time;
@@ -370,7 +408,7 @@
     return isoOf(y - 1, m, Math.min(d, lastDay(y - 1, m)));   // 1年前から（既定）
   }
 
-  const api = { parseICS, fromGoogle, toItems, buildICS, googleAddURL, googleCreateInput, rangeFrom, expandDates, simpleRepeat, rruleOf, localTZ, addDaysISO, uidOf };
+  const api = { calNameOf, readZip, parseICS, fromGoogle, toItems, buildICS, googleAddURL, googleCreateInput, rangeFrom, expandDates, simpleRepeat, rruleOf, localTZ, addDaysISO, uidOf };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.HoiICS = api;
 })(typeof window !== 'undefined' ? window : globalThis);
