@@ -200,6 +200,7 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .cal-links a, .cal-links button { font-size: 11px; color: var(--accent); background: none; border: none; padding: 0; cursor: pointer; text-decoration: underline; font-family: inherit; }
 .cal-src { font-size: 10px; color: var(--fg-muted); border: 1px solid var(--border); border-radius: 3px; padding: 0 4px; margin-left: 4px; }
 .cx-sec { border-top: 1px solid var(--border); margin-top: 14px; padding-top: 12px; }
+#calPanel > .cx-sec:not([hidden]) ~ .cx-sec { border-top: 1px solid var(--border); }
 .cx-sec h3 { font-size: 13px; margin: 0 0 6px; }
 .cx-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0; font-size: 12px; }
 .cx-row select { font-size: 12px; }
@@ -470,6 +471,7 @@ header h1 { letter-spacing: .12em; }
     <button type="button" id="btn-kset" class="btn-export" aria-expanded="false" aria-controls="kset">方位の設定</button>
     <button type="button" id="btn-geo" class="btn-export" aria-expanded="false" aria-controls="geoPanel">地図・起点</button>
     <button type="button" id="btn-lic" class="btn-export" aria-expanded="false" aria-controls="lic">購入・解錠</button>
+    <button type="button" id="btn-cal" class="btn-export" aria-expanded="false" aria-controls="calPanel">カレンダー連携</button>
     <button type="button" id="btn-data" class="btn-export" aria-expanded="false" aria-controls="dataPanel">データ</button>
   </div>
 </header>
@@ -562,15 +564,14 @@ header h1 { letter-spacing: .12em; }
       <label class="btn-cancel btn-file">読み込む<input type="file" id="f-import" accept="application/json,.json" hidden></label>
       <span class="form-msg" id="d-msg"></span>
     </div>
-    <div class="cx-sec">
-      <h3>Google・Apple のカレンダーとやり取りする</h3>
-      <div class="kset-note">過去の予定を取り込むと、病気・出会い・合格など、ご自分の歩みの出来事をその日の方位盤と照らし合わせて、確かめることができます。</div>
-      <div class="kset-note">カレンダー用のファイル（.ics）で受け渡します。Google カレンダーにも、iPhone・Mac のカレンダーにも使えます。</div>
-      <div class="cx-row">
-        <button type="button" class="btn-primary btn-sm" id="cx-export">予定帖 → カレンダー用に書き出す</button>
-        <label><input type="checkbox" id="cx-skip-imported" checked> カレンダーから取り込んだ予定は含めない</label>
-      </div>
-      <div class="cx-row">
+    <div class="btn-row"><button type="button" class="btn-cancel" id="d-close">閉じる</button></div>
+  </div>
+
+  <!-- カレンダー連携 -->
+  <div class="kset" id="calPanel" hidden>
+    <h2>カレンダー連携</h2>
+    <div class="kset-note">Google カレンダーや iPhone・Mac のカレンダーの予定を取り込み、予定帖の予定をそちらへ送ります。過去の予定を取り込むと、病気・出会い・合格など、ご自分の歩みの出来事をその日の方位盤と照らし合わせて、確かめることができます。</div>
+    <div class="cx-row">
         <label>取り込む範囲
           <select id="cx-range">
             <option value="1y">1年前から</option>
@@ -579,6 +580,36 @@ header h1 { letter-spacing: .12em; }
             <option value="all">すべて</option>
             <option value="future">これからの予定だけ</option>
           </select></label>
+    </div>
+    <div class="cx-sec" id="gx-sec" hidden>
+      <h3>Google カレンダーと直接やり取りする</h3>
+      <div class="kset-note">claude.ai につないである Google カレンダーと、ファイルを使わずに直接やり取りします。</div>
+      <div class="cx-row">
+        <button type="button" class="btn-cancel btn-sm" id="gx-cals">カレンダーの一覧を読む</button>
+      </div>
+      <div class="cx-row" id="gx-list"></div>
+      <div class="cx-row">
+        <button type="button" class="btn-primary btn-sm" id="gx-import">選んだカレンダー → 予定帖に取り込む</button>
+        <span class="kset-note">上の「取り込む範囲」の分を取り込みます</span>
+      </div>
+      <div class="cx-row">
+        <label>送り先 <select id="gx-cal"><option value="">（主なカレンダー）</option></select></label>
+        <button type="button" class="btn-primary btn-sm" id="gx-push">予定帖 → Google に送る</button>
+        <span class="kset-note" id="gx-count"></span>
+      </div>
+      <details class="cx-help"><summary>ほかのアカウントのカレンダーも並べるには</summary>
+        <div>ここで読めるのは、claude.ai につないだ Google アカウントから見えるカレンダーです。ほかのアカウントのカレンダーは、そのアカウントで Google カレンダーを開き、カレンダー名の「︙」→「設定と共有」→「特定のユーザーまたはグループと共有する」に、つないだアカウントのメールアドレスを加えてください。次に「一覧を読む」を押すと並びます。共有しづらいときは、下のファイルでの取り込み（zip をまとめて選ぶ）もお使いいただけます。</div>
+      </details>
+      <div class="form-msg" id="gx-msg"></div>
+    </div>
+    <div class="cx-sec">
+      <h3>ファイルでやり取りする（Google・Apple）</h3>
+      <div class="kset-note">カレンダー用のファイル（.ics）で受け渡します。Google カレンダーにも、iPhone・Mac のカレンダーにも使えます。</div>
+      <div class="cx-row">
+        <button type="button" class="btn-primary btn-sm" id="cx-export">予定帖 → カレンダー用に書き出す</button>
+        <label><input type="checkbox" id="cx-skip-imported" checked> カレンダーから取り込んだ予定は含めない</label>
+      </div>
+      <div class="cx-row">
         <label class="btn-cancel btn-file btn-sm">カレンダー → 予定帖に取り込む<input type="file" id="cx-import" accept=".ics,.zip,text/calendar,application/zip" multiple hidden></label>
       </div>
       <div class="form-msg" id="cx-msg"></div>
@@ -591,28 +622,7 @@ header h1 { letter-spacing: .12em; }
         <div>一度取り込んだ予定は、もう一度取り込んでも重ねません。過去の予定は「済」として入り、その日の方位盤と見比べられます。毎週・毎月の予定は予定帖の繰り返しに、それ以外の繰り返しは1年先までを一件ずつ入れます。</div>
       </details>
     </div>
-    <div class="cx-sec" id="gx-sec" hidden>
-      <h3>Google カレンダーと直接やり取りする（自分用）</h3>
-      <div class="kset-note">claude.ai につないである Google カレンダーと、ファイルを使わずに直接やり取りします。</div>
-      <div class="cx-row">
-        <button type="button" class="btn-cancel btn-sm" id="gx-cals">カレンダーの一覧を読む</button>
-      </div>
-      <div class="cx-row" id="gx-list"></div>
-      <div class="cx-row">
-        <button type="button" class="btn-primary btn-sm" id="gx-import">選んだカレンダー → 予定帖に取り込む</button>
-        <span class="kset-note">範囲は上の「取り込む範囲」に従います</span>
-      </div>
-      <div class="cx-row">
-        <label>送り先 <select id="gx-cal"><option value="">（主なカレンダー）</option></select></label>
-        <button type="button" class="btn-primary btn-sm" id="gx-push">予定帖 → Google に送る</button>
-        <span class="kset-note" id="gx-count"></span>
-      </div>
-      <details class="cx-help"><summary>ほかのアカウントのカレンダーも並べるには</summary>
-        <div>ここで読めるのは、claude.ai につないだ Google アカウントから見えるカレンダーです。ほかのアカウントのカレンダーは、そのアカウントで Google カレンダーを開き、カレンダー名の「︙」→「設定と共有」→「特定のユーザーまたはグループと共有する」に、つないだアカウントのメールアドレスを加えてください。次に「一覧を読む」を押すと並びます。共有しづらいときは、上のファイルでの取り込み（zip をまとめて選ぶ）もお使いいただけます。</div>
-      </details>
-      <div class="form-msg" id="gx-msg"></div>
-    </div>
-    <div class="btn-row"><button type="button" class="btn-cancel" id="d-close">閉じる</button></div>
+    <div class="btn-row"><button type="button" class="btn-cancel" id="cal-close">閉じる</button></div>
   </div>
 
   <div class="view-tabs" role="group" aria-label="表示の切り替え">
@@ -1415,7 +1425,7 @@ function closeCtx() { const m = document.getElementById('ctx-menu'); if (m) m.re
 })();
 
 // ── 開閉パネル ─────────────────────────────────────
-const PANELS = { kset: 'btn-kset', geoPanel: 'btn-geo', lic: 'btn-lic', dataPanel: 'btn-data' };
+const PANELS = { kset: 'btn-kset', geoPanel: 'btn-geo', lic: 'btn-lic', calPanel: 'btn-cal', dataPanel: 'btn-data' };
 function openPanel(id, open) {
   Object.keys(PANELS).forEach(p => {
     const show = p === id && open;
@@ -1434,6 +1444,7 @@ Object.keys(PANELS).forEach(p => document.getElementById(PANELS[p]).addEventList
 document.getElementById('k-close').addEventListener('click', () => openPanel('kset', false));
 document.getElementById('lic-close').addEventListener('click', () => openPanel('lic', false));
 document.getElementById('d-close').addEventListener('click', () => openPanel('dataPanel', false));
+document.getElementById('cal-close').addEventListener('click', () => openPanel('calPanel', false));
 document.getElementById('g-close').addEventListener('click', () => openPanel('geoPanel', false));
 
 // ── 方位の設定 ─────────────────────────────────────
@@ -1926,7 +1937,11 @@ function gxRefreshCount() {
 }
 if (PERSONAL && HX) {
   document.getElementById('gx-sec').hidden = false;
-  document.getElementById('btn-data').addEventListener('click', gxRefreshCount);
+  // 窓を開いたら、カレンダーの一覧を自動で読む（初回だけ）
+  document.getElementById('btn-cal').addEventListener('click', () => {
+    gxRefreshCount();
+    if (!document.getElementById('calPanel').hidden && !document.querySelector('#gx-list [data-gcal]')) document.getElementById('gx-cals').click();
+  });
   document.getElementById('gx-cals').addEventListener('click', async () => {
     try {
       const mcp = await gxUse(); if (!mcp) throw { code: 'not_granted' };
