@@ -13,5 +13,7 @@ out = out.replace('<a class="lang-link" href="hoi-yotei-en.html" hreflang="en" l
                   '<a class="lang-link" href="hoi-yotei.html" hreflang="ja" lang="ja" translate="no">日本語</a>', 1)
 out = out.replace('content: "今年";', 'content: "this year";', 1)
 # 日本語の解説ページへのリンクには（日本語）と分かるように
+assert '<a class="small-link" href="tokusho.html">' in out
+out = out.replace('<a class="small-link" href="tokusho.html">', '<a class="small-link" href="tokusho-en.html">', 1)
 open('hoi-yotei-en.html', 'w', encoding='utf-8').write(out)
 print('hoi-yotei-en.html', len(out))

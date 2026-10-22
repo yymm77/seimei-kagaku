@@ -38,7 +38,7 @@
     'はじめに、生年月日を登録してください': 'First, register your date of birth', '生年月日を登録してください': 'Please register your date of birth',
     'ご購入ありがとうございます。最後に、生年月日を登録してください': 'Thank you for your purchase. Finally, register your date of birth',
     '生年月日を登録する': 'Register date of birth', '生まれ時刻：不明': 'Birth time: unknown', '閉じる': 'Close', '登録する': 'Register',
-    '（税込）': '(tax included)', '購入する（カード払い）': 'Buy (card payment)', '特定商取引法に基づく表記': 'Legal notice (Japanese)',
+    '（税込）': '(tax included)', '購入する（カード払い）': 'Buy (card payment)', '特定商取引法に基づく表記': 'Legal notice',
     '解錠する': 'Unlock', '解錠番号を忘れたとき': 'Forgot your unlock code?', '番号をメールで受け取る': 'Email me my code',
     '地図と起点': 'Map & origins', '流派（方位の区切り）': 'School (how directions are divided)', '入れ替えない': 'Do not swap',
     '計算法': 'Calculation method', '自動（近くは一致、遠くは大圏）': 'Automatic (same nearby; great circle far away)', '大圏（正距方位）': 'Great circle (azimuthal equidistant)', '等角航路（メルカトル）': 'Rhumb line (Mercator)',
