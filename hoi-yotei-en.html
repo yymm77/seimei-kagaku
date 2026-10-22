@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script src="hoi_en.js?v=202610221235"></script>
+<script src="hoi_en.js?v=202610221237"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Hōi Yotei-chō — Nine Star Ki Planner</title>
@@ -1541,12 +1541,18 @@ document.getElementById('k-save').addEventListener('click', () => {
 
 // ── 購入・解錠 ─────────────────────────────────────
 const buyLink = document.getElementById('buy-link');
-if (PAY_URL) buyLink.href = PAY_URL;
+// 英語版から買う方は、支払いリンクに印（client_reference_id=en）を付け、戻ったときに英語版へ案内する
+const IS_EN = window.HOI_LANG === 'en';
+if (PAY_URL) {
+  buyLink.href = IS_EN ? PAY_URL + (PAY_URL.includes('?') ? '&' : '?') + 'client_reference_id=en' : PAY_URL;
+  buyLink.addEventListener('click', () => { try { localStorage.setItem('hoi_buy_lang', JSON.stringify({ lang: IS_EN ? 'en' : 'ja', at: Date.now() })); } catch (e) {} });
+}
 else { buyLink.removeAttribute('href'); buyLink.classList.add('is-off'); buyLink.textContent = '購入の受付準備中です'; }
 
 async function gas(params) {
   if (!GAS_URL) throw new Error('準備中');
-  const res = await fetch(GAS_URL + '?' + new URLSearchParams(params).toString(), { method: 'GET' });
+  const q = new URLSearchParams(params); if (IS_EN) q.set('lang', 'en');
+  const res = await fetch(GAS_URL + '?' + q.toString(), { method: 'GET' });
   if (!res.ok) throw new Error('通信');
   return res.json();
 }
@@ -1575,6 +1581,14 @@ document.getElementById('lic-resend').addEventListener('click', async () => {
 (async function claimFromStripe() {
   const sp = new URLSearchParams(location.search), sid = sp.get('session_id');
   if (!sid) return;
+  // 英語版から買った方が日本語版に戻ってきたら（支払いリンクの戻り先は一つ）、英語版へ移る
+  if (!IS_EN) {
+    let b = null; try { b = JSON.parse(localStorage.getItem('hoi_buy_lang') || 'null'); } catch (e) {}
+    if (b && b.lang === 'en' && Date.now() - b.at < 2 * 86400000) {
+      location.replace('hoi-yotei-en.html?session_id=' + encodeURIComponent(sid) + location.hash); return;
+    }
+  }
+  try { localStorage.removeItem('hoi_buy_lang'); } catch (e) {}
   history.replaceState(null, '', location.pathname + location.hash);
   openPanel('lic', true);
   showMsg('lic-msg', 'お支払いを確かめています…', true);
