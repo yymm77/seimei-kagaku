@@ -1,0 +1,2323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="hoi_en.js?v=202610221215"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Hōi Yotei-chō — Nine Star Ki Planner</title>
+<meta name="description" content="A planner that lays each day's Nine Star Ki direction chart over your plans. Import your Google or iPhone calendar and check the charts against your own past. Solar terms within one minute of Japan's national observatory.">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-V0EMF3WHLM"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-V0EMF3WHLM');</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="vendor/leaflet.css">
+<style>
+:root { padding-top: env(safe-area-inset-top,0px); padding-bottom: env(safe-area-inset-bottom,0px); }
+[hidden] { display: none !important; }
+
+/* 一覧と月表示を切り替える一枚の帳面。月表示は日曜はじまりの七列 */
+:root {
+  --bg: #f7f5f0;
+  --surface: #ffffff;
+  --surface2: #f0ede6;
+  --fg: #1c1a15;
+  --fg-muted: #6b6455;
+  --border: #ddd8ce;
+  --accent: #2a5298;
+  --accent-light: #e8edf8;
+  --done-bg: #f0f7ee;
+  --done-fg: #3a6b35;
+  --del: #c0392b;
+  --tag-bg: #fff3cd;
+  --tag-fg: #856404;
+  --sun: #c0392b;
+  --sat: #2a5298;
+  --today-bg: #fdf3d6;
+  --chip-bg: #e8edf8;
+  --chip-fg: #1f3d73;
+  --on-accent: #ffffff;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #18160f;
+    --surface: #242018;
+    --surface2: #2e2a1e;
+    --fg: #ede8da;
+    --fg-muted: #a09480;
+    --border: #3a3528;
+    --accent: #7aabf0;
+    --accent-light: #1a2540;
+    --done-bg: #1a2e18;
+    --done-fg: #7ac876;
+    --del: #e05a4a;
+    --tag-bg: #3a2e00;
+    --tag-fg: #d4a820;
+    --sun: #f07a6a;
+    --sat: #8db8f5;
+    --today-bg: #3a3218;
+    --chip-bg: #1f2c47;
+    --chip-fg: #c4d8fa;
+    --on-accent: #10141c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #18160f;
+  --surface: #242018;
+  --surface2: #2e2a1e;
+  --fg: #ede8da;
+  --fg-muted: #a09480;
+  --border: #3a3528;
+  --accent: #7aabf0;
+  --accent-light: #1a2540;
+  --done-bg: #1a2e18;
+  --done-fg: #7ac876;
+  --del: #e05a4a;
+  --tag-bg: #3a2e00;
+  --tag-fg: #d4a820;
+  --sun: #f07a6a;
+  --sat: #8db8f5;
+  --today-bg: #3a3218;
+  --chip-bg: #1f2c47;
+  --chip-fg: #c4d8fa;
+  --on-accent: #10141c;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Noto Sans JP', 'Hiragino Sans', sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 14px;
+  line-height: 1.65;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0;
+  min-height: 100vh;
+}
+
+/* ヘッダー */
+header {
+  background: var(--accent);
+  color: var(--on-accent);
+  padding-block: 14px;
+  padding-left: max(20px, env(safe-area-inset-left, 0px));
+  padding-right: max(20px, env(safe-area-inset-right, 0px));
+  margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px)));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+header h1 { font-size: 17px; font-weight: 700; letter-spacing: .04em; }
+.head-right { display: flex; align-items: center; gap: 10px; }
+.btn-export {
+  background: transparent; color: var(--on-accent);
+  border: 1px solid currentColor; border-radius: 5px;
+  padding: 5px 12px; font-size: 12px; font-weight: 600; opacity: .9;
+}
+.sync-status { font-size: 11px; opacity: .85; display: flex; align-items: center; gap: 5px; }
+.sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #aaa; flex-shrink: 0; transition: background .3s; }
+.sync-dot.ok { background: #4caf50; }
+.sync-dot.err { background: #f44336; }
+
+/* メインレイアウト */
+.main { max-width: 760px; margin: 0 auto; padding: 20px 0 40px; }
+
+/* 表示の切り替え */
+.view-tabs {
+  display: flex; gap: 4px; padding: 4px;
+  background: var(--surface2); border-radius: 8px;
+  margin-bottom: 18px; width: fit-content;
+}
+.view-tabs button {
+  background: transparent; color: var(--fg-muted);
+  padding: 6px 16px; border-radius: 6px;
+}
+.view-tabs button[aria-pressed="true"] { background: var(--surface); color: var(--fg); box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+
+/* 追加フォーム */
+.add-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+.add-card h2 { font-size: 13px; font-weight: 700; color: var(--fg-muted); margin-bottom: 12px; letter-spacing: .05em; }
+.form-row { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+.form-row input, .form-row select, .form-row textarea {
+  flex: 1 1 120px; min-width: 0;
+  border: 1px solid var(--border); border-radius: 6px;
+  padding: 8px 10px; font-size: 14px; font-family: inherit;
+  background: var(--bg); color: var(--fg); outline: none;
+  transition: border-color .15s;
+}
+.form-row input:focus, .form-row select:focus, .form-row textarea:focus { border-color: var(--accent); }
+.form-row textarea { resize: vertical; min-height: 60px; flex-basis: 100%; }
+.form-row input[type="date"] { min-width: 140px; }
+.btn-row { display: flex; gap: 8px; justify-content: flex-end; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+.form-msg { font-size: 12px; color: var(--del); margin-right: auto; }
+button {
+  border: none; border-radius: 6px; padding: 8px 18px;
+  font-size: 13px; font-family: inherit; cursor: pointer; font-weight: 600;
+  transition: opacity .15s;
+}
+button:hover { opacity: .85; }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn-primary { background: var(--accent); color: var(--on-accent); }
+.btn-cancel  { background: var(--surface2); color: var(--fg); }
+.btn-sm { padding: 4px 10px; font-size: 12px; }
+.btn-done { background: var(--done-bg); color: var(--done-fg); }
+.btn-del  { background: transparent; color: var(--del); border: 1px solid var(--del); }
+
+/* 予定リスト */
+.section-head {
+  display: flex; align-items: center; gap: 10px;
+  margin: 20px 0 10px; font-size: 12px; font-weight: 700;
+  color: var(--fg-muted); letter-spacing: .06em;
+}
+.section-head::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.yotei-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.yotei-item {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  padding: 12px 14px; display: flex; gap: 12px; align-items: flex-start;
+  transition: box-shadow .15s;
+}
+.yotei-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+.yotei-item.is-done { background: var(--done-bg); border-color: transparent; opacity: .75; }
+.yotei-item.is-past { border-left: 3px solid var(--del); }
+.yotei-item.is-today { border-left: 3px solid var(--accent); }
+.yotei-date-col { min-width: 60px; text-align: center; flex-shrink: 0; }
+.yotei-month { font-size: 10px; color: var(--fg-muted); }
+.yotei-day   { font-size: 22px; font-weight: 700; line-height: 1.1; color: var(--accent); }
+.yotei-weekday { font-size: 10px; color: var(--fg-muted); }
+.yotei-body { flex: 1; min-width: 0; }
+.yotei-title { font-weight: 700; font-size: 15px; }
+.yotei-sub   { font-size: 12px; color: var(--fg-muted); margin-top: 2px; }
+.cal-links { font-size: 11px; color: var(--fg-muted); margin-top: 4px; display: flex; flex-wrap: wrap; gap: 2px 8px; align-items: center; }
+.cal-links a, .cal-links button { font-size: 11px; color: var(--accent); background: none; border: none; padding: 0; cursor: pointer; text-decoration: underline; font-family: inherit; }
+.cal-src { font-size: 10px; color: var(--fg-muted); border: 1px solid var(--border); border-radius: 3px; padding: 0 4px; margin-left: 4px; }
+.cx-sec { border-top: 1px solid var(--border); margin-top: 14px; padding-top: 12px; }
+#calPanel > .cx-sec:not([hidden]) ~ .cx-sec { border-top: 1px solid var(--border); }
+.cx-sec h3 { font-size: 13px; margin: 0 0 6px; }
+.cx-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0; font-size: 12px; }
+.cx-row select { font-size: 12px; }
+.cx-help { font-size: 11px; color: var(--fg-muted); line-height: 1.7; }
+.cx-help summary { cursor: pointer; }
+.yotei-memo  { font-size: 12px; color: var(--fg-muted); margin-top: 4px; white-space: pre-wrap; }
+.yotei-repeat {
+  display: inline-block; background: var(--tag-bg); color: var(--tag-fg);
+  border-radius: 3px; font-size: 10px; padding: 1px 6px; margin-top: 4px; font-weight: 600;
+}
+.yotei-actions { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
+.confirm-row { display: flex; gap: 4px; align-items: center; font-size: 12px; color: var(--del); flex-wrap: wrap; justify-content: flex-end; }
+
+/* 月表示 */
+.month-nav { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+.month-nav h2 { font-size: 20px; font-weight: 700; letter-spacing: .04em; min-width: 9em; font-variant-numeric: tabular-nums; }
+.month-nav .nav-btn { background: var(--surface); border: 1px solid var(--border); color: var(--fg); padding: 5px 12px; }
+.cal {
+  display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));
+  border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+  background: var(--border); gap: 1px;
+}
+.cal-wd { background: var(--surface2); text-align: center; font-size: 11px; font-weight: 700; padding: 4px 0; color: var(--fg-muted); }
+.cal-wd.sun { color: var(--sun); }
+.cal-wd.sat { color: var(--sat); }
+.cal-day {
+  background: var(--surface); min-height: 84px; padding: 4px 4px 6px;
+  display: flex; flex-direction: column; gap: 2px; min-width: 0;
+  cursor: pointer; text-align: left; border-radius: 0; font-weight: 400;
+}
+.cal-day:hover { opacity: 1; background: var(--accent-light); }
+.cal-day:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.cal-day { position: relative; }
+.cal-add { position: absolute; right: 3px; bottom: 3px; width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: var(--on-accent);
+  display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; line-height: 1; cursor: pointer; opacity: 0; transition: opacity .12s; }
+.cal-day:hover .cal-add, .cal-day:focus-within .cal-add, .cal-day.is-sel .cal-add { opacity: 1; }
+@media (hover: none) { .cal-add { opacity: .8; } }
+.cal-add:focus-visible { outline: 2px solid var(--fg); outline-offset: 1px; opacity: 1; }
+.cal .chip { cursor: grab; touch-action: none; }
+.cal.dragging, .cal.dragging * { cursor: grabbing; user-select: none; }
+.cal-day.drop-target { outline: 2px dashed var(--accent); outline-offset: -3px; background: var(--accent-light); }
+.chip-ghost { position: fixed; z-index: 300; pointer-events: none; font-size: 11px; background: var(--chip-bg); color: var(--chip-fg); border-radius: 3px; padding: 2px 6px; box-shadow: 0 4px 14px rgba(0,0,0,.2); max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ctx-menu { position: fixed; z-index: 310; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 8px 28px rgba(0,0,0,.2); padding: 4px; display: grid; min-width: 168px; }
+.ctx-menu .ctx-t { font-size: 11px; color: var(--fg-muted); padding: 4px 10px 2px; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ctx-menu button { background: transparent; color: var(--fg); text-align: left; padding: 7px 10px; font-size: 13px; font-weight: 500; border-radius: 5px; }
+.ctx-menu button:hover { background: var(--accent-light); opacity: 1; }
+.ctx-menu button.del { color: var(--del); }
+.toast { position: fixed; z-index: 320; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--fg); color: var(--bg); font-size: 13px; border-radius: 8px; padding: 9px 14px; display: flex; gap: 12px; align-items: center; box-shadow: 0 6px 22px rgba(0,0,0,.25); }
+.toast button { background: transparent; color: var(--bg); text-decoration: underline; padding: 0; font-size: 13px; }
+.cal-day.other { background: var(--bg); }
+.cal-day.other .cal-num { opacity: .45; }
+.cal-day.is-today { background: var(--today-bg); }
+.cal-day.is-sel { outline: 2px solid var(--accent); outline-offset: -2px; }
+.cal-num { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; display: flex; align-items: baseline; gap: 4px; }
+.cal-num.sun, .cal-num.hol { color: var(--sun); }
+.cal-num.sat { color: var(--sat); }
+.cal-hol { font-size: 9px; font-weight: 500; color: var(--sun); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chip {
+  font-size: 11px; line-height: 1.35; background: var(--chip-bg); color: var(--chip-fg);
+  border-radius: 3px; padding: 1px 4px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.chip.done { text-decoration: line-through; opacity: .6; }
+.chip-more { font-size: 10px; color: var(--fg-muted); padding-left: 2px; }
+.day-panel { margin-top: 16px; }
+.cal-legend { font-size: 11px; color: var(--fg-muted); margin-top: 6px; }
+/* 吉凶の平均（日の下の3本線：上から年盤・月盤・日盤） */
+.cal-day.lv-良 { background: var(--k-kichi-bg); }
+.cal-day.lv-並 { background: var(--surface); }   /* 今日の黄色が「やや注意」と紛れないように */
+.cal-day.lv-やや注意 { background: var(--k-kk-bg); }
+.cal-day.lv-注意 { background: var(--k-sho-bg); }
+.cal-day.is-today { box-shadow: inset 0 0 0 2px var(--k-star); }
+.cal.filtering .cal-day:not(.kasa):not(.other) { opacity: .35; }
+.cal.filtering .cal-day.kasa { box-shadow: inset 0 0 0 2px var(--k-kichi-fg); }
+.kasa-badge { font-size: 9px; font-weight: 700; line-height: 1.3; color: var(--k-kichi-fg); background: var(--surface); border: 1px solid var(--k-kichi-fg); border-radius: 3px; padding: 0 3px; align-self: flex-start; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cal-lv { font-size: 9px; font-weight: 700; line-height: 1.2; margin-left: auto; padding: 0 2px; border-radius: 2px; border: 1px solid currentColor; }
+.cal-lv + .cal-star { margin-left: 2px; }
+.cal-lv.lv-良 { color: var(--k-kichi-fg); }
+.cal-lv.lv-並 { color: var(--k-futsu-fg); }
+.cal-lv.lv-やや注意 { color: var(--k-kyo-fg); }
+.cal-lv.lv-注意 { color: var(--k-sai-bg); }
+:root[data-theme="dark"] .cal-lv.lv-注意 { color: var(--k-dai-fg); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .cal-lv.lv-注意 { color: var(--k-dai-fg); } }
+.luck-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin-bottom: 8px; font-size: 12px; color: var(--fg-muted); }
+.luck-ctl .ban-tabs button:disabled { opacity: .45; cursor: not-allowed; }
+.cal-sw { font-size: 9px; font-weight: 700; line-height: 1.2; color: var(--k-kk-fg); }
+.cal-sw.risshun { color: var(--del); }
+.sw-note { font-size: 12px; line-height: 1.6; background: var(--tag-bg); color: var(--tag-fg); border-left: 3px solid var(--del); border-radius: 6px; padding: 7px 10px; margin-bottom: 8px; }
+.luck-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; font-size: 11px; color: var(--fg-muted); margin-top: 6px; }
+.luck-legend .sw { display: inline-block; width: 14px; height: 10px; border-radius: 2px; border: 1px solid var(--border); vertical-align: middle; margin-right: 4px; }
+.luck-legend .sw.l-良 { background: var(--k-kichi-bg); }
+.luck-legend .sw.l-並 { background: var(--surface); }
+.luck-legend .sw.l-やや注意 { background: var(--k-kk-bg); }
+.luck-legend .sw.l-注意 { background: var(--k-sho-bg); }
+@media (max-width: 520px) {
+  .cal-day { min-height: 64px; padding: 3px 2px 4px; }
+  .chip { font-size: 10px; padding: 0 2px; }
+  .cal-hol { display: none; }
+  .month-nav h2 { font-size: 17px; }
+}
+
+/* 編集モーダル */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.45);
+  display: flex; align-items: center; justify-content: center; z-index: 100;
+  padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+}
+.modal-box {
+  background: var(--surface); border-radius: 10px; padding: 20px;
+  width: 100%; max-width: 460px; box-shadow: 0 8px 32px rgba(0,0,0,.2);
+}
+.modal-box h3 { font-size: 14px; font-weight: 700; margin-bottom: 14px; }
+
+/* 空状態・読み込み */
+.empty-msg { text-align: center; padding: 40px 0; color: var(--fg-muted); font-size: 13px; }
+.loading-bar { height: 3px; background: var(--accent); width: 0%; transition: width .4s; position: fixed; top: 0; left: 0; right: 0; z-index: 200; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* 九星方位 */
+:root {
+  --k-kichi-bg:#e3f1e6; --k-kichi-fg:#24603a;
+  --k-futsu-bg:#f1efe9; --k-futsu-fg:#5c5649;
+  --k-kk-bg:#f7efd6; --k-kk-fg:#7a5a12;
+  --k-sho-bg:#f8e3c6; --k-sho-fg:#8a4b0c;
+  --k-kyo-bg:#f6d6d2; --k-kyo-fg:#9c2a20;
+  --k-dai-bg:#e9b3ad; --k-dai-fg:#6e140c;
+  --k-sai-bg:#7a1d16; --k-sai-fg:#fff3f1;
+  --k-star:#7a6a3a;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --k-kichi-bg:#1d3a26; --k-kichi-fg:#9ad6ab; --k-futsu-bg:#2c2920; --k-futsu-fg:#bdb39c;
+  --k-kk-bg:#3b3215; --k-kk-fg:#e0c06a; --k-sho-bg:#46300f; --k-sho-fg:#f0b56a;
+  --k-kyo-bg:#4a1f1b; --k-kyo-fg:#f2a197; --k-dai-bg:#61201a; --k-dai-fg:#ffc4bb;
+  --k-sai-bg:#a5291f; --k-sai-fg:#fff3f1; --k-star:#c9b77e; } }
+:root[data-theme="dark"] {
+  --k-kichi-bg:#1d3a26; --k-kichi-fg:#9ad6ab; --k-futsu-bg:#2c2920; --k-futsu-fg:#bdb39c;
+  --k-kk-bg:#3b3215; --k-kk-fg:#e0c06a; --k-sho-bg:#46300f; --k-sho-fg:#f0b56a;
+  --k-kyo-bg:#4a1f1b; --k-kyo-fg:#f2a197; --k-dai-bg:#61201a; --k-dai-fg:#ffc4bb;
+  --k-sai-bg:#a5291f; --k-sai-fg:#fff3f1; --k-star:#c9b77e; }
+.yr-strip { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 6px; }
+@media (max-width: 600px) {
+  /* スマホ：年は横一列にして、指ですべらせて見る */
+  .yr-strip { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 6px; padding-bottom: 6px; -webkit-overflow-scrolling: touch; }
+  .yr-strip .yr-tile { flex: 0 0 116px; scroll-snap-align: start; }
+}
+.yr-hint { display: none; font-size: 11px; color: var(--fg-muted); margin-top: 2px; }
+@media (max-width: 600px) { .yr-hint { display: block; } }
+.yr-tile { text-align: left; border: 1px solid var(--border); border-radius: 8px; padding: 6px 8px; background: var(--surface); color: var(--fg); font-weight: 400; display: grid; gap: 1px; cursor: pointer; }
+.yr-tile .y { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.yr-tile .s { font-size: 11px; color: var(--fg-muted); }
+.yr-tile .k { font-size: 11px; }
+.yr-tile .lvt { font-size: 11px; font-weight: 700; margin-left: 4px; }
+.yr-tile.is-sel { outline: 2px solid var(--accent); outline-offset: -1px; }
+.yr-tile.is-now .y::after { content: "this year"; font-size: 10px; font-weight: 700; color: var(--accent); margin-left: 6px; vertical-align: 2px; }
+.lvbg-良 { background: var(--k-kichi-bg); }
+.lvbg-並 { background: var(--surface); }
+.lvbg-やや注意 { background: var(--k-kk-bg); }
+.lvbg-注意 { background: var(--k-sho-bg); }
+.yr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); gap: 12px; }
+.ym { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--surface); }
+.ym-head { width: 100%; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; padding: 5px 8px; border-radius: 0; text-align: left; font-weight: 400; color: var(--fg); border-bottom: 1px solid var(--border); cursor: pointer; }
+.ym-head .mn { font-size: 15px; font-weight: 700; }
+.ym-head .sm { font-size: 11px; color: var(--fg-muted); }
+.ym-head .lvt { font-size: 11px; font-weight: 700; }
+.ym-cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 1px; background: var(--border); }
+.ym-wd { background: var(--surface2); font-size: 9px; text-align: center; color: var(--fg-muted); padding: 1px 0; }
+.ym-d { background: var(--surface); font-size: 11px; text-align: center; padding: 3px 0 2px; cursor: pointer; position: relative; font-variant-numeric: tabular-nums; line-height: 1.3; }
+.ym-d.sun, .ym-d.hol { color: var(--sun); }
+.ym-d.sat { color: var(--sat); }
+.ym-d.blank { background: var(--bg); cursor: default; }
+.ym-d.is-today { box-shadow: inset 0 0 0 2px var(--k-star); font-weight: 700; }
+.ym-d.sw { box-shadow: inset 2px 0 0 var(--k-star); }
+.ym-d.sw.rs { box-shadow: inset 3px 0 0 var(--vermillion, #b0392b); }
+.ym-d .dot { position: absolute; left: 50%; bottom: 1px; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--accent); }
+.ym-d .t { display: block; font-size: 8px; font-weight: 700; line-height: 1; border: none !important; padding: 0 !important; background: none !important; margin: 1px 0 0 !important; }
+.ym-d:hover { outline: 1px solid var(--accent); outline-offset: -1px; }
+.cal-star { font-size: 9px; color: var(--k-star); font-weight: 500; margin-left: auto; letter-spacing: .02em; }
+.kset { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 18px; display: grid; gap: 10px; }
+.kset h2 { font-size: 13px; font-weight: 700; color: var(--fg-muted); letter-spacing: .05em; }
+.kset .form-row { margin: 0; }
+.kset-note { font-size: 12px; color: var(--fg-muted); }
+.kset-who { font-size: 13px; }
+.kset-who b { font-size: 15px; }
+.houi { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; display: grid; gap: 12px; margin-bottom: 14px; }
+.houi-top { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.houi-top h3 { font-size: 14px; font-weight: 700; }
+.ban-tabs { display: flex; gap: 4px; padding: 3px; background: var(--surface2); border-radius: 7px; }
+.ban-tabs button { background: transparent; color: var(--fg-muted); padding: 4px 12px; font-size: 12px; }
+.ban-tabs button[aria-pressed="true"] { background: var(--surface); color: var(--fg); box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+.houi-body { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 14px; align-items: start; }
+@media (max-width: 600px) { .houi-body { grid-template-columns: minmax(0, 1fr); } }
+.ban { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 3px; aspect-ratio: 1; max-width: 300px; width: 100%; }
+.ban-cell { border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; padding: 4px; text-align: center; min-width: 0; }
+.ban-dir { font-size: 11px; font-weight: 700; opacity: .85; }
+.ban-st { font-size: 15px; font-weight: 700; }
+.ban-lb { font-size: 11px; font-weight: 700; }
+.ban-cell.c { background: var(--surface2); color: var(--fg); }
+.k-吉 { background: var(--k-kichi-bg); color: var(--k-kichi-fg); }
+.k-普通 { background: var(--k-futsu-bg); color: var(--k-futsu-fg); }
+.k-吉凶 { background: var(--k-kk-bg); color: var(--k-kk-fg); }
+.k-小凶 { background: var(--k-sho-bg); color: var(--k-sho-fg); }
+.k-凶 { background: var(--k-kyo-bg); color: var(--k-kyo-fg); }
+.k-大凶 { background: var(--k-dai-bg); color: var(--k-dai-fg); }
+.k-最大凶, .k-超最大凶 { background: var(--k-sai-bg); color: var(--k-sai-fg); }
+.k-none { background: var(--surface2); color: var(--fg); }
+.houi-info { font-size: 12px; color: var(--fg-muted); line-height: 1.8; }
+.houi-reasons { list-style: none; display: grid; gap: 6px; font-size: 13px; }
+.houi-reasons li { display: grid; grid-template-columns: 4.6em minmax(0,1fr); gap: 8px; align-items: baseline; }
+.houi-reasons .tag { font-size: 11px; font-weight: 700; border-radius: 4px; padding: 1px 6px; text-align: center; }
+.houi-legend { display: flex; flex-wrap: wrap; gap: 4px; font-size: 10px; }
+.houi-legend span { padding: 1px 6px; border-radius: 3px; }
+
+/* 月表示の上をなぞると付いてくる方位盤（星が飛泊の順に動く） */
+.hban { position: fixed; z-index: 150; width: 216px; pointer-events: none; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 8px; box-shadow: 0 6px 24px rgba(0,0,0,.18); display: grid; gap: 6px; opacity: 0; transition: opacity .15s; }
+.hban.on { opacity: 1; }
+.hban-head { font-size: 12px; font-weight: 700; display: flex; justify-content: space-between; gap: 6px; }
+.hban-head span:last-child { color: var(--fg-muted); font-weight: 500; }
+.hban-board { position: relative; width: 198px; height: 198px; }
+.hban-cell { position: absolute; width: 64px; height: 64px; border-radius: 6px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 3px 0; font-size: 9px; font-weight: 700; transition: background-color .25s, color .25s; }
+.hban-cell .lb { font-size: 10px; }
+.hban-star { position: absolute; width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; color: var(--fg); transition: transform .11s ease-in-out; will-change: transform; }
+.hban-star[class*="k-"] { background: transparent; }
+.hban .hban-star.k-吉 { color: var(--k-kichi-fg); }
+.hban .hban-star.k-普通 { color: var(--k-futsu-fg); }
+.hban .hban-star.k-吉凶 { color: var(--k-kk-fg); }
+.hban .hban-star.k-小凶 { color: var(--k-sho-fg); }
+.hban .hban-star.k-凶 { color: var(--k-kyo-fg); }
+.hban .hban-star.k-大凶 { color: var(--k-dai-fg); }
+.hban .hban-star.k-最大凶 { color: var(--k-sai-fg); }
+.hban .hban-star.k-超最大凶 { color: var(--k-sai-fg); }
+.hban-star.is-hon { text-decoration: underline; text-underline-offset: 3px; }
+.hban-foot { font-size: 10px; color: var(--fg-muted); line-height: 1.5; }
+@media (prefers-reduced-motion: reduce) { .hban-star { transition: none; } }
+
+
+/* 方位予定帖：販売ページとしての追加 */
+.intro { font-size: 13px; color: var(--fg-muted); margin-bottom: 10px; max-width: 65ch; }
+.lic-state { font-size: 13px; margin-bottom: 14px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.lic-state:empty { display: none; }
+.time-row { align-items: center; }
+.form-row .time-lb { flex: 0 0 auto; display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--fg-muted); }
+.form-row .time-lb input { flex: 0 0 auto; min-width: 0; width: 8.5em; }
+.time-note { font-size: 12px; color: var(--fg-muted); flex: 1 1 200px; }
+.chip-t { font-variant-numeric: tabular-nums; font-weight: 700; margin-right: 3px; }
+.yotei-time { font-size: 13px; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; margin-bottom: 2px; }
+.nudge { border: 2px solid var(--accent); background: var(--accent-light); border-radius: 10px; padding: 14px 16px; margin-bottom: 18px; display: grid; gap: 8px; }
+.nudge-t { font-size: 15px; font-weight: 700; color: var(--fg); }
+.nudge-b { font-size: 13px; color: var(--fg-muted); max-width: 65ch; }
+.pill-ok, .pill-off { font-size: 11px; font-weight: 700; border-radius: 10px; padding: 1px 9px; }
+.pill-ok { background: var(--done-bg); color: var(--done-fg); }
+.pill-off { background: var(--tag-bg); color: var(--tag-fg); }
+.buy { display: grid; gap: 8px; }
+.buy-price { font-size: 24px; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
+.buy-price span { font-size: 12px; color: var(--fg-muted); font-weight: 500; }
+.buy-list { padding-left: 1.2em; font-size: 13px; display: grid; gap: 2px; }
+.btn-link { display: inline-block; text-decoration: none; border-radius: 6px; padding: 9px 20px; font-size: 14px; font-weight: 700; }
+.btn-link.is-off { background: var(--surface2); color: var(--fg-muted); cursor: default; }
+.small-link { font-size: 12px; color: var(--accent); }
+.btn-file { display: inline-block; cursor: pointer; border-radius: 6px; padding: 8px 18px; font-size: 13px; font-weight: 600; }
+.btn-file:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+.locked { display: grid; gap: 8px; font-size: 13px; padding: 4px 2px; }
+.koyomi-note { margin-top: 36px; padding-top: 16px; border-top: 1px solid var(--border); display: grid; gap: 8px; font-size: 13px; color: var(--fg-muted); }
+.koyomi-note h2 { font-size: 13px; font-weight: 700; color: var(--fg); letter-spacing: .05em; }
+.koyomi-note ul { padding-left: 1.2em; display: grid; gap: 3px; max-width: 70ch; }
+.koyomi-note a { color: var(--accent); }
+.request { border: 1px solid var(--border); background: var(--surface); border-radius: 10px; padding: 14px 16px; display: grid; gap: 8px; justify-items: start; }
+.koyomi-note .request a.btn-link { color: var(--fg); font-size: 13px; padding: 7px 16px; }
+header h1 { letter-spacing: .12em; }
+.lang-link { font-size: 11px; font-weight: 400; letter-spacing: 0; margin-left: 8px; color: inherit; opacity: .85; text-decoration: underline; vertical-align: 2px; }
+.cal-lv { white-space: nowrap; }
+
+/* 地図・起点・行き先 */
+.geo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 8px; }
+.geo-org { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; display: grid; gap: 6px; background: var(--bg); min-width: 0; }
+.geo-org .nm { font-weight: 700; font-size: 13px; display: flex; gap: 6px; align-items: center; }
+.geo-org .nm input { flex: 1; min-width: 0; font-size: 13px; padding: 3px 6px; border: 1px solid var(--border); border-radius: 5px; background: var(--surface); color: var(--fg); font-family: inherit; }
+.geo-org .at { font-size: 12px; color: var(--fg-muted); overflow-wrap: anywhere; }
+.geo-set { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 8px 12px; }
+.geo-set label { display: grid; gap: 3px; font-size: 12px; color: var(--fg-muted); }
+.geo-set select, .geo-set input { border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px; font-size: 13px; font-family: inherit; background: var(--bg); color: var(--fg); }
+.dest-row { align-items: center; }
+.dest-label { font-size: 12px; color: var(--fg-muted); flex: 1 1 160px; min-width: 0; overflow-wrap: anywhere; }
+.map-box { max-width: 720px; max-height: calc(100vh - 32px); overflow-y: auto; display: grid; gap: 10px; }
+.map-search { display: flex; gap: 6px; flex-wrap: wrap; }
+.map-search input { flex: 1 1 180px; min-width: 0; border: 1px solid var(--border); border-radius: 6px; padding: 7px 9px; font-size: 14px; font-family: inherit; background: var(--bg); color: var(--fg); }
+.map-results { display: grid; gap: 2px; font-size: 13px; }
+.map-results button { text-align: left; background: var(--surface2); color: var(--fg); font-weight: 500; padding: 6px 10px; }
+#geoMap { height: 340px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); }
+.map-pick { font-size: 13px; line-height: 1.7; }
+.map-pick b { font-size: 14px; }
+.map-msg { font-size: 12px; color: var(--fg-muted); line-height: 1.7; }
+.dir-line { font-size: 12px; line-height: 1.8; margin-top: 4px; display: flex; flex-wrap: wrap; gap: 2px 8px; align-items: baseline; }
+.dir-line .dl-dir { font-weight: 700; color: var(--fg); }
+.dir-line .tag { font-size: 11px; font-weight: 700; border-radius: 4px; padding: 0 6px; }
+.dir-line .dl-note { color: var(--fg-muted); flex-basis: 100%; }
+.ban-cell.is-dest { box-shadow: inset 0 0 0 3px var(--accent); }
+.ban-cell .dest-mk { font-size: 10px; font-weight: 700; color: var(--accent); }
+.leaflet-container { font-family: inherit; }
+</style>
+</head>
+<body>
+<div class="loading-bar" id="loading-bar" hidden></div>
+
+<header>
+  <h1>方位予定帖 <a class="lang-link" href="hoi-yotei.html" hreflang="ja" lang="ja" translate="no">日本語</a></h1>
+  <div class="head-right">
+    <button type="button" id="btn-kset" class="btn-export" aria-expanded="false" aria-controls="kset">方位の設定</button>
+    <button type="button" id="btn-geo" class="btn-export" aria-expanded="false" aria-controls="geoPanel">地図・起点</button>
+    <button type="button" id="btn-lic" class="btn-export" aria-expanded="false" aria-controls="lic">購入・解錠</button>
+    <button type="button" id="btn-cal" class="btn-export" aria-expanded="false" aria-controls="calPanel">カレンダー連携</button>
+    <button type="button" id="btn-data" class="btn-export" aria-expanded="false" aria-controls="dataPanel">データ</button>
+  </div>
+</header>
+
+<div class="main">
+
+  <p class="intro">予定を書き込むと、その日の方位盤が重なります。予定の記録と今日の日盤は無料です。ほかの日の方位盤・月盤・年盤・吉凶の色分けは、購入（1,000円・購入日から1年間）で開きます。</p>
+  <div class="lic-state" id="lic-state"></div>
+  <div class="nudge" id="birth-nudge" role="status" hidden></div>
+
+  <!-- 方位の設定 -->
+  <div class="kset" id="kset" hidden>
+    <h2>方位の設定</h2>
+    <div class="kset-who" id="kset-who">生年月日を登録すると、本命星と月命星を出し、日付ごとの吉方位を表示します。</div>
+    <div class="form-row">
+      <input type="date" id="k-birth" min="1900-01-01" max="2100-12-31" aria-label="生年月日">
+      <select id="k-hour" aria-label="生まれた時刻">
+        <option value="-1">生まれ時刻：不明</option>
+        <option value="23">子の刻（23〜01時）</option><option value="1">丑の刻（01〜03時）</option>
+        <option value="3">寅の刻（03〜05時）</option><option value="5">卯の刻（05〜07時）</option>
+        <option value="7">辰の刻（07〜09時）</option><option value="9">巳の刻（09〜11時）</option>
+        <option value="11">午の刻（11〜13時）</option><option value="13">未の刻（13〜15時）</option>
+        <option value="15">申の刻（15〜17時）</option><option value="17">酉の刻（17〜19時）</option>
+        <option value="19">戌の刻（19〜21時）</option><option value="21">亥の刻（21〜23時）</option>
+      </select>
+    </div>
+    <div class="btn-row">
+      <span class="form-msg" id="k-msg"></span>
+      <button type="button" class="btn-cancel" id="k-close">閉じる</button>
+      <button type="button" class="btn-primary" id="k-save">登録する</button>
+    </div>
+    <div class="kset-note">生年月日はこの端末の中にだけ保存し、どこにも送りません。時刻は立春・節入りの当日生まれのときだけ使います。</div>
+  </div>
+
+  <!-- 購入・解錠 -->
+  <div class="kset" id="lic" hidden>
+    <h2>購入・解錠</h2>
+    <div class="buy">
+      <div class="buy-price">1,000円<span>（税込）</span></div>
+      <ul class="buy-list">
+        <li>購入日から1年間。自動更新はありません</li>
+        <li>すべての日の方位盤（日盤・月盤・年盤）と吉凶の色分け、凶の理由</li>
+        <li>月表示をなぞると付いてくる、星が回る方位盤</li>
+        <li>期限が過ぎても、書いた予定はそのまま使えます</li>
+      </ul>
+      <div class="btn-row" style="justify-content:flex-start">
+        <a class="btn-primary btn-link" id="buy-link" href="#" rel="noopener">購入する（カード払い）</a>
+        <a class="small-link" href="tokusho.html">特定商取引法に基づく表記</a>
+      </div>
+      <div class="kset-note">お支払いが済むとこのページに戻り、自動で解錠します。解錠番号はメールでもお送りします。</div>
+    </div>
+    <h2 style="margin-top:6px">お持ちの解錠番号を入れる（別の端末で使うとき）</h2>
+    <div class="form-row">
+      <input type="text" id="lic-key" placeholder="例：HY-XXXX-XXXX-XXXX" autocomplete="off" spellcheck="false" aria-label="解錠番号">
+      <button type="button" class="btn-primary" id="lic-apply">解錠する</button>
+    </div>
+    <h2 style="margin-top:6px">解錠番号を忘れたとき</h2>
+    <div class="form-row">
+      <input type="email" id="lic-mail" placeholder="購入時のメールアドレス" aria-label="購入時のメールアドレス">
+      <button type="button" class="btn-cancel" id="lic-resend">番号をメールで受け取る</button>
+    </div>
+    <div class="btn-row">
+      <span class="form-msg" id="lic-msg"></span>
+      <button type="button" class="btn-cancel" id="lic-close">閉じる</button>
+    </div>
+  </div>
+
+  <!-- 地図・起点 -->
+  <div class="kset" id="geoPanel" hidden>
+    <h2>地図と起点</h2>
+    <div class="kset-note">方位を測る起点を三か所まで登録できます。予定に行き先を付けると、起点からの方位と距離を出し、その日の方位盤の吉凶と合わせて示します。起点と行き先はこの端末の中にだけ保存します。</div>
+    <div class="geo-grid" id="geo-origins"></div>
+    <div class="geo-set">
+      <label>流派（方位の区切り）<select id="g-school"><option value="30-60">四正30度・四隅60度</option><option value="45">八方位45度均等</option></select></label>
+      <label>北の基準<select id="g-north"><option value="true">真北</option><option value="magnetic">磁北</option></select></label>
+      <label>計算法<select id="g-method"><option value="auto">自動（近くは一致、遠くは大圏）</option><option value="gc">大圏（正距方位）</option><option value="rhumb">等角航路（メルカトル）</option></select></label>
+      <label>南半球の扱い（起点が南半球のとき）<select id="g-southern"><option value="none">入れ替えない</option><option value="ns">南北を入れ替える</option><option value="nsew">南北・東西とも入れ替える</option></select></label>
+      <label>境界の近くで判定しない幅（度）<input type="number" id="g-margin" min="0" max="10" step="0.5"></label>
+      <label>判定日の基準<select id="g-basis"><option value="jst">日本時間</option><option value="local">行き先の現地時間</option></select></label>
+    </div>
+    <div class="btn-row"><span class="form-msg" id="g-msg"></span><button type="button" class="btn-cancel" id="g-close">閉じる</button></div>
+  </div>
+
+  <!-- データ -->
+  <div class="kset" id="dataPanel" hidden>
+    <h2>データの書き出し・読み込み</h2>
+    <div class="kset-note">予定はこの端末のブラウザの中に保存しています。機種変更や別の端末へ移すときは、書き出したファイルを新しい端末で読み込んでください。ブラウザの閲覧履歴を消すと予定も消えることがあるので、ときどき書き出しておくと安心です。</div>
+    <div class="btn-row" style="justify-content:flex-start">
+      <button type="button" class="btn-primary" id="btn-export">書き出す</button>
+      <label class="btn-cancel btn-file">読み込む<input type="file" id="f-import" accept="application/json,.json" hidden></label>
+      <span class="form-msg" id="d-msg"></span>
+    </div>
+    <div class="btn-row"><button type="button" class="btn-cancel" id="d-close">閉じる</button></div>
+  </div>
+
+  <!-- カレンダー連携 -->
+  <div class="kset" id="calPanel" hidden>
+    <h2>カレンダー連携</h2>
+    <div class="kset-note">Google カレンダーや iPhone・Mac のカレンダーの予定を取り込み、予定帖の予定をそちらへ送ります。過去の予定を取り込むと、病気・出会い・合格など、ご自分の歩みの出来事をその日の方位盤と照らし合わせて、確かめることができます。</div>
+    <div class="cx-row">
+        <label>取り込む範囲
+          <select id="cx-range">
+            <option value="1y">1年前から</option>
+            <option value="3m">3か月前から</option>
+            <option value="thisyear">今年の1月から</option>
+            <option value="all">すべて</option>
+            <option value="future">これからの予定だけ</option>
+          </select></label>
+    </div>
+    <div class="cx-sec" id="gx-sec" hidden>
+      <h3>Google カレンダーと直接やり取りする</h3>
+      <div class="kset-note">claude.ai につないである Google カレンダーと、ファイルを使わずに直接やり取りします。</div>
+      <div class="cx-row">
+        <button type="button" class="btn-cancel btn-sm" id="gx-cals">カレンダーの一覧を読む</button>
+      </div>
+      <div class="cx-row" id="gx-list"></div>
+      <div class="cx-row">
+        <button type="button" class="btn-primary btn-sm" id="gx-import">選んだカレンダー → 予定帖に取り込む</button>
+        <span class="kset-note">上の「取り込む範囲」の分を取り込みます</span>
+      </div>
+      <div class="cx-row">
+        <label>送り先 <select id="gx-cal"><option value="">（主なカレンダー）</option></select></label>
+        <button type="button" class="btn-primary btn-sm" id="gx-push">予定帖 → Google に送る</button>
+        <span class="kset-note" id="gx-count"></span>
+      </div>
+      <details class="cx-help"><summary>ほかのアカウントのカレンダーも並べるには</summary>
+        <div>ここで読めるのは、claude.ai につないだ Google アカウントから見えるカレンダーです。ほかのアカウントのカレンダーは、そのアカウントで Google カレンダーを開き、カレンダー名の「︙」→「設定と共有」→「特定のユーザーまたはグループと共有する」に、つないだアカウントのメールアドレスを加えてください。次に「一覧を読む」を押すと並びます。共有しづらいときは、下のファイルでの取り込み（zip をまとめて選ぶ）もお使いいただけます。</div>
+      </details>
+      <div class="form-msg" id="gx-msg"></div>
+    </div>
+    <div class="cx-sec">
+      <h3>ファイルでやり取りする（Google・Apple）</h3>
+      <div class="kset-note">カレンダー用のファイル（.ics）で受け渡します。Google カレンダーにも、iPhone・Mac のカレンダーにも使えます。</div>
+      <div class="cx-row">
+        <button type="button" class="btn-primary btn-sm" id="cx-export">予定帖 → カレンダー用に書き出す</button>
+        <label><input type="checkbox" id="cx-skip-imported" checked> カレンダーから取り込んだ予定は含めない</label>
+      </div>
+      <div class="cx-row">
+        <label class="btn-cancel btn-file btn-sm">カレンダー → 予定帖に取り込む<input type="file" id="cx-import" accept=".ics,.zip,text/calendar,application/zip" multiple hidden></label>
+      </div>
+      <div class="form-msg" id="cx-msg"></div>
+      <details class="cx-help"><summary>カレンダー側の操作</summary>
+        <div><b>Google カレンダーへ入れる</b>：パソコンで Google カレンダーを開き、右上の歯車 →「設定」→「インポート / エクスポート」→「インポート」で、書き出したファイルを選びます。</div>
+        <div><b>Google カレンダーから出す</b>：同じ画面の「エクスポート」で zip ファイルが届きます。そのアカウントのカレンダーが全部入っているので、zip のまま予定帖で取り込めます。</div>
+        <div><b>アカウントがいくつもある場合</b>：アカウントごとに書き出した zip を、取り込むときにまとめて選んでください（Ctrl キーや ⌘ キーを押しながら選ぶと、いくつも選べます）。どのカレンダーから来た予定かは、予定の横に札で出ます。同じ予定が二つのアカウントに入っていても、一つにまとめます。</div>
+        <div><b>iPhone・Mac のカレンダーへ入れる</b>：書き出したファイルを開くと、カレンダーに追加するか尋ねられます。</div>
+        <div><b>Mac のカレンダーから出す</b>：カレンダーの一覧で書き出したいカレンダーを選び、「ファイル」→「書き出す」→「書き出す」で .ics ができます。iPhone だけをお使いの場合は、iCloud のカレンダーを Mac か Google カレンダーに読み込んでから書き出してください。</div>
+        <div>一度取り込んだ予定は、もう一度取り込んでも重ねません。過去の予定は「済」として入り、その日の方位盤と見比べられます。毎週・毎月の予定は予定帖の繰り返しに、それ以外の繰り返しは1年先までを一件ずつ入れます。</div>
+      </details>
+    </div>
+    <div class="btn-row"><button type="button" class="btn-cancel" id="cal-close">閉じる</button></div>
+  </div>
+
+  <div class="view-tabs" role="group" aria-label="表示の切り替え">
+    <button type="button" id="tab-year" aria-pressed="false">年表示</button>
+    <button type="button" id="tab-month" aria-pressed="true">月表示</button>
+    <button type="button" id="tab-list" aria-pressed="false">一覧</button>
+  </div>
+
+  <!-- 追加フォーム -->
+  <div class="add-card">
+    <h2>＋ 新しい予定を追加</h2>
+    <div class="form-row">
+      <input type="date" id="f-date" required aria-label="日付">
+      <input type="text" id="f-title" placeholder="予定のタイトル（必須）" style="flex:2 1 160px;" aria-label="予定のタイトル">
+    </div>
+    <div class="form-row time-row">
+      <label class="time-lb">時刻<input type="time" id="f-time" aria-label="開始時刻（任意）"></label>
+      <label class="time-lb">〜<input type="time" id="f-end" aria-label="終了時刻（任意）"></label>
+      <span class="time-note">時刻は任意です。入れなければ終日の予定になります。</span>
+    </div>
+    <div class="form-row">
+      <input type="text" id="f-place" placeholder="場所（任意）" aria-label="場所">
+      <select id="f-repeat" aria-label="繰り返し">
+        <option value="none">繰り返しなし</option>
+        <option value="weekly">毎週</option>
+        <option value="monthly">毎月</option>
+      </select>
+    </div>
+    <div class="form-row dest-row">
+      <select id="f-origin" aria-label="方位を測る起点"></select>
+      <button type="button" class="btn-sm btn-cancel" id="f-dest-btn">行き先を選ぶ</button>
+      <span class="dest-label" id="f-dest-label">行き先：なし</span>
+      <button type="button" class="btn-sm btn-cancel" id="f-dest-clear" hidden>外す</button>
+    </div>
+    <div class="form-row">
+      <textarea id="f-memo" placeholder="メモ（任意）" aria-label="メモ"></textarea>
+    </div>
+    <div class="btn-row">
+      <span class="form-msg" id="f-msg"></span>
+      <button type="button" class="btn-primary" id="btn-add">追加する</button>
+    </div>
+  </div>
+
+  <!-- 年表示：暦年を選ぶ（年盤）→ 12か月の暦（月盤・日盤）→ 月表示へ -->
+  <section id="year-area" hidden>
+    <div class="month-nav">
+      <button type="button" class="nav-btn" id="yr-prev10" aria-label="前の10年">‹ 前の10年</button>
+      <h2>暦年を選ぶ</h2>
+      <button type="button" class="nav-btn" id="yr-next10" aria-label="次の10年">次の10年 ›</button>
+      <button type="button" class="nav-btn" id="yr-this">今年</button>
+    </div>
+    <div class="kset-note" id="yr-note" style="margin-bottom:8px"></div>
+    <div class="yr-strip" id="yr-strip"></div>
+    <div class="yr-hint">← 指で左右にすべらせると、ほかの年が見られます →</div>
+    <div id="yr-board"></div>
+    <div class="month-nav" style="margin-top:18px">
+      <button type="button" class="nav-btn" id="yr-prev" aria-label="前の年">‹ 前年</button>
+      <h2 id="yr-title"></h2>
+      <button type="button" class="nav-btn" id="yr-next" aria-label="次の年">翌年 ›</button>
+    </div>
+    <div id="yr-ctl"></div>
+    <div class="yr-grid" id="yr-grid"></div>
+    <div id="yr-legend"></div>
+  </section>
+
+  <!-- 月表示 -->
+  <section id="month-area">
+    <div class="month-nav">
+      <button type="button" class="nav-btn" id="m-prev" aria-label="前の月">‹ 前月</button>
+      <h2 id="m-title"></h2>
+      <button type="button" class="nav-btn" id="m-next" aria-label="次の月">翌月 ›</button>
+      <button type="button" class="nav-btn" id="m-today">今月</button>
+    </div>
+    <div id="sw-note"></div>
+    <div id="luck-ctl"></div>
+    <div class="cal" id="cal"></div>
+    <div id="luck-legend"></div>
+    <div class="cal-legend">日付を押すと、その日の方位盤と予定が下に出ます。日付の枠の右下の「＋」を押すと、その日の予定をその場で書き込めます。日付の横の星はその日の日盤（中宮の星）です。マウスで日付をなぞると、方位盤が付いてきて星が飛泊の順に回ります。</div>
+    <div class="day-panel" id="day-panel"></div>
+  </section>
+
+  <!-- 一覧 -->
+  <section id="list-section" hidden>
+    <div id="list-area"></div>
+    <div id="done-area" hidden></div>
+  </section>
+
+  <!-- 暦の確かさ -->
+  <section class="koyomi-note">
+    <h2>この暦の確かさ</h2>
+    <ul>
+      <li>節入り・夏至・冬至の時刻は天文計算で1900〜2100年分を求め、国立天文台『暦要項』と照らして差は1分以内です。</li>
+      <li>年盤は立春、月盤は各月の節入りで切り替えます。日付だけで区切る簡易計算で起こる「1月と立春前後のずれ」はありません。</li>
+      <li>日盤は冬至・夏至に最も近い甲子の日で陽遁・陰遁を切り替え、閏の年（次は2031年）も暦どおりに扱います。</li>
+      <li>方位の吉凶は高木彬光『改訂版 方位学入門』の方位表と同じ規則で判定しています（648通りすべて一致）。</li>
+      <li>そこに、一般の九星気学で誰にとっても凶とされる歳破・月破・日破を加えています（方位表には含まれないため、画面に但し書きを添えています）。</li>
+    </ul>
+    <p>何を加え、どう確かめたかは、<a href="hoi-yotei-kairyou.html">改良の記録</a>に日付ごとに書き足しています。</p>
+    <div class="request">
+      <h2>ご要望をお聞かせください</h2>
+      <p>使ってみて欲しくなった機能や、気づいた点をお寄せください。いただいた声をもとに手を入れていきます。</p>
+      <a class="btn-cancel btn-link" href="https://docs.google.com/forms/d/e/1FAIpQLSf9h_OH-plZEZkxM5yGhiO8c09U8yWMzmlTgBcvZI5m2SwgfQ/viewform" target="_blank" rel="noopener">ご要望を送る（Google フォーム）</a>
+    </div>
+    <p>方位の吉凶は暮らしの目安としてお使いください。<a href="houigaku.html">方位学のページ</a>では、地図の上で実際の方位を測ることもできます。</p>
+  </section>
+</div>
+
+<!-- 編集モーダル -->
+<div class="modal-overlay" id="edit-modal" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="edit-h">
+    <h3 id="edit-h">予定を編集</h3>
+    <div class="form-row">
+      <input type="date" id="e-date" required aria-label="日付">
+      <input type="text" id="e-title" placeholder="タイトル" style="flex:2 1 160px;" aria-label="タイトル">
+    </div>
+    <div class="form-row time-row">
+      <label class="time-lb">時刻<input type="time" id="e-time" aria-label="開始時刻（任意）"></label>
+      <label class="time-lb">〜<input type="time" id="e-end" aria-label="終了時刻（任意）"></label>
+    </div>
+    <div class="form-row">
+      <input type="text" id="e-place" placeholder="場所" aria-label="場所">
+      <select id="e-repeat" aria-label="繰り返し">
+        <option value="none">繰り返しなし</option>
+        <option value="weekly">毎週</option>
+        <option value="monthly">毎月</option>
+      </select>
+    </div>
+    <div class="form-row dest-row">
+      <select id="e-origin" aria-label="方位を測る起点"></select>
+      <button type="button" class="btn-sm btn-cancel" id="e-dest-btn">行き先を選ぶ</button>
+      <span class="dest-label" id="e-dest-label">行き先：なし</span>
+      <button type="button" class="btn-sm btn-cancel" id="e-dest-clear" hidden>外す</button>
+    </div>
+    <div class="form-row">
+      <textarea id="e-memo" placeholder="メモ" aria-label="メモ"></textarea>
+    </div>
+    <div class="btn-row">
+      <span class="form-msg" id="e-msg"></span>
+      <button type="button" class="btn-cancel" id="btn-edit-cancel">取消</button>
+      <button type="button" class="btn-primary" id="btn-edit-save">更新する</button>
+    </div>
+  </div>
+</div>
+
+<!-- 地図の窓 -->
+<div class="modal-overlay" id="map-modal" hidden>
+  <div class="modal-box map-box" role="dialog" aria-modal="true" aria-labelledby="map-h">
+    <h3 id="map-h">地点を選ぶ</h3>
+    <div class="map-search">
+      <input type="text" id="map-q" placeholder="住所・駅名・建物名・地名（海外も可）" aria-label="住所や地名で探す">
+      <button type="button" class="btn-sm btn-primary" id="map-go">探す</button>
+      <button type="button" class="btn-sm btn-cancel" id="map-here">現在地</button>
+    </div>
+    <div class="map-results" id="map-results"></div>
+    <div id="geoMap" role="application" aria-label="地図。押した地点を選びます"></div>
+    <div class="map-search">
+      <input type="text" id="map-ll" placeholder="座標を貼る（例：35.6812, 139.7671）" aria-label="緯度と経度">
+      <button type="button" class="btn-sm btn-cancel" id="map-ll-go">座標で決める</button>
+    </div>
+    <div class="map-pick" id="map-pick"></div>
+    <div class="map-msg" id="map-msg"></div>
+    <div class="btn-row">
+      <button type="button" class="btn-cancel" id="map-cancel">取消</button>
+      <button type="button" class="btn-primary" id="map-ok" disabled>この地点にする</button>
+    </div>
+  </div>
+</div>
+
+<script src="vendor/leaflet.js"></script>
+<script src="vendor/geographiclib-geodesic.min.js"></script>
+<script src="vendor/tz-lookup.js"></script>
+<script src="houi_calc.js?v=20261020a"></script>
+<script src="kyusei_koyomi.js?v=20261020b"></script>
+<script src="hoi_ics.js?v=20261022a"></script>
+<script>
+// ====================================================
+// 方位予定帖 — 予定は端末に保存、方位盤は解錠番号で開く
+// 計算は kyusei_koyomi.js（方位学ページと共通）
+// ====================================================
+
+// ── 設定（三原様が Stripe と GAS の準備をしたら書き込む） ──
+const PAY_URL = 'https://buy.stripe.com/4gMeVfbo15SA5j5eHMbEA03';   // Stripe の支払いリンク
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzhYgaDLiSe0l-dzjEGWoCtbehCW2pF9SYYPKu9f6jDl55UjIznHL7HKxSmhsiqcyuo/exec';   // 解錠の仕組み（GAS）
+
+const KK = window.KyuseiKoyomi || null;
+// 自分用：claude.ai の中で開いたとき（window.claude がある）。予定と生年月日を同期し、購入の鍵は付けない。
+// 販売用（GitHub Pages）では window.claude がないので、これまでどおり端末保存＋解錠番号で動く。
+const PERSONAL = !!(window.claude && typeof window.claude.use === 'function');
+const HX = window.HoiICS || null;   // カレンダーとのやり取り（hoi_ics.js）
+let pdb = null, kDocRef = null;   // 自分用の同期先（予定：yotei コレクション、生年月日：本人専用の場所）
+const WEEKDAYS = ['日','月','火','水','木','金','土'];
+const ST_ITEMS = 'hoi_yotei_items', ST_KYUSEI = 'hoi_yotei_kyusei', ST_LIC = 'hoi_yotei_license';
+const ST_VIEW = 'hoi_yotei_view', ST_BAN = 'hoi_yotei_ban';
+
+function lsGet(k, def) { try { const v = localStorage.getItem(k); return v == null ? def : JSON.parse(v); } catch (e) { return def; } }
+function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
+function lsDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
+
+// ── 日付 ──────────────────────────────────────────
+function toISO(d) { const p = s => String(s).padStart(2,'0'); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`; }
+function todayISO() { return toISO(new Date()); }
+function parseDate(s) { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); }
+function fmtDate(iso) { const d = parseDate(iso); return { month: `${d.getMonth()+1}月`, day: d.getDate(), wd: WEEKDAYS[d.getDay()] }; }
+function addDays(iso, n) { const d = parseDate(iso); d.setDate(d.getDate() + n); return toISO(d); }
+// 使う人が書いた文字（題・場所・メモなど）は、英語版の訳の対象から外す
+function ue(s) { return `<span translate="no">${esc(s)}</span>`; }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── 国民の祝日（祝日法による計算。春分・秋分は計算式、2022年以降を想定） ──
+const _holCache = {};
+function holidaysOf(y) {
+  if (_holCache[y]) return _holCache[y];
+  const H = {};
+  const put = (m, d, n) => { H[`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`] = n; };
+  const nthMon = (m, n) => { const f = new Date(y, m-1, 1).getDay(); return 1 + ((8 - f) % 7) + (n-1)*7; };
+  put(1,1,'元日'); put(1,nthMon(1,2),'成人の日'); put(2,11,'建国記念の日'); put(2,23,'天皇誕生日');
+  const k = y - 1980, q = Math.floor(k/4);
+  put(3, Math.floor(20.8431 + 0.242194*k - q), '春分の日');
+  put(4,29,'昭和の日'); put(5,3,'憲法記念日'); put(5,4,'みどりの日'); put(5,5,'こどもの日');
+  put(7,nthMon(7,3),'海の日'); put(8,11,'山の日'); put(9,nthMon(9,3),'敬老の日');
+  put(9, Math.floor(23.2488 + 0.242194*k - q), '秋分の日');
+  put(10,nthMon(10,2),'スポーツの日'); put(11,3,'文化の日'); put(11,23,'勤労感謝の日');
+  // 振替休日：祝日が日曜なら、その後の最初の祝日でない日
+  Object.keys(H).sort().forEach(iso => {
+    if (parseDate(iso).getDay() === 0) { let n = addDays(iso, 1); while (H[n]) n = addDays(n, 1); H[n] = '振替休日'; }
+  });
+  // 国民の休日：前後が祝日で挟まれた平日
+  Object.keys(H).sort().forEach(iso => {
+    const n2 = addDays(iso, 2), mid = addDays(iso, 1);
+    if (H[n2] && !H[mid] && parseDate(mid).getDay() !== 0 && mid.slice(0,4) === String(y)) H[mid] = '国民の休日';
+  });
+  return (_holCache[y] = H);
+}
+// 英語版では日本の祝日は出さない（海外の方には意味が薄く、暦の欄を狭めるため）
+function holidayOf(iso) { return window.HOI_LANG === 'en' ? '' : (holidaysOf(Number(iso.slice(0,4)))[iso] || ''); }
+
+// ── 状態 ──────────────────────────────────────────
+let items = lsGet(ST_ITEMS, {}) || {};
+let view = lsGet(ST_VIEW, 'month'); if (!['list','month','year'].includes(view)) view = 'month';
+let kProfile = lsGet(ST_KYUSEI, null);
+let kBan = lsGet(ST_BAN, 'nichi'); if (!['nichi','getsu','nen'].includes(kBan)) kBan = 'nichi';
+let lic = lsGet(ST_LIC, null);
+const nowD = new Date();
+let curY = nowD.getFullYear(), curM = nowD.getMonth();
+let selDate = todayISO();
+let pendingDelete = null, editId = null;
+
+const BAN_NAME = { nichi: '日盤', getsu: '月盤', nen: '年盤' };
+const BAN_GRID = [['NW','N','NE'],['W','C','E'],['SW','S','SE']];
+const LABEL_ORDER = ['吉','普通','吉凶','小凶','凶','大凶','最大凶','超最大凶'];
+
+function isOpen() { return PERSONAL || !!(lic && lic.key && lic.expires && lic.expires >= todayISO()); }
+function saveItems() { if (!lsSet(ST_ITEMS, items)) showMsg('f-msg', 'この端末に保存できませんでした。ブラウザの設定をご確認ください。'); }
+function showMsg(id, text, ok) { const el = document.getElementById(id); el.textContent = text; el.style.color = ok ? 'var(--done-fg)' : ''; }
+
+// ── 予定の追加・更新・削除 ─────────────────────────
+// 自分用では、一件ずつ同期先へ送る（id と画面用の印は保存しない）
+function pushItem(id) {
+  if (!pdb) return;
+  const it = items[id];
+  const ref = pdb.collection('yotei').doc(id);
+  const p = it ? ref.set(Object.fromEntries(Object.entries(it).filter(([k]) => k !== 'id' && !k.startsWith('_')))) : ref.delete();
+  Promise.resolve(p).catch(() => setSync('err'));
+}
+function addItem(data) {
+  const id = Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+  items[id] = { id, ...data, done: false, createdAt: Date.now() };
+  saveItems(); pushItem(id); renderAll();
+}
+function updateItem(id, data) { items[id] = { ...items[id], ...data }; saveItems(); pushItem(id); renderAll(); }
+function deleteItem(id) { delete items[id]; saveItems(); pushItem(id); renderAll(); }
+function toggleDone(id) { if (items[id]) updateItem(id, { done: !items[id].done }); }
+
+function occurrences(from, to) {
+  const out = [];
+  Object.values(items).forEach(item => {
+    if (!item.date) return;
+    if (item.date >= from && item.date <= to) out.push(item);
+    if (item.done) return;
+    if (item.repeat === 'weekly') {
+      let iso = item.date, i = 0;
+      while (true) {
+        iso = addDays(iso, 7); i++;
+        if (iso > to || i > 600) break;
+        if (iso >= from) out.push({ ...item, id: item.id + '_w' + i, _virtual: true, date: iso });
+      }
+    }
+    if (item.repeat === 'monthly') {
+      const base = parseDate(item.date);
+      for (let i = 1; i < 240; i++) {
+        const d = new Date(base.getFullYear(), base.getMonth() + i, 1);
+        const last = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+        d.setDate(Math.min(base.getDate(), last));
+        const iso = toISO(d);
+        if (iso > to) break;
+        if (iso >= from) out.push({ ...item, id: item.id + '_m' + i, _virtual: true, date: iso });
+      }
+    }
+  });
+  return out;
+}
+
+function timeKey(x) { return x.time || '99:99'; }   // 終日の予定は最後
+function byTime(p, q) { return (p.done - q.done) || timeKey(p).localeCompare(timeKey(q)) || (p.title||'').localeCompare(q.title||''); }
+function timeLabel(x) { return x.time ? (x.end ? `${x.time}〜${x.end}` : x.time) : ''; }
+
+// ── 九星 ──────────────────────────────────────────
+function kBirthStars() {
+  if (!KK || !kProfile || !kProfile.birth) return null;
+  const [y,m,d] = kProfile.birth.split('-').map(Number);
+  const h = Number(kProfile.hour);
+  const t = h >= 0 ? (h === 23 ? [23,59] : [h+1, 0]) : [null, null];
+  try { return { hon: KK.honmei(y,m,d,t[0],t[1]), get: KK.getsumei(y,m,d,t[0],t[1]) }; } catch (e) { return null; }
+}
+function starOf(d) {
+  if (!KK) return '';
+  try { return `<span class="cal-star">${KK.SHORT[KK.nichiStar(d.getFullYear(), d.getMonth()+1, d.getDate()) - 1]}</span>`; } catch (e) { return ''; }
+}
+
+// ── 吉凶の平均（八方位の点数の平均）──────────────────
+// 点数は暦モジュールの SCORE（吉80・普通50 … 超最大凶1）に歳破・月破・日破を重ねたもの。
+// 区分の境目は、2025〜2028年の全日×本命星9×三盤で、ほぼ均等に分かれる位置に置いた
+// （良24%・並20%・やや注意31%・注意25%。2026-10-20 破を加えたときに見直し）。
+const LUCK_LEVELS = ['良', '並', 'やや注意', '注意'];
+// 盤の判定に歳破・月破・日破を重ねたもの（ban: 'nen' | 'getsu' | 'nichi'、info は KK.dayInfo の戻り値）
+function jBan(hon, info, ban) {
+  const c = ban === 'nen' ? info.nen : ban === 'getsu' ? info.getsu : info.nichi;
+  // 古い暦モジュールがブラウザに残っていても止まらないように（その場合は破を重ねない）
+  return typeof KK.judgeHa === 'function' ? KK.judgeHa(hon, c, ban, info.y, info.m, info.d) : KK.judge(hon, c);
+}
+const HA_NOTE = '歳破・月破・日破は、一般の九星気学で誰にとっても凶とされるため判定に加えています（高木彬光『方位学入門』の方位表には含まれません）。破に当たる方位は、ほかの判定が「凶」より軽くても「凶」とします。流派によって扱いが異なります。';
+function luckAvg(hon, info, ban) { const j = jBan(hon, info, ban); return KK.DIRS.reduce((t, k) => t + j[k].score, 0) / 8; }
+function luckLevel(avg) { return avg >= 49 ? '良' : avg >= 45 ? '並' : avg >= 41 ? 'やや注意' : '注意'; }
+const ST_LUCKBAN = 'hoi_yotei_luckban', ST_KASA = 'hoi_yotei_kasa';
+let luckBan = lsGet(ST_LUCKBAN, 'nichi'); if (!['nichi','getsu','nen','off'].includes(luckBan)) luckBan = 'nichi';
+let kasaMode = lsGet(ST_KASA, 'off'); if (!['off','gm','all'].includes(kasaMode)) kasaMode = 'off';
+const ST_LVTEXT = 'hoi_yotei_lvtext';
+let lvText = lsGet(ST_LVTEXT, true) !== false;
+const LV_TEXT = { '良': '吉', '並': '普', 'やや注意': '凶', '注意': '大凶' };   // 色に頼らず読める四段階の文字
+const KASA_NAME = { off: 'なし', gm: '月盤・日盤', all: '年盤・月盤・日盤' };
+// 背景色：選んだ盤の八方位の平均で色分け（未購入は今日だけ）
+function luckLv(iso, info, bs) {
+  if (!bs || !info || luckBan === 'off' || !(isOpen() || iso === todayISO())) return '';
+  return luckLevel(luckAvg(bs.hon, info, luckBan));
+}
+function lvTextHTML(lv) { return lvText && lv ? `<span class="cal-lv lv-${lv}" title="${BAN_NAME[luckBan]}の平均">${LV_TEXT[lv]}</span>` : ''; }
+function luckClass(iso, info, bs) {
+  if (!bs || !info || luckBan === 'off' || !(isOpen() || iso === todayISO())) return '';
+  return 'lv-' + luckLevel(luckAvg(bs.hon, info, luckBan));
+}
+// 吉の重なる方位（同じ方位が、選んだ階層のすべての盤で「吉」）
+function kasaDirs(info, bs) {
+  if (!bs || !info || kasaMode === 'off' || !isOpen()) return [];
+  const boards = [jBan(bs.hon, info, 'nichi'), jBan(bs.hon, info, 'getsu')];
+  if (kasaMode === 'all') boards.push(jBan(bs.hon, info, 'nen'));
+  return KK.DIRS.filter(k => boards.every(j => j[k].label === '吉')).map(k => KK.DIR_JA[k]);
+}
+function renderLuckCtl() {
+  const el = document.getElementById('luck-ctl');
+  if (!KK || !kBirthStars()) { el.innerHTML = ''; return; }
+  const open = isOpen();
+  const seg = (name, cur, opts, attr, dis) => `<span>${name}</span><div class="ban-tabs" role="group" aria-label="${name}">${opts.map(([v, t]) =>
+    `<button type="button" ${attr}="${v}" aria-pressed="${v === cur}" ${dis && v !== 'off' ? 'disabled' : ''}>${t}</button>`).join('')}</div>`;
+  el.innerHTML = `<div class="luck-ctl">
+    ${seg('背景色', luckBan, [['nichi','日盤'],['getsu','月盤'],['nen','年盤'],['off','なし']], 'data-luckban', false)}
+    ${seg('文字表記', lvText ? 'on' : 'off', [['on','あり'],['off','なし']], 'data-lvtext', false)}
+    ${seg('吉の重なる日', kasaMode, [['off','なし'],['gm','月・日'],['all','年・月・日']], 'data-kasa', !open)}
+    ${open ? '' : '<span>吉の重なる日は購入後に使えます</span>'}</div>`;
+  el.querySelectorAll('[data-luckban]').forEach(b => b.addEventListener('click', () => { luckBan = b.dataset.luckban; lsSet(ST_LUCKBAN, luckBan); renderMonth(); }));
+  el.querySelectorAll('[data-lvtext]').forEach(b => b.addEventListener('click', () => { lvText = b.dataset.lvtext === 'on'; lsSet(ST_LVTEXT, lvText); renderMonth(); }));
+  el.querySelectorAll('[data-kasa]').forEach(b => b.addEventListener('click', () => { kasaMode = b.dataset.kasa; lsSet(ST_KASA, kasaMode); renderMonth(); }));
+}
+// 節入りの日の印（立春は年盤も切り替わるので強調）
+function switchHTML(info) {
+  if (!info || !info.setsuiriToday) return '';
+  return info.setsuiriToday.m === 2
+    ? '<span class="cal-sw risshun">立春 年盤・月盤切替</span>'
+    : `<span class="cal-sw">${info.setsuiriToday.name} 月盤切替</span>`;
+}
+// 月の上の知らせ（1月・2月は立春の切り替えを、ほかの月は節入りを知らせる）
+function renderSwitchNote() {
+  const el = document.getElementById('sw-note'), lg = document.getElementById('luck-legend');
+  if (!KK) { el.innerHTML = ''; lg.innerHTML = ''; return; }
+  const m = curM + 1, hm = t => `${t.m}月${t.d}日 ${t.h}:${String(t.mi).padStart(2,'0')}`;
+  let rs; try { rs = KK.setsuiri(curY, 2); } catch (e) { rs = null; }
+  if (rs && m === 2) {
+    el.innerHTML = `<div class="sw-note"><b>${hm(rs)}の立春で、年盤と月盤が切り替わります。</b>九星の一年は元日ではなく立春から始まるため、${rs.d - 1}日までは前年の年盤で判定します。</div>`;
+  } else if (rs && m === 1) {
+    el.innerHTML = `<div class="sw-note"><b>1月はまだ前年の年盤です。</b>年盤は${hm(rs)}の立春で切り替わります。</div>`;
+  } else {
+    let st; try { st = KK.setsuiri(curY, m); } catch (e) { st = null; }
+    el.innerHTML = st ? `<div class="kset-note" style="margin-bottom:6px">この月の月盤は${st.d}日（${st.name}）で切り替わります。</div>` : '';
+  }
+  const bs = kBirthStars();
+  lg.innerHTML = bs && luckBan !== 'off' ? `<div class="luck-legend"><span>背景色：${BAN_NAME[luckBan]}の八方位の吉凶の平均</span>
+    ${LUCK_LEVELS.map(l => `<span><span class="sw l-${l}"></span>${lvText ? `「${LV_TEXT[l]}」` : ''}${l}</span>`).join('')}
+    <span>${isOpen() ? '平均なので、凶の方位がある日も「良」になり得ます。行き先の方位は方位盤で確かめてください。' : '今日の分だけ色が付きます。購入すると全部の日に付きます。'}</span>
+    <span>※${HA_NOTE}</span>
+    ${kasaMode !== 'off' && isOpen() ? `<span>枠で囲んだ日：${KASA_NAME[kasaMode]}のすべてで同じ方位が「吉」になる日。札の方位がその吉方位です。</span>` : ''}</div>` : '';
+}
+
+// ── 描画 ──────────────────────────────────────────
+function renderAll() {
+  document.getElementById('month-area').hidden = view !== 'month';
+  document.getElementById('year-area').hidden = view !== 'year';
+  document.getElementById('list-section').hidden = view !== 'list';
+  document.getElementById('tab-year').setAttribute('aria-pressed', view === 'year');
+  document.getElementById('tab-month').setAttribute('aria-pressed', view === 'month');
+  document.getElementById('tab-list').setAttribute('aria-pressed', view === 'list');
+  renderLicState();
+  renderMonth();
+  renderList();
+  if (view === 'year') renderYear();
+}
+
+function renderBirthNudge() {
+  const el = document.getElementById('birth-nudge');
+  if (!el) return;
+  if (kBirthStars()) { el.hidden = true; el.innerHTML = ''; return; }
+  el.hidden = false;
+  el.innerHTML = `<div class="nudge-t">${PERSONAL ? '生年月日を登録してください' : isOpen() ? 'ご購入ありがとうございます。最後に、生年月日を登録してください' : 'はじめに、生年月日を登録してください'}</div>
+    <div class="nudge-b">方位の吉凶は、ご本人の本命星から見て決まります。登録すると、${isOpen() ? 'すべての日の方位盤が' : '今日の方位盤が'}吉凶で色分けされ、凶の方位にはその理由が出ます。生年月日はこの端末の中にだけ保存します。</div>
+    <div><button type="button" class="btn-primary" id="nudge-btn">生年月日を登録する</button></div>`;
+  document.getElementById('nudge-btn').addEventListener('click', () => openPanel('kset', true));
+}
+
+let syncText = '同期の準備中…';
+function setSync(state) {
+  syncText = state === 'ok' ? '予定と生年月日を端末間で同期しています。' : state === 'err' ? '同期できませんでした。この端末の中だけで動いています。' : '同期の準備中…';
+  const el = document.getElementById('sync-label'); if (el) el.textContent = syncText;
+}
+function renderLicState() {
+  renderBirthNudge();
+  const el = document.getElementById('lic-state');
+  if (PERSONAL) {
+    el.innerHTML = `<span class="pill-ok">自分用</span> <span id="sync-label">${syncText}</span>`;
+    return;
+  }
+  if (isOpen()) {
+    const [y,m,d] = lic.expires.split('-').map(Number);
+    el.innerHTML = `<span class="pill-ok">解錠済み</span> ${y}年${m}月${d}日まで、すべての方位盤をご覧になれます。`;
+  } else if (lic && lic.expires) {
+    el.innerHTML = `<span class="pill-off">期限切れ</span> 方位盤の有効期限が過ぎました。予定はこれまでどおり使えます。<button type="button" class="btn-sm btn-cancel" data-open-lic>購入する</button>`;
+  } else {
+    el.innerHTML = '';
+  }
+  el.querySelectorAll('[data-open-lic]').forEach(b => b.addEventListener('click', () => openPanel('lic', true)));
+}
+
+function renderMonth() {
+  const today = todayISO();
+  document.getElementById('m-title').textContent = `${curY}年 ${curM+1}月`;
+  const first = new Date(curY, curM, 1);
+  const start = new Date(curY, curM, 1 - first.getDay());
+  const lastDay = new Date(curY, curM + 1, 0);
+  const cells = Math.ceil((first.getDay() + lastDay.getDate()) / 7) * 7;
+  const end = new Date(start); end.setDate(start.getDate() + cells - 1);
+  const occ = occurrences(toISO(start), toISO(end));
+  const byDay = {};
+  occ.forEach(x => (byDay[x.date] = byDay[x.date] || []).push(x));
+  Object.values(byDay).forEach(a => a.sort(byTime));
+
+  renderSwitchNote();
+  renderLuckCtl();
+  const bsM = KK ? kBirthStars() : null;
+  let html = WEEKDAYS.map((w,i) => `<div class="cal-wd ${i===0?'sun':i===6?'sat':''}">${w}</div>`).join('');
+  for (let i = 0; i < cells; i++) {
+    const d = new Date(start); d.setDate(start.getDate() + i);
+    const iso = toISO(d), wd = d.getDay(), hol = holidayOf(iso), list = byDay[iso] || [];
+    let dInfo = null; if (KK) { try { dInfo = KK.dayInfo(d.getFullYear(), d.getMonth()+1, d.getDate()); } catch (e) {} }
+    const kd = d.getMonth() === curM ? kasaDirs(dInfo, bsM) : [];
+    const cls = ['cal-day', d.getMonth() !== curM ? 'other' : '', iso === today ? 'is-today' : '', iso === selDate ? 'is-sel' : '', luckClass(iso, dInfo, bsM), kd.length ? 'kasa' : ''].join(' ');
+    const numCls = hol ? 'hol' : wd === 0 ? 'sun' : wd === 6 ? 'sat' : '';
+    const shown = list.slice(0, 3).map(x => `<div class="chip ${x.done?'done':''}" data-item="${esc(x._virtual ? x.id.replace(/_[wm]\d+$/, '') : x.id)}" title="ドラッグで別の日へ移動・右クリックで完了／削除">${x.time ? `<span class="chip-t">${x.time}</span>` : ''}${ue(x.title||'')}</div>`).join('');
+    const more = list.length > 3 ? `<div class="chip-more">ほか${list.length-3}件</div>` : '';
+    html += `<div role="button" tabindex="0" class="${cls}" data-date="${iso}" aria-label=""${d.getMonth()+1}月${d.getDate()}日（${WEEKDAYS[wd]}）${hol?' '+hol:''} 予定${list.length}件">
+      <span class="cal-num ${numCls}">${d.getDate()}${hol ? `<span class="cal-hol">${hol}</span>` : ''}${lvTextHTML(luckLv(iso, dInfo, bsM))}${starOf(d)}</span>${switchHTML(dInfo)}${kd.length ? `<span class="kasa-badge" title="吉の重なる方位">吉 ${kd.join('・')}</span>` : ''}${shown}${more}<span class="cal-add" role="button" tabindex="0" data-add="${iso}" aria-label="${d.getMonth()+1}月${d.getDate()}日に予定を追加" title="この日に予定を追加">＋</span></div>`;
+  }
+  const cal = document.getElementById('cal');
+  cal.innerHTML = html;
+  cal.classList.toggle('filtering', kasaMode !== 'off' && isOpen() && !!bsM);
+  cal.querySelectorAll('.cal-day').forEach(b => b.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); b.click(); }
+  }));
+  cal.querySelectorAll('.cal-day').forEach(b => b.addEventListener('click', () => {
+    selDate = b.dataset.date;
+    document.getElementById('f-date').value = selDate;
+    const sd = parseDate(selDate);
+    if (sd.getMonth() !== curM || sd.getFullYear() !== curY) { curY = sd.getFullYear(); curM = sd.getMonth(); }
+    renderMonth();
+  }));
+
+  const panel = document.getElementById('day-panel');
+  const f = fmtDate(selDate), hol = holidayOf(selDate);
+  const dayItems = occurrences(selDate, selDate).sort(byTime);
+  panel.innerHTML = houiHTML(selDate) + `<div class="section-head">${f.month}${f.day}日（${f.wd}）${hol ? '・' + hol : ''}の予定</div>`
+    + (dayItems.length
+      ? `<ul class="yotei-list">${dayItems.map(x => renderItem(x, today)).join('')}</ul>`
+      : '<div class="empty-msg" style="padding:16px 0">この日の予定はありません。上の欄から追加できます。</div>');
+  wirePanel(panel);
+}
+
+function renderList() {
+  const today = todayISO();
+  const all = Object.values(items);
+  const listArea = document.getElementById('list-area');
+  const doneArea = document.getElementById('done-area');
+  const lo = all.reduce((m,x) => x.date && x.date < m ? x.date : m, today);
+  const expanded = occurrences(lo, addDays(today, 90));
+  const active = expanded.filter(x => !x.done && !(x.date < today && (x._virtual || (x.repeat && x.repeat !== 'none')))).sort((a,b) => a.date.localeCompare(b.date) || timeKey(a).localeCompare(timeKey(b)));
+  const done = all.filter(x => x.done).sort((a,b) => b.date.localeCompare(a.date)).slice(0,10);
+  if (active.length === 0) {
+    listArea.innerHTML = '<div class="empty-msg">予定はまだありません。上の欄に日付とタイトルを入れて「追加する」を押してください。</div>';
+  } else {
+    const past = active.filter(x => x.date < today), todayItems = active.filter(x => x.date === today), future = active.filter(x => x.date > today);
+    let html = '';
+    if (past.length) html += renderSection('過去の未完了', past, today);
+    if (todayItems.length) html += renderSection('今日', todayItems, today);
+    if (future.length) html += renderSection('今後の予定', future, today);
+    listArea.innerHTML = html;
+  }
+  if (done.length) {
+    doneArea.hidden = false;
+    doneArea.innerHTML = '<div class="section-head">完了した予定</div><ul class="yotei-list">' + done.map(x => renderItem(x, today)).join('') + '</ul>';
+  } else doneArea.hidden = true;
+  wirePanel(listArea); wirePanel(doneArea);
+}
+function renderSection(title, list, today) {
+  return `<div class="section-head">${title}</div><ul class="yotei-list">${list.map(x => renderItem(x, today)).join('')}</ul>`;
+}
+function renderItem(item, today) {
+  const { month, day, wd } = fmtDate(item.date);
+  const cls = item.done ? 'is-done' : item.date < today ? 'is-past' : item.date === today ? 'is-today' : '';
+  let actions = '';
+  if (!item._virtual) {
+    actions = pendingDelete === item.id
+      ? `<div class="confirm-row">削除しますか？
+           <button type="button" class="btn-sm btn-del" data-act="del" data-id="${item.id}">削除する</button>
+           <button type="button" class="btn-sm btn-cancel" data-act="nodel">やめる</button></div>`
+      : `<div class="yotei-actions">
+           <button type="button" class="btn-sm ${item.done ? 'btn-cancel' : 'btn-done'}" data-act="done" data-id="${item.id}">${item.done ? '戻す' : '完了'}</button>
+           <button type="button" class="btn-sm btn-cancel" data-act="edit" data-id="${item.id}">編集</button>
+           <button type="button" class="btn-sm btn-del" data-act="ask" data-id="${item.id}">削除</button></div>`;
+  }
+  return `<li class="yotei-item ${cls}">
+    <div class="yotei-date-col"><div class="yotei-month">${month}</div><div class="yotei-day">${day}</div><div class="yotei-weekday">(${wd})</div></div>
+    <div class="yotei-body">
+      ${item.time ? `<div class="yotei-time">${timeLabel(item)}</div>` : ''}
+      <div class="yotei-title">${ue(item.title || '')}${item.src ? `<span class="cal-src">${item.cal ? ue(item.cal) : (item.src === 'google' ? 'Google' : 'カレンダー')}</span>` : ''}</div>
+      ${item.place ? `<div class="yotei-sub">場所：${ue(item.place)}</div>` : ''}
+      ${item.memo ? `<div class="yotei-memo">${ue(item.memo)}</div>` : ''}
+      ${item.repeat && item.repeat !== 'none' ? `<span class="yotei-repeat">${item.repeat==='weekly'?'毎週':'毎月'}</span>` : ''}
+      ${item.dest ? dirLineHTML(item) : ''}
+      ${!item._virtual && HX ? calLinksHTML(item) : ''}
+    </div>
+    ${actions}
+  </li>`;
+}
+
+// ── 方位盤（選んだ日） ─────────────────────────────
+function houiHTML(iso) {
+  if (!KK) return '';
+  const [y,m,d] = iso.split('-').map(Number);
+  let info; try { info = KK.dayInfo(y,m,d); } catch (e) { return ''; }
+  const open = isOpen(), isToday = iso === todayISO();
+  const tabs = ['nichi','getsu','nen'].map(k =>
+    `<button type="button" data-ban="${k}" aria-pressed="${k===kBan}">${BAN_NAME[k]}${!open && k !== 'nichi' ? '（購入後）' : ''}</button>`).join('');
+  const head = `<div class="houi-top"><h3>${m}月${d}日の方位盤</h3><div class="ban-tabs" role="group" aria-label="盤の切り替え">${tabs}</div></div>`;
+
+  // 未購入：今日の日盤だけ見られる
+  if (!open && (!isToday || kBan !== 'nichi')) {
+    return `<div class="houi">${head}<div class="locked">
+      <p><b>${!isToday ? 'ほかの日の方位盤' : BAN_NAME[kBan]}</b>は、購入後にご覧になれます。今日の日盤は無料でご覧いただけます。</p>
+      <p class="kset-note">1,000円で購入日から1年間、すべての日の日盤・月盤・年盤と、吉凶の色分け・凶の理由が見られます。</p>
+      <div class="btn-row" style="justify-content:flex-start"><button type="button" class="btn-primary" data-open-lic>購入・解錠</button>
+      ${!isToday ? `<button type="button" class="btn-cancel" data-go-today>今日の盤を見る</button>` : ''}</div></div></div>`;
+  }
+
+  const center = kBan === 'nen' ? info.nen : kBan === 'getsu' ? info.getsu : info.nichi;
+  const bs = kBirthStars(), ban = KK.ban(center), j = bs ? jBan(bs.hon, info, kBan) : null;
+  const destDirs = new Set();   // この日の予定の行き先の方位（境界付近で判定しないものは除く）
+  occurrences(iso, iso).forEach(x => { const g = x.dest ? itemGeo(x) : null; if (g && g.r && g.r.sector && g.r.judged) destDirs.add(KK.DIRS[g.r.sector.index]); });
+  let cells = '';
+  BAN_GRID.flat().forEach(k => {
+    if (k === 'C') { cells += `<div class="ban-cell c"><span class="ban-dir">中宮</span><span class="ban-st">${KK.SHORT[center-1]}</span></div>`; return; }
+    const r = j ? j[k] : null;
+    const isDest = destDirs.has(k);
+    cells += `<div class="ban-cell ${r ? 'k-' + r.label : 'k-none'}${isDest ? ' is-dest' : ''}" title="${KK.DIR_JA[k]}：${KK.NAMES[ban[k]-1]}${r ? '（' + r.label + '）' : ''}">
+      <span class="ban-dir">${KK.DIR_JA[k]}</span><span class="ban-st">${KK.SHORT[ban[k]-1]}</span>${r ? `<span class="ban-lb">${r.label}${r.ha ? '・' + r.ha : ''}</span>` : ''}${isDest ? '<span class="dest-mk">行き先</span>' : ''}</div>`;
+  });
+  const hm = t => `${t.m}月${t.d}日 ${t.h}:${String(t.mi).padStart(2,'0')}`;
+  const st = KK.setsuiri(y, m);
+  const infoLines = [
+    `${info.kanshi}の日　年盤 ${KK.SHORT[info.nen-1]}・月盤 ${KK.SHORT[info.getsu-1]}・日盤 ${KK.SHORT[info.nichi-1]}`,
+    `日盤は${info.ton.type}（${info.ton.start.slice(5).replace('-','/')}の甲子から）${info.ton.uru ? '・閏の期間' : ''}`,
+    info.setsuiriToday ? `この日が${st.name}（${hm(st)}）。この日から新しい月盤` : `この月の節入り：${st.name} ${hm(st)}`,
+  ];
+  if (info.shiToday) infoLines.push(`この日は${info.shiToday.name}（${hm(info.shiToday)}）`);
+  let side;
+  if (!j) {
+    side = `<div class="houi-info">${infoLines.join('<br>')}</div>
+      <div class="kset-note">生年月日を登録すると、各方位の吉凶と凶の理由が出ます。<button type="button" class="btn-sm btn-cancel" data-kopen>登録する</button></div>`;
+  } else {
+    const rows = KK.DIRS.map(k => j[k]).sort((a,b) => a.score - b.score);
+    const kyou = rows.filter(r => r.kyou), kichi = rows.filter(r => r.label === '吉').map(r => r.dir);
+    side = `<div class="houi-info">本命星 <b>${KK.NAMES[bs.hon-1]}</b>・月命星 ${KK.NAMES[bs.get-1]}<br>${infoLines.join('<br>')}</div>
+      <div class="houi-info">吉方位：${kichi.length ? '<b>' + kichi.join('・') + '</b>' : 'なし'}</div>
+      ${kyou.length ? `<ul class="houi-reasons" aria-label="凶方位とその理由">${kyou.map(r =>
+        `<li><span class="tag k-${r.label}">${r.dir}</span><span><b>${r.label}</b>　${r.starName}が回る。${r.reasons.join('・')}</span></li>`).join('')}</ul>` : ''}
+      <div class="houi-legend">${LABEL_ORDER.map(l => `<span class="k-${l}">${l}</span>`).join('')}</div>
+      <div class="kset-note">※${HA_NOTE}</div>`;
+  }
+  return `<div class="houi">${head}
+    <div class="houi-body"><div class="ban" role="img" aria-label="${BAN_NAME[kBan]}の八方位">${cells}</div><div style="display:grid;gap:10px;min-width:0">${side}</div></div>
+  </div>`;
+}
+
+function wirePanel(root) {
+  root.querySelectorAll('[data-ban]').forEach(b => b.addEventListener('click', () => {
+    kBan = b.dataset.ban; lsSet(ST_BAN, kBan); renderMonth();
+  }));
+  root.querySelectorAll('[data-kopen]').forEach(b => b.addEventListener('click', () => openPanel('kset', true)));
+  root.querySelectorAll('[data-open-lic]').forEach(b => b.addEventListener('click', () => openPanel('lic', true)));
+  root.querySelectorAll('[data-go-today]').forEach(b => b.addEventListener('click', () => {
+    kBan = 'nichi'; selDate = todayISO(); curY = new Date().getFullYear(); curM = new Date().getMonth(); renderMonth();
+  }));
+  root.querySelectorAll('[data-act]').forEach(b => b.addEventListener('click', () => {
+    const id = b.dataset.id, a = b.dataset.act;
+    if (a === 'done') toggleDone(id);
+    else if (a === 'edit') openEdit(id);
+    else if (a === 'ask') { pendingDelete = id; renderAll(); }
+    else if (a === 'nodel') { pendingDelete = null; renderAll(); }
+    else if (a === 'del') { pendingDelete = null; deleteItem(id); }
+    else if (a === 'ics1' && items[id]) saveICS([items[id]], `${items[id].date}_${(items[id].title || 'yotei').replace(/[\\/:*?"<>|\s]+/g, '_').slice(0, 30)}.ics`, null);
+  }));
+}
+
+// ── なぞると付いてくる方位盤（星が飛泊の順に動く） ──────
+const HB_PATH = ['C','NW','W','NE','S','N','SW','E','SE'];
+const HB_XY = { NW:[0,0], N:[1,0], NE:[2,0], W:[0,1], C:[1,1], E:[2,1], SW:[0,2], S:[1,2], SE:[2,2] };
+const HB_STEP = 67;
+let hbEl = null, hbCenter = null, hbTarget = null, hbTimer = null, hbIso = null;
+// 浮かぶ方位盤：日付に乗せると日盤、クリックするたびに月盤→年盤→日盤と切り替わる
+const HB_ORDER = ['nichi', 'getsu', 'nen'];
+let hbBan = 'nichi', hbBanIso = null, hbJT = null;   // hbJT：行き着く盤の判定（破を含む）
+function hbBuild() {
+  hbEl = document.createElement('div');
+  hbEl.className = 'hban'; hbEl.setAttribute('aria-hidden', 'true');
+  let cells = '', stars = '';
+  Object.keys(HB_XY).forEach(k => {
+    const [x,y] = HB_XY[k];
+    cells += `<div class="hban-cell k-none" data-cell="${k}" style="left:${x*HB_STEP}px;top:${y*HB_STEP}px"><span>${k==='C'?'中宮':KK.DIR_JA[k]}</span><span class="lb"></span></div>`;
+  });
+  for (let n = 1; n <= 9; n++) stars += `<div class="hban-star" data-star="${n}">${KK.SHORT[n-1]}</div>`;
+  hbEl.innerHTML = `<div class="hban-head"><span id="hb-date"></span><span id="hb-ban"></span></div><div class="hban-board">${cells}${stars}</div><div class="hban-foot" id="hb-foot"></div>`;
+  document.body.appendChild(hbEl);
+}
+function hbPlace(center) {
+  const bs = isOpen() ? kBirthStars() : null;
+  const j = bs ? (center === hbTarget && hbJT ? hbJT : KK.judge(bs.hon, center)) : null;   // 回っている途中の盤には破を重ねない
+  hbEl.querySelectorAll('.hban-star').forEach(el => {
+    const n = Number(el.dataset.star), key = HB_PATH[((n - center) % 9 + 9) % 9], [x,y] = HB_XY[key];
+    el.style.transform = `translate(${x*HB_STEP}px, ${y*HB_STEP}px)`;
+    const r = j && key !== 'C' ? j[key] : null;
+    el.className = 'hban-star' + (r ? ' k-' + r.label : '') + (bs && n === bs.hon ? ' is-hon' : '');
+  });
+  hbEl.querySelectorAll('.hban-cell').forEach(el => {
+    const k = el.dataset.cell, r = j && k !== 'C' ? j[k] : null;
+    el.className = 'hban-cell ' + (r ? 'k-' + r.label : 'k-none');
+    el.querySelector('.lb').textContent = r ? r.label : '';
+  });
+}
+function hbStep() {
+  hbTimer = null;
+  if (hbCenter === hbTarget) return;
+  const fwd = ((hbTarget - hbCenter) % 9 + 9) % 9;
+  hbCenter = ((hbCenter - 1 + (fwd <= 4 ? 1 : -1)) % 9 + 9) % 9 + 1;
+  hbPlace(hbCenter);
+  if (hbCenter !== hbTarget) hbTimer = setTimeout(hbStep, 115);
+}
+function hbShow(iso) {
+  if (!KK) return;
+  if (!hbEl) hbBuild();
+  if (iso !== hbIso) {
+    hbIso = iso;
+    const [y,m,d] = iso.split('-').map(Number);
+    let info; try { info = KK.dayInfo(y,m,d); } catch (e) { return; }
+    if (iso !== hbBanIso) { hbBan = 'nichi'; hbBanIso = iso; }   // 別の日に移ったら日盤から
+    const ban = isOpen() ? hbBan : 'nichi';
+    const c = ban === 'nen' ? info.nen : ban === 'getsu' ? info.getsu : info.nichi;
+    document.getElementById('hb-date').textContent = `${m}月${d}日（${WEEKDAYS[new Date(y,m-1,d).getDay()]}）`;
+    document.getElementById('hb-ban').textContent = ban === 'nichi' ? `${BAN_NAME[ban]}・${info.ton.type}` : BAN_NAME[ban];
+    const bs = kBirthStars(), foot = document.getElementById('hb-foot');
+    hbJT = bs && isOpen() ? jBan(bs.hon, info, ban) : null;
+    if (!isOpen()) foot.textContent = '購入すると吉凶の色と凶方位が出ます';
+    else if (bs) {
+      const kyou = KK.DIRS.map(k => hbJT[k]).filter(r => r.kyou).map(r => r.dir + r.label + (r.ha ? '（' + r.ha + '）' : ''));
+      const next = BAN_NAME[HB_ORDER[(HB_ORDER.indexOf(ban) + 1) % 3]];
+      foot.textContent = (kyou.length ? '凶：' + kyou.join('・') : '凶方位なし') + `　［クリックで${next}へ］`;
+    } else foot.textContent = '生年月日を登録すると吉凶の色が付きます';
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (hbCenter == null || reduce || hbCenter === c) { clearTimeout(hbTimer); hbTimer = null; hbCenter = hbTarget = c; hbPlace(c); }
+    else { hbTarget = c; if (!hbTimer) hbStep(); }
+  }
+  hbEl.classList.add('on');
+}
+function hbMove(e) {
+  const w = 216, h = hbEl.offsetHeight || 290, gap = 18;
+  let x = e.clientX + gap, y = e.clientY + gap;
+  if (x + w > window.innerWidth - 8) x = e.clientX - w - gap;
+  if (y + h > window.innerHeight - 8) y = Math.max(8, window.innerHeight - h - 8);
+  hbEl.style.left = x + 'px'; hbEl.style.top = y + 'px';
+}
+function hbHide() { if (hbEl) hbEl.classList.remove('on'); hbIso = null; }
+
+// ── 予定の札：ドラッグで別の日へ、右クリックで完了・削除 ──────────
+let toastTimer = null;
+function toast(text, undo) {
+  let el = document.getElementById('toast');
+  if (!el) { el = document.createElement('div'); el.id = 'toast'; el.className = 'toast'; el.setAttribute('role', 'status'); document.body.appendChild(el); }
+  el.innerHTML = `<span>${esc(text)}</span>${undo ? '<button type="button" id="toast-undo">元に戻す</button>' : ''}`;
+  el.hidden = false;
+  if (undo) document.getElementById('toast-undo').addEventListener('click', () => { undo(); el.hidden = true; });
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true; }, 6000);
+}
+function snapshotItem(id) { const it = items[id]; return it ? JSON.parse(JSON.stringify(it)) : null; }
+function restoreItem(snap) { if (snap) { items[snap.id] = snap; saveItems(); pushItem(snap.id); renderAll(); } }
+
+let drag = null, dragJustEnded = false;
+(function () {
+  const cal = document.getElementById('cal');
+  const cellAt = (x, y) => { const el = document.elementFromPoint(x, y); return el ? el.closest('#cal .cal-day') : null; };
+  cal.addEventListener('pointerdown', e => {
+    if (e.button !== 0 || e.pointerType === 'touch') return;      // 指で触る端末は画面のスクロールを優先
+    const chip = e.target.closest('.chip[data-item]');
+    if (!chip) return;
+    drag = { id: chip.dataset.item, from: chip.closest('.cal-day').dataset.date, x: e.clientX, y: e.clientY, on: false, ghost: null, over: null, chip };
+  });
+  window.addEventListener('pointermove', e => {
+    if (!drag) return;
+    if (!drag.on) {
+      if (Math.hypot(e.clientX - drag.x, e.clientY - drag.y) < 6) return;
+      const it = items[drag.id];
+      if (!it) { drag = null; return; }
+      if (it.repeat === 'weekly' || it.repeat === 'monthly') {
+        toast('繰り返しの予定は、一覧の「編集」から日付を変えてください'); drag = null; return;
+      }
+      drag.on = true; hbHide(); cal.classList.add('dragging');
+      drag.ghost = document.createElement('div'); drag.ghost.className = 'chip-ghost'; drag.ghost.textContent = (it.time ? it.time + ' ' : '') + (it.title || '');
+      document.body.appendChild(drag.ghost);
+    }
+    drag.ghost.style.left = (e.clientX + 12) + 'px'; drag.ghost.style.top = (e.clientY + 10) + 'px';
+    const c = cellAt(e.clientX, e.clientY);
+    if (drag.over && drag.over !== c) drag.over.classList.remove('drop-target');
+    if (c && c.dataset.date !== drag.from) { c.classList.add('drop-target'); drag.over = c; } else drag.over = null;
+  });
+  const endDrag = (e, cancel) => {
+    if (!drag) return;
+    const d = drag; drag = null;
+    if (!d.on) return;
+    cal.classList.remove('dragging'); d.ghost.remove(); if (d.over) d.over.classList.remove('drop-target');
+    dragJustEnded = true; setTimeout(() => { dragJustEnded = false; }, 0);
+    if (cancel || !d.over) return;
+    const to = d.over.dataset.date, snap = snapshotItem(d.id);
+    updateItem(d.id, { date: to });
+    const t = parseDate(to);
+    toast(`「${snap.title || '予定'}」を${t.getMonth()+1}月${t.getDate()}日（${WEEKDAYS[t.getDay()]}）へ移しました`, () => restoreItem(snap));
+  };
+  window.addEventListener('pointerup', e => endDrag(e, false));
+  window.addEventListener('pointercancel', e => endDrag(e, true));
+  window.addEventListener('keydown', e => { if (e.key === 'Escape') { endDrag(e, true); closeCtx(); } });
+  // ドラッグを終えた直後のクリックで日付が選ばれないようにする
+  cal.addEventListener('click', e => { if (dragJustEnded) { e.stopPropagation(); e.preventDefault(); } }, true);
+
+  // 右クリックの小さなメニュー
+  cal.addEventListener('contextmenu', e => {
+    const chip = e.target.closest('.chip[data-item]');
+    if (!chip) return;
+    const it = items[chip.dataset.item];
+    if (!it) return;
+    e.preventDefault(); hbHide(); closeCtx();
+    const rep = it.repeat === 'weekly' || it.repeat === 'monthly';
+    const m = document.createElement('div'); m.className = 'ctx-menu'; m.id = 'ctx-menu'; m.setAttribute('role', 'menu');
+    m.innerHTML = `<div class="ctx-t">${it.title ? ue(it.title) : '予定'}${rep ? '（繰り返し全体）' : ''}</div>
+      <button type="button" role="menuitem" data-ctx="done">${it.done ? '未完了に戻す' : '完了にする'}</button>
+      <button type="button" role="menuitem" data-ctx="del" class="del">削除する</button>`;
+    document.body.appendChild(m);
+    const w = m.offsetWidth || 170, h = m.offsetHeight || 110;
+    m.style.left = Math.min(e.clientX, window.innerWidth - w - 8) + 'px';
+    m.style.top = Math.min(e.clientY, window.innerHeight - h - 8) + 'px';
+    m.querySelector('[data-ctx="done"]').focus();
+    m.addEventListener('click', ev => {
+      const a = ev.target.closest('[data-ctx]'); if (!a) return;
+      const snap = snapshotItem(it.id);
+      closeCtx();
+      if (a.dataset.ctx === 'done') {
+        updateItem(it.id, { done: !snap.done });
+        toast(snap.done ? `「${snap.title || '予定'}」を未完了に戻しました` : `「${snap.title || '予定'}」を完了にしました`, () => restoreItem(snap));
+      } else {
+        deleteItem(it.id);
+        toast(`「${snap.title || '予定'}」を削除しました`, () => restoreItem(snap));
+      }
+    });
+  });
+  document.addEventListener('pointerdown', e => { if (!e.target.closest('#ctx-menu')) closeCtx(); });
+  window.addEventListener('scroll', closeCtx, true);
+})();
+function closeCtx() { const m = document.getElementById('ctx-menu'); if (m) m.remove(); }
+(function () {
+  const cal = document.getElementById('cal');
+  cal.addEventListener('pointermove', e => {
+    if (e.pointerType !== 'mouse') return;
+    const cell = e.target.closest('.cal-day');
+    if (!cell) { hbHide(); return; }
+    hbShow(cell.dataset.date); hbMove(e);
+  });
+  cal.addEventListener('pointerleave', hbHide);
+  // クリックで盤を順に切り替える（マウスのときだけ。日付の選択はこれまでどおり）
+  cal.addEventListener('click', e => {
+    if (e.pointerType && e.pointerType !== 'mouse') return;
+    const cell = e.target.closest('.cal-day');
+    if (!cell || !hbEl || !hbEl.classList.contains('on')) return;
+    const iso = cell.dataset.date;
+    if (iso !== hbBanIso) { hbBanIso = iso; hbBan = 'nichi'; }
+    else if (isOpen()) hbBan = HB_ORDER[(HB_ORDER.indexOf(hbBan) + 1) % 3];
+    hbIso = null; hbShow(iso);
+    if (!isOpen()) document.getElementById('hb-foot').textContent = '月盤・年盤は購入後にご覧になれます';
+  });
+})();
+
+// ── 開閉パネル ─────────────────────────────────────
+const PANELS = { kset: 'btn-kset', geoPanel: 'btn-geo', lic: 'btn-lic', calPanel: 'btn-cal', dataPanel: 'btn-data' };
+function openPanel(id, open) {
+  Object.keys(PANELS).forEach(p => {
+    const show = p === id && open;
+    document.getElementById(p).hidden = !show;
+    document.getElementById(PANELS[p]).setAttribute('aria-expanded', String(show));
+  });
+  if (open && id === 'kset') {
+    document.getElementById('k-birth').value = kProfile?.birth || '';
+    document.getElementById('k-hour').value = String(kProfile?.hour ?? -1);
+    showWho();
+  }
+  if (open && id === 'geoPanel') renderGeoPanel();
+  if (open) document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+Object.keys(PANELS).forEach(p => document.getElementById(PANELS[p]).addEventListener('click', () => openPanel(p, document.getElementById(p).hidden)));
+document.getElementById('k-close').addEventListener('click', () => openPanel('kset', false));
+document.getElementById('lic-close').addEventListener('click', () => openPanel('lic', false));
+document.getElementById('d-close').addEventListener('click', () => openPanel('dataPanel', false));
+document.getElementById('cal-close').addEventListener('click', () => openPanel('calPanel', false));
+document.getElementById('g-close').addEventListener('click', () => openPanel('geoPanel', false));
+
+// ── 方位の設定 ─────────────────────────────────────
+function showWho() {
+  const who = document.getElementById('kset-who'), bs = kBirthStars();
+  if (bs && kProfile) {
+    const [y,m,d] = kProfile.birth.split('-').map(Number);
+    who.innerHTML = `登録済み：${y}年${m}月${d}日生まれ　本命星 <b>${KK.NAMES[bs.hon-1]}</b>・月命星 <b>${KK.NAMES[bs.get-1]}</b>`;
+  } else who.textContent = '生年月日を登録すると、本命星と月命星を出し、日付ごとの吉方位を表示します。';
+}
+document.getElementById('k-save').addEventListener('click', () => {
+  const birth = document.getElementById('k-birth').value, hour = Number(document.getElementById('k-hour').value);
+  if (!birth) { showMsg('k-msg', '生年月日を入れてください。'); return; }
+  const y = Number(birth.slice(0,4));
+  if (y < 1900 || y > 2100) { showMsg('k-msg', '1900〜2100年の生年月日で入れてください。'); return; }
+  kProfile = { birth, hour };
+  if (kDocRef) Promise.resolve(kDocRef.set({ birth, hour, updatedAt: Date.now() })).then(
+    () => showMsg('k-msg', '登録しました（どの端末でも使えます）。', true), () => showMsg('k-msg', '同期先に保存できませんでした。もう一度お試しください。'));
+  else showMsg('k-msg', lsSet(ST_KYUSEI, kProfile) ? '登録しました。' : 'この端末に保存できませんでした。', true);
+  showWho(); renderBirthNudge(); renderMonth();
+});
+
+// ── 購入・解錠 ─────────────────────────────────────
+const buyLink = document.getElementById('buy-link');
+if (PAY_URL) buyLink.href = PAY_URL;
+else { buyLink.removeAttribute('href'); buyLink.classList.add('is-off'); buyLink.textContent = '購入の受付準備中です'; }
+
+async function gas(params) {
+  if (!GAS_URL) throw new Error('準備中');
+  const res = await fetch(GAS_URL + '?' + new URLSearchParams(params).toString(), { method: 'GET' });
+  if (!res.ok) throw new Error('通信');
+  return res.json();
+}
+function setLic(key, expires) { lic = { key, expires, checkedAt: todayISO() }; lsSet(ST_LIC, lic); hbIso = null; renderAll(); }
+
+document.getElementById('lic-apply').addEventListener('click', async () => {
+  const key = document.getElementById('lic-key').value.trim().toUpperCase();
+  if (!/^HY-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{4}$/.test(key)) { showMsg('lic-msg', '解錠番号は「HY-」で始まる英数字です。メールの番号をそのまま入れてください。'); return; }
+  showMsg('lic-msg', '確かめています…', true);
+  try {
+    const r = await gas({ action: 'check', key });
+    if (r.ok) { setLic(key, r.expires); showMsg('lic-msg', `解錠しました。${r.expires.replace(/-/g,'/')}までご利用いただけます。`, true); }
+    else showMsg('lic-msg', r.message || 'この解錠番号は見つかりませんでした。');
+  } catch (e) { showMsg('lic-msg', e.message === '準備中' ? '解錠の受付は準備中です。' : '通信できませんでした。時間をおいてもう一度お試しください。'); }
+});
+document.getElementById('lic-resend').addEventListener('click', async () => {
+  const mail = document.getElementById('lic-mail').value.trim();
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail)) { showMsg('lic-msg', 'メールアドレスを正しく入れてください。'); return; }
+  try {
+    await gas({ action: 'resend', email: mail });
+    showMsg('lic-msg', 'ご購入の記録があれば、解錠番号をそのアドレスへお送りしました。届かないときは迷惑メールの欄もご確認ください。', true);
+  } catch (e) { showMsg('lic-msg', e.message === '準備中' ? '解錠の受付は準備中です。' : '通信できませんでした。時間をおいてもう一度お試しください。'); }
+});
+
+// 支払い後の戻り（?session_id=…）を受けて解錠
+(async function claimFromStripe() {
+  const sp = new URLSearchParams(location.search), sid = sp.get('session_id');
+  if (!sid) return;
+  history.replaceState(null, '', location.pathname + location.hash);
+  openPanel('lic', true);
+  showMsg('lic-msg', 'お支払いを確かめています…', true);
+  try {
+    const r = await gas({ action: 'claim', session_id: sid });
+    if (r.ok) {
+      setLic(r.key, r.expires);
+      document.getElementById('lic-key').value = r.key;
+      showMsg('lic-msg', `ご購入ありがとうございます。解錠しました（${r.expires.replace(/-/g,'/')}まで）。解錠番号 ${r.key} は控えておいてください。メールでもお送りしました。${kBirthStars() ? '' : '続けて「方位の設定」で生年月日を登録すると、方位盤に吉凶の色が付きます。'}`, true);
+    } else showMsg('lic-msg', r.message || 'お支払いを確かめられませんでした。お手数ですが、届いたメールの解錠番号を入れてください。');
+  } catch (e) { showMsg('lic-msg', '通信できませんでした。届いたメールの解錠番号を入れてください。'); }
+})();
+
+// 解錠番号の定期確認（1日1回。通信できないときは手元の期限で判断）
+(async function recheck() {
+  if (!lic || !lic.key || lic.checkedAt === todayISO() || !GAS_URL) return;
+  try {
+    const r = await gas({ action: 'check', key: lic.key });
+    if (r.ok) setLic(lic.key, r.expires);
+    else if (r.revoked) { lic = null; lsDel(ST_LIC); renderAll(); }
+  } catch (e) {}
+})();
+
+
+// ====================================================
+// 地図・起点・行き先（計算は houi_calc.js、大圏は GeographicLib）
+// ====================================================
+const HC = window.HouiCalc || null;
+const GEOD = window.geodesic && window.geodesic.Geodesic ? window.geodesic.Geodesic.WGS84 : null;
+const judgeGeo = HC && GEOD ? HC.createHoui(GEOD) : null;
+const TZL = typeof window.tzlookup === 'function' ? window.tzlookup : null;
+const ST_GEO = 'hoi_yotei_geo';
+const ORIGIN_KEYS = ['home', 'work', 'other'];
+let geo = lsGet(ST_GEO, null) || {};
+geo = { school: '30-60', north: 'true', method: 'auto', southern: 'none', margin: 2,
+        dayBasis: HC ? HC.defaultDayBasis() : 'jst', otherName: 'その他', ...geo };
+geo.origins = { home: null, work: null, other: null, ...(geo.origins || {}) };
+function originName(k) { return k === 'home' ? '自宅' : k === 'work' ? '勤務先' : (geo.otherName || 'その他'); }
+function saveGeo() { lsSet(ST_GEO, geo); geoCache.clear(); hbIso = null; }
+const geoCache = new Map();
+
+// 予定の行き先の方位・距離・三盤の吉凶
+function itemGeo(item) {
+  if (!item.dest || !judgeGeo || !KK) return null;
+  const okey = item.origin && ORIGIN_KEYS.includes(item.origin) ? item.origin : 'home';
+  const org = geo.origins[okey];
+  if (!org) return { err: `起点「${originName(okey)}」が未登録です。「地図・起点」で登録してください。`, okey };
+  const key = [item.date, item.time || '', item.dest.lat, item.dest.lon, okey, org.lat, org.lon, geo.school, geo.north, geo.method, geo.southern, geo.margin, geo.dayBasis].join('|');
+  if (geoCache.has(key)) return geoCache.get(key);
+  const [y, m, d] = item.date.split('-').map(Number);
+  const [hh, mi] = (item.time || '12:00').split(':').map(Number);
+  const when = new Date(y, m - 1, d, hh, mi);
+  const r = judgeGeo(org, item.dest, { school: geo.school, north: geo.north, method: geo.method, southern: geo.southern, margin: Number(geo.margin), date: when });
+  let jd = { day: item.date, timeZone: 'Asia/Tokyo' };
+  if (TZL) { try { jd = HC.judgmentDay(when, geo.dayBasis, item.dest, TZL); } catch (e) {} }
+  const out = { r, okey, org, jday: jd.day, tz: jd.timeZone, labels: null };
+  const bs = kBirthStars();
+  if (bs && r.sector && r.judged) {
+    const [jy, jm, jdd] = jd.day.split('-').map(Number);
+    try {
+      const info = KK.dayInfo(jy, jm, jdd), k = KK.DIRS[r.sector.index];
+      out.labels = ['nichi', 'getsu', 'nen'].map(b => ({ ban: b, ...jBan(bs.hon, info, b)[k] }));
+    } catch (e) {}
+  }
+  geoCache.set(key, out);
+  return out;
+}
+function fmtKm(km) { return km < 10 ? km.toFixed(1) + 'km' : Math.round(km).toLocaleString('ja-JP') + 'km'; }
+function dirLineHTML(item) {
+  const g = itemGeo(item);
+  const name = item.dest.name ? ue(item.dest.name) : '行き先';
+  if (!g) return `<div class="dir-line"><span>行き先：${name}</span></div>`;
+  if (g.err) return `<div class="dir-line"><span>行き先：${name}</span><span class="dl-note">${esc(g.err)}</span></div>`;
+  const r = g.r;
+  if (r.undefined) return `<div class="dir-line"><span>行き先：${name}（${originName(g.okey)}から）</span><span class="dl-note">${esc(r.undefined)}</span></div>`;
+  const az = r.azimuth.toFixed(1) + '°';
+  let judge = '';
+  if (!r.judged) judge = '<span class="tag k-吉凶">境界のため判定しない</span>';
+  else if (!isOpen() && g.jday !== todayISO()) judge = '<span>吉凶は購入後にご覧になれます</span>';
+  else if (!g.labels) judge = '<span>生年月日を登録すると吉凶が出ます</span>';
+  else judge = g.labels.map(l => `<span class="tag k-${l.label}">${BAN_NAME[l.ban]} ${l.label}${l.ha ? '（' + l.ha + '）' : ''}</span>`).join('');
+  const notes = [...r.notes.filter(n => !/判定しない/.test(n))];
+  if (geo.north === 'magnetic' && r.declination) notes.push(`磁北で判定（偏角 ${Math.abs(r.declination.value).toFixed(1)}°${r.declination.value < 0 ? '西' : '東'}）`);
+  if (g.jday !== item.date) notes.push(`判定日は${geo.dayBasis === 'local' ? '現地時間' : '日本時間'}の${Number(g.jday.slice(5,7))}月${Number(g.jday.slice(8))}日`);
+  return `<div class="dir-line"><span>行き先：${name}（${originName(g.okey)}から）</span><span class="dl-dir">${r.sector.dir} ${az}・${fmtKm(r.distanceKm)}</span>${judge}${notes.length ? `<span class="dl-note">${esc(notes.join('。'))}</span>` : ''}</div>`;
+}
+
+// 起点と設定のパネル
+function renderGeoPanel() {
+  const box = document.getElementById('geo-origins');
+  box.innerHTML = ORIGIN_KEYS.map(k => {
+    const o = geo.origins[k];
+    const nm = k === 'other' ? `<input type="text" id="g-other-name" value="${esc(geo.otherName || 'その他')}" aria-label="三つ目の起点の名前" maxlength="12">` : originName(k);
+    return `<div class="geo-org"><div class="nm">${nm}</div>
+      <div class="at">${o ? ue(o.name || '') + `<br>${o.lat.toFixed(5)}, ${o.lon.toFixed(5)}` : '未登録'}</div>
+      <div class="btn-row" style="justify-content:flex-start;margin:0"><button type="button" class="btn-sm btn-primary" data-org-set="${k}">${o ? '変える' : '登録する'}</button>${o ? `<button type="button" class="btn-sm btn-cancel" data-org-del="${k}">消す</button>` : ''}</div></div>`;
+  }).join('');
+  box.querySelectorAll('[data-org-set]').forEach(b => b.addEventListener('click', () => openMap({ kind: 'origin', key: b.dataset.orgSet })));
+  box.querySelectorAll('[data-org-del]').forEach(b => b.addEventListener('click', () => { geo.origins[b.dataset.orgDel] = null; saveGeo(); renderGeoPanel(); renderAll(); }));
+  const on = document.getElementById('g-other-name');
+  if (on) on.addEventListener('change', () => { geo.otherName = on.value.trim() || 'その他'; saveGeo(); fillOriginSelects(); renderAll(); });
+  document.getElementById('g-school').value = geo.school;
+  document.getElementById('g-north').value = geo.north;
+  document.getElementById('g-method').value = geo.method;
+  document.getElementById('g-southern').value = geo.southern;
+  document.getElementById('g-margin').value = geo.margin;
+  document.getElementById('g-basis').value = geo.dayBasis;
+}
+[['g-school','school'],['g-north','north'],['g-method','method'],['g-southern','southern'],['g-basis','dayBasis']].forEach(([id, k]) =>
+  document.getElementById(id).addEventListener('change', e => { geo[k] = e.target.value; saveGeo(); renderAll(); showMsg('g-msg', '変えました。', true); }));
+document.getElementById('g-margin').addEventListener('change', e => {
+  const v = Number(e.target.value);
+  if (!(v >= 0 && v <= 10)) { showMsg('g-msg', '0〜10度の範囲で入れてください。'); e.target.value = geo.margin; return; }
+  geo.margin = v; saveGeo(); renderAll(); showMsg('g-msg', '変えました。', true);
+});
+
+// 追加欄・編集欄の行き先
+const destDraft = { f: null, e: null };
+function fillOriginSelects() {
+  ['f', 'e'].forEach(p => {
+    const sel = document.getElementById(p + '-origin'), cur = sel.value || 'home';
+    sel.innerHTML = ORIGIN_KEYS.map(k => `<option value="${k}">起点：${esc(originName(k))}${geo.origins[k] ? '' : '（未登録）'}</option>`).join('');
+    sel.value = cur;
+  });
+}
+function showDraft(p) {
+  const d = destDraft[p];
+  document.getElementById(p + '-dest-label').textContent = d ? `行き先：${d.name || ''}（${d.lat.toFixed(4)}, ${d.lon.toFixed(4)}）` : '行き先：なし';
+  document.getElementById(p + '-dest-clear').hidden = !d;
+}
+['f', 'e'].forEach(p => {
+  document.getElementById(p + '-dest-btn').addEventListener('click', () => openMap({ kind: 'dest', prefix: p }));
+  document.getElementById(p + '-dest-clear').addEventListener('click', () => { destDraft[p] = null; showDraft(p); });
+});
+
+// 地図の窓
+let lmap = null, lTiles = null, lTileKind = '', lPick = null, lOrg = null, lLine = null, lRays = [];
+let mapMode = null, pick = null, lastSearch = 0;
+const MAP_OK = !PERSONAL && !!window.L;   // claude.ai の中では外の地図画像を読めないため、座標の入力だけにする
+const inJP = (lat, lon) => lat >= 20 && lat <= 46 && lon >= 122 && lon <= 154;
+function setTiles(lat, lon) {
+  const kind = inJP(lat, lon) ? 'gsi' : 'osm';
+  if (kind === lTileKind) return;
+  if (lTiles) lmap.removeLayer(lTiles);
+  lTiles = kind === 'gsi'
+    ? L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank">国土地理院</a>' })
+    : L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>' });
+  lTiles.addTo(lmap); lTileKind = kind;
+}
+function geodesicPath(a, b, n) {   // 大圏の道筋（経度は連続させる）
+  const line = GEOD.InverseLine(a.lat, a.lon, b.lat, b.lon), pts = [];
+  for (let i = 0; i <= n; i++) { const p = line.Position(line.s13 * i / n, window.geodesic.Geodesic.STANDARD | window.geodesic.Geodesic.LONG_UNROLL); pts.push([p.lat2, p.lon2]); }
+  return pts;
+}
+function drawGuides() {
+  if (!lmap) return;
+  if (lLine) { lmap.removeLayer(lLine); lLine = null; }
+  lRays.forEach(x => lmap.removeLayer(x)); lRays = [];
+  if (lOrg) { lmap.removeLayer(lOrg); lOrg = null; }
+  if (!mapMode || mapMode.kind !== 'dest') return;
+  const okey = document.getElementById(mapMode.prefix + '-origin').value;
+  const org = geo.origins[okey];
+  if (!org) return;
+  lOrg = L.circleMarker([org.lat, org.lon], { radius: 7, color: '#1a3a5c', fillColor: '#1a3a5c', fillOpacity: 0.9 }).addTo(lmap).bindTooltip(originName(okey));
+  // 方位の境界線（流派の区切り。磁北のときは偏角の分だけ回す）
+  const dist = pick ? Math.max(30000, Math.min(4e6, GEOD.Inverse(org.lat, org.lon, pick.lat, pick.lon).s12 * 1.3)) : 60000;
+  let rot = 0;
+  if (geo.north === 'magnetic' && HC) { try { rot = HC.declination(org.lat, org.lon).value; } catch (e) {} }
+  HC.SCHOOLS[geo.school].start.forEach(b => {
+    const line = GEOD.DirectLine(org.lat, org.lon, b + rot, dist), pts = [];
+    for (let i = 0; i <= 24; i++) { const p = line.Position(dist * i / 24, window.geodesic.Geodesic.STANDARD | window.geodesic.Geodesic.LONG_UNROLL); pts.push([p.lat2, p.lon2]); }
+    lRays.push(L.polyline(pts, { color: '#b8960c', weight: 1.5, dashArray: '5 6', opacity: 0.9 }).addTo(lmap));
+  });
+  if (pick) lLine = L.polyline(geodesicPath(org, pick, 64), { color: '#8b2e2e', weight: 3 }).addTo(lmap);
+}
+function setPick(p, pan) {
+  pick = p;
+  document.getElementById('map-ok').disabled = !pick;
+  if (lmap && pick) {
+    if (!lPick) { lPick = L.marker([pick.lat, pick.lon], { draggable: true }).addTo(lmap); lPick.on('dragend', () => { const ll = lPick.getLatLng(); setPick({ lat: ll.lat, lon: L.Util.wrapNum(ll.lng, [-180, 180], true), name: '地図で選んだ地点' }, false); }); }
+    else lPick.setLatLng([pick.lat, pick.lon]);
+    if (pan) lmap.setView([pick.lat, pick.lon], Math.max(lmap.getZoom(), 13));
+    setTiles(pick.lat, pick.lon);
+  }
+  drawGuides(); showPick();
+}
+function showPick() {
+  const el = document.getElementById('map-pick');
+  if (!pick) { el.innerHTML = ''; return; }
+  let line = `<b>${pick.name ? ue(pick.name) : '選んだ地点'}</b>　${pick.lat.toFixed(5)}, ${pick.lon.toFixed(5)}`;
+  if (mapMode && mapMode.kind === 'dest' && judgeGeo) {
+    const okey = document.getElementById(mapMode.prefix + '-origin').value, org = geo.origins[okey];
+    if (!org) line += `<br>起点「${esc(originName(okey))}」が未登録です。先に「地図・起点」で登録すると、方位と距離が出ます。`;
+    else {
+      const r = judgeGeo(org, pick, { school: geo.school, north: geo.north, method: geo.method, southern: geo.southern, margin: Number(geo.margin) });
+      line += r.undefined ? `<br>${esc(r.undefined)}` : `<br>${esc(originName(okey))}から <b>${r.sector.dir}</b> ${r.azimuth.toFixed(1)}°・${fmtKm(r.distanceKm)}${r.judged ? '' : '（境界の近くのため判定しない）'}`;
+    }
+  }
+  el.innerHTML = line;
+}
+function openMap(mode) {
+  mapMode = mode;
+  const cur = mode.kind === 'origin' ? geo.origins[mode.key] : destDraft[mode.prefix];
+  document.getElementById('map-h').textContent = mode.kind === 'origin' ? `起点「${originName(mode.key)}」を選ぶ` : '行き先を選ぶ';
+  document.getElementById('map-results').innerHTML = '';
+  document.getElementById('map-q').value = '';
+  document.getElementById('map-ll').value = '';
+  document.getElementById('map-msg').textContent = MAP_OK ? '地図を押すか、住所・地名で探してください。印は動かせます。'
+    : (PERSONAL ? 'この画面（claude.ai の中）では、外の地図や住所検索を読み込めません。座標を貼って決めてください。Google マップなどで地点を右クリックすると、座標を写せます。'
+                : '地図を読み込めませんでした。座標を貼って決めてください。');
+  document.getElementById('geoMap').hidden = !MAP_OK;
+  document.querySelector('#map-modal .map-search').hidden = !MAP_OK;
+  document.getElementById('map-modal').hidden = false;
+  const start = cur || (mode.kind === 'dest' && geo.origins[document.getElementById(mode.prefix + '-origin').value]) || geo.origins.home || { lat: 35.6812, lon: 139.7671 };
+  if (MAP_OK) {
+    if (!lmap) {
+      lmap = L.map('geoMap', { worldCopyJump: true }).setView([start.lat, start.lon], 13);
+      lmap.on('click', e => setPick({ lat: e.latlng.lat, lon: L.Util.wrapNum(e.latlng.lng, [-180, 180], true), name: '地図で選んだ地点' }, false));
+      lmap.on('moveend', () => { const c = lmap.getCenter(); setTiles(c.lat, c.lng); });
+    }
+    setTimeout(() => { lmap.invalidateSize(); lmap.setView([start.lat, start.lon], cur ? 14 : 12); setTiles(start.lat, start.lon); }, 0);
+  }
+  if (lPick && lmap) { lmap.removeLayer(lPick); lPick = null; }
+  setPick(cur ? { ...cur } : null, false);
+  (MAP_OK ? document.getElementById('map-q') : document.getElementById('map-ll')).focus();
+}
+function closeMap() { document.getElementById('map-modal').hidden = true; mapMode = null; }
+document.getElementById('map-cancel').addEventListener('click', closeMap);
+document.getElementById('map-ok').addEventListener('click', () => {
+  if (!pick || !mapMode) return;
+  const p = { lat: +pick.lat.toFixed(6), lon: +pick.lon.toFixed(6), name: (pick.name || '').slice(0, 80) };
+  if (mapMode.kind === 'origin') { geo.origins[mapMode.key] = p; saveGeo(); renderGeoPanel(); fillOriginSelects(); renderAll(); }
+  else { destDraft[mapMode.prefix] = p; showDraft(mapMode.prefix); }
+  closeMap();
+});
+document.getElementById('map-ll-go').addEventListener('click', () => {
+  const m = document.getElementById('map-ll').value.match(/(-?\d+(?:\.\d+)?)\s*[,，、\s]\s*(-?\d+(?:\.\d+)?)/);
+  if (!m || Math.abs(+m[1]) > 90 || Math.abs(+m[2]) > 180) { document.getElementById('map-msg').textContent = '「緯度, 経度」の形で入れてください（例：35.6812, 139.7671）。'; return; }
+  setPick({ lat: +m[1], lon: +m[2], name: '座標で選んだ地点' }, true);
+});
+async function searchPlace() {
+  const q = document.getElementById('map-q').value.trim(), out = document.getElementById('map-results'), msg = document.getElementById('map-msg');
+  if (!q) return;
+  const wait = 1100 - (Date.now() - lastSearch);   // 地名検索の決まり（1秒に1回まで）を守る
+  if (wait > 0) await new Promise(r => setTimeout(r, wait));
+  lastSearch = Date.now();
+  msg.textContent = '探しています…'; out.innerHTML = '';
+  let hits = [];
+  try {   // 国内：国土地理院の住所検索
+    const r = await fetch('https://msearch.gsi.go.jp/address-search/AddressSearch?q=' + encodeURIComponent(q));
+    const j = await r.json();
+    hits = (j || []).slice(0, 6).map(x => ({ lat: x.geometry.coordinates[1], lon: x.geometry.coordinates[0], name: x.properties.title }));
+  } catch (e) {}
+  if (!hits.length) {
+    try {   // 海外や施設名：OpenStreetMap の Nominatim
+      const r = await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6&accept-language=' + (window.HOI_LANG === 'en' ? 'en' : 'ja') + '&q=' + encodeURIComponent(q));
+      const j = await r.json();
+      hits = (j || []).map(x => ({ lat: +x.lat, lon: +x.lon, name: x.display_name }));
+    } catch (e) {}
+  }
+  if (!hits.length) { msg.textContent = '見つかりませんでした。言い方を変えるか、地図を押して選んでください。'; return; }
+  msg.textContent = '候補から選んでください。';
+  out.innerHTML = hits.map((h, i) => `<button type="button" data-hit="${i}">${esc(h.name)}</button>`).join('');
+  out.querySelectorAll('[data-hit]').forEach(b => b.addEventListener('click', () => { setPick(hits[+b.dataset.hit], true); out.innerHTML = ''; }));
+}
+document.getElementById('map-go').addEventListener('click', searchPlace);
+document.getElementById('map-q').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); searchPlace(); } });
+document.getElementById('map-here').addEventListener('click', () => {
+  const msg = document.getElementById('map-msg');
+  if (!navigator.geolocation) { msg.textContent = 'この端末では現在地を使えません。'; return; }
+  msg.textContent = '現在地を確かめています…';
+  navigator.geolocation.getCurrentPosition(p => { setPick({ lat: p.coords.latitude, lon: p.coords.longitude, name: '現在地' }, true); msg.textContent = '現在地に印を置きました。'; },
+    () => { msg.textContent = '現在地を取れませんでした。ブラウザの位置情報の許可をご確認ください。'; }, { enableHighAccuracy: true, timeout: 10000 });
+});
+['f', 'e'].forEach(p => document.getElementById(p + '-origin').addEventListener('change', () => { if (mapMode && mapMode.prefix === p) { drawGuides(); showPick(); } }));
+fillOriginSelects();
+
+// ── データの書き出し・読み込み ─────────────────────
+document.getElementById('btn-export').addEventListener('click', async () => {
+  const data = { app: '方位予定帖', version: 1, exportedAt: new Date().toISOString(), items, kyusei: kProfile, license: lic };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  if (PERSONAL) {
+    try {
+      const dl = await window.claude.use('downloads');
+      if (!dl) throw new Error();
+      await dl.save({ filename: `hoi-yotei_${todayISO()}.json`, data: blob });
+      showMsg('d-msg', '書き出しました。', true);
+    } catch (e) { showMsg('d-msg', '書き出しを取りやめたか、この画面では保存できませんでした。'); }
+    return;
+  }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = `hoi-yotei_${todayISO()}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  showMsg('d-msg', '書き出しました。', true);
+});
+document.getElementById('f-import').addEventListener('change', async e => {
+  const file = e.target.files[0]; e.target.value = '';
+  if (!file) return;
+  try {
+    const data = JSON.parse(await file.text());
+    const inItems = data.items || (Array.isArray(data) ? Object.fromEntries(data.map(x => [x.id, x])) : null);
+    if (!inItems) throw new Error();
+    let n = 0;
+    Object.values(inItems).forEach(x => { if (x && x.id && x.date && !items[x.id]) { items[x.id] = x; pushItem(x.id); n++; } });
+    if (data.kyusei && data.kyusei.birth && !kProfile) { kProfile = data.kyusei; lsSet(ST_KYUSEI, kProfile); }
+    if (data.license && data.license.key && !isOpen()) { lic = data.license; lic.checkedAt = ''; lsSet(ST_LIC, lic); }
+    saveItems(); renderAll();
+    showMsg('d-msg', `${n}件の予定を読み込みました（同じ予定は重ねません）。`, true);
+  } catch (err) { showMsg('d-msg', 'このファイルは読み込めませんでした。方位予定帖で書き出したファイルを選んでください。'); }
+});
+
+// ── Google・Apple のカレンダーとのやり取り ─────────────
+const CX_NOTE = window.HOI_LANG === 'en' ? 'From Hōi Yotei-chō' : '方位予定帖より';
+function calLinksHTML(item) {
+  const g = (item.gcalId || item.src === 'google') ? '<span>Google に登録済み</span>'
+    : `<a href="${esc(HX.googleAddURL(item, { note: CX_NOTE }))}" target="_blank" rel="noopener">Google カレンダーに追加</a>`;
+  return `<div class="cal-links">${g}<button type="button" data-act="ics1" data-id="${item.id}">iPhone・Mac などに追加</button></div>`;
+}
+async function saveICS(list, filename, msgId) {
+  const text = HX.buildICS(list, { today: todayISO(), note: CX_NOTE });
+  const blob = new Blob([text], { type: 'text/calendar;charset=utf-8' });
+  if (PERSONAL) {
+    try {
+      const dl = await window.claude.use('downloads');
+      if (!dl) throw new Error();
+      await dl.save({ filename, data: blob });
+      if (msgId) showMsg(msgId, `${list.length}件を書き出しました。`, true);
+    } catch (e) { if (msgId) showMsg(msgId, '書き出しを取りやめたか、この画面では保存できませんでした。'); }
+    return;
+  }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  if (msgId) showMsg(msgId, `${list.length}件を書き出しました。`, true);
+}
+// 取り込んだ予定を、重ねずに加える
+function importItems(list) {
+  const seen = new Set(), gids = [];
+  Object.values(items).forEach(x => {
+    if (x.icsUid) seen.add(x.icsUid);
+    seen.add(x.id + '@hoi-yotei');
+    if (x.gcalId) { seen.add('g:' + x.gcalId); gids.push(x.gcalId); }
+  });
+  let n = 0, dup = 0;
+  const added = [];
+  list.forEach(x => {
+    const u = x.icsUid;
+    if (seen.has(u) || (x.gid && gids.some(g => x.gid === g || x.gid.startsWith(g + '_')))) { dup++; return; }
+    seen.add(u);
+    const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    items[id] = { id, ...x, done: !!x.done, createdAt: Date.now() };
+    added.push(id); n++;
+  });
+  if (n) { saveItems(); added.forEach(pushItem); renderAll(); }
+  return { n, dup };
+}
+function importReport(r, skipped) {
+  const parts = [`${r.n}件を取り込みました。`];
+  if (r.dup) parts.push(`すでにある${r.dup}件は重ねていません。`);
+  if (skipped.old) parts.push(`範囲より前の${skipped.old}件は入れていません。`);
+  if (skipped.cancelled) parts.push(`中止になった${skipped.cancelled}件は入れていません。`);
+  if (skipped.unsupported) parts.push(`時間単位の繰り返しなど、扱えない${skipped.unsupported}件は入れていません。`);
+  return parts.join('');
+}
+if (HX) {
+  document.getElementById('cx-export').addEventListener('click', () => {
+    const skip = document.getElementById('cx-skip-imported').checked;
+    const list = Object.values(items).filter(x => x.date && x.title && !(skip && x.src));
+    if (!list.length) { showMsg('cx-msg', '書き出す予定がありません。'); return; }
+    saveICS(list, `hoi-yotei_${todayISO()}.ics`, 'cx-msg');
+  });
+  document.getElementById('cx-import').addEventListener('change', async e => {
+    const files = [...e.target.files]; e.target.value = '';
+    if (!files.length) return;
+    showMsg('cx-msg', '読んでいます…', true);
+    // zip（Google の書き出し）は中の .ics を一つずつ取り出す。複数のアカウント・カレンダーをまとめて選べる
+    const cals = [], bad = [];
+    for (const f of files) {
+      try {
+        if (/\.zip$/i.test(f.name) || f.type === 'application/zip') {
+          const inner = await HX.readZip(await f.arrayBuffer());
+          if (!inner.length) bad.push(f.name);
+          inner.forEach(x => cals.push(x));
+        } else cals.push({ name: f.name, text: await f.text() });
+      } catch (err) { bad.push(f.name); }
+    }
+    const today = todayISO(), from = HX.rangeFrom(document.getElementById('cx-range').value, today);
+    const lines = [], tot = { n: 0, dup: 0 };
+    cals.forEach(c => {
+      if (!/BEGIN:VCALENDAR/i.test(c.text)) { bad.push(c.name); return; }
+      const cal = HX.calNameOf(c.text) || c.name.replace(/\.ics$/i, '');
+      const res = HX.toItems(HX.parseICS(c.text), { from, today, src: 'ics', cal });
+      const r = importItems(res.items);
+      tot.n += r.n; tot.dup += r.dup;
+      lines.push(`「${cal}」${r.n}件` + (r.dup ? `（重なり${r.dup}件は除く）` : ''));
+    });
+    if (!lines.length) { showMsg('cx-msg', 'このファイルは読み込めませんでした。カレンダーから書き出した .ics か、Google の書き出しの zip を選んでください。'); return; }
+    showMsg('cx-msg', `${cals.length - bad.length}つのカレンダーから、合わせて${tot.n}件を取り込みました。` + lines.join('、') + '。' + (bad.length ? `読めなかったもの：${bad.join('、')}` : ''), true);
+  });
+} else {
+  document.querySelectorAll('.cx-sec').forEach(x => x.hidden = true);
+}
+
+// 自分用：Google カレンダーと直接（claude.ai につないだ Google カレンダーを使う）
+const GX_SERVER = 'Google Calendar';
+function gxErr(e) {
+  const c = e && e.code;
+  if (c === 'needs_reauth') return 'Google カレンダーとのつながりが切れています。claude.ai の「設定」→「コネクタ」で Google カレンダーをつなぎ直してください。';
+  if (c === 'server_not_connected' || c === 'selection_required') return 'Google カレンダーが claude.ai につながっていません。claude.ai の「設定」→「コネクタ」で Google カレンダーを加えてください。';
+  if (c === 'not_in_manifest' || c === 'approval_required' || c === 'consent_required') return 'この予定帖から Google カレンダーを使う許可が出ていません。もう一度ボタンを押し、出てくる確認で「許可」を選んでください。';
+  if (c === 'blocked_by_policy') return '組織の設定で、Google カレンダーの利用が止められています。';
+  if (c === 'tool_error') return 'Google カレンダーが受け付けませんでした：' + String(e.message || '').slice(0, 120);
+  if (c === 'not_granted' || c === 'capability_disabled' || c === 'capability_removed') return 'この画面では Google カレンダーと直接やり取りできません。上のファイルでの受け渡しをお使いください。';
+  return 'Google カレンダーに届きませんでした。少し置いてから、もう一度お試しください。';
+}
+let gxMcp = null;
+async function gxUse() {
+  if (gxMcp) return gxMcp;
+  gxMcp = await window.claude.use('mcp');
+  return gxMcp;
+}
+const gxPayload = r => (r && r.payload !== undefined) ? r.payload : r;
+function gxCandidates() {
+  const today = todayISO();
+  return Object.values(items).filter(x => x.date && x.title && !x.gcalId && x.src !== 'google' && !x.done && (x.date >= today || (x.repeat && x.repeat !== 'none')));
+}
+function gxRefreshCount() {
+  const el = document.getElementById('gx-count');
+  if (el) { const n = gxCandidates().length; el.textContent = n ? `まだ送っていない今日以降の予定：${n}件` : 'まだ送っていない予定はありません'; }
+}
+if (PERSONAL && HX) {
+  document.getElementById('gx-sec').hidden = false;
+  // 窓を開いたら、カレンダーの一覧を自動で読む（初回だけ）
+  document.getElementById('btn-cal').addEventListener('click', () => {
+    gxRefreshCount();
+    if (!document.getElementById('calPanel').hidden && !document.querySelector('#gx-list [data-gcal]')) document.getElementById('gx-cals').click();
+  });
+  document.getElementById('gx-cals').addEventListener('click', async () => {
+    try {
+      const mcp = await gxUse(); if (!mcp) throw { code: 'not_granted' };
+      const res = gxPayload(await mcp.callTool(GX_SERVER, 'list_calendars', {}));
+      const list = (res && res.calendars) || [];
+      const sel = document.getElementById('gx-cal'), cur = sel.value;
+      sel.innerHTML = '<option value="">（主なカレンダー）</option>' + list.filter(c => !/#holiday@|#contacts@|#weeknum@/.test(c.id)).map(c => `<option value="${esc(c.id)}">${esc(c.summary || c.id)}</option>`).join('');
+      sel.value = cur;
+      // 祝日のカレンダーは予定帖に祝日があるので、最初は外しておく
+      document.getElementById('gx-list').innerHTML = list.map(c => `<label><input type="checkbox" data-gcal="${esc(c.id)}" data-gname="${esc(c.summary || c.id)}"${/#holiday@|#contacts@|#weeknum@/.test(c.id) ? '' : ' checked'}> ${esc(c.summary || c.id)}</label>`).join('');
+      showMsg('gx-msg', `${list.length}つのカレンダーが見えます。取り込むものに印を付けてください。`, true);
+    } catch (e) { showMsg('gx-msg', gxErr(e)); }
+  });
+  document.getElementById('gx-import').addEventListener('click', async () => {
+    const btn = document.getElementById('gx-import'); btn.disabled = true;
+    showMsg('gx-msg', 'Google カレンダーを読んでいます…', true);
+    try {
+      const mcp = await gxUse(); if (!mcp) throw { code: 'not_granted' };
+      const today = todayISO(), key = document.getElementById('cx-range').value;
+      const from = HX.rangeFrom(key, today), horizon = HX.addDaysISO(today, 366);
+      const boxes = [...document.querySelectorAll('#gx-list [data-gcal]')];
+      const cals = boxes.length ? boxes.filter(b => b.checked).map(b => ({ id: b.dataset.gcal, name: b.dataset.gname })) : [{ id: '', name: 'Google' }];
+      if (!cals.length) { showMsg('gx-msg', '取り込むカレンダーに印を付けてください。'); btn.disabled = false; return; }
+      const lines = []; let total = 0;
+      for (const c of cals) {
+        const evs = [];
+        let token = '', pages = 0;
+        do {
+          const input = { startTime: (from < '1970-01-01' ? '1970-01-01' : from) + 'T00:00:00', endTime: horizon + 'T00:00:00', pageSize: 250 };
+          if (c.id) input.calendarId = c.id;
+          if (token) input.pageToken = token;
+          const res = gxPayload(await mcp.callTool(GX_SERVER, 'list_events', input));
+          ((res && res.events) || []).forEach(g => { const x = HX.fromGoogle(g); if (x) evs.push(x); });
+          token = res && res.nextPageToken; pages++;
+          showMsg('gx-msg', `「${c.name}」を読んでいます…（${evs.length}件）`, true);
+        } while (token && pages < 40);
+        const res = HX.toItems(evs, { from, today, src: 'google', cal: c.name });
+        const r = importItems(res.items); total += r.n;
+        lines.push(`「${c.name}」${r.n}件` + (r.dup ? `（重なり${r.dup}件は除く）` : ''));
+      }
+      showMsg('gx-msg', `合わせて${total}件を取り込みました。` + lines.join('、') + '。', true);
+    } catch (e) { showMsg('gx-msg', gxErr(e)); }
+    btn.disabled = false; gxRefreshCount();
+  });
+  document.getElementById('gx-push').addEventListener('click', async () => {
+    const list = gxCandidates();
+    if (!list.length) { showMsg('gx-msg', '送る予定はありません。', true); return; }
+    const btn = document.getElementById('gx-push'); btn.disabled = true;
+    const cal = document.getElementById('gx-cal').value;
+    let sent = 0;
+    try {
+      const mcp = await gxUse(); if (!mcp) throw { code: 'not_granted' };
+      for (const it of list) {
+        showMsg('gx-msg', `Google カレンダーへ送っています…（${sent}/${list.length}件）`, true);
+        const res = gxPayload(await mcp.callTool(GX_SERVER, 'create_event', HX.googleCreateInput(it, { note: CX_NOTE, calendarId: cal || undefined })));
+        if (items[it.id]) { items[it.id].gcalId = (res && res.id) || 'sent'; pushItem(it.id); }
+        sent++;
+      }
+      saveItems(); renderAll();
+      showMsg('gx-msg', `${sent}件を Google カレンダーへ送りました。`, true);
+    } catch (e) {
+      saveItems(); renderAll();
+      const head = sent ? `${sent}件まで送ったところで止まりました。` : '';
+      const amb = (e && (e.code === 'server_unavailable' || e.code === 'upstream_error')) ? '最後の1件は Google 側に入っているかもしれません。Google カレンダーで確かめてから、もう一度押してください。' : '';
+      showMsg('gx-msg', head + gxErr(e) + amb);
+    }
+    btn.disabled = false; gxRefreshCount();
+  });
+}
+
+// ── 予定の入力 ─────────────────────────────────────
+document.getElementById('f-date').value = todayISO();
+document.getElementById('btn-add').addEventListener('click', () => {
+  const date = document.getElementById('f-date').value, title = document.getElementById('f-title').value.trim();
+  if (!date || !title) { showMsg('f-msg', '日付とタイトルを入れてください。'); return; }
+  showMsg('f-msg', '');
+  const time = document.getElementById('f-time').value, end = document.getElementById('f-end').value;
+  if (end && !time) { showMsg('f-msg', '終了時刻だけでは登録できません。開始時刻も入れてください。'); return; }
+  if (time && end && end < time) { showMsg('f-msg', '終了時刻が開始時刻より前になっています。'); return; }
+  addItem({ date, title, time, end, place: document.getElementById('f-place').value.trim(), repeat: document.getElementById('f-repeat').value, memo: document.getElementById('f-memo').value.trim(),
+    ...(destDraft.f ? { dest: destDraft.f, origin: document.getElementById('f-origin').value } : {}) });
+  destDraft.f = null; showDraft('f');
+  ['f-title','f-place','f-memo','f-time','f-end'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-repeat').value = 'none';
+  selDate = date; renderMonth();
+  document.getElementById('f-title').focus();
+});
+document.getElementById('f-title').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); document.getElementById('btn-add').click(); }
+});
+function openEdit(id) {
+  editNew = false; document.getElementById('edit-h').textContent = '予定を編集'; document.getElementById('btn-edit-save').textContent = '更新する';
+  if (document.getElementById('e-msg')) showMsg('e-msg', '');
+  const item = items[id]; if (!item) return;
+  editId = id;
+  document.getElementById('e-date').value = item.date;
+  document.getElementById('e-title').value = item.title || '';
+  document.getElementById('e-time').value = item.time || '';
+  document.getElementById('e-end').value = item.end || '';
+  document.getElementById('e-place').value = item.place || '';
+  document.getElementById('e-repeat').value = item.repeat || 'none';
+  document.getElementById('e-memo').value = item.memo || '';
+  destDraft.e = item.dest ? { ...item.dest } : null; showDraft('e');
+  fillOriginSelects(); document.getElementById('e-origin').value = item.origin || 'home';
+  document.getElementById('edit-modal').hidden = false;
+  document.getElementById('e-title').focus();
+}
+let editNew = false;   // true：日付の＋から開いた新規追加
+function openNew(iso) {
+  editId = null; editNew = true;
+  document.getElementById('edit-h').textContent = '予定を追加';
+  document.getElementById('btn-edit-save').textContent = '追加する';
+  document.getElementById('e-date').value = iso;
+  ['e-title','e-time','e-end','e-place','e-memo'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('e-repeat').value = 'none';
+  destDraft.e = null; showDraft('e'); fillOriginSelects(); document.getElementById('e-origin').value = 'home';
+  showMsg('e-msg', '');
+  document.getElementById('edit-modal').hidden = false;
+  document.getElementById('e-title').focus();
+}
+function closeEdit() {
+  document.getElementById('edit-modal').hidden = true; editId = null; editNew = false;
+  document.getElementById('edit-h').textContent = '予定を編集';
+  document.getElementById('btn-edit-save').textContent = '更新する';
+}
+(function () {   // 日付枠の＋（PCでもスマホでも）。日付の選択や盤の切り替えには渡さない
+  const cal = document.getElementById('cal');
+  cal.addEventListener('click', e => {
+    const a = e.target.closest('[data-add]');
+    if (!a) return;
+    e.stopPropagation(); e.preventDefault();
+    selDate = a.dataset.add; hbHide();
+    openNew(a.dataset.add);
+  }, true);
+  cal.addEventListener('keydown', e => {
+    const a = e.target.closest && e.target.closest('[data-add]');
+    if (a && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); e.stopPropagation(); openNew(a.dataset.add); }
+  }, true);
+})();
+document.getElementById('btn-edit-cancel').addEventListener('click', closeEdit);
+document.getElementById('btn-edit-save').addEventListener('click', () => {
+  if (!editId && !editNew) return;
+  const eDate = document.getElementById('e-date').value, eTitle = document.getElementById('e-title').value.trim();
+  const eTime = document.getElementById('e-time').value, eEnd = document.getElementById('e-end').value;
+  if (!eDate || !eTitle) { showMsg('e-msg', '日付とタイトルを入れてください。'); return; }
+  if (eEnd && !eTime) { showMsg('e-msg', '終了時刻だけでは登録できません。開始時刻も入れてください。'); return; }
+  if (eTime && eEnd && eEnd < eTime) { showMsg('e-msg', '終了時刻が開始時刻より前になっています。'); return; }
+  if (editNew) {
+    addItem({ date: eDate, title: eTitle, time: eTime, end: eTime ? eEnd : '', place: document.getElementById('e-place').value.trim(),
+      repeat: document.getElementById('e-repeat').value, memo: document.getElementById('e-memo').value.trim(),
+      ...(destDraft.e ? { dest: destDraft.e, origin: document.getElementById('e-origin').value } : {}) });
+    selDate = eDate; closeEdit(); renderMonth(); return;
+  }
+  updateItem(editId, { date: document.getElementById('e-date').value, title: document.getElementById('e-title').value.trim(),
+    time: document.getElementById('e-time').value, end: document.getElementById('e-time').value ? document.getElementById('e-end').value : '',
+    place: document.getElementById('e-place').value.trim(), repeat: document.getElementById('e-repeat').value, memo: document.getElementById('e-memo').value.trim(),
+    dest: destDraft.e || null, origin: destDraft.e ? document.getElementById('e-origin').value : null });
+  closeEdit();
+});
+
+
+// ── 年表示 ────────────────────────────────────────
+// 上段：暦年ごとの年盤（立春から翌年の立春の前日まで）を、本人の吉凶で色分けして並べる。
+// 下段：選んだ年の12か月。月の見出しは、その月に始まる節月の月盤の吉凶。日の色は選んだ盤の吉凶。
+const ST_YRBAN = 'hoi_yotei_yrban';
+let yrBan = lsGet(ST_YRBAN, 'getsu'); if (!['nichi','getsu','nen'].includes(yrBan)) yrBan = 'getsu';
+let yrSel = new Date().getFullYear(), yrStart = yrSel - 2;
+function yrInfo(y, m, d) { try { return KK.dayInfo(y, m, d); } catch (e) { return null; } }
+function lvOf(bs, info, ban) { return bs && info ? luckLevel(luckAvg(bs.hon, info, ban)) : ''; }
+function kichiOf(bs, info, ban) { if (!bs || !info) return []; const j = jBan(bs.hon, info, ban); return KK.DIRS.filter(k => j[k].label === '吉').map(k => KK.DIR_JA[k]); }
+function yearBoardHTML(y, bs) {
+  const info = yrInfo(y, 6, 15);   // 立春のあとの日なら、その暦年の年盤（歳破もその年の十二支）
+  if (!info) return '';
+  const rs = KK.setsuiri(y, 2), rn = KK.setsuiri(y + 1, 2);
+  const center = info.nen, ban = KK.ban(center), j = bs ? jBan(bs.hon, info, 'nen') : null;
+  let cells = '';
+  BAN_GRID.flat().forEach(k => {
+    if (k === 'C') { cells += `<div class="ban-cell c"><span class="ban-dir">中宮</span><span class="ban-st">${KK.SHORT[center-1]}</span></div>`; return; }
+    const r = j ? j[k] : null;
+    cells += `<div class="ban-cell ${r ? 'k-' + r.label : 'k-none'}"><span class="ban-dir">${KK.DIR_JA[k]}</span><span class="ban-st">${KK.SHORT[ban[k]-1]}</span>${r ? `<span class="ban-lb">${r.label}${r.ha ? '・' + r.ha : ''}</span>` : ''}</div>`;
+  });
+  let side = `<div class="houi-info">${y}年の年盤（${rs.m}月${rs.d}日の立春から、${y+1}年${rn.m}月${rn.d - 1}日まで）　中宮 ${KK.NAMES[center-1]}</div>`;
+  if (j) {
+    const rows = KK.DIRS.map(k => j[k]).sort((a,b) => a.score - b.score);
+    const kyou = rows.filter(r => r.kyou), kichi = rows.filter(r => r.label === '吉').map(r => r.dir);
+    side += `<div class="houi-info">本命星 <b>${KK.NAMES[bs.hon-1]}</b>　この年の吉方位：${kichi.length ? '<b>' + kichi.join('・') + '</b>' : 'なし'}</div>
+      ${kyou.length ? `<ul class="houi-reasons">${kyou.map(r => `<li><span class="tag k-${r.label}">${r.dir}</span><span><b>${r.label}</b>　${r.starName}が回る。${r.reasons.join('・')}</span></li>`).join('')}</ul>` : ''}
+      <div class="kset-note">引っ越し・家の新築・就職など、一年以上続く動きは年盤の吉方位を重く見ます。</div>`;
+  } else side += `<div class="kset-note">生年月日を登録すると、年ごとの吉凶と凶の理由が出ます。</div>`;
+  return `<div class="houi" style="margin-top:12px"><div class="houi-top"><h3>${y}年の年盤</h3></div>
+    <div class="houi-body"><div class="ban" role="img" aria-label="${y}年の年盤">${cells}</div><div style="display:grid;gap:10px;min-width:0">${side}</div></div></div>`;
+}
+function renderYear() {
+  if (!KK) return;
+  const open = isOpen(), bs = kBirthStars(), col = open && bs;
+  const nowY = new Date().getFullYear(), today = todayISO();
+  // 上段：暦年
+  document.getElementById('yr-note').innerHTML = !bs ? '生年月日を登録すると、年・月・日の吉凶が色で出ます。'
+    : !open ? '年盤・月盤の吉凶の色分けは、購入後にご覧になれます。星の並びは見られます。'
+    : '色は、その年の年盤の八方位の吉凶の平均です（年盤は立春で切り替わります）。札の方位は、その年の吉方位です。押すと、その年の年盤と12か月の暦が下に出ます。';
+  let tiles = '';
+  for (let y = yrStart; y < yrStart + 10; y++) {
+    const info = yrInfo(y, 6, 15); if (!info) continue;
+    const lv = col ? lvOf(bs, info, 'nen') : '', kd = col ? kichiOf(bs, info, 'nen') : [];
+    tiles += `<button type="button" class="yr-tile ${lv ? 'lvbg-' + lv : ''} ${y === yrSel ? 'is-sel' : ''} ${y === nowY ? 'is-now' : ''}" data-yr="${y}" aria-pressed="${y === yrSel}">
+      <span class="y">${y}年</span><span class="s">年盤 ${KK.SHORT[info.nen-1]}${lv ? `<span class="lvt cal-lv lv-${lv}">${LV_TEXT[lv]}</span>` : ''}</span>
+      ${col ? `<span class="k">${kd.length ? '吉 ' + kd.join('・') : '吉方位なし'}</span>` : ''}</button>`;
+  }
+  const strip = document.getElementById('yr-strip');
+  strip.innerHTML = tiles;
+  strip.querySelectorAll('[data-yr]').forEach(b => b.addEventListener('click', () => { yrSel = +b.dataset.yr; renderYear(); }));
+  // 選んだ年が見える位置まで横に送る（スマホの一列のとき）
+  const sel = strip.querySelector('.yr-tile.is-sel');
+  if (sel && strip.scrollWidth > strip.clientWidth) strip.scrollLeft = Math.max(0, sel.offsetLeft - strip.offsetLeft - 8);
+  document.getElementById('yr-board').innerHTML = open ? yearBoardHTML(yrSel, bs) : '';
+  // 下段：12か月
+  document.getElementById('yr-title').textContent = `${yrSel}年`;
+  const ctl = document.getElementById('yr-ctl');
+  ctl.innerHTML = col ? `<div class="luck-ctl"><span>日の色</span><div class="ban-tabs" role="group" aria-label="日の色">${[['nichi','日盤'],['getsu','月盤'],['nen','年盤']].map(([v,t]) =>
+    `<button type="button" data-yrban="${v}" aria-pressed="${v === yrBan}">${t}</button>`).join('')}</div><span>月の見出しの色は、その月に始まる月盤（節入りから）の吉凶です。</span></div>` : '';
+  ctl.querySelectorAll('[data-yrban]').forEach(b => b.addEventListener('click', () => { yrBan = b.dataset.yrban; lsSet(ST_YRBAN, yrBan); renderYear(); }));
+  const occ = occurrences(`${yrSel}-01-01`, `${yrSel}-12-31`), has = new Set(occ.map(x => x.date));
+  let html = '';
+  for (let m = 1; m <= 12; m++) {
+    const st = KK.setsuiri(yrSel, m), i20 = yrInfo(yrSel, m, 20);
+    const mlv = col ? lvOf(bs, i20, 'getsu') : '';
+    let cal = WEEKDAYS.map((w, i) => `<div class="ym-wd">${w}</div>`).join('');
+    const first = new Date(yrSel, m - 1, 1).getDay(), last = new Date(yrSel, m, 0).getDate();
+    for (let i = 0; i < first; i++) cal += '<div class="ym-d blank"></div>';
+    for (let d = 1; d <= last; d++) {
+      const iso = `${yrSel}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`, wd = (first + d - 1) % 7;
+      const info = col ? yrInfo(yrSel, m, d) : null, lv = col ? lvOf(bs, info, yrBan) : '';
+      const hol = holidayOf(iso), sw = st.d === d;
+      const cls = ['ym-d', hol ? 'hol' : wd === 0 ? 'sun' : wd === 6 ? 'sat' : '', lv ? 'lv-' + lv : '', iso === today ? 'is-today' : '', sw ? 'sw' : '', sw && m === 2 ? 'rs' : ''].join(' ');
+      cal += `<div class="${cls}" role="button" tabindex="0" data-ymd="${iso}" title="${m}月${d}日${hol ? ' ' + hol : ''}${sw ? '・' + st.name + (m === 2 ? '（年盤・月盤の切替）' : '（月盤の切替）') : ''}${lv ? '・' + BAN_NAME[yrBan] + ' ' + LV_TEXT[lv] : ''}">${d}${lv && lvText ? `<span class="t cal-lv lv-${lv}">${LV_TEXT[lv]}</span>` : ''}${has.has(iso) ? '<span class="dot"></span>' : ''}</div>`;
+    }
+    html += `<div class="ym"><button type="button" class="ym-head ${mlv ? 'lvbg-' + mlv : ''}" data-ym="${m}">
+      <span class="mn">${m}月</span><span class="sm">${st.name} ${st.d}日〜 月盤 ${i20 ? KK.SHORT[i20.getsu-1] : ''}</span>${mlv ? `<span class="lvt cal-lv lv-${mlv}">${LV_TEXT[mlv]}</span>` : ''}</button>
+      <div class="ym-cal">${cal}</div></div>`;
+  }
+  const grid = document.getElementById('yr-grid');
+  grid.innerHTML = html;
+  const toMonth = (y, m, iso) => { curY = y; curM = m - 1; if (iso) { selDate = iso; document.getElementById('f-date').value = iso; } setView('month'); };
+  grid.querySelectorAll('[data-ym]').forEach(b => b.addEventListener('click', () => toMonth(yrSel, +b.dataset.ym, null)));
+  grid.querySelectorAll('[data-ymd]').forEach(b => {
+    const go = () => { const [y, m] = b.dataset.ymd.split('-').map(Number); toMonth(y, m, b.dataset.ymd); };
+    b.addEventListener('click', go);
+    b.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+  });
+  document.getElementById('yr-legend').innerHTML = col ? `<div class="luck-legend"><span>色：八方位の吉凶の平均</span>
+    ${LUCK_LEVELS.map(l => `<span><span class="sw l-${l}"></span>「${LV_TEXT[l]}」${l}</span>`).join('')}
+    <span>日付の左の線は節入り（月盤の切替）、赤い線は立春（年盤も切替）。点は予定のある日。日付を押すと、その日の月表示へ移ります。</span>
+    <span>平均なので、凶の方位がある年・月・日も「良」になり得ます。行き先の方位は方位盤で確かめてください。</span>
+    <span>※${HA_NOTE}</span></div>` : '';
+}
+document.getElementById('yr-prev10').addEventListener('click', () => { yrStart -= 10; renderYear(); });
+document.getElementById('yr-next10').addEventListener('click', () => { yrStart += 10; renderYear(); });
+document.getElementById('yr-this').addEventListener('click', () => { yrSel = new Date().getFullYear(); yrStart = yrSel - 2; renderYear(); });
+document.getElementById('yr-prev').addEventListener('click', () => { yrSel--; if (yrSel < yrStart) yrStart -= 10; renderYear(); });
+document.getElementById('yr-next').addEventListener('click', () => { yrSel++; if (yrSel >= yrStart + 10) yrStart += 10; renderYear(); });
+function setView(v) { view = v; lsSet(ST_VIEW, v); renderAll(); }
+document.getElementById('tab-year').addEventListener('click', () => { if (view !== 'year') { yrSel = curY; yrStart = yrSel - 2; } setView('year'); });
+document.getElementById('tab-month').addEventListener('click', () => setView('month'));
+document.getElementById('tab-list').addEventListener('click', () => setView('list'));
+document.getElementById('m-prev').addEventListener('click', () => { curM--; if (curM < 0) { curM = 11; curY--; } renderMonth(); });
+document.getElementById('m-next').addEventListener('click', () => { curM++; if (curM > 11) { curM = 0; curY++; } renderMonth(); });
+document.getElementById('m-today').addEventListener('click', () => { const n = new Date(); curY = n.getFullYear(); curM = n.getMonth(); selDate = todayISO(); renderMonth(); });
+
+// 別のタブで変わったときに合わせる
+window.addEventListener('storage', e => {
+  if (e.key === ST_ITEMS) items = lsGet(ST_ITEMS, {}) || {};
+  if (e.key === ST_KYUSEI) kProfile = lsGet(ST_KYUSEI, null);
+  if (e.key === ST_LIC) lic = lsGet(ST_LIC, null);
+  renderAll();
+});
+
+if (PERSONAL) {
+  document.getElementById('btn-lic').hidden = true;
+  document.querySelector('header h1').textContent = '方位予定帖（自分用）';   // 自分用では英語への切り替えの印は出さない
+  const note = document.querySelector('#dataPanel .kset-note');
+  if (note) note.textContent = '予定と生年月日は同期先に保存し、どの端末でも同じものが見られます。書き出しは控えとしてお使いください。';
+  (async () => {
+    try {
+      const [dbx, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]);
+      if (!dbx) { setSync('err'); return; }
+      pdb = dbx; items = {};
+      pdb.collection('yotei').onSnapshot(snap => {
+        snap.docChanges().forEach(ch => {
+          if (ch.type === 'removed') delete items[ch.doc.id];
+          else items[ch.doc.id] = { id: ch.doc.id, ...ch.doc.data() };
+        });
+        saveItems(); setSync('ok'); renderAll();
+      }, () => setSync('err'));
+      const uid = user ? await user.id() : null;
+      if (uid) {
+        kDocRef = pdb.doc('data/users/' + uid + '/kyusei');
+        kDocRef.onSnapshot(snap => {
+          const v = snap && snap.exists ? snap.data() : null;
+          if (v && v.birth) { kProfile = { birth: v.birth, hour: v.hour ?? -1 }; hbIso = null; renderAll(); }
+        }, () => {});
+      }
+    } catch (e) { setSync('err'); }
+  })();
+}
+if (!KK) document.getElementById('lic-state').textContent = '暦の計算ファイルを読み込めませんでした。ページを開き直してください。';
+renderAll();
+
+</script>
+</body>
+</html>

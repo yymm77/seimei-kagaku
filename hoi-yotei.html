@@ -469,6 +469,8 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .request { border: 1px solid var(--border); background: var(--surface); border-radius: 10px; padding: 14px 16px; display: grid; gap: 8px; justify-items: start; }
 .koyomi-note .request a.btn-link { color: var(--fg); font-size: 13px; padding: 7px 16px; }
 header h1 { letter-spacing: .12em; }
+.lang-link { font-size: 11px; font-weight: 400; letter-spacing: 0; margin-left: 8px; color: inherit; opacity: .85; text-decoration: underline; vertical-align: 2px; }
+.cal-lv { white-space: nowrap; }
 
 /* 地図・起点・行き先 */
 .geo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 8px; }
@@ -503,7 +505,7 @@ header h1 { letter-spacing: .12em; }
 <div class="loading-bar" id="loading-bar" hidden></div>
 
 <header>
-  <h1>方位予定帖</h1>
+  <h1>方位予定帖 <a class="lang-link" href="hoi-yotei-en.html" hreflang="en" lang="en" translate="no">English</a></h1>
   <div class="head-right">
     <button type="button" id="btn-kset" class="btn-export" aria-expanded="false" aria-controls="kset">方位の設定</button>
     <button type="button" id="btn-geo" class="btn-export" aria-expanded="false" aria-controls="geoPanel">地図・起点</button>
@@ -864,6 +866,8 @@ function todayISO() { return toISO(new Date()); }
 function parseDate(s) { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); }
 function fmtDate(iso) { const d = parseDate(iso); return { month: `${d.getMonth()+1}月`, day: d.getDate(), wd: WEEKDAYS[d.getDay()] }; }
 function addDays(iso, n) { const d = parseDate(iso); d.setDate(d.getDate() + n); return toISO(d); }
+// 使う人が書いた文字（題・場所・メモなど）は、英語版の訳の対象から外す
+function ue(s) { return `<span translate="no">${esc(s)}</span>`; }
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 // ── 国民の祝日（祝日法による計算。春分・秋分は計算式、2022年以降を想定） ──
@@ -891,7 +895,8 @@ function holidaysOf(y) {
   });
   return (_holCache[y] = H);
 }
-function holidayOf(iso) { return holidaysOf(Number(iso.slice(0,4)))[iso] || ''; }
+// 英語版では日本の祝日は出さない（海外の方には意味が薄く、暦の欄を狭めるため）
+function holidayOf(iso) { return window.HOI_LANG === 'en' ? '' : (holidaysOf(Number(iso.slice(0,4)))[iso] || ''); }
 
 // ── 状態 ──────────────────────────────────────────
 let items = lsGet(ST_ITEMS, {}) || {};
@@ -1130,7 +1135,7 @@ function renderMonth() {
     const kd = d.getMonth() === curM ? kasaDirs(dInfo, bsM) : [];
     const cls = ['cal-day', d.getMonth() !== curM ? 'other' : '', iso === today ? 'is-today' : '', iso === selDate ? 'is-sel' : '', luckClass(iso, dInfo, bsM), kd.length ? 'kasa' : ''].join(' ');
     const numCls = hol ? 'hol' : wd === 0 ? 'sun' : wd === 6 ? 'sat' : '';
-    const shown = list.slice(0, 3).map(x => `<div class="chip ${x.done?'done':''}" data-item="${esc(x._virtual ? x.id.replace(/_[wm]\d+$/, '') : x.id)}" title="ドラッグで別の日へ移動・右クリックで完了／削除">${x.time ? `<span class="chip-t">${x.time}</span>` : ''}${esc(x.title||'')}</div>`).join('');
+    const shown = list.slice(0, 3).map(x => `<div class="chip ${x.done?'done':''}" data-item="${esc(x._virtual ? x.id.replace(/_[wm]\d+$/, '') : x.id)}" title="ドラッグで別の日へ移動・右クリックで完了／削除">${x.time ? `<span class="chip-t">${x.time}</span>` : ''}${ue(x.title||'')}</div>`).join('');
     const more = list.length > 3 ? `<div class="chip-more">ほか${list.length-3}件</div>` : '';
     html += `<div role="button" tabindex="0" class="${cls}" data-date="${iso}" aria-label=""${d.getMonth()+1}月${d.getDate()}日（${WEEKDAYS[wd]}）${hol?' '+hol:''} 予定${list.length}件">
       <span class="cal-num ${numCls}">${d.getDate()}${hol ? `<span class="cal-hol">${hol}</span>` : ''}${lvTextHTML(luckLv(iso, dInfo, bsM))}${starOf(d)}</span>${switchHTML(dInfo)}${kd.length ? `<span class="kasa-badge" title="吉の重なる方位">吉 ${kd.join('・')}</span>` : ''}${shown}${more}<span class="cal-add" role="button" tabindex="0" data-add="${iso}" aria-label="${d.getMonth()+1}月${d.getDate()}日に予定を追加" title="この日に予定を追加">＋</span></div>`;
@@ -1205,9 +1210,9 @@ function renderItem(item, today) {
     <div class="yotei-date-col"><div class="yotei-month">${month}</div><div class="yotei-day">${day}</div><div class="yotei-weekday">(${wd})</div></div>
     <div class="yotei-body">
       ${item.time ? `<div class="yotei-time">${timeLabel(item)}</div>` : ''}
-      <div class="yotei-title">${esc(item.title || '')}${item.src ? `<span class="cal-src">${esc(item.cal || (item.src === 'google' ? 'Google' : 'カレンダー'))}</span>` : ''}</div>
-      ${item.place ? `<div class="yotei-sub">場所：${esc(item.place)}</div>` : ''}
-      ${item.memo ? `<div class="yotei-memo">${esc(item.memo)}</div>` : ''}
+      <div class="yotei-title">${ue(item.title || '')}${item.src ? `<span class="cal-src">${item.cal ? ue(item.cal) : (item.src === 'google' ? 'Google' : 'カレンダー')}</span>` : ''}</div>
+      ${item.place ? `<div class="yotei-sub">場所：${ue(item.place)}</div>` : ''}
+      ${item.memo ? `<div class="yotei-memo">${ue(item.memo)}</div>` : ''}
       ${item.repeat && item.repeat !== 'none' ? `<span class="yotei-repeat">${item.repeat==='weekly'?'毎週':'毎月'}</span>` : ''}
       ${item.dest ? dirLineHTML(item) : ''}
       ${!item._virtual && HX ? calLinksHTML(item) : ''}
@@ -1440,7 +1445,7 @@ let drag = null, dragJustEnded = false;
     e.preventDefault(); hbHide(); closeCtx();
     const rep = it.repeat === 'weekly' || it.repeat === 'monthly';
     const m = document.createElement('div'); m.className = 'ctx-menu'; m.id = 'ctx-menu'; m.setAttribute('role', 'menu');
-    m.innerHTML = `<div class="ctx-t">${esc(it.title || '予定')}${rep ? '（繰り返し全体）' : ''}</div>
+    m.innerHTML = `<div class="ctx-t">${it.title ? ue(it.title) : '予定'}${rep ? '（繰り返し全体）' : ''}</div>
       <button type="button" role="menuitem" data-ctx="done">${it.done ? '未完了に戻す' : '完了にする'}</button>
       <button type="button" role="menuitem" data-ctx="del" class="del">削除する</button>`;
     document.body.appendChild(m);
@@ -1636,7 +1641,7 @@ function itemGeo(item) {
 function fmtKm(km) { return km < 10 ? km.toFixed(1) + 'km' : Math.round(km).toLocaleString('ja-JP') + 'km'; }
 function dirLineHTML(item) {
   const g = itemGeo(item);
-  const name = esc(item.dest.name || '行き先');
+  const name = item.dest.name ? ue(item.dest.name) : '行き先';
   if (!g) return `<div class="dir-line"><span>行き先：${name}</span></div>`;
   if (g.err) return `<div class="dir-line"><span>行き先：${name}</span><span class="dl-note">${esc(g.err)}</span></div>`;
   const r = g.r;
@@ -1660,7 +1665,7 @@ function renderGeoPanel() {
     const o = geo.origins[k];
     const nm = k === 'other' ? `<input type="text" id="g-other-name" value="${esc(geo.otherName || 'その他')}" aria-label="三つ目の起点の名前" maxlength="12">` : originName(k);
     return `<div class="geo-org"><div class="nm">${nm}</div>
-      <div class="at">${o ? esc(o.name || '') + `<br>${o.lat.toFixed(5)}, ${o.lon.toFixed(5)}` : '未登録'}</div>
+      <div class="at">${o ? ue(o.name || '') + `<br>${o.lat.toFixed(5)}, ${o.lon.toFixed(5)}` : '未登録'}</div>
       <div class="btn-row" style="justify-content:flex-start;margin:0"><button type="button" class="btn-sm btn-primary" data-org-set="${k}">${o ? '変える' : '登録する'}</button>${o ? `<button type="button" class="btn-sm btn-cancel" data-org-del="${k}">消す</button>` : ''}</div></div>`;
   }).join('');
   box.querySelectorAll('[data-org-set]').forEach(b => b.addEventListener('click', () => openMap({ kind: 'origin', key: b.dataset.orgSet })));
@@ -1755,7 +1760,7 @@ function setPick(p, pan) {
 function showPick() {
   const el = document.getElementById('map-pick');
   if (!pick) { el.innerHTML = ''; return; }
-  let line = `<b>${esc(pick.name || '選んだ地点')}</b>　${pick.lat.toFixed(5)}, ${pick.lon.toFixed(5)}`;
+  let line = `<b>${pick.name ? ue(pick.name) : '選んだ地点'}</b>　${pick.lat.toFixed(5)}, ${pick.lon.toFixed(5)}`;
   if (mapMode && mapMode.kind === 'dest' && judgeGeo) {
     const okey = document.getElementById(mapMode.prefix + '-origin').value, org = geo.origins[okey];
     if (!org) line += `<br>起点「${esc(originName(okey))}」が未登録です。先に「地図・起点」で登録すると、方位と距離が出ます。`;
@@ -1821,7 +1826,7 @@ async function searchPlace() {
   } catch (e) {}
   if (!hits.length) {
     try {   // 海外や施設名：OpenStreetMap の Nominatim
-      const r = await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6&accept-language=ja&q=' + encodeURIComponent(q));
+      const r = await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6&accept-language=' + (window.HOI_LANG === 'en' ? 'en' : 'ja') + '&q=' + encodeURIComponent(q));
       const j = await r.json();
       hits = (j || []).map(x => ({ lat: +x.lat, lon: +x.lon, name: x.display_name }));
     } catch (e) {}
@@ -1879,7 +1884,7 @@ document.getElementById('f-import').addEventListener('change', async e => {
 });
 
 // ── Google・Apple のカレンダーとのやり取り ─────────────
-const CX_NOTE = '方位予定帖より';
+const CX_NOTE = window.HOI_LANG === 'en' ? 'From Hōi Yotei-chō' : '方位予定帖より';
 function calLinksHTML(item) {
   const g = (item.gcalId || item.src === 'google') ? '<span>Google に登録済み</span>'
     : `<a href="${esc(HX.googleAddURL(item, { note: CX_NOTE }))}" target="_blank" rel="noopener">Google カレンダーに追加</a>`;
@@ -2283,7 +2288,7 @@ window.addEventListener('storage', e => {
 
 if (PERSONAL) {
   document.getElementById('btn-lic').hidden = true;
-  document.querySelector('header h1').textContent = '方位予定帖（自分用）';
+  document.querySelector('header h1').textContent = '方位予定帖（自分用）';   // 自分用では英語への切り替えの印は出さない
   const note = document.querySelector('#dataPanel .kset-note');
   if (note) note.textContent = '予定と生年月日は同期先に保存し、どの端末でも同じものが見られます。書き出しは控えとしてお使いください。';
   (async () => {
