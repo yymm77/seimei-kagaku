@@ -196,6 +196,15 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .yotei-body { flex: 1; min-width: 0; }
 .yotei-title { font-weight: 700; font-size: 15px; }
 .yotei-sub   { font-size: 12px; color: var(--fg-muted); margin-top: 2px; }
+.cal-links { font-size: 11px; color: var(--fg-muted); margin-top: 4px; display: flex; flex-wrap: wrap; gap: 2px 8px; align-items: center; }
+.cal-links a, .cal-links button { font-size: 11px; color: var(--accent); background: none; border: none; padding: 0; cursor: pointer; text-decoration: underline; font-family: inherit; }
+.cal-src { font-size: 10px; color: var(--fg-muted); border: 1px solid var(--border); border-radius: 3px; padding: 0 4px; margin-left: 4px; }
+.cx-sec { border-top: 1px solid var(--border); margin-top: 14px; padding-top: 12px; }
+.cx-sec h3 { font-size: 13px; margin: 0 0 6px; }
+.cx-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0; font-size: 12px; }
+.cx-row select { font-size: 12px; }
+.cx-help { font-size: 11px; color: var(--fg-muted); line-height: 1.7; }
+.cx-help summary { cursor: pointer; }
 .yotei-memo  { font-size: 12px; color: var(--fg-muted); margin-top: 4px; white-space: pre-wrap; }
 .yotei-repeat {
   display: inline-block; background: var(--tag-bg); color: var(--tag-fg);
@@ -553,6 +562,50 @@ header h1 { letter-spacing: .12em; }
       <label class="btn-cancel btn-file">読み込む<input type="file" id="f-import" accept="application/json,.json" hidden></label>
       <span class="form-msg" id="d-msg"></span>
     </div>
+    <div class="cx-sec">
+      <h3>Google・Apple のカレンダーとやり取りする</h3>
+      <div class="kset-note">カレンダー用のファイル（.ics）で受け渡します。Google カレンダーにも、iPhone・Mac のカレンダーにも使えます。</div>
+      <div class="cx-row">
+        <button type="button" class="btn-primary btn-sm" id="cx-export">予定帖 → カレンダー用に書き出す</button>
+        <label><input type="checkbox" id="cx-skip-imported" checked> カレンダーから取り込んだ予定は含めない</label>
+      </div>
+      <div class="cx-row">
+        <label>取り込む範囲
+          <select id="cx-range">
+            <option value="1y">1年前から</option>
+            <option value="3m">3か月前から</option>
+            <option value="thisyear">今年の1月から</option>
+            <option value="all">すべて</option>
+            <option value="future">これからの予定だけ</option>
+          </select></label>
+        <label class="btn-cancel btn-file btn-sm">カレンダー → 予定帖に取り込む<input type="file" id="cx-import" accept=".ics,text/calendar" hidden></label>
+      </div>
+      <div class="form-msg" id="cx-msg"></div>
+      <details class="cx-help"><summary>カレンダー側の操作</summary>
+        <div><b>Google カレンダーへ入れる</b>：パソコンで Google カレンダーを開き、右上の歯車 →「設定」→「インポート / エクスポート」→「インポート」で、書き出したファイルを選びます。</div>
+        <div><b>Google カレンダーから出す</b>：同じ画面の「エクスポート」で zip ファイルが届きます。開くと中に .ics があるので、それを予定帖で取り込みます。</div>
+        <div><b>iPhone・Mac のカレンダーへ入れる</b>：書き出したファイルを開くと、カレンダーに追加するか尋ねられます。</div>
+        <div><b>Mac のカレンダーから出す</b>：カレンダーの一覧で書き出したいカレンダーを選び、「ファイル」→「書き出す」→「書き出す」で .ics ができます。iPhone だけをお使いの場合は、iCloud のカレンダーを Mac か Google カレンダーに読み込んでから書き出してください。</div>
+        <div>一度取り込んだ予定は、もう一度取り込んでも重ねません。過去の予定は「済」として入り、その日の方位盤と見比べられます。毎週・毎月の予定は予定帖の繰り返しに、それ以外の繰り返しは1年先までを一件ずつ入れます。</div>
+      </details>
+    </div>
+    <div class="cx-sec" id="gx-sec" hidden>
+      <h3>Google カレンダーと直接やり取りする（自分用）</h3>
+      <div class="kset-note">claude.ai につないである Google カレンダーと、ファイルを使わずに直接やり取りします。</div>
+      <div class="cx-row">
+        <label>カレンダー <select id="gx-cal"><option value="">（主なカレンダー）</option></select></label>
+        <button type="button" class="btn-cancel btn-sm" id="gx-cals">一覧を読む</button>
+      </div>
+      <div class="cx-row">
+        <button type="button" class="btn-primary btn-sm" id="gx-import">Google → 予定帖に取り込む</button>
+        <span class="kset-note">範囲は上の「取り込む範囲」に従います</span>
+      </div>
+      <div class="cx-row">
+        <button type="button" class="btn-primary btn-sm" id="gx-push">予定帖 → Google に送る</button>
+        <span class="kset-note" id="gx-count"></span>
+      </div>
+      <div class="form-msg" id="gx-msg"></div>
+    </div>
     <div class="btn-row"><button type="button" class="btn-cancel" id="d-close">閉じる</button></div>
   </div>
 
@@ -704,6 +757,7 @@ header h1 { letter-spacing: .12em; }
 <script src="vendor/tz-lookup.js"></script>
 <script src="houi_calc.js?v=20261020a"></script>
 <script src="kyusei_koyomi.js?v=20261020b"></script>
+<script src="hoi_ics.js?v=20261022a"></script>
 <script>
 // ====================================================
 // 方位予定帖 — 予定は端末に保存、方位盤は解錠番号で開く
@@ -718,6 +772,7 @@ const KK = window.KyuseiKoyomi || null;
 // 自分用：claude.ai の中で開いたとき（window.claude がある）。予定と生年月日を同期し、購入の鍵は付けない。
 // 販売用（GitHub Pages）では window.claude がないので、これまでどおり端末保存＋解錠番号で動く。
 const PERSONAL = !!(window.claude && typeof window.claude.use === 'function');
+const HX = window.HoiICS || null;   // カレンダーとのやり取り（hoi_ics.js）
 let pdb = null, kDocRef = null;   // 自分用の同期先（予定：yotei コレクション、生年月日：本人専用の場所）
 const WEEKDAYS = ['日','月','火','水','木','金','土'];
 const ST_ITEMS = 'hoi_yotei_items', ST_KYUSEI = 'hoi_yotei_kyusei', ST_LIC = 'hoi_yotei_license';
@@ -1032,7 +1087,7 @@ function renderList() {
   const doneArea = document.getElementById('done-area');
   const lo = all.reduce((m,x) => x.date && x.date < m ? x.date : m, today);
   const expanded = occurrences(lo, addDays(today, 90));
-  const active = expanded.filter(x => !x.done).sort((a,b) => a.date.localeCompare(b.date) || timeKey(a).localeCompare(timeKey(b)));
+  const active = expanded.filter(x => !x.done && !(x.date < today && (x._virtual || (x.repeat && x.repeat !== 'none')))).sort((a,b) => a.date.localeCompare(b.date) || timeKey(a).localeCompare(timeKey(b)));
   const done = all.filter(x => x.done).sort((a,b) => b.date.localeCompare(a.date)).slice(0,10);
   if (active.length === 0) {
     listArea.innerHTML = '<div class="empty-msg">予定はまだありません。上の欄に日付とタイトルを入れて「追加する」を押してください。</div>';
@@ -1071,11 +1126,12 @@ function renderItem(item, today) {
     <div class="yotei-date-col"><div class="yotei-month">${month}</div><div class="yotei-day">${day}</div><div class="yotei-weekday">(${wd})</div></div>
     <div class="yotei-body">
       ${item.time ? `<div class="yotei-time">${timeLabel(item)}</div>` : ''}
-      <div class="yotei-title">${esc(item.title || '')}</div>
+      <div class="yotei-title">${esc(item.title || '')}${item.src ? `<span class="cal-src">${item.src === 'google' ? 'Google' : 'カレンダー'}から</span>` : ''}</div>
       ${item.place ? `<div class="yotei-sub">場所：${esc(item.place)}</div>` : ''}
       ${item.memo ? `<div class="yotei-memo">${esc(item.memo)}</div>` : ''}
       ${item.repeat && item.repeat !== 'none' ? `<span class="yotei-repeat">${item.repeat==='weekly'?'毎週':'毎月'}</span>` : ''}
       ${item.dest ? dirLineHTML(item) : ''}
+      ${!item._virtual && HX ? calLinksHTML(item) : ''}
     </div>
     ${actions}
   </li>`;
@@ -1155,6 +1211,7 @@ function wirePanel(root) {
     else if (a === 'ask') { pendingDelete = id; renderAll(); }
     else if (a === 'nodel') { pendingDelete = null; renderAll(); }
     else if (a === 'del') { pendingDelete = null; deleteItem(id); }
+    else if (a === 'ics1' && items[id]) saveICS([items[id]], `${items[id].date}_${(items[id].title || 'yotei').replace(/[\\/:*?"<>|\s]+/g, '_').slice(0, 30)}.ics`, null);
   }));
 }
 
@@ -1740,6 +1797,172 @@ document.getElementById('f-import').addEventListener('change', async e => {
     showMsg('d-msg', `${n}件の予定を読み込みました（同じ予定は重ねません）。`, true);
   } catch (err) { showMsg('d-msg', 'このファイルは読み込めませんでした。方位予定帖で書き出したファイルを選んでください。'); }
 });
+
+// ── Google・Apple のカレンダーとのやり取り ─────────────
+const CX_NOTE = '方位予定帖より';
+function calLinksHTML(item) {
+  const g = (item.gcalId || item.src === 'google') ? '<span>Google に登録済み</span>'
+    : `<a href="${esc(HX.googleAddURL(item, { note: CX_NOTE }))}" target="_blank" rel="noopener">Google カレンダーに追加</a>`;
+  return `<div class="cal-links">${g}<button type="button" data-act="ics1" data-id="${item.id}">iPhone・Mac などに追加</button></div>`;
+}
+async function saveICS(list, filename, msgId) {
+  const text = HX.buildICS(list, { today: todayISO(), note: CX_NOTE });
+  const blob = new Blob([text], { type: 'text/calendar;charset=utf-8' });
+  if (PERSONAL) {
+    try {
+      const dl = await window.claude.use('downloads');
+      if (!dl) throw new Error();
+      await dl.save({ filename, data: blob });
+      if (msgId) showMsg(msgId, `${list.length}件を書き出しました。`, true);
+    } catch (e) { if (msgId) showMsg(msgId, '書き出しを取りやめたか、この画面では保存できませんでした。'); }
+    return;
+  }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  if (msgId) showMsg(msgId, `${list.length}件を書き出しました。`, true);
+}
+// 取り込んだ予定を、重ねずに加える
+function importItems(list) {
+  const seen = new Set(), gids = [];
+  Object.values(items).forEach(x => {
+    if (x.icsUid) seen.add(x.icsUid);
+    seen.add(x.id + '@hoi-yotei');
+    if (x.gcalId) { seen.add('g:' + x.gcalId); gids.push(x.gcalId); }
+  });
+  let n = 0, dup = 0;
+  const added = [];
+  list.forEach(x => {
+    const u = x.icsUid;
+    if (seen.has(u) || (u.startsWith('g:') && gids.some(g => u.startsWith('g:' + g + '_')))) { dup++; return; }
+    seen.add(u);
+    const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    items[id] = { id, ...x, done: !!x.done, createdAt: Date.now() };
+    added.push(id); n++;
+  });
+  if (n) { saveItems(); added.forEach(pushItem); renderAll(); }
+  return { n, dup };
+}
+function importReport(r, skipped) {
+  const parts = [`${r.n}件を取り込みました。`];
+  if (r.dup) parts.push(`すでにある${r.dup}件は重ねていません。`);
+  if (skipped.old) parts.push(`範囲より前の${skipped.old}件は入れていません。`);
+  if (skipped.cancelled) parts.push(`中止になった${skipped.cancelled}件は入れていません。`);
+  if (skipped.unsupported) parts.push(`時間単位の繰り返しなど、扱えない${skipped.unsupported}件は入れていません。`);
+  return parts.join('');
+}
+if (HX) {
+  document.getElementById('cx-export').addEventListener('click', () => {
+    const skip = document.getElementById('cx-skip-imported').checked;
+    const list = Object.values(items).filter(x => x.date && x.title && !(skip && x.src));
+    if (!list.length) { showMsg('cx-msg', '書き出す予定がありません。'); return; }
+    saveICS(list, `hoi-yotei_${todayISO()}.ics`, 'cx-msg');
+  });
+  document.getElementById('cx-import').addEventListener('change', async e => {
+    const file = e.target.files[0]; e.target.value = '';
+    if (!file) return;
+    try {
+      const text = await file.text();
+      if (!/BEGIN:VCALENDAR/i.test(text)) throw new Error('not ics');
+      const today = todayISO(), from = HX.rangeFrom(document.getElementById('cx-range').value, today);
+      const res = HX.toItems(HX.parseICS(text), { from, today, src: 'ics' });
+      showMsg('cx-msg', importReport(importItems(res.items), res.skipped), true);
+    } catch (err) { showMsg('cx-msg', 'このファイルは読み込めませんでした。カレンダーから書き出した .ics ファイルを選んでください（Google の場合は zip を開いた中にあります）。'); }
+  });
+} else {
+  document.querySelectorAll('.cx-sec').forEach(x => x.hidden = true);
+}
+
+// 自分用：Google カレンダーと直接（claude.ai につないだ Google カレンダーを使う）
+const GX_SERVER = 'Google Calendar';
+function gxErr(e) {
+  const c = e && e.code;
+  if (c === 'needs_reauth') return 'Google カレンダーとのつながりが切れています。claude.ai の「設定」→「コネクタ」で Google カレンダーをつなぎ直してください。';
+  if (c === 'server_not_connected' || c === 'selection_required') return 'Google カレンダーが claude.ai につながっていません。claude.ai の「設定」→「コネクタ」で Google カレンダーを加えてください。';
+  if (c === 'not_in_manifest' || c === 'approval_required' || c === 'consent_required') return 'この予定帖から Google カレンダーを使う許可が出ていません。もう一度ボタンを押し、出てくる確認で「許可」を選んでください。';
+  if (c === 'blocked_by_policy') return '組織の設定で、Google カレンダーの利用が止められています。';
+  if (c === 'tool_error') return 'Google カレンダーが受け付けませんでした：' + String(e.message || '').slice(0, 120);
+  if (c === 'not_granted' || c === 'capability_disabled' || c === 'capability_removed') return 'この画面では Google カレンダーと直接やり取りできません。上のファイルでの受け渡しをお使いください。';
+  return 'Google カレンダーに届きませんでした。少し置いてから、もう一度お試しください。';
+}
+let gxMcp = null;
+async function gxUse() {
+  if (gxMcp) return gxMcp;
+  gxMcp = await window.claude.use('mcp');
+  return gxMcp;
+}
+const gxPayload = r => (r && r.payload !== undefined) ? r.payload : r;
+function gxCandidates() {
+  const today = todayISO();
+  return Object.values(items).filter(x => x.date && x.title && !x.gcalId && x.src !== 'google' && !x.done && (x.date >= today || (x.repeat && x.repeat !== 'none')));
+}
+function gxRefreshCount() {
+  const el = document.getElementById('gx-count');
+  if (el) { const n = gxCandidates().length; el.textContent = n ? `まだ送っていない今日以降の予定：${n}件` : 'まだ送っていない予定はありません'; }
+}
+if (PERSONAL && HX) {
+  document.getElementById('gx-sec').hidden = false;
+  document.getElementById('btn-data').addEventListener('click', gxRefreshCount);
+  document.getElementById('gx-cals').addEventListener('click', async () => {
+    try {
+      const mcp = await gxUse(); if (!mcp) throw { code: 'not_granted' };
+      const res = gxPayload(await mcp.callTool(GX_SERVER, 'list_calendars', {}));
+      const sel = document.getElementById('gx-cal'), cur = sel.value;
+      sel.innerHTML = '<option value="">（主なカレンダー）</option>' + ((res && res.calendars) || []).map(c => `<option value="${esc(c.id)}">${esc(c.summary || c.id)}</option>`).join('');
+      sel.value = cur;
+      showMsg('gx-msg', 'カレンダーの一覧を読みました。', true);
+    } catch (e) { showMsg('gx-msg', gxErr(e)); }
+  });
+  document.getElementById('gx-import').addEventListener('click', async () => {
+    const btn = document.getElementById('gx-import'); btn.disabled = true;
+    showMsg('gx-msg', 'Google カレンダーを読んでいます…', true);
+    try {
+      const mcp = await gxUse(); if (!mcp) throw { code: 'not_granted' };
+      const today = todayISO(), key = document.getElementById('cx-range').value;
+      const from = HX.rangeFrom(key, today), horizon = HX.addDaysISO(today, 366);
+      const cal = document.getElementById('gx-cal').value;
+      const evs = [];
+      let token = '', pages = 0;
+      do {
+        const input = { startTime: (from < '1970-01-01' ? '1970-01-01' : from) + 'T00:00:00', endTime: horizon + 'T00:00:00', pageSize: 250 };
+        if (cal) input.calendarId = cal;
+        if (token) input.pageToken = token;
+        const res = gxPayload(await mcp.callTool(GX_SERVER, 'list_events', input));
+        ((res && res.events) || []).forEach(g => { const x = HX.fromGoogle(g); if (x) evs.push(x); });
+        token = res && res.nextPageToken; pages++;
+        if (token) showMsg('gx-msg', `Google カレンダーを読んでいます…（${evs.length}件）`, true);
+      } while (token && pages < 40);
+      const res = HX.toItems(evs, { from, today, src: 'google' });
+      showMsg('gx-msg', importReport(importItems(res.items), res.skipped), true);
+    } catch (e) { showMsg('gx-msg', gxErr(e)); }
+    btn.disabled = false; gxRefreshCount();
+  });
+  document.getElementById('gx-push').addEventListener('click', async () => {
+    const list = gxCandidates();
+    if (!list.length) { showMsg('gx-msg', '送る予定はありません。', true); return; }
+    const btn = document.getElementById('gx-push'); btn.disabled = true;
+    const cal = document.getElementById('gx-cal').value;
+    let sent = 0;
+    try {
+      const mcp = await gxUse(); if (!mcp) throw { code: 'not_granted' };
+      for (const it of list) {
+        showMsg('gx-msg', `Google カレンダーへ送っています…（${sent}/${list.length}件）`, true);
+        const res = gxPayload(await mcp.callTool(GX_SERVER, 'create_event', HX.googleCreateInput(it, { note: CX_NOTE, calendarId: cal || undefined })));
+        if (items[it.id]) { items[it.id].gcalId = (res && res.id) || 'sent'; pushItem(it.id); }
+        sent++;
+      }
+      saveItems(); renderAll();
+      showMsg('gx-msg', `${sent}件を Google カレンダーへ送りました。`, true);
+    } catch (e) {
+      saveItems(); renderAll();
+      const head = sent ? `${sent}件まで送ったところで止まりました。` : '';
+      const amb = (e && (e.code === 'server_unavailable' || e.code === 'upstream_error')) ? '最後の1件は Google 側に入っているかもしれません。Google カレンダーで確かめてから、もう一度押してください。' : '';
+      showMsg('gx-msg', head + gxErr(e) + amb);
+    }
+    btn.disabled = false; gxRefreshCount();
+  });
+}
 
 // ── 予定の入力 ─────────────────────────────────────
 document.getElementById('f-date').value = todayISO();
