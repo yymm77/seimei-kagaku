@@ -340,6 +340,36 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   --k-kk-bg:#3b3215; --k-kk-fg:#e0c06a; --k-sho-bg:#46300f; --k-sho-fg:#f0b56a;
   --k-kyo-bg:#4a1f1b; --k-kyo-fg:#f2a197; --k-dai-bg:#61201a; --k-dai-fg:#ffc4bb;
   --k-sai-bg:#a5291f; --k-sai-fg:#fff3f1; --k-star:#c9b77e; }
+.yr-strip { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 6px; }
+.yr-tile { text-align: left; border: 1px solid var(--border); border-radius: 8px; padding: 6px 8px; background: var(--surface); color: var(--fg); font-weight: 400; display: grid; gap: 1px; cursor: pointer; }
+.yr-tile .y { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.yr-tile .s { font-size: 11px; color: var(--fg-muted); }
+.yr-tile .k { font-size: 11px; }
+.yr-tile .lvt { font-size: 11px; font-weight: 700; margin-left: 4px; }
+.yr-tile.is-sel { outline: 2px solid var(--accent); outline-offset: -1px; }
+.yr-tile.is-now .y::after { content: "今年"; font-size: 10px; font-weight: 700; color: var(--accent); margin-left: 6px; vertical-align: 2px; }
+.lvbg-良 { background: var(--k-kichi-bg); }
+.lvbg-並 { background: var(--surface); }
+.lvbg-やや注意 { background: var(--k-kk-bg); }
+.lvbg-注意 { background: var(--k-sho-bg); }
+.yr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); gap: 12px; }
+.ym { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--surface); }
+.ym-head { width: 100%; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; padding: 5px 8px; border-radius: 0; text-align: left; font-weight: 400; color: var(--fg); border-bottom: 1px solid var(--border); cursor: pointer; }
+.ym-head .mn { font-size: 15px; font-weight: 700; }
+.ym-head .sm { font-size: 11px; color: var(--fg-muted); }
+.ym-head .lvt { font-size: 11px; font-weight: 700; }
+.ym-cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 1px; background: var(--border); }
+.ym-wd { background: var(--surface2); font-size: 9px; text-align: center; color: var(--fg-muted); padding: 1px 0; }
+.ym-d { background: var(--surface); font-size: 11px; text-align: center; padding: 3px 0 2px; cursor: pointer; position: relative; font-variant-numeric: tabular-nums; line-height: 1.3; }
+.ym-d.sun, .ym-d.hol { color: var(--sun); }
+.ym-d.sat { color: var(--sat); }
+.ym-d.blank { background: var(--bg); cursor: default; }
+.ym-d.is-today { box-shadow: inset 0 0 0 2px var(--k-star); font-weight: 700; }
+.ym-d.sw { box-shadow: inset 2px 0 0 var(--k-star); }
+.ym-d.sw.rs { box-shadow: inset 3px 0 0 var(--vermillion, #b0392b); }
+.ym-d .dot { position: absolute; left: 50%; bottom: 1px; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--accent); }
+.ym-d .t { display: block; font-size: 8px; font-weight: 700; line-height: 1; border: none !important; padding: 0 !important; background: none !important; margin: 1px 0 0 !important; }
+.ym-d:hover { outline: 1px solid var(--accent); outline-offset: -1px; }
 .cal-star { font-size: 9px; color: var(--k-star); font-weight: 500; margin-left: auto; letter-spacing: .02em; }
 .kset { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 18px; display: grid; gap: 10px; }
 .kset h2 { font-size: 13px; font-weight: 700; color: var(--fg-muted); letter-spacing: .05em; }
@@ -626,6 +656,7 @@ header h1 { letter-spacing: .12em; }
   </div>
 
   <div class="view-tabs" role="group" aria-label="表示の切り替え">
+    <button type="button" id="tab-year" aria-pressed="false">年表示</button>
     <button type="button" id="tab-month" aria-pressed="true">月表示</button>
     <button type="button" id="tab-list" aria-pressed="false">一覧</button>
   </div>
@@ -664,6 +695,27 @@ header h1 { letter-spacing: .12em; }
       <button type="button" class="btn-primary" id="btn-add">追加する</button>
     </div>
   </div>
+
+  <!-- 年表示：暦年を選ぶ（年盤）→ 12か月の暦（月盤・日盤）→ 月表示へ -->
+  <section id="year-area" hidden>
+    <div class="month-nav">
+      <button type="button" class="nav-btn" id="yr-prev10" aria-label="前の10年">‹ 前の10年</button>
+      <h2>暦年を選ぶ</h2>
+      <button type="button" class="nav-btn" id="yr-next10" aria-label="次の10年">次の10年 ›</button>
+      <button type="button" class="nav-btn" id="yr-this">今年</button>
+    </div>
+    <div class="kset-note" id="yr-note" style="margin-bottom:8px"></div>
+    <div class="yr-strip" id="yr-strip"></div>
+    <div id="yr-board"></div>
+    <div class="month-nav" style="margin-top:18px">
+      <button type="button" class="nav-btn" id="yr-prev" aria-label="前の年">‹ 前年</button>
+      <h2 id="yr-title"></h2>
+      <button type="button" class="nav-btn" id="yr-next" aria-label="次の年">翌年 ›</button>
+    </div>
+    <div id="yr-ctl"></div>
+    <div class="yr-grid" id="yr-grid"></div>
+    <div id="yr-legend"></div>
+  </section>
 
   <!-- 月表示 -->
   <section id="month-area">
@@ -835,7 +887,7 @@ function holidayOf(iso) { return holidaysOf(Number(iso.slice(0,4)))[iso] || ''; 
 
 // ── 状態 ──────────────────────────────────────────
 let items = lsGet(ST_ITEMS, {}) || {};
-let view = lsGet(ST_VIEW, 'month'); if (view !== 'list' && view !== 'month') view = 'month';
+let view = lsGet(ST_VIEW, 'month'); if (!['list','month','year'].includes(view)) view = 'month';
 let kProfile = lsGet(ST_KYUSEI, null);
 let kBan = lsGet(ST_BAN, 'nichi'); if (!['nichi','getsu','nen'].includes(kBan)) kBan = 'nichi';
 let lic = lsGet(ST_LIC, null);
@@ -1001,12 +1053,15 @@ function renderSwitchNote() {
 // ── 描画 ──────────────────────────────────────────
 function renderAll() {
   document.getElementById('month-area').hidden = view !== 'month';
+  document.getElementById('year-area').hidden = view !== 'year';
   document.getElementById('list-section').hidden = view !== 'list';
+  document.getElementById('tab-year').setAttribute('aria-pressed', view === 'year');
   document.getElementById('tab-month').setAttribute('aria-pressed', view === 'month');
   document.getElementById('tab-list').setAttribute('aria-pressed', view === 'list');
   renderLicState();
   renderMonth();
   renderList();
+  if (view === 'year') renderYear();
 }
 
 function renderBirthNudge() {
@@ -2102,7 +2157,105 @@ document.getElementById('btn-edit-save').addEventListener('click', () => {
   closeEdit();
 });
 
+
+// ── 年表示 ────────────────────────────────────────
+// 上段：暦年ごとの年盤（立春から翌年の立春の前日まで）を、本人の吉凶で色分けして並べる。
+// 下段：選んだ年の12か月。月の見出しは、その月に始まる節月の月盤の吉凶。日の色は選んだ盤の吉凶。
+const ST_YRBAN = 'hoi_yotei_yrban';
+let yrBan = lsGet(ST_YRBAN, 'getsu'); if (!['nichi','getsu','nen'].includes(yrBan)) yrBan = 'getsu';
+let yrSel = new Date().getFullYear(), yrStart = yrSel - 2;
+function yrInfo(y, m, d) { try { return KK.dayInfo(y, m, d); } catch (e) { return null; } }
+function lvOf(bs, info, ban) { return bs && info ? luckLevel(luckAvg(bs.hon, info, ban)) : ''; }
+function kichiOf(bs, info, ban) { if (!bs || !info) return []; const j = jBan(bs.hon, info, ban); return KK.DIRS.filter(k => j[k].label === '吉').map(k => KK.DIR_JA[k]); }
+function yearBoardHTML(y, bs) {
+  const info = yrInfo(y, 6, 15);   // 立春のあとの日なら、その暦年の年盤（歳破もその年の十二支）
+  if (!info) return '';
+  const rs = KK.setsuiri(y, 2), rn = KK.setsuiri(y + 1, 2);
+  const center = info.nen, ban = KK.ban(center), j = bs ? jBan(bs.hon, info, 'nen') : null;
+  let cells = '';
+  BAN_GRID.flat().forEach(k => {
+    if (k === 'C') { cells += `<div class="ban-cell c"><span class="ban-dir">中宮</span><span class="ban-st">${KK.SHORT[center-1]}</span></div>`; return; }
+    const r = j ? j[k] : null;
+    cells += `<div class="ban-cell ${r ? 'k-' + r.label : 'k-none'}"><span class="ban-dir">${KK.DIR_JA[k]}</span><span class="ban-st">${KK.SHORT[ban[k]-1]}</span>${r ? `<span class="ban-lb">${r.label}${r.ha ? '・' + r.ha : ''}</span>` : ''}</div>`;
+  });
+  let side = `<div class="houi-info">${y}年の年盤（${rs.m}月${rs.d}日の立春から、${y+1}年${rn.m}月${rn.d - 1}日まで）　中宮 ${KK.NAMES[center-1]}</div>`;
+  if (j) {
+    const rows = KK.DIRS.map(k => j[k]).sort((a,b) => a.score - b.score);
+    const kyou = rows.filter(r => r.kyou), kichi = rows.filter(r => r.label === '吉').map(r => r.dir);
+    side += `<div class="houi-info">本命星 <b>${KK.NAMES[bs.hon-1]}</b>　この年の吉方位：${kichi.length ? '<b>' + kichi.join('・') + '</b>' : 'なし'}</div>
+      ${kyou.length ? `<ul class="houi-reasons">${kyou.map(r => `<li><span class="tag k-${r.label}">${r.dir}</span><span><b>${r.label}</b>　${r.starName}が回る。${r.reasons.join('・')}</span></li>`).join('')}</ul>` : ''}
+      <div class="kset-note">引っ越し・家の新築・就職など、一年以上続く動きは年盤の吉方位を重く見ます。</div>`;
+  } else side += `<div class="kset-note">生年月日を登録すると、年ごとの吉凶と凶の理由が出ます。</div>`;
+  return `<div class="houi" style="margin-top:12px"><div class="houi-top"><h3>${y}年の年盤</h3></div>
+    <div class="houi-body"><div class="ban" role="img" aria-label="${y}年の年盤">${cells}</div><div style="display:grid;gap:10px;min-width:0">${side}</div></div></div>`;
+}
+function renderYear() {
+  if (!KK) return;
+  const open = isOpen(), bs = kBirthStars(), col = open && bs;
+  const nowY = new Date().getFullYear(), today = todayISO();
+  // 上段：暦年
+  document.getElementById('yr-note').innerHTML = !bs ? '生年月日を登録すると、年・月・日の吉凶が色で出ます。'
+    : !open ? '年盤・月盤の吉凶の色分けは、購入後にご覧になれます。星の並びは見られます。'
+    : '色は、その年の年盤の八方位の吉凶の平均です（年盤は立春で切り替わります）。札の方位は、その年の吉方位です。押すと、その年の年盤と12か月の暦が下に出ます。';
+  let tiles = '';
+  for (let y = yrStart; y < yrStart + 10; y++) {
+    const info = yrInfo(y, 6, 15); if (!info) continue;
+    const lv = col ? lvOf(bs, info, 'nen') : '', kd = col ? kichiOf(bs, info, 'nen') : [];
+    tiles += `<button type="button" class="yr-tile ${lv ? 'lvbg-' + lv : ''} ${y === yrSel ? 'is-sel' : ''} ${y === nowY ? 'is-now' : ''}" data-yr="${y}" aria-pressed="${y === yrSel}">
+      <span class="y">${y}年</span><span class="s">年盤 ${KK.SHORT[info.nen-1]}${lv ? `<span class="lvt cal-lv lv-${lv}">${LV_TEXT[lv]}</span>` : ''}</span>
+      ${col ? `<span class="k">${kd.length ? '吉 ' + kd.join('・') : '吉方位なし'}</span>` : ''}</button>`;
+  }
+  const strip = document.getElementById('yr-strip');
+  strip.innerHTML = tiles;
+  strip.querySelectorAll('[data-yr]').forEach(b => b.addEventListener('click', () => { yrSel = +b.dataset.yr; renderYear(); }));
+  document.getElementById('yr-board').innerHTML = open ? yearBoardHTML(yrSel, bs) : '';
+  // 下段：12か月
+  document.getElementById('yr-title').textContent = `${yrSel}年`;
+  const ctl = document.getElementById('yr-ctl');
+  ctl.innerHTML = col ? `<div class="luck-ctl"><span>日の色</span><div class="ban-tabs" role="group" aria-label="日の色">${[['nichi','日盤'],['getsu','月盤'],['nen','年盤']].map(([v,t]) =>
+    `<button type="button" data-yrban="${v}" aria-pressed="${v === yrBan}">${t}</button>`).join('')}</div><span>月の見出しの色は、その月に始まる月盤（節入りから）の吉凶です。</span></div>` : '';
+  ctl.querySelectorAll('[data-yrban]').forEach(b => b.addEventListener('click', () => { yrBan = b.dataset.yrban; lsSet(ST_YRBAN, yrBan); renderYear(); }));
+  const occ = occurrences(`${yrSel}-01-01`, `${yrSel}-12-31`), has = new Set(occ.map(x => x.date));
+  let html = '';
+  for (let m = 1; m <= 12; m++) {
+    const st = KK.setsuiri(yrSel, m), i20 = yrInfo(yrSel, m, 20);
+    const mlv = col ? lvOf(bs, i20, 'getsu') : '';
+    let cal = WEEKDAYS.map((w, i) => `<div class="ym-wd">${w}</div>`).join('');
+    const first = new Date(yrSel, m - 1, 1).getDay(), last = new Date(yrSel, m, 0).getDate();
+    for (let i = 0; i < first; i++) cal += '<div class="ym-d blank"></div>';
+    for (let d = 1; d <= last; d++) {
+      const iso = `${yrSel}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`, wd = (first + d - 1) % 7;
+      const info = col ? yrInfo(yrSel, m, d) : null, lv = col ? lvOf(bs, info, yrBan) : '';
+      const hol = holidayOf(iso), sw = st.d === d;
+      const cls = ['ym-d', hol ? 'hol' : wd === 0 ? 'sun' : wd === 6 ? 'sat' : '', lv ? 'lv-' + lv : '', iso === today ? 'is-today' : '', sw ? 'sw' : '', sw && m === 2 ? 'rs' : ''].join(' ');
+      cal += `<div class="${cls}" role="button" tabindex="0" data-ymd="${iso}" title="${m}月${d}日${hol ? ' ' + hol : ''}${sw ? '・' + st.name + (m === 2 ? '（年盤・月盤の切替）' : '（月盤の切替）') : ''}${lv ? '・' + BAN_NAME[yrBan] + ' ' + LV_TEXT[lv] : ''}">${d}${lv && lvText ? `<span class="t cal-lv lv-${lv}">${LV_TEXT[lv]}</span>` : ''}${has.has(iso) ? '<span class="dot"></span>' : ''}</div>`;
+    }
+    html += `<div class="ym"><button type="button" class="ym-head ${mlv ? 'lvbg-' + mlv : ''}" data-ym="${m}">
+      <span class="mn">${m}月</span><span class="sm">${st.name} ${st.d}日〜 月盤 ${i20 ? KK.SHORT[i20.getsu-1] : ''}</span>${mlv ? `<span class="lvt cal-lv lv-${mlv}">${LV_TEXT[mlv]}</span>` : ''}</button>
+      <div class="ym-cal">${cal}</div></div>`;
+  }
+  const grid = document.getElementById('yr-grid');
+  grid.innerHTML = html;
+  const toMonth = (y, m, iso) => { curY = y; curM = m - 1; if (iso) { selDate = iso; document.getElementById('f-date').value = iso; } setView('month'); };
+  grid.querySelectorAll('[data-ym]').forEach(b => b.addEventListener('click', () => toMonth(yrSel, +b.dataset.ym, null)));
+  grid.querySelectorAll('[data-ymd]').forEach(b => {
+    const go = () => { const [y, m] = b.dataset.ymd.split('-').map(Number); toMonth(y, m, b.dataset.ymd); };
+    b.addEventListener('click', go);
+    b.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+  });
+  document.getElementById('yr-legend').innerHTML = col ? `<div class="luck-legend"><span>色：八方位の吉凶の平均</span>
+    ${LUCK_LEVELS.map(l => `<span><span class="sw l-${l}"></span>「${LV_TEXT[l]}」${l}</span>`).join('')}
+    <span>日付の左の線は節入り（月盤の切替）、赤い線は立春（年盤も切替）。点は予定のある日。日付を押すと、その日の月表示へ移ります。</span>
+    <span>平均なので、凶の方位がある年・月・日も「良」になり得ます。行き先の方位は方位盤で確かめてください。</span>
+    <span>※${HA_NOTE}</span></div>` : '';
+}
+document.getElementById('yr-prev10').addEventListener('click', () => { yrStart -= 10; renderYear(); });
+document.getElementById('yr-next10').addEventListener('click', () => { yrStart += 10; renderYear(); });
+document.getElementById('yr-this').addEventListener('click', () => { yrSel = new Date().getFullYear(); yrStart = yrSel - 2; renderYear(); });
+document.getElementById('yr-prev').addEventListener('click', () => { yrSel--; if (yrSel < yrStart) yrStart -= 10; renderYear(); });
+document.getElementById('yr-next').addEventListener('click', () => { yrSel++; if (yrSel >= yrStart + 10) yrStart += 10; renderYear(); });
 function setView(v) { view = v; lsSet(ST_VIEW, v); renderAll(); }
+document.getElementById('tab-year').addEventListener('click', () => { if (view !== 'year') { yrSel = curY; yrStart = yrSel - 2; } setView('year'); });
 document.getElementById('tab-month').addEventListener('click', () => setView('month'));
 document.getElementById('tab-list').addEventListener('click', () => setView('list'));
 document.getElementById('m-prev').addEventListener('click', () => { curM--; if (curM < 0) { curM = 11; curY--; } renderMonth(); });
