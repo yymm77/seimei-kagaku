@@ -112,6 +112,7 @@
     'PCでは、月の見出しにマウスを乗せるとその月の月盤が、日付に乗せるとその日の日盤が浮かびます。日付を押したときの動きは、下で選べます。': 'On a computer, hover over a month heading to see that month’s chart, or over a date to see that day’s chart. You can choose below what clicking a date does.',
     '方位の見方や、五黄殺・暗剣殺・破などの凶方位の意味を詳しく知りたい方は、次へ。': 'To learn more about reading directions and what the Five Yellow, Dark Sword and Breakers mean, go here: ', '▶ 方位学の殿堂（九星気学方位判定システム）': '▶ Hall of Directions (Nine Star Ki direction system, in Japanese)',
     '易で確かめる': 'Ask the I Ching', '☯ 易で確かめる': '☯ Ask the I Ching', '方位の吉凶に加えて、易の卦でも確かめたい方へ（易経門が開きます）': 'For a second opinion from an I Ching reading (opens our I Ching page)', '方位の吉凶に加えて、易の卦でも確かめたい方へ（易経門が開きます）。': 'For a second opinion from an I Ching reading (opens our I Ching page).', 'この予定について、易経門で卦を立てます': 'Cast an I Ching hexagram about this plan',
+    '盤が切り替わる日（月盤は節入り、年盤は立春）は、枠の左端を0時・右端を24時として、切り替わる時刻までを前の盤の色で塗っています。': 'On a day when the chart changes (the month chart at each solar term, the year chart at Risshun), the cell runs from midnight at the left edge to midnight at the right, and is shaded in the previous chart’s colour up to the moment of change.',
     '日付を押したときの動き': 'When you click or tap a date', 'スマホ': 'Phone', 'PC': 'Computer',
     '一回で月表示・ダブルクリックで予定': 'Click: month view · double-click: plans', '一回で予定・ダブルクリックで月表示': 'Click: plans · double-click: month view',
     '押すと月表示': 'Tap: month view', '押すと予定（月表示へは予定の窓から）': 'Tap: plans (open the month view from there)',

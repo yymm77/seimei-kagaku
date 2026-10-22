@@ -377,6 +377,10 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .ym-d .dot { position: absolute; left: 50%; bottom: 1px; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--accent); }
 .ym-d .t { display: block; font-size: 8px; font-weight: 700; line-height: 1; border: none !important; padding: 0 !important; background: none !important; margin: 1px 0 0 !important; }
 .ym-d:hover { outline: 1px solid var(--accent); outline-offset: -1px; }
+.ym-d.lv-良 { background: var(--k-kichi-bg); }
+.ym-d.lv-並 { background: var(--surface); }
+.ym-d.lv-やや注意 { background: var(--k-kk-bg); }
+.ym-d.lv-注意 { background: var(--k-sho-bg); }
 .eki-btn { margin-left: auto; font-size: 13px; font-weight: 700; padding: 5px 12px; border-radius: 7px; border: 1.5px solid #b8960c; background: #fbf6e6; color: #6b5310; cursor: pointer; }
 .eki-btn:hover { background: #f5ebc8; opacity: 1; }
 .yotei-actions .eki-item { border: 1.5px solid #b8960c; background: #fbf6e6; color: #6b5310; font-weight: 700; }
@@ -1056,6 +1060,20 @@ function luckLv(iso, info, bs) {
   if (!bs || !info || luckBan === 'off' || !(isOpen() || iso === todayISO())) return '';
   return luckLevel(luckAvg(bs.hon, info, luckBan));
 }
+// 盤が切り替わる日（月盤は節入り、年盤は立春）は、切り替わる時刻までを前の盤の色で塗る。
+// 枠の左端を0時、右端を24時として、たとえば8時の切り替えなら左から8/24までが前の盤の色。
+const LV_BG = { '良': 'var(--k-kichi-bg)', '並': 'var(--surface)', 'やや注意': 'var(--k-kk-bg)', '注意': 'var(--k-sho-bg)' };
+function splitStyle(info, bs, ban, lvNow) {
+  if (!KK || !info || !bs || !lvNow || !info.setsuiriToday) return '';
+  const t = info.setsuiriToday;
+  if (ban !== 'getsu' && !(ban === 'nen' && t.m === 2)) return '';
+  const pd = new Date(info.y, info.m - 1, info.d - 1);
+  let prev; try { prev = KK.dayInfo(pd.getFullYear(), pd.getMonth() + 1, pd.getDate()); } catch (e) { return ''; }
+  const lvPrev = luckLevel(luckAvg(bs.hon, prev, ban));
+  if (lvPrev === lvNow) return '';
+  const pct = ((t.h * 60 + t.mi) / 1440 * 100).toFixed(2);
+  return ` style="background:linear-gradient(to right, ${LV_BG[lvPrev]} 0 ${pct}%, ${LV_BG[lvNow]} ${pct}% 100%)" data-split="${t.h}:${String(t.mi).padStart(2,'0')}"`;
+}
 function lvTextHTML(lv) { return lvText && lv ? `<span class="cal-lv lv-${lv}" title="${BAN_NAME[luckBan]}の平均">${LV_TEXT[lv]}</span>` : ''; }
 function luckClass(iso, info, bs) {
   if (!bs || !info || luckBan === 'off' || !(isOpen() || iso === todayISO())) return '';
@@ -1108,6 +1126,7 @@ function renderSwitchNote() {
   lg.innerHTML = bs && luckBan !== 'off' ? `<div class="luck-legend"><span>背景色：${BAN_NAME[luckBan]}の八方位の吉凶の平均</span>
     ${LUCK_LEVELS.map(l => `<span><span class="sw l-${l}"></span>${lvText ? `「${LV_TEXT[l]}」` : ''}${l}</span>`).join('')}
     <span>${isOpen() ? '平均なので、凶の方位がある日も「良」になり得ます。行き先の方位は方位盤で確かめてください。' : '今日の分だけ色が付きます。購入すると全部の日に付きます。'}</span>
+    ${luckBan === 'getsu' || luckBan === 'nen' ? '<span>盤が切り替わる日（月盤は節入り、年盤は立春）は、枠の左端を0時・右端を24時として、切り替わる時刻までを前の盤の色で塗っています。</span>' : ''}
     <span>※${HA_NOTE}</span>
     ${kasaMode !== 'off' && isOpen() ? `<span>枠で囲んだ日：${KASA_NAME[kasaMode]}のすべてで同じ方位が「吉」になる日。札の方位がその吉方位です。</span>` : ''}</div>` : '';
 }
@@ -1186,7 +1205,8 @@ function renderMonth() {
     const numCls = hol ? 'hol' : wd === 0 ? 'sun' : wd === 6 ? 'sat' : '';
     const shown = list.slice(0, 3).map(x => `<div class="chip ${x.done?'done':''}" data-item="${esc(x._virtual ? x.id.replace(/_[wm]\d+$/, '') : x.id)}" title="ドラッグで別の日へ移動・右クリックで完了／削除">${x.time ? `<span class="chip-t">${x.time}</span>` : ''}${ue(x.title||'')}</div>`).join('');
     const more = list.length > 3 ? `<div class="chip-more">ほか${list.length-3}件</div>` : '';
-    html += `<div role="button" tabindex="0" class="${cls}" data-date="${iso}" aria-label=""${d.getMonth()+1}月${d.getDate()}日（${WEEKDAYS[wd]}）${hol?' '+hol:''} 予定${list.length}件">
+    const lvNowM = luckLv(iso, dInfo, bsM);
+    html += `<div role="button" tabindex="0" class="${cls}"${lvNowM ? splitStyle(dInfo, bsM, luckBan, lvNowM) : ''} data-date="${iso}" aria-label=""${d.getMonth()+1}月${d.getDate()}日（${WEEKDAYS[wd]}）${hol?' '+hol:''} 予定${list.length}件">
       <span class="cal-num ${numCls}">${d.getDate()}${hol ? `<span class="cal-hol">${hol}</span>` : ''}${lvTextHTML(luckLv(iso, dInfo, bsM))}${starOf(d)}</span>${switchHTML(dInfo)}${kd.length ? `<span class="kasa-badge" title="吉の重なる方位">吉 ${kd.join('・')}</span>` : ''}${shown}${more}<span class="cal-add" role="button" tabindex="0" data-add="${iso}" aria-label="${d.getMonth()+1}月${d.getDate()}日に予定を追加" title="この日に予定を追加">＋</span></div>`;
   }
   const cal = document.getElementById('cal');
@@ -2344,7 +2364,7 @@ function renderYear() {
       const info = col ? yrInfo(yrSel, m, d) : null, lv = col ? lvOf(bs, info, yrBan) : '';
       const hol = holidayOf(iso), sw = st.d === d;
       const cls = ['ym-d', hol ? 'hol' : wd === 0 ? 'sun' : wd === 6 ? 'sat' : '', lv ? 'lv-' + lv : '', iso === today ? 'is-today' : '', sw ? 'sw' : '', sw && m === 2 ? 'rs' : ''].join(' ');
-      cal += `<div class="${cls}" role="button" tabindex="0" data-ymd="${iso}" title="${m}月${d}日${hol ? ' ' + hol : ''}${sw ? '・' + st.name + (m === 2 ? '（年盤・月盤の切替）' : '（月盤の切替）') : ''}${lv ? '・' + BAN_NAME[yrBan] + ' ' + LV_TEXT[lv] : ''}">${d}${lv && lvText ? `<span class="t cal-lv lv-${lv}">${LV_TEXT[lv]}</span>` : ''}${has.has(iso) ? '<span class="dot"></span>' : ''}</div>`;
+      cal += `<div class="${cls}"${lv ? splitStyle(info, bs, yrBan, lv) : ''} role="button" tabindex="0" data-ymd="${iso}" title="${m}月${d}日${hol ? ' ' + hol : ''}${sw ? '・' + st.name + (m === 2 ? '（年盤・月盤の切替）' : '（月盤の切替）') : ''}${lv ? '・' + BAN_NAME[yrBan] + ' ' + LV_TEXT[lv] : ''}">${d}${lv && lvText ? `<span class="t cal-lv lv-${lv}">${LV_TEXT[lv]}</span>` : ''}${has.has(iso) ? '<span class="dot"></span>' : ''}</div>`;
     }
     html += `<div class="ym"><button type="button" class="ym-head ${mlv ? 'lvbg-' + mlv : ''}" data-ym="${m}">
       <span class="mn">${m}月</span><span class="sm">${st.name} ${st.d}日〜 月盤 ${i20 ? KK.SHORT[i20.getsu-1] : ''}</span>${mlv ? `<span class="lvt cal-lv lv-${mlv}">${LV_TEXT[mlv]}</span>` : ''}</button>
@@ -2394,6 +2414,7 @@ function renderYear() {
     <span>日付の左の線は節入り（月盤の切替）、赤い線は立春（年盤も切替）。点は予定のある日。日付を押すと、その日の月表示へ移ります。</span>
     <span>PCでは、月の見出しにマウスを乗せるとその月の月盤が、日付に乗せるとその日の日盤が浮かびます。日付を押したときの動きは、下で選べます。</span>
     <span>平均なので、凶の方位がある年・月・日も「良」になり得ます。行き先の方位は方位盤で確かめてください。</span>
+    ${yrBan === 'getsu' || yrBan === 'nen' ? '<span>盤が切り替わる日（月盤は節入り、年盤は立春）は、枠の左端を0時・右端を24時として、切り替わる時刻までを前の盤の色で塗っています。</span>' : ''}
     <span>※${HA_NOTE}</span></div>` : '';
   const ck = document.createElement('div');
   ck.className = 'yr-click';
