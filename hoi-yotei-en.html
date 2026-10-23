@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script src="hoi_en.js?v=202610230848"></script>
+<script src="hoi_en.js?v=202610231319"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Hōi Yotei-chō — Nine Star Ki Planner</title>
@@ -203,6 +203,10 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .cx-sec { border-top: 1px solid var(--border); margin-top: 14px; padding-top: 12px; }
 #calPanel > .cx-sec:not([hidden]) ~ .cx-sec { border-top: 1px solid var(--border); }
 .cx-sec h3 { font-size: 13px; margin: 0 0 6px; }
+.cx-drop { border: 2px dashed var(--border); border-radius: 10px; padding: 14px 12px; text-align: center; font-size: 12px; color: var(--fg-muted); margin: 6px 0; }
+.cx-drop.is-over { border-color: var(--accent); background: var(--accent-light); color: var(--fg); }
+.cx-sum { font-size: 12px; line-height: 1.8; margin: 8px 0 0; padding: 8px 10px; background: var(--surface2); border-radius: 8px; }
+.cx-sum b { font-weight: 700; }
 .cx-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0; font-size: 12px; }
 .cx-row select { font-size: 12px; }
 .cx-help { font-size: 11px; color: var(--fg-muted); line-height: 1.7; }
@@ -641,6 +645,7 @@ header h1 { letter-spacing: .12em; }
             <option value="future">これからの予定だけ</option>
           </select></label>
     </div>
+    <div class="cx-sum" id="cx-sum"></div>
     <div class="cx-sec" id="gx-sec" hidden>
       <h3>Google カレンダーと直接やり取りする</h3>
       <div class="kset-note">claude.ai につないである Google カレンダーと、ファイルを使わずに直接やり取りします。</div>
@@ -671,7 +676,9 @@ header h1 { letter-spacing: .12em; }
       </div>
       <div class="cx-row">
         <label class="btn-cancel btn-file btn-sm">カレンダー → 予定帖に取り込む<input type="file" id="cx-import" accept=".ics,.zip,text/calendar,application/zip" multiple hidden></label>
+        <span class="kset-note">いくつでも選べます（Ctrl キーや ⌘ キーを押しながら選ぶ）。一つずつ続けて取り込んでも構いません。同じ予定は重なりません。</span>
       </div>
+      <div class="cx-drop" id="cx-drop">ここに、カレンダーのファイル（.ics）や Google の zip を、まとめて引きずって落としても取り込めます。</div>
       <div class="form-msg" id="cx-msg"></div>
       <details class="cx-help"><summary>カレンダー側の操作</summary>
         <div><b>Google カレンダーへ入れる</b>：パソコンで Google カレンダーを開き、右上の歯車 →「設定」→「インポート / エクスポート」→「インポート」で、書き出したファイルを選びます。</div>
@@ -1581,6 +1588,7 @@ function openPanel(id, open) {
     document.getElementById(p).hidden = !show;
     document.getElementById(PANELS[p]).setAttribute('aria-expanded', String(show));
   });
+  if (open && id === 'calPanel') renderCxSum();
   if (open && id === 'kset') {
     document.getElementById('k-birth').value = kProfile?.birth || '';
     document.getElementById('k-hour').value = String(kProfile?.hour ?? -1);
@@ -2003,6 +2011,19 @@ async function saveICS(list, filename, msgId) {
   setTimeout(() => URL.revokeObjectURL(a.href), 2000);
   if (msgId) showMsg(msgId, `${list.length}件を書き出しました。`, true);
 }
+// これまでに取り込んだカレンダーと件数（カレンダー連携の窓の上に出す）
+function renderCxSum() {
+  const el = document.getElementById('cx-sum'); if (!el) return;
+  const by = new Map();
+  Object.values(items).forEach(x => {
+    if (!x.src) return;
+    const k = x.cal || (x.src === 'google' ? 'Google' : 'カレンダー');
+    by.set(k, (by.get(k) || 0) + 1);
+  });
+  el.innerHTML = by.size
+    ? `<b>これまでに取り込んだカレンダー</b><br>` + [...by].sort((a, b) => b[1] - a[1]).map(([k, n]) => `${ue(k)} ${n}件`).join('　')
+    : 'まだカレンダーから取り込んだ予定はありません。';
+}
 // 取り込んだ予定を、重ねずに加える
 function importItems(list) {
   const seen = new Set(), gids = [];
@@ -2039,8 +2060,19 @@ if (HX) {
     if (!list.length) { showMsg('cx-msg', '書き出す予定がありません。'); return; }
     saveICS(list, `hoi-yotei_${todayISO()}.ics`, 'cx-msg');
   });
-  document.getElementById('cx-import').addEventListener('change', async e => {
+  document.getElementById('cx-import').addEventListener('change', e => {
     const files = [...e.target.files]; e.target.value = '';
+    importFiles(files);
+  });
+  // ファイルを引きずって落として取り込む（いくつでも）
+  const drop = document.getElementById('cx-drop');
+  ['dragenter', 'dragover'].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.add('is-over'); }));
+  ['dragleave', 'dragend'].forEach(t => drop.addEventListener(t, () => drop.classList.remove('is-over')));
+  drop.addEventListener('drop', e => {
+    e.preventDefault(); drop.classList.remove('is-over');
+    importFiles([...(e.dataTransfer && e.dataTransfer.files || [])]);
+  });
+  async function importFiles(files) {
     if (!files.length) return;
     showMsg('cx-msg', '読んでいます…', true);
     // zip（Google の書き出し）は中の .ics を一つずつ取り出す。複数のアカウント・カレンダーをまとめて選べる
@@ -2066,7 +2098,8 @@ if (HX) {
     });
     if (!lines.length) { showMsg('cx-msg', 'このファイルは読み込めませんでした。カレンダーから書き出した .ics か、Google の書き出しの zip を選んでください。'); return; }
     showMsg('cx-msg', `${cals.length - bad.length}つのカレンダーから、合わせて${tot.n}件を取り込みました。` + lines.join('、') + '。' + (bad.length ? `読めなかったもの：${bad.join('、')}` : ''), true);
-  });
+    renderCxSum();
+  }
 } else {
   document.querySelectorAll('.cx-sec').forEach(x => x.hidden = true);
 }
@@ -2146,6 +2179,7 @@ if (PERSONAL && HX) {
         lines.push(`「${c.name}」${r.n}件` + (r.dup ? `（重なり${r.dup}件は除く）` : ''));
       }
       showMsg('gx-msg', `合わせて${total}件を取り込みました。` + lines.join('、') + '。', true);
+      renderCxSum();
     } catch (e) { showMsg('gx-msg', gxErr(e)); }
     btn.disabled = false; gxRefreshCount();
   });
